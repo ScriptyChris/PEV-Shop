@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/JSHoliq/Fake-PEV-Shopping/issues"
   },
-  "main": "./src/index.js",
+  "main": "src/app.js",
   "scripts": {
     "test": "echo \"Tests not ready yet!\"",
     "prettier": "prettier --write src/",
@@ -29,13 +29,17 @@
     "babel-cli": "^6.26.0",
     "babel-loader": "^8.1.0",
     "babel-preset-react-app": "^9.1.2",
+    "css-loader": "^4.2.1",
     "eslint": "^7.7.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-react": "^7.20.6",
+    "mini-css-extract-plugin": "^0.10.0",
     "node-sass": "^4.14.1",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "sass-loader": "^9.0.3",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
