@@ -19,18 +19,42 @@ export default class ProductList extends React.Component {
   }
 
   render() {
+    const translations = {
+      lackOfProducts: 'Brak produktów...',
+      productName: 'Name',
+      productImage: 'Image of ',
+      productUrl: 'URL',
+      price: 'Price',
+    };
+
     return (
-      <ul>
+      <ul className="product-list">
         {this.state.productList.length > 0
           ? this.state.productList.map(({ name, url, price, image }) => {
               return (
-                <li key={name}>
-                  <span>Name: {name}</span> |<span>URL: {url}</span> |<span>Price: {price}</span>
-                  <img src={image} alt={`Image of "${name}"`} />
+                <li key={name} className="product-list-item">
+                  <img src={image} alt={`${translations.productImage}${name}`} className="product-list-item__image" />
+
+                  <dl>
+                    <div className="product-list-item__metadata">
+                      <dt>{translations.productName}:</dt>
+                      <dd>{name}</dd>
+                    </div>
+
+                    <div className="product-list-item__metadata">
+                      <dt>{translations.productUrl}:</dt>
+                      <dd>{url}</dd>
+                    </div>
+
+                    <div className="product-list-item__metadata">
+                      <dt>{translations.price}:</dt>
+                      <dd>{price}</dd>
+                    </div>
+                  </dl>
                 </li>
               );
             })
-          : 'Brak produktów...'}
+          : translations.lackOfProducts}
       </ul>
     );
   }

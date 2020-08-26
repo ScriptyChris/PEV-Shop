@@ -1,0 +1,27 @@
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.product-list-item {
+  max-width: 250px;
+  border: 2px solid black;
+  margin-bottom: 30px;
+
+  &__image {
+    width: 250px;
+  }
+
+  &__metadata {
+    display: flex;
+
+    background: black;
+    color: white;
+
+    dd {
+      word-break: break-word;
+    }
+  }
+}

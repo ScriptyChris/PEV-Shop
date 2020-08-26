@@ -1,7 +1,9 @@
+@import './views/productList';
+
 .app-root {
   display: grid;
   grid-template-columns: 3fr 1fr;
-  grid-template-rows: minmax(15vh, 1fr) 3fr 1fr;
+  grid-template-rows: 10vh auto 10vh;
   grid-template-areas:
     "header header"
     "main aside"

@@ -38,6 +38,7 @@ module.exports = {
       chunkFilename: '[id].css'
     })
   ],
+  devtool: 'source-map',
   devServer: {
     publicPath: '/dist/',
     watchContentBase: true,
