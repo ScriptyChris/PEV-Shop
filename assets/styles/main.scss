@@ -1,0 +1,25 @@
+.app-root {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: minmax(15vh, 1fr) 3fr 1fr;
+  grid-template-areas:
+    "header header"
+    "main aside"
+    "footer footer";
+
+  & > * {
+    border: 1px solid red;
+  }
+}
+
+.header {
+  grid-area: header;
+}
+
+.main {
+  grid-area: main;
+}
+
+.footer {
+  grid-area: footer;
+}

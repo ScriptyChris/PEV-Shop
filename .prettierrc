@@ -1,0 +1,16 @@
+{
+  "singleQuote": true,
+  "useTabs": false,
+  "tabWidth": 2,
+  "semi": true,
+  "printWidth": 120,
+  "endOfLine": "crlf",
+  "overrides": [
+    {
+      "files": "*.js",
+      "options": {
+        "parser": "babel"
+      }
+    }
+  ]
+}
