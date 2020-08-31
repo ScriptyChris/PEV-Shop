@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function ProductItem({ product }) {
   const translations = {
@@ -6,9 +7,10 @@ export default function ProductItem({ product }) {
     productImage: 'Image of ',
     productUrl: 'URL',
     price: 'Price',
+    detailsBtn: 'Check details!',
   };
 
-  const { name, url, image, price } = product;
+  const { name, url, image, price, details } = product;
 
   return (
     <li className="product-list-item">
@@ -30,6 +32,15 @@ export default function ProductItem({ product }) {
           <dd>{price}</dd>
         </div>
       </dl>
+
+      <Link
+        to={{
+          pathname: `/shop/${url}`,
+          state: { name, details },
+        }}
+      >
+        {translations.detailsBtn}
+      </Link>
     </li>
   );
 }
