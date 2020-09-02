@@ -3,7 +3,7 @@ import React from 'react';
 export default function Footer() {
   return (
     <footer className="footer">
-      <a href="https://github.com/JSHoliq/Fake-PEV-Shopping">Kod źródłowy</a>
+      <a href="https://github.com/ScriptyChris/Fake-PEV-Shopping">Kod źródłowy</a>
       <br />
       <a target="_blank" rel="noreferrer" href="https://icons8.com/icons/set/engine">
         Engine icon
