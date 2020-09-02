@@ -43,7 +43,7 @@ const middleware = (app) => {
     }
 
     res.status(200);
-    res.end();
+    res.end('Success!');
   });
 };
 
