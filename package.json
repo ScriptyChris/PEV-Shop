@@ -20,7 +20,7 @@
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Tests not ready yet!\"",
-    "prettier": "prettier --write src/",
+    "prettier": "prettier --write src/ database/** !database/data",
     "start": "webpack-dev-server",
     "prebuild": "npm run prettier",
     "build": "webpack"
@@ -44,5 +44,9 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "mongodb": "3.5.10",
+    "mongoose": "5.9.27"
   }
 }
