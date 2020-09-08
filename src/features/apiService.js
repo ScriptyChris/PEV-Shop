@@ -1,14 +1,37 @@
-const apiService = (() => {
-  const BASE_URL = 'http://localhost:8080';
+class Ajax {
+  constructor() {
+    this._BASE_API_URL = 'http://localhost:8080/api';
+  }
 
-  const getProductList = () => {
-    /*Promise.resolve([{name: 'test', price: 123, url: BASE_URL}])*/
-    return fetch(`${BASE_URL}/getProductList`).then((response) => response.json());
-  };
+  getRequest(apiEndpoint) {
+    return fetch(`${this._BASE_API_URL}/${apiEndpoint}`).then((response) => response.json());
+  }
 
-  return {
-    getProductList,
-  };
+  postRequest(apiEndpoint, data) {
+    return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    }).then((response) => response.text());
+  }
+}
+
+const apiService = new (class ApiService extends Ajax {
+  constructor() {
+    super();
+
+    this.PRODUCTS_URL = 'products';
+  }
+
+  getProducts() {
+    return this.getRequest(this.PRODUCTS_URL);
+  }
+
+  addProduct(product) {
+    return this.postRequest(this.PRODUCTS_URL, product);
+  }
 })();
 
 export default apiService;
