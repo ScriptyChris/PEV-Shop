@@ -10,7 +10,7 @@ export default function Main() {
     <main className="main">
       Hello from PEV main!
       <Switch>
-        <Route exact={true} path="/">
+        <Route path="/" exact>
           <Home />
         </Route>
         <Route path="/shop">
