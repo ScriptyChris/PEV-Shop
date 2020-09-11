@@ -1,12 +1,13 @@
 const glob = require('glob');
 const bodyParser = require('body-parser');
 const apiProducts = require('./routes/api-products');
+const apiUsers = require('./routes/api-users');
 
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
 const middleware = (app) => {
   app.use(bodyParser.json());
-  app.use(apiProducts);
+  app.use(apiProducts, apiUsers);
 
   app.get('/images/*', (req, res) => {
     const imagePath = req.url.split('/').pop();
@@ -25,7 +26,7 @@ const middleware = (app) => {
 };
 
 // TODO: refactor to use ENV
-if (process.argv[2] === '--standalone=true') {
+if (process.env.NODE_ONLY === 'true') {
   const app = require('express')();
   const port = 3000;
 

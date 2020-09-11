@@ -11,7 +11,7 @@ router.get('/api/products', (req, res) => {
 });
 
 router.post('/api/products', async (req, res) => {
-  console.log('req.body', req.body);
+  console.log('[products POST] req.body', req.body);
 
   try {
     const savedProduct = await saveToDB(req.body, 'product');
@@ -24,7 +24,7 @@ router.post('/api/products', async (req, res) => {
     res.end(JSON.stringify({ exception }));
   }
 
-  res.status(200);
+  res.status(201);
   res.end('Success!');
 });
 

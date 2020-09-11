@@ -1,5 +1,6 @@
 const MODELS = {
   product: require('./_product'),
+  user: require('./_user'),
 };
 
 module.exports = (modelType) => {
