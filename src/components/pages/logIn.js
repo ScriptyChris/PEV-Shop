@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import apiService from '../../features/apiService';
 
 export default function LogIn() {
   const [loginState, setLoginState] = useState('');
   const [passwordState, setPasswordState] = useState('');
+  const [loggedInUserData, setLoggedInUserData] = useState(null);
 
   const onInputChange = ({ target }) => {
     if (target.id === 'login') {
@@ -20,11 +22,13 @@ export default function LogIn() {
 
     apiService.loginUser().then((res) => {
       console.log('login res: ', res);
+
+      setLoggedInUserData(res);
     });
   };
 
   return (
-    <div>
+    <>
       LogIn!
       <form onSubmit={handleSubmit}>
         <fieldset>
@@ -39,6 +43,14 @@ export default function LogIn() {
           <button type="submit">Log in!</button>
         </fieldset>
       </form>
-    </div>
+      {loggedInUserData && (
+        <Redirect
+          to={{
+            pathname: '/account',
+            state: { data: loggedInUserData },
+          }}
+        />
+      )}
+    </>
   );
 }

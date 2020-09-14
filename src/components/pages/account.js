@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import apiService from '../../features/apiService';
 
 export default function Account() {
+  // TODO: fix rendering component twice when redirected from LogIn page
+  const { state: locationState } = useLocation();
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
+    if (locationState) {
+      setUserData(locationState.data);
+
+      return;
+    }
+
     apiService.getUser().then(
-      (result) => {
-        console.log('result?', result);
-        setUserData(result);
-      },
+      (result) => setUserData(result),
       (error) => {
-        console.log('err?', error);
+        console.log('getUser() error:', error);
       }
     );
-  });
+  }, []);
 
   return (
-    <div>
+    <>
       User account!
-      {userData ? JSON.stringify(userData) : 'No user data'}
-    </div>
+      <div>{userData ? JSON.stringify(userData) : 'No user data'}</div>
+    </>
   );
 }
