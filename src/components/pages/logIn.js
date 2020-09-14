@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import apiService from '../../features/apiService';
 
 export default function LogIn() {
   const [loginState, setLoginState] = useState('');
@@ -16,6 +17,10 @@ export default function LogIn() {
     event.preventDefault();
 
     console.warn('loginState', loginState, ' /passwordState', passwordState);
+
+    apiService.loginUser().then((res) => {
+      console.log('login res: ', res);
+    });
   };
 
   return (

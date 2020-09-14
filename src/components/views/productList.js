@@ -13,10 +13,10 @@ export default class ProductList extends React.Component {
   }
 
   async getProductList() {
-    const products = await apiService.getProducts();
-    console.log('products', products);
+    const productList = await apiService.getProducts();
+    console.log('productList', productList);
 
-    this.setState({ products });
+    this.setState({ productList });
   }
 
   render() {

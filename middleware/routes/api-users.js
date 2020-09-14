@@ -53,7 +53,7 @@ router.post('/api/users/login', async (req, res) => {
 
     console.log('token', token);
 
-    res.send({ user, token });
+    res.send({ payload: user, token });
   } catch (exception) {
     console.error('Login user exception:', exception);
 
@@ -80,7 +80,7 @@ router.get('/api/users/:id', authMiddleware, async (req, res) => {
   console.log('[GET] /:id', req.params.id);
   const user = await getFromDB(req.params.id, 'user');
 
-  res.send(user);
+  res.send({ payload: user });
 });
 
 module.exports = router;
