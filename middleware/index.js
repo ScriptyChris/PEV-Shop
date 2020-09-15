@@ -1,17 +1,13 @@
-const { readFileSync } = require('fs');
 const glob = require('glob');
 const bodyParser = require('body-parser');
-const { saveToDB } = require('../database/index');
+const apiProducts = require('./routes/api-products');
+const apiUsers = require('./routes/api-users');
 
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
-const productList = getProductList();
 
 const middleware = (app) => {
   app.use(bodyParser.json());
-
-  app.get('/api/products', (req, res) => {
-    res.json(productList);
-  });
+  app.use(apiProducts, apiUsers);
 
   app.get('/images/*', (req, res) => {
     const imagePath = req.url.split('/').pop();
@@ -27,37 +23,20 @@ const middleware = (app) => {
         res.end();
       });
   });
-
-  app.post('/api/products', async (req, res) => {
-    console.log('req.body', req.body);
-
-    try {
-      const savedProduct = await saveToDB(req.body, 'product');
-
-      console.log('Product saved', savedProduct);
-    } catch (exception) {
-      console.error('Saving product exception:', exception);
-
-      res.status(500);
-      res.end(JSON.stringify({ exception }));
-    }
-
-    res.status(200);
-    res.end('Success!');
-  });
 };
 
-module.exports = middleware;
+// TODO: refactor to use ENV
+if (process.env.NODE_ONLY === 'true') {
+  const app = require('express')();
+  const port = 3000;
 
-function getProductList() {
-  const [firstCategory] = JSON.parse(readFileSync(`${databaseDirname}/raw-data-formatted.json`, 'utf8'));
-
-  return firstCategory.products.map(({ name, url, price, images }) => {
-    const image = '/images/' + images[0].imageSrc.split('/').pop();
-
-    return { name, url, price, image };
+  middleware(app);
+  app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
   });
 }
+
+module.exports = middleware;
 
 function getImage(fileName) {
   const cachedImage = getImage.cache[fileName];
