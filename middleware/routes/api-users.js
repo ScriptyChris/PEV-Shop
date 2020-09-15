@@ -17,10 +17,11 @@ const authMiddleware = async (req, res, next) => {
 
     req.token = token;
     req.user = user;
+
     next();
   } catch (exception) {
     console.error('authMiddleware exception', exception);
-    res.status(401).send('You are unauthorized!');
+    res.status(401).json({ error: 'You are unauthorized!' });
   }
 };
 
@@ -36,12 +37,10 @@ router.post('/api/users/', async (req, res) => {
   } catch (exception) {
     console.error('Saving product exception:', exception);
 
-    res.status(500);
-    res.end(JSON.stringify({ exception }));
+    res.status(500).json({ exception });
   }
 
-  res.status(201);
-  res.end('Success!');
+  res.status(201).json({ msg: 'Success!' });
 });
 
 router.post('/api/users/login', async (req, res) => {
@@ -51,14 +50,11 @@ router.post('/api/users/login', async (req, res) => {
     const user = await getFromDB({ nickName: req.body.nickName }, 'user');
     const token = await user.generateAuthToken();
 
-    console.log('token', token);
-
-    res.send({ payload: user, token });
+    res.json({ payload: user, token });
   } catch (exception) {
     console.error('Login user exception:', exception);
 
-    res.status(500);
-    res.end(JSON.stringify({ exception }));
+    res.status(500).json({ exception });
   }
 });
 
@@ -67,12 +63,11 @@ router.post('/api/users/logout', authMiddleware, async (req, res) => {
     req.user.tokens = req.user.tokens.filter((tokenItem) => tokenItem.token !== req.token);
     await req.user.save();
 
-    res.status(200).send('Logged out!');
+    res.status(200).json({ payload: 'Logged out!' });
   } catch (exception) {
     console.error('Logout user exception:', exception);
 
-    res.status(500);
-    res.end(JSON.stringify({ exception }));
+    res.status(500).json({ exception });
   }
 });
 
@@ -80,7 +75,7 @@ router.get('/api/users/:id', authMiddleware, async (req, res) => {
   console.log('[GET] /:id', req.params.id);
   const user = await getFromDB(req.params.id, 'user');
 
-  res.send({ payload: user });
+  res.json({ payload: user });
 });
 
 module.exports = router;

@@ -1,7 +1,13 @@
 class Ajax {
   constructor() {
-    this._BASE_API_URL = 'http://localhost:8080/api';
+    this._BASE_API_URL = `${location.origin}/api`;
     this._AUTH_TOKEN = '';
+  }
+
+  _getContentTypeHeader() {
+    return {
+      'Content-Type': 'application/json',
+    };
   }
 
   _getAuthHeader() {
@@ -9,24 +15,28 @@ class Ajax {
   }
 
   getRequest(apiEndpoint, useToken) {
-    const options = useToken
-      ? {
-          headers: {
-            Authorization: this._getAuthHeader(),
-          },
-        }
-      : null;
+    const options = {};
+
+    if (useToken) {
+      options.headers = {
+        Authorization: this._getAuthHeader(),
+      };
+    }
 
     return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, options).then((response) => response.json());
   }
 
-  postRequest(apiEndpoint, data) {
+  postRequest(apiEndpoint, data, useToken) {
+    const headers = new Headers(this._getContentTypeHeader());
+
+    if (useToken) {
+      headers.append('Authorization', this._getAuthHeader());
+    }
+
     return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+      headers,
+      body: JSON.stringify(data || {}),
     })
       .then((response) => {
         console.warn('POST response headers', response.headers);
@@ -67,6 +77,10 @@ const apiService = new (class ApiService extends Ajax {
   loginUser() {
     const userData = { nickName: 'test user1' };
     return this.postRequest(`${this.USERS_URL}/login`, userData);
+  }
+
+  logoutUser() {
+    return this.postRequest(`${this.USERS_URL}/logout`, null, true);
   }
 })();
 

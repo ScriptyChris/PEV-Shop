@@ -2,6 +2,7 @@ import React from 'react';
 import apiService from '../../features/apiService';
 import ProductItem from './productItem';
 
+// TODO: consider refactoring class based component to a function based one (and so use mobx-react-lite instead of mobx-react)
 export default class ProductList extends React.Component {
   constructor(props) {
     super(props);

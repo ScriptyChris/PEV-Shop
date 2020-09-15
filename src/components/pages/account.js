@@ -6,6 +6,7 @@ export default function Account() {
   // TODO: fix rendering component twice when redirected from LogIn page
   const { state: locationState } = useLocation();
   const [userData, setUserData] = useState(null);
+  console.warn('Account...state', locationState);
 
   useEffect(() => {
     if (locationState) {
@@ -23,9 +24,9 @@ export default function Account() {
   }, []);
 
   return (
-    <>
+    <section>
       User account!
       <div>{userData ? JSON.stringify(userData) : 'No user data'}</div>
-    </>
+    </section>
   );
 }

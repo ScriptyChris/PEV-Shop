@@ -9,7 +9,7 @@ export default function ProductDetails() {
   console.warn('location.state: ', locationState);
 
   return (
-    <>
+    <section>
       Product details!
       <p>{locationState.name}</p>
       <ul>
@@ -19,6 +19,6 @@ export default function ProductDetails() {
             })
           : translations.emptyData}
       </ul>
-    </>
+    </section>
   );
 }
