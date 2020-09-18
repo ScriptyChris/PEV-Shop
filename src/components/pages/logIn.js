@@ -4,24 +4,24 @@ import appStore, { USER_SESSION_STATES } from '../../features/appStore';
 import apiService from '../../features/apiService';
 
 export default function LogIn() {
-  const [loginState, setLoginState] = useState('');
-  const [passwordState, setPasswordState] = useState('');
+  const [userLogin, setUserLogin] = useState('');
+  const [userPassword, setUserPassword] = useState('');
   const [loggedInUserData, setLoggedInUserData] = useState(null);
 
   const onInputChange = ({ target }) => {
     if (target.id === 'login') {
-      setLoginState(target.value);
+      setUserLogin(target.value);
     } else if (target.id === 'password') {
-      setPasswordState(target.value);
+      setUserPassword(target.value);
     }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    console.warn('loginState', loginState, ' /passwordState', passwordState);
+    console.warn('userLogin:', userLogin, ' /userPassword:', userPassword);
 
-    apiService.loginUser().then((res) => {
+    apiService.loginUser({ login: userLogin, password: userPassword }).then((res) => {
       console.log('login res: ', res);
 
       setLoggedInUserData(res);
@@ -38,12 +38,12 @@ export default function LogIn() {
 
           <div>
             <label htmlFor="login">Login</label>
-            <input id="login" type="text" value={loginState} onChange={onInputChange} />
+            <input id="login" type="text" value={userLogin} onChange={onInputChange} required />
           </div>
 
           <div>
             <label htmlFor="password">Password</label>
-            <input id="password" type="password" value={passwordState} onChange={onInputChange} />
+            <input id="password" type="password" value={userPassword} onChange={onInputChange} required />
           </div>
 
           <button type="submit">Log in!</button>

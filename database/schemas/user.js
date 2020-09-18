@@ -7,11 +7,15 @@ const SECRET_KEY = 'secret-key';
 const userCredentialsError = new Error('Unable to login');
 
 const userSchema = new Schema({
-  nickName: {
+  login: {
     type: String,
     unique: true,
+    required: true,
   },
-  password: String,
+  password: {
+    type: String,
+    required: true,
+  },
   tokens: [
     {
       token: {
@@ -36,10 +40,16 @@ userSchema.methods.toJSON = function () {
   const user = this.toObject();
 
   delete user.tokens;
+  delete user.password;
 
   return user;
 };
 
+userSchema.methods.matchPassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+// TODO: remove if unused
 userSchema.statics.findByCredentials = async (userModel, nick, password) => {
   const user = userModel.findOne({ nick });
 
