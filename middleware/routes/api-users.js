@@ -1,16 +1,11 @@
 const { Router } = require('express');
 const { saveToDB, getFromDB } = require('../../database/index');
-const jwt = require('jsonwebtoken');
-// TODO: move to User Schema
-const bcrypt = require('bcrypt');
-
-// TODO: move to ENV
-const SECRET_KEY = 'secret-key';
+const auth = require('../features/auth');
 
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '');
-    const decodedToken = jwt.verify(token, SECRET_KEY);
+    const decodedToken = auth.verifyToken(token);
     const user = await getFromDB({ _id: decodedToken._id.toString(), 'tokens.token': token }, 'user');
     console.log('schema class?', user.constructor, ' /class name: ', user.constructor.name);
 
@@ -28,28 +23,13 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-const matchingPasswordMiddleware = async (req, res, next) => {
-  try {
-    const isPasswordMatch = await req.user.matchPassword(req.body.userPassword);
-
-    if (isPasswordMatch) {
-      next();
-    } else {
-      throw new Error('Invalid credentials');
-    }
-  } catch (exception) {
-    console.error('authMiddleware exception', exception);
-    res.status(400).json({ error: 'Invalid credentials!' });
-  }
-};
-
 const router = Router();
 
 router.post('/api/users/', async (req, res) => {
   console.log('[POST] /users req.body', req.body);
 
   try {
-    req.body.password = await bcrypt.hash(req.body.password, 8);
+    req.body.password = await auth.hashPassword(req.body.password);
     const savedUser = await saveToDB(req.body, 'user');
 
     console.log('User saved', savedUser);

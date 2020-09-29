@@ -1,9 +1,6 @@
 const { Schema } = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const auth = require('../../middleware/features/auth');
 
-// TODO: move to ENV
-const SECRET_KEY = 'secret-key';
 const userCredentialsError = new Error('Unable to login');
 
 const userSchema = new Schema({
@@ -28,7 +25,7 @@ const userSchema = new Schema({
 
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
-  const token = jwt.sign({ _id: user._id }, SECRET_KEY);
+  const token = auth.getToken({ _id: user._id });
 
   user.tokens.push({ token });
   await user.save();
@@ -45,8 +42,8 @@ userSchema.methods.toJSON = function () {
   return user;
 };
 
-userSchema.methods.matchPassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
+userSchema.methods.matchPassword = function (password) {
+  return auth.comparePasswords(password, this.password);
 };
 
 // TODO: remove if unused
@@ -57,7 +54,7 @@ userSchema.statics.findByCredentials = async (userModel, nick, password) => {
     throw userCredentialsError;
   }
 
-  const isPasswordMatch = await bcrypt.compare(password, user.password);
+  const isPasswordMatch = await auth.comparePasswords(password, user.password);
 
   if (!isPasswordMatch) {
     throw userCredentialsError;
