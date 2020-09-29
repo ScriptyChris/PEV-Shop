@@ -1,10 +1,10 @@
+// TODO: refactor to use ENV
 const isNodeOnly = process.env.NODE_ONLY === 'true';
 const config = {
     browser: !isNodeOnly,
     extends: isNodeOnly ? "" : "plugin:react/recommended",
     jsx: !isNodeOnly,
     plugins: isNodeOnly ? [] : ["react"],
-    // TODO: refactor to use ENV
     ignorePatterns: isNodeOnly ? ["database/data"] : [],
 };
 

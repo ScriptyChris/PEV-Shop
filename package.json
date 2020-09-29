@@ -23,7 +23,7 @@
     "prettier": "prettier --write src/ middleware/ database/ !database/data",
     "prettier:backend": "prettier --write middleware/ database/ !database/data",
     "eslint:backend": "eslint middleware/** database/**",
-    "start": "webpack-dev-server",
+    "start": "set \"NODE_ONLY=false\" && webpack-dev-server",
     "serve": "set \"NODE_ONLY=true\" && nodemon --exec \"npm run eslint:backend && npm run prettier:backend && node middleware/index.js\"",
     "prebuild": "npm run prettier",
     "build": "webpack"
@@ -53,6 +53,8 @@
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "jsonwebtoken": "^8.5.1",
+    "mobx": "^5.15.6",
+    "mobx-react": "^6.3.0",
     "mongodb": "3.5.10",
     "mongoose": "5.9.27"
   }

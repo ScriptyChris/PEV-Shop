@@ -40,6 +40,7 @@ module.exports = {
     publicPath: '/dist/',
     watchContentBase: true,
     historyApiFallback: true,
-    before: middleware
+    before: middleware,
+    port: 3000,
   }
 };

@@ -6,7 +6,7 @@ import ProductDetails from '../views/productDetails';
 
 export default function Shop() {
   return (
-    <>
+    <section>
       <div>Shop!!!</div>
 
       <Switch>
@@ -17,6 +17,6 @@ export default function Shop() {
           <ProductDetails />
         </Route>
       </Switch>
-    </>
+    </section>
   );
 }

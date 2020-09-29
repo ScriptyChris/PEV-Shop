@@ -19,8 +19,7 @@ const middleware = (app) => {
       .catch((error) => {
         console.log('Image searching error: ', error, ' /imagePath: ', imagePath);
 
-        res.status(404);
-        res.end();
+        res.status(404).end();
       });
   });
 };

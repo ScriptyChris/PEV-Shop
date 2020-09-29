@@ -18,6 +18,13 @@
   grid-area: header;
 }
 
+.nav {
+  ul {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}
+
 .main {
   grid-area: main;
 }

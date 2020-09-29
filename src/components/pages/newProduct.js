@@ -28,25 +28,27 @@ export default function NewProduct() {
   };
 
   return (
-    <form action="" onSubmit={handlerSubmit}>
-      <fieldset>
-        <legend>Fill new product details</legend>
+    <section>
+      <form action="" onSubmit={handlerSubmit}>
+        <fieldset>
+          <legend>Fill new product details</legend>
 
-        <label htmlFor="newProductName">Name</label>
-        <input id="newProductName" name="name" value={productNameValue} onChange={handleChange} />
+          <label htmlFor="newProductName">Name</label>
+          <input id="newProductName" name="name" value={productNameValue} onChange={handleChange} />
 
-        <label htmlFor="newProductPrice">Price</label>
-        <input
-          id="newProductPrice"
-          name="price"
-          type="number"
-          step="0.01"
-          value={productPriceValue}
-          onChange={handleChange}
-        />
+          <label htmlFor="newProductPrice">Price</label>
+          <input
+            id="newProductPrice"
+            name="price"
+            type="number"
+            step="0.01"
+            value={productPriceValue}
+            onChange={handleChange}
+          />
 
-        <button>Save</button>
-      </fieldset>
-    </form>
+          <button>Save</button>
+        </fieldset>
+      </form>
+    </section>
   );
 }

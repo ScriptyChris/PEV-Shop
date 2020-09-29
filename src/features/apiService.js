@@ -1,20 +1,55 @@
 class Ajax {
   constructor() {
-    this._BASE_API_URL = 'http://localhost:8080/api';
+    this._BASE_API_URL = `${location.origin}/api`;
+    this._AUTH_TOKEN = '';
   }
 
-  getRequest(apiEndpoint) {
-    return fetch(`${this._BASE_API_URL}/${apiEndpoint}`).then((response) => response.json());
+  _getContentTypeHeader() {
+    return {
+      'Content-Type': 'application/json',
+    };
   }
 
-  postRequest(apiEndpoint, data) {
+  _getAuthHeader() {
+    return `Bearer ${this._AUTH_TOKEN}`;
+  }
+
+  getRequest(apiEndpoint, useToken) {
+    const options = {};
+
+    if (useToken) {
+      options.headers = {
+        Authorization: this._getAuthHeader(),
+      };
+    }
+
+    return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, options).then((response) => response.json());
+  }
+
+  postRequest(apiEndpoint, data, useToken) {
+    const headers = new Headers(this._getContentTypeHeader());
+
+    if (useToken) {
+      headers.append('Authorization', this._getAuthHeader());
+    }
+
     return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }).then((response) => response.text());
+      headers,
+      body: JSON.stringify(data || {}),
+    })
+      .then((response) => {
+        console.warn('POST response headers', response.headers);
+
+        return response.json();
+      })
+      .then((body) => {
+        if (body.token) {
+          this._AUTH_TOKEN = body.token;
+        }
+
+        return body.payload;
+      });
   }
 }
 
@@ -23,14 +58,29 @@ const apiService = new (class ApiService extends Ajax {
     super();
 
     this.PRODUCTS_URL = 'products';
+    this.USERS_URL = 'users';
+  }
+
+  addProduct(product) {
+    return this.postRequest(this.PRODUCTS_URL, product);
   }
 
   getProducts() {
     return this.getRequest(this.PRODUCTS_URL);
   }
 
-  addProduct(product) {
-    return this.postRequest(this.PRODUCTS_URL, product);
+  getUser() {
+    const userId = '5f5a8dce154f830fd840dc7b';
+    return this.getRequest(`${this.USERS_URL}/${userId}`, true);
+  }
+
+  loginUser(credentials) {
+    // const credentials = { login: 'test user1' };
+    return this.postRequest(`${this.USERS_URL}/login`, credentials);
+  }
+
+  logoutUser() {
+    return this.postRequest(`${this.USERS_URL}/logout`, null, true);
   }
 })();
 

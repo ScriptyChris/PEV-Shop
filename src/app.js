@@ -8,7 +8,7 @@ import Header from './components/views/header';
 import Main from './components/views/main';
 import Footer from './components/views/footer';
 
-const RootComponents = (
+const App = (
   <>
     <Router>
       <Header />
@@ -18,4 +18,4 @@ const RootComponents = (
   </>
 );
 
-ReactDOM.render(RootComponents, document.querySelector('#root'));
+ReactDOM.render(App, document.querySelector('#app'));
