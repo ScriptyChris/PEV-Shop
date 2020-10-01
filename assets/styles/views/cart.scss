@@ -1,0 +1,16 @@
+.cart-button {
+
+}
+
+.cart-container {
+  background: orange;
+
+  position: relative;
+  z-index: 1;
+
+  display: none;
+
+  &--visible {
+    display: block;
+  }
+}

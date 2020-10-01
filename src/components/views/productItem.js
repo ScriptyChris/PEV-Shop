@@ -1,16 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { autorun } from 'mobx';
 import { Link } from 'react-router-dom';
+import appStore from '../../features/appStore';
 
 export default function ProductItem({ product }) {
+  const [productCounterState, updateProductCounterState] = useState(0);
   const translations = {
     productName: 'Name',
     productImage: 'Image of ',
     productUrl: 'URL',
     price: 'Price',
     detailsBtn: 'Check details!',
+    addToCart: 'Add to cart!',
   };
 
   const { name, url, image, price, details } = product;
+
+  useEffect(() => {
+    return autorun(() => {
+      console.warn('????', productCounterState);
+
+      // if (productCounterState > 0) {
+      //   appStore.updateUserCartState({
+      //     name, price,
+      //     count: productCounterState
+      //   });
+      // }
+    });
+  }, []);
+
+  const handleAddToCartClick = () => {
+    updateProductCounterState((prevState) => prevState + 1);
+
+    appStore.updateUserCartState({
+      name,
+      price,
+      count: productCounterState,
+    });
+  };
 
   return (
     <li className="product-list-item">
@@ -32,6 +59,8 @@ export default function ProductItem({ product }) {
           <dd>{price}</dd>
         </div>
       </dl>
+
+      <button onClick={handleAddToCartClick}>{translations.addToCart}</button>
 
       <Link
         to={{
