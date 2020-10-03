@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import appStore from '../../features/appStore';
+import { getUserCartStateFromStorage, saveUserCartStateToStorage } from '../../features/storageApi';
 
 export default observer(function Cart() {
   const [cartVisibility, updateCartVisibility] = useState(false);
@@ -14,6 +15,18 @@ export default observer(function Cart() {
     productsTotals: 'Totals',
     cleanupCart: 'Cleanup cart',
   };
+
+  useEffect(() => {
+    appStore.replaceUserCartState(getUserCartStateFromStorage());
+
+    window.addEventListener(
+      'beforeunload',
+      () => {
+        saveUserCartStateToStorage(appStore.userCartState);
+      },
+      { once: true }
+    );
+  }, []);
 
   const handleTogglingCart = () => {
     updateCartVisibility(!cartVisibility);
@@ -63,7 +76,7 @@ export default observer(function Cart() {
             <tr>
               <th>{translations.productsTotals}</th>
               <td>{appStore.userCartProductsCount}</td>
-              <td>{appStore.userCartPriceSum}</td>
+              <td>{appStore.userCartTotalPrice}</td>
             </tr>
           </tfoot>
         </table>
