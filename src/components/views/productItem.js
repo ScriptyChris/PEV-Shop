@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import appStore from '../../features/appStore';
 
 export default function ProductItem({ product }) {
-  const [productCounterState, updateProductCounterState] = useState(0);
   const translations = {
     productName: 'Name',
     productImage: 'Image of ',
@@ -15,18 +14,8 @@ export default function ProductItem({ product }) {
 
   const { name, url, image, price, details } = product;
 
-  useEffect(() => {
-    if (productCounterState > 0) {
-      appStore.updateUserCartState({
-        name,
-        price,
-        count: productCounterState,
-      });
-    }
-  }, [productCounterState]);
-
   const handleAddToCartClick = () => {
-    updateProductCounterState((prevState) => prevState + 1);
+    appStore.updateUserCartState({ name, price });
   };
 
   return (

@@ -11,16 +11,21 @@ export default observer(function Cart() {
     productCountHeader: 'Count',
     productPriceHeader: 'Price',
     lackOfProducts: 'No products yet...',
-    productsTotalPrice: 'Total price',
+    productsTotals: 'Totals',
+    cleanupCart: 'Cleanup cart',
   };
 
   const handleTogglingCart = () => {
     updateCartVisibility(!cartVisibility);
   };
 
+  const handleCartCleanup = () => {
+    appStore.clearUserCartState();
+  };
+
   return (
     <>
-      <button className="cart-button" onClick={handleTogglingCart}>
+      <button className="cart-toggle-button" onClick={handleTogglingCart}>
         $$$
       </button>
 
@@ -56,11 +61,16 @@ export default observer(function Cart() {
 
           <tfoot>
             <tr>
-              <th>{translations.productsTotalPrice}</th>
+              <th>{translations.productsTotals}</th>
+              <td>{appStore.userCartProductsCount}</td>
               <td>{appStore.userCartPriceSum}</td>
             </tr>
           </tfoot>
         </table>
+
+        <button className="cart-cleanup-button" onClick={handleCartCleanup}>
+          {translations.cleanupCart}
+        </button>
       </section>
     </>
   );

@@ -33,9 +33,19 @@ class AppStore {
     );
     if (productIndexInCart !== -1) {
       this._userCartState.products[productIndexInCart].count++;
+      this._userCartState.totalCount++;
     } else {
+      userCartState.count = 1;
       this._userCartState.products.push(userCartState);
+      this._userCartState.totalCount = 'totalCount' in this._userCartState ? this._userCartState.totalCount + 1 : 1;
     }
+  }
+
+  clearUserCartState() {
+    this._userCartState.products.splice(0, this._userCartState.products.length);
+
+    this._userCartState.priceSum = 0;
+    this._userCartState.totalCount = 0;
   }
 
   get userCartProducts() {
@@ -45,6 +55,10 @@ class AppStore {
   get userCartPriceSum() {
     return this._userCartState.priceSum;
   }
+
+  get userCartProductsCount() {
+    return this._userCartState.totalCount;
+  }
 }
 
 decorate(AppStore, {
@@ -53,6 +67,7 @@ decorate(AppStore, {
 
   _userCartState: observable,
   updateUserCartState: action,
+  clearUserCartState: action,
 });
 
 const appStore = new AppStore();

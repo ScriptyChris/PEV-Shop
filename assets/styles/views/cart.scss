@@ -1,14 +1,21 @@
-.cart-button {
+.cart-toggle-button {
+
+}
+
+.cart-cleanup-button {
 
 }
 
 .cart-container {
-  background: orange;
-
+  display: none;
   position: relative;
   z-index: 1;
 
-  display: none;
+  background: orange;
+
+  td, th {
+    border: 1px solid black;
+  }
 
   &--visible {
     display: block;
