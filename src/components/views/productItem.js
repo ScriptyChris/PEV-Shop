@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { autorun } from 'mobx';
 import { Link } from 'react-router-dom';
 import appStore from '../../features/appStore';
 
@@ -17,26 +16,17 @@ export default function ProductItem({ product }) {
   const { name, url, image, price, details } = product;
 
   useEffect(() => {
-    return autorun(() => {
-      console.warn('????', productCounterState);
-
-      // if (productCounterState > 0) {
-      //   appStore.updateUserCartState({
-      //     name, price,
-      //     count: productCounterState
-      //   });
-      // }
-    });
-  }, []);
+    if (productCounterState > 0) {
+      appStore.updateUserCartState({
+        name,
+        price,
+        count: productCounterState,
+      });
+    }
+  }, [productCounterState]);
 
   const handleAddToCartClick = () => {
     updateProductCounterState((prevState) => prevState + 1);
-
-    appStore.updateUserCartState({
-      name,
-      price,
-      count: productCounterState,
-    });
   };
 
   return (
