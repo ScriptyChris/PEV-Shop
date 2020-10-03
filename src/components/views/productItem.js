@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import appStore from '../../features/appStore';
 
 export default function ProductItem({ product }) {
   const translations = {
@@ -8,9 +9,14 @@ export default function ProductItem({ product }) {
     productUrl: 'URL',
     price: 'Price',
     detailsBtn: 'Check details!',
+    addToCart: 'Add to cart!',
   };
 
   const { name, url, image, price, details } = product;
+
+  const handleAddToCartClick = () => {
+    appStore.updateUserCartState({ name, price });
+  };
 
   return (
     <li className="product-list-item">
@@ -32,6 +38,8 @@ export default function ProductItem({ product }) {
           <dd>{price}</dd>
         </div>
       </dl>
+
+      <button onClick={handleAddToCartClick}>{translations.addToCart}</button>
 
       <Link
         to={{

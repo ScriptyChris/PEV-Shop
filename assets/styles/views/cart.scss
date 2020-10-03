@@ -1,0 +1,23 @@
+.cart-toggle-button {
+
+}
+
+.cart-cleanup-button {
+
+}
+
+.cart-container {
+  display: none;
+  position: relative;
+  z-index: 1;
+
+  background: orange;
+
+  td, th {
+    border: 1px solid black;
+  }
+
+  &--visible {
+    display: block;
+  }
+}
