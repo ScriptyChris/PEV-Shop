@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { middlewareFn: authMiddleware } = require('../features/auth');
-const { saveToDB, getFromDB } = require('../../database/index');
+const { saveToDB, getFromDB, updateOneModelInDB } = require('../../database/index');
 
 const router = Router();
 
@@ -19,6 +19,19 @@ router.post('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
   console.log('savedUserRole:', savedUserRole);
 
   res.status(200).json({ payload: savedUserRole });
+});
+
+router.patch('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
+  console.log('[PATCH] /user-roles:', req.body);
+
+  const updatedUserRole = await updateOneModelInDB(
+    { roleName: req.body.roleName /*'administrator'*/ },
+    req.body.permissions,
+    'UserRole'
+  );
+  console.log('updatedUserRole:', updatedUserRole);
+
+  res.status(200).json({ payload: updatedUserRole });
 });
 
 router.get('/api/user-roles/:roleName', authMiddleware(getFromDB), async (req, res) => {
