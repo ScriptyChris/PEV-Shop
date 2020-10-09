@@ -2,12 +2,13 @@ const glob = require('glob');
 const bodyParser = require('body-parser');
 const apiProducts = require('./routes/api-products');
 const apiUsers = require('./routes/api-users');
+const apiUserRoles = require('./routes/api-user-roles');
 
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
 const middleware = (app) => {
   app.use(bodyParser.json());
-  app.use(apiProducts, apiUsers);
+  app.use(apiProducts, apiUsers, apiUserRoles);
 
   app.get('/images/*', (req, res) => {
     const imagePath = req.url.split('/').pop();

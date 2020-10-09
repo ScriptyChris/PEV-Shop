@@ -2,27 +2,6 @@ const { Router } = require('express');
 const { saveToDB, getFromDB } = require('../../database/index');
 const auth = require('../features/auth');
 
-const authMiddleware = async (req, res, next) => {
-  try {
-    const token = req.header('Authorization').replace('Bearer ', '');
-    const decodedToken = auth.verifyToken(token);
-    const user = await getFromDB({ _id: decodedToken._id.toString(), 'tokens.token': token }, 'user');
-    console.log('schema class?', user.constructor, ' /class name: ', user.constructor.name);
-
-    if (!user) {
-      throw new Error('Auth failed!');
-    }
-
-    req.token = token;
-    req.user = user;
-
-    next();
-  } catch (exception) {
-    console.error('authMiddleware exception', exception);
-    res.status(401).json({ error: 'You are unauthorized!' });
-  }
-};
-
 const router = Router();
 
 router.post('/api/users/', async (req, res) => {
@@ -30,7 +9,7 @@ router.post('/api/users/', async (req, res) => {
 
   try {
     req.body.password = await auth.hashPassword(req.body.password);
-    const savedUser = await saveToDB(req.body, 'user');
+    const savedUser = await saveToDB(req.body, 'User');
 
     console.log('User saved', savedUser);
   } catch (exception) {
@@ -46,7 +25,7 @@ router.post('/api/users/login', async (req, res) => {
   console.log('[POST] /login');
 
   try {
-    const user = await getFromDB({ login: req.body.login }, 'user');
+    const user = await getFromDB({ login: req.body.login }, 'User');
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
@@ -63,7 +42,7 @@ router.post('/api/users/login', async (req, res) => {
   }
 });
 
-router.post('/api/users/logout', authMiddleware, async (req, res) => {
+router.post('/api/users/logout', auth.middlewareFn(getFromDB), async (req, res) => {
   try {
     req.user.tokens = req.user.tokens.filter((tokenItem) => tokenItem.token !== req.token);
     await req.user.save();
@@ -76,9 +55,9 @@ router.post('/api/users/logout', authMiddleware, async (req, res) => {
   }
 });
 
-router.get('/api/users/:id', authMiddleware, async (req, res) => {
+router.get('/api/users/:id', auth.middlewareFn(getFromDB), async (req, res) => {
   console.log('[GET] /:id', req.params.id);
-  const user = await getFromDB(req.params.id, 'user');
+  const user = await getFromDB(req.params.id, 'User');
 
   res.json({ payload: user });
 });

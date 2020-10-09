@@ -1,6 +1,7 @@
 const MODELS = {
-  product: require('./_product'),
-  user: require('./_user'),
+  Product: require('./_product'),
+  User: require('./_user'),
+  UserRole: require('./_userRole'),
 };
 
 module.exports = (modelType) => {
@@ -9,5 +10,5 @@ module.exports = (modelType) => {
     return null;
   }
 
-  return MODELS[modelType.toLowerCase()] || null;
+  return MODELS[modelType] || null;
 };
