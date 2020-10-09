@@ -7,6 +7,8 @@ connect(databaseURL, {
   useUnifiedTopology: true,
 });
 
+// TODO: create script and optionally use it to populate example database data
+
 const saveToDB = (itemData, modelType) => {
   // TODO: improve validation
   if (!itemData || typeof itemData !== 'object' || !modelType || typeof modelType !== 'string') {

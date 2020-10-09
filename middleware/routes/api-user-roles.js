@@ -21,4 +21,13 @@ router.post('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
   res.status(200).json({ payload: savedUserRole });
 });
 
+router.get('/api/user-roles/:roleName', authMiddleware(getFromDB), async (req, res) => {
+  console.log('[GET] /user-roles:', req.params);
+
+  const userRole = await getFromDB({ roleName: req.params.roleName }, 'UserRole');
+  await userRole.execPopulate('owner');
+
+  res.status(200).json({ payload: userRole });
+});
+
 module.exports = router;
