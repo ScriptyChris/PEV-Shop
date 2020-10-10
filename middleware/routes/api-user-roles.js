@@ -24,11 +24,7 @@ router.post('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
 router.patch('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
   console.log('[PATCH] /user-roles:', req.body);
 
-  const updatedUserRole = await updateOneModelInDB(
-    { roleName: req.body.roleName /*'administrator'*/ },
-    req.body.permissions,
-    'UserRole'
-  );
+  const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'UserRole');
   console.log('updatedUserRole:', updatedUserRole);
 
   res.status(200).json({ payload: updatedUserRole });

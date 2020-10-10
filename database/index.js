@@ -58,8 +58,6 @@ const updateOneModelInDB = (itemQuery, updateData, modelType) => {
       itemQuery = { _id: itemQuery };
     }
 
-    const updateDataQueries = {};
-
     let operator;
 
     switch (updateData.action) {
@@ -77,12 +75,11 @@ const updateOneModelInDB = (itemQuery, updateData, modelType) => {
     }
 
     // TODO: handle multiple values, most likely by $each operator
-    const [key, value] = Object.entries(updateData.data)[0];
-    updateDataQueries[operator] = {
-      [key]: value,
+    const updateDataQueries = {
+      [operator]: updateData.data,
     };
 
-    Model.updateOne(itemQuery, updateDataQueries, (error, updatedItem) => {
+    Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true }, (error, updatedItem) => {
       if (error) {
         return reject(error);
       }
