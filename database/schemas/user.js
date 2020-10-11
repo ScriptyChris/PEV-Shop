@@ -26,7 +26,7 @@ const userSchema = new Schema({
 userSchema.virtual('roleName', {
   ref: 'UserRole',
   localField: '_id',
-  foreignField: 'owner',
+  foreignField: 'owners',
 });
 
 userSchema.methods.generateAuthToken = async function () {

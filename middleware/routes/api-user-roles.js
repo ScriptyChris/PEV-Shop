@@ -9,7 +9,8 @@ router.post('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
 
   const userRole = {
     roleName: req.body.roleName,
-    owner: req.user._id,
+    permissions: req.body.permissions,
+    // owners: req.user._id,
   };
   console.log('userRole: ', userRole);
 
@@ -34,7 +35,7 @@ router.get('/api/user-roles/:roleName', authMiddleware(getFromDB), async (req, r
   console.log('[GET] /user-roles:', req.params);
 
   const userRole = await getFromDB({ roleName: req.params.roleName }, 'UserRole');
-  await userRole.execPopulate('owner');
+  await userRole.execPopulate('owners');
 
   res.status(200).json({ payload: userRole });
 });
