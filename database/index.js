@@ -69,6 +69,10 @@ const updateOneModelInDB = (itemQuery, updateData, modelType) => {
         operator = '$pull';
         break;
       }
+      case 'modify': {
+        operator = '$set';
+        break;
+      }
       default: {
         reject(`'Unrecognized update action: ${updateData.action}`);
       }

@@ -35,7 +35,8 @@ userRoleSchema.methods.toJSON = function () {
   delete userRole._id;
   delete userRole.__v;
 
-  if (userRole.owners.login) {
+  // TODO: use optional chaining
+  if (userRole.owners && userRole.owners.login) {
     userRole.owners = userRole.owners.login;
   }
 
