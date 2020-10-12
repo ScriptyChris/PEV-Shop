@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const { connect } = require('mongoose');
 const getModel = require('./models/index');
 
@@ -97,4 +98,5 @@ module.exports = {
   saveToDB,
   getFromDB,
   updateOneModelInDB,
+  ObjectId,
 };

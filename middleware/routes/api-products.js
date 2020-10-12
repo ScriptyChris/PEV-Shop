@@ -1,6 +1,6 @@
 const { readFileSync } = require('fs');
 const { Router } = require('express');
-const { middlewareFn: authMiddleware } = require('../features/auth');
+const { authMiddlewareFn: authMiddleware, userRoleMiddlewareFn } = require('../features/auth');
 const { getFromDB, saveToDB, updateOneModelInDB } = require('../../database/index');
 
 const router = Router();
@@ -29,10 +29,14 @@ router.post('/api/products', async (req, res) => {
   res.end('Success!');
 });
 
-router.patch('/api/products/', authMiddleware(getFromDB), async (req, res) => {
-  console.log('[products PATCH] req.body', res.body);
+router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), async (req, res) => {
+  console.log('[products PATCH] req.body', req.body);
 
   try {
+    if (!req.userPermissions) {
+      throw new Error('User has no permissions!');
+    }
+
     // TODO: prepare to be used with various product properties
     const modifiedProduct = await updateOneModelInDB(req.body.productId, req.body.modifications, 'Product');
 
@@ -41,7 +45,7 @@ router.patch('/api/products/', authMiddleware(getFromDB), async (req, res) => {
   } catch (exception) {
     console.error('Modifying product exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(403).json({ exception });
   }
 });
 

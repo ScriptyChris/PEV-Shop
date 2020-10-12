@@ -1,7 +1,7 @@
 const MODELS = {
   Product: require('./_product'),
   User: require('./_user'),
-  UserRole: require('./_userRole'),
+  'User-Role': require('./_userRole'),
 };
 
 module.exports = (modelType) => {

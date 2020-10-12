@@ -24,7 +24,7 @@ const userSchema = new Schema({
 });
 
 userSchema.virtual('roleName', {
-  ref: 'UserRole',
+  ref: 'User-Role',
   localField: '_id',
   foreignField: 'owners',
 });

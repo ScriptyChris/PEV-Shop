@@ -1,11 +1,11 @@
 const { Schema } = require('mongoose');
 
-// const userRoleOwnerSchema = new Schema({
-//   owner: {
-//     type: Schema.Types.ObjectId,
-//     ref: 'User',
-//   },
-// });
+/*const userRoleOwnerSchema = new Schema({
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
+});*/
 
 const userRoleSchema = new Schema({
   roleName: {
@@ -16,15 +16,12 @@ const userRoleSchema = new Schema({
     type: [String],
     required: true,
     // TODO: use validation in all other database Schemas
-    validate: (value) => {
-      console.log('perm value', value);
+    validate(value) {
       return Array.isArray(value) && value.length > 0;
     },
   },
   owners: {
-    // type: userRoleOwnerSchema,
-    type: Map,
-    of: Schema.Types.ObjectId,
+    type: [Schema.Types.ObjectId],
     ref: 'User',
   },
 });

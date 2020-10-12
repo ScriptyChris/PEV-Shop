@@ -21,7 +21,7 @@ const verifyToken = (token) => {
   return jwt.verify(token, SECRET_KEY);
 };
 
-const middlewareFn = (getFromDB) => {
+const authMiddlewareFn = (getFromDB) => {
   return async (req, res, next) => {
     try {
       const token = req.header('Authorization').replace('Bearer ', '');
@@ -44,10 +44,35 @@ const middlewareFn = (getFromDB) => {
   };
 };
 
+const userRoleMiddlewareFn = (roleName) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new Error('No user provided - probably forgot to do auth first.');
+      }
+
+      // TODO: improve selecting data while populating
+      await req.user.execPopulate({
+        path: 'roleName',
+        match: { roleName },
+      });
+      console.log('Populated req.user.roleName', req.user.roleName);
+
+      req.userPermissions = req.user.roleName[0].permissions;
+
+      next();
+    } catch (exception) {
+      console.error('userRoleMiddlewareFn exception', exception);
+      res.status(403).json({ error: "You don't have permissions!" });
+    }
+  };
+};
+
 module.exports = {
   comparePasswords,
   hashPassword,
   getToken,
   verifyToken,
-  middlewareFn,
+  authMiddlewareFn,
+  userRoleMiddlewareFn,
 };
