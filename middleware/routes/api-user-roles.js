@@ -10,7 +10,6 @@ router.post('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
   const userRole = {
     roleName: req.body.roleName,
     permissions: req.body.permissions,
-    // owners: req.user._id,
   };
   console.log('userRole: ', userRole);
 

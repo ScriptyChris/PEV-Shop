@@ -1,12 +1,5 @@
 const { Schema } = require('mongoose');
 
-/*const userRoleOwnerSchema = new Schema({
-  owner: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-  },
-});*/
-
 const userRoleSchema = new Schema({
   roleName: {
     type: String,
