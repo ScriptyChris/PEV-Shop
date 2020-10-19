@@ -1,6 +1,7 @@
 const { readFileSync } = require('fs');
 const { Router } = require('express');
-const { saveToDB } = require('../../database/index');
+const { authMiddlewareFn: authMiddleware, userRoleMiddlewareFn } = require('../features/auth');
+const { getFromDB, saveToDB, updateOneModelInDB } = require('../../database/index');
 
 const router = Router();
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
@@ -26,6 +27,26 @@ router.post('/api/products', async (req, res) => {
 
   res.status(201);
   res.end('Success!');
+});
+
+router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), async (req, res) => {
+  console.log('[products PATCH] req.body', req.body);
+
+  try {
+    if (!req.userPermissions) {
+      throw new Error('User has no permissions!');
+    }
+
+    // TODO: prepare to be used with various product properties
+    const modifiedProduct = await updateOneModelInDB(req.body.productId, req.body.modifications, 'Product');
+
+    console.log('Product modified', modifiedProduct);
+    res.status(201).json({ payload: modifiedProduct });
+  } catch (exception) {
+    console.error('Modifying product exception:', exception);
+
+    res.status(403).json({ exception });
+  }
 });
 
 module.exports = router;

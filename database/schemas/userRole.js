@@ -9,11 +9,12 @@ const userRoleSchema = new Schema({
     type: [String],
     required: true,
     // TODO: use validation in all other database Schemas
-    validate: (value) => Array.isArray(value) && value.length > 0,
+    validate(value) {
+      return Array.isArray(value) && value.length > 0;
+    },
   },
-  owner: {
-    type: Schema.Types.ObjectId,
-    required: true,
+  owners: {
+    type: [Schema.Types.ObjectId],
     ref: 'User',
   },
 });
@@ -24,7 +25,10 @@ userRoleSchema.methods.toJSON = function () {
   delete userRole._id;
   delete userRole.__v;
 
-  userRole.owner = userRole.owner.login;
+  // TODO: use optional chaining
+  if (userRole.owners && userRole.owners.login) {
+    userRole.owners = userRole.owners.login;
+  }
 
   return userRole;
 };

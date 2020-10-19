@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { middlewareFn: authMiddleware } = require('../features/auth');
+const { authMiddlewareFn: authMiddleware } = require('../features/auth');
 const { saveToDB, getFromDB, updateOneModelInDB } = require('../../database/index');
 
 const router = Router();
@@ -9,11 +9,11 @@ router.post('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
 
   const userRole = {
     roleName: req.body.roleName,
-    owner: req.user._id,
+    permissions: req.body.permissions,
   };
   console.log('userRole: ', userRole);
 
-  const savedUserRole = await saveToDB(userRole, 'UserRole');
+  const savedUserRole = await saveToDB(userRole, 'User-Role');
   savedUserRole.save();
 
   console.log('savedUserRole:', savedUserRole);
@@ -24,7 +24,7 @@ router.post('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
 router.patch('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
   console.log('[PATCH] /user-roles:', req.body);
 
-  const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'UserRole');
+  const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'User-Role');
   console.log('updatedUserRole:', updatedUserRole);
 
   res.status(200).json({ payload: updatedUserRole });
@@ -33,8 +33,8 @@ router.patch('/api/user-roles', authMiddleware(getFromDB), async (req, res) => {
 router.get('/api/user-roles/:roleName', authMiddleware(getFromDB), async (req, res) => {
   console.log('[GET] /user-roles:', req.params);
 
-  const userRole = await getFromDB({ roleName: req.params.roleName }, 'UserRole');
-  await userRole.execPopulate('owner');
+  const userRole = await getFromDB({ roleName: req.params.roleName }, 'User-Role');
+  await userRole.execPopulate('owners');
 
   res.status(200).json({ payload: userRole });
 });

@@ -75,7 +75,6 @@ const apiService = new (class ApiService extends Ajax {
   }
 
   loginUser(credentials) {
-    // const credentials = { login: 'test user1' };
     return this.postRequest(`${this.USERS_URL}/login`, credentials);
   }
 

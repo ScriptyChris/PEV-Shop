@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const { connect } = require('mongoose');
 const getModel = require('./models/index');
 
@@ -69,6 +70,10 @@ const updateOneModelInDB = (itemQuery, updateData, modelType) => {
         operator = '$pull';
         break;
       }
+      case 'modify': {
+        operator = '$set';
+        break;
+      }
       default: {
         reject(`'Unrecognized update action: ${updateData.action}`);
       }
@@ -93,4 +98,5 @@ module.exports = {
   saveToDB,
   getFromDB,
   updateOneModelInDB,
+  ObjectId,
 };
