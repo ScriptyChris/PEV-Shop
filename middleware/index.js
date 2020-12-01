@@ -55,6 +55,7 @@ getImage.cache = {};
 
 function findFileRecursively(fileName) {
   return new Promise((resolve, reject) => {
+    // TODO: wrap it with util.promisify
     glob(`${databaseDirname}/web-scraped/images/**/${fileName}`, (err, files) => {
       if (err || !files.length) {
         reject(err || 'No files found!');
