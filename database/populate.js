@@ -9,10 +9,10 @@ readFile = promisify(readFile);
 
 const PARAMS = {
   CLEAN_ALL: 'cleanAll=true',
-  GROUP_CATEGORIES: 'categoriesGroupPath='
+  GROUP_CATEGORIES: 'categoriesGroupPath=',
 };
 
-console.log('process.argv', process.argv);
+console.log('process.argv:', process.argv);
 
 (async () => {
   await connectToDB();
@@ -55,13 +55,15 @@ async function getSourceData() {
   const isFileInPath = path.endsWith('.json');
 
   if (!isFileInPath && (!fileName || fileName === PARAMS.CLEAN_ALL)) {
-    return Promise.reject('If file name is not included in path as first argument, it must be provided separately - as second argument!');
+    return Promise.reject(
+      'If file name is not included in path as first argument, it must be provided separately - as second argument!'
+    );
   }
 
   const sourceDataPath = isFileInPath ? path : `${path}${sep}**${sep}${fileName}.json`;
   const sourceDataFiles = await glob(sourceDataPath);
   const sourceDataList = await Promise.all(
-      sourceDataFiles.map(async filePath => JSON.parse(await readFile(filePath, { encoding: 'utf8' })))
+    sourceDataFiles.map(async (filePath) => JSON.parse(await readFile(filePath, { encoding: 'utf8' })))
   );
 
   console.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
@@ -71,14 +73,14 @@ async function getSourceData() {
 
 async function populateProducts(ProductModel, sourceDataList) {
   const normalizersObj = {
-    category: categoryNameGrouper()
-  }
+    category: categoryNameGrouper(),
+  };
 
   return Promise.all(
-      sourceDataList.map((data) => {
-        const product = new ProductModel(normalizeData(data, normalizersObj));
-        return product.save();
-      })
+    sourceDataList.map((data) => {
+      const product = new ProductModel(normalizeData(data, normalizersObj));
+      return product.save();
+    })
   );
 
   function normalizeData(data, normalizersObj) {
@@ -87,7 +89,7 @@ async function populateProducts(ProductModel, sourceDataList) {
     const normalizedData = {
       ...data,
       name: data.nameAndCategory.name,
-      category: normalizersObj.category(categoryName)
+      category: normalizersObj.category(categoryName),
     };
 
     delete normalizedData.nameAndCategory;
@@ -96,7 +98,7 @@ async function populateProducts(ProductModel, sourceDataList) {
 
     normalizedData.reviews = {
       summary: isAnyReview ? data.reviews[0] : {},
-      list: isAnyReview ? data.reviews.slice(1) : []
+      list: isAnyReview ? data.reviews.slice(1) : [],
     };
 
     return normalizedData;
@@ -107,16 +109,17 @@ async function populateProducts(ProductModel, sourceDataList) {
     const categoryRegExps = JSON.parse(readFileSync(categoriesGroupPath.split('=').pop(), { encoding: 'utf8' }));
 
     if (categoriesGroupPath) {
-        return (categoryName) => {
-          const matchedRegExp = categoryRegExps
-            .find(regExp => typeof regExp.matcher === 'string' && (new RegExp(regExp.matcher)).test(categoryName));
+      return (categoryName) => {
+        const matchedRegExp = categoryRegExps.find(
+          (regExp) => typeof regExp.matcher === 'string' && new RegExp(regExp.matcher).test(categoryName)
+        );
 
-          if (matchedRegExp) {
-            return categoryName.replace(new RegExp(matchedRegExp.matcher), matchedRegExp.replacer);
-          }
+        if (matchedRegExp) {
+          return categoryName.replace(new RegExp(matchedRegExp.matcher), matchedRegExp.replacer);
+        }
 
-          return categoryName;
-        };
+        return categoryName;
+      };
     }
 
     return (categoryName) => categoryName;
@@ -124,12 +127,11 @@ async function populateProducts(ProductModel, sourceDataList) {
 }
 
 function getScriptParamValue(param, lenientSearch) {
-  return process.argv
-    .find((arg) => {
-      if (lenientSearch) {
-        return arg.includes(param);
-      }
+  return process.argv.find((arg) => {
+    if (lenientSearch) {
+      return arg.includes(param);
+    }
 
-      return arg === param;
+    return arg === param;
   });
 }

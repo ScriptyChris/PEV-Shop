@@ -3,18 +3,18 @@ const { Schema } = require('mongoose');
 const reviewsSchema = new Schema({
   summary: {
     type: Object,
-    required: true
+    required: true,
   },
   list: {
     type: Array,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 module.exports = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   category: {
     type: String,
@@ -27,11 +27,11 @@ module.exports = new Schema({
   // },
   price: {
     type: Number,
-    required: true
+    required: true,
   },
   shortDescription: {
     type: [String],
-    required: true
+    required: true,
   },
   technicalSpecs: {
     type: [Object],
@@ -40,15 +40,15 @@ module.exports = new Schema({
   images: {
     // TODO: include different kinds, like Main and Others
     type: [Object],
-    required: true
+    required: true,
   },
   relatedProducts: {
     // TODO: consider more specific typing (to include name, url and price)
     type: Object,
-    required: false
+    required: false,
   },
   reviews: {
     type: reviewsSchema,
-    required: false
-  }
+    required: false,
+  },
 });
