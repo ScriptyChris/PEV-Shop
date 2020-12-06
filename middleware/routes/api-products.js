@@ -1,14 +1,38 @@
-const { readFileSync } = require('fs');
+// const { readFileSync } = require('fs');
 const { Router } = require('express');
 const { authMiddlewareFn: authMiddleware, userRoleMiddlewareFn } = require('../features/auth');
 const { getFromDB, saveToDB, updateOneModelInDB } = require('../../database/index');
 
 const router = Router();
-const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
-const productList = getProductList();
+// const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
+// const productList =  getProductList();
 
-router.get('/api/products', (req, res) => {
-  res.json(productList);
+router.get('/api/products', async (req, res) => {
+  console.log('[products GET]');
+
+  try {
+    const products = await getFromDB({}, 'Product');
+
+    res.status(200).json({ products });
+  } catch (exception) {
+    console.error('Retrieving product exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+});
+
+router.get('/api/products/:id', async (req, res) => {
+  console.log('[products/:id GET] req.param', req.params);
+
+  try {
+    const product = await getFromDB(req.params._id, 'Product');
+
+    res.status(200).json({ product });
+  } catch (exception) {
+    console.error('Retrieving product exception:', exception);
+
+    res.status(500).json({ exception });
+  }
 });
 
 router.post('/api/products', async (req, res) => {
@@ -18,15 +42,14 @@ router.post('/api/products', async (req, res) => {
     const savedProduct = await saveToDB(req.body, 'Product');
 
     console.log('Product saved', savedProduct);
+
+    res.status(201);
+    res.end('Success!');
   } catch (exception) {
     console.error('Saving product exception:', exception);
 
-    res.status(500);
-    res.end(JSON.stringify({ exception }));
+    res.status(500).json({ exception });
   }
-
-  res.status(201);
-  res.end('Success!');
 });
 
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), async (req, res) => {
@@ -51,12 +74,12 @@ router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('
 
 module.exports = router;
 
-function getProductList() {
-  const [firstCategory] = JSON.parse(readFileSync(`${databaseDirname}/raw-data-formatted.json`, 'utf8'));
-
-  return firstCategory.products.map(({ name, url, price, images }) => {
-    const image = '/images/' + images[0].imageSrc.split('/').pop();
-
-    return { name, url, price, image };
-  });
-}
+// function getProductList() {
+//   const [firstCategory] = JSON.parse(readFileSync(`${databaseDirname}/raw-data-formatted.json`, 'utf8'));
+//
+//   return firstCategory.products.map(({ name, url, price, images }) => {
+//     const image = '/images/' + images[0].imageSrc.split('/').pop();
+//
+//     return { name, url, price, image };
+//   });
+// }

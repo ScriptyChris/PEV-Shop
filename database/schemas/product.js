@@ -2,7 +2,16 @@ const { Schema } = require('mongoose');
 
 const reviewsSchema = new Schema({
   summary: {
-    type: Object,
+    type: {
+      rating: {
+        type: Number,
+        default: 0,
+      },
+      reviewsAmount: {
+        type: String,
+        default: '',
+      },
+    },
     required: true,
   },
   list: {
@@ -11,7 +20,7 @@ const reviewsSchema = new Schema({
   },
 });
 
-module.exports = new Schema({
+const userSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -52,3 +61,13 @@ module.exports = new Schema({
     required: false,
   },
 });
+
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+
+  delete user.__v;
+
+  return user;
+};
+
+module.exports = userSchema;

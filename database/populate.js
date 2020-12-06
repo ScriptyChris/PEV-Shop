@@ -41,7 +41,7 @@ function connectToDB() {
 }
 
 function getProductModel() {
-  return model('Full-Product', productSchema);
+  return model('Product', productSchema);
 }
 
 async function getSourceData() {
@@ -97,7 +97,7 @@ async function populateProducts(ProductModel, sourceDataList) {
     const isAnyReview = data.reviews[0] !== null;
 
     normalizedData.reviews = {
-      summary: isAnyReview ? data.reviews[0] : {},
+      summary: isAnyReview ? data.reviews[0] : { summary: '', reviewsAmount: 0 },
       list: isAnyReview ? data.reviews.slice(1) : [],
     };
 
