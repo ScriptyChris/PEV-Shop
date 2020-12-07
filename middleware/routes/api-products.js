@@ -13,7 +13,7 @@ router.get('/api/products', async (req, res) => {
   try {
     const products = await getFromDB({}, 'Product');
 
-    res.status(200).json({ products });
+    res.status(200).json(products);
   } catch (exception) {
     console.error('Retrieving product exception:', exception);
 
@@ -27,7 +27,7 @@ router.get('/api/products/:id', async (req, res) => {
   try {
     const product = await getFromDB(req.params._id, 'Product');
 
-    res.status(200).json({ product });
+    res.status(200).json(product);
   } catch (exception) {
     console.error('Retrieving product exception:', exception);
 

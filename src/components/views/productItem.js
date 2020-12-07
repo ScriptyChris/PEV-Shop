@@ -11,8 +11,7 @@ export default function ProductItem({ product }) {
     detailsBtn: 'Check details!',
     addToCart: 'Add to cart!',
   };
-
-  const { name, url, image, price, details } = product;
+  const { name, price } = product;
 
   const handleAddToCartClick = () => {
     appStore.updateUserCartState({ name, price });
@@ -20,18 +19,18 @@ export default function ProductItem({ product }) {
 
   return (
     <li className="product-list-item">
-      <img src={image} alt={`${translations.productImage}${name}`} className="product-list-item__image" />
+      {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-list-item__image" />*/}
 
       <dl>
         <div className="product-list-item__metadata">
           <dt>{translations.productName}:</dt>
-          <dd>{image}</dd>
+          <dd>{name}</dd>
         </div>
 
-        <div className="product-list-item__metadata">
-          <dt>{translations.productUrl}:</dt>
-          <dd>{url}</dd>
-        </div>
+        {/*<div className="product-list-item__metadata">*/}
+        {/*  <dt>{translations.productUrl}:</dt>*/}
+        {/*  <dd>{url}</dd>*/}
+        {/*</div>*/}
 
         <div className="product-list-item__metadata">
           <dt>{translations.price}:</dt>
@@ -43,8 +42,8 @@ export default function ProductItem({ product }) {
 
       <Link
         to={{
-          pathname: `/shop/${url}`,
-          state: { name, details },
+          pathname: `/shop/${name/*url*/}`,
+          state: product,
         }}
       >
         {translations.detailsBtn}
