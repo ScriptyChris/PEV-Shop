@@ -18,7 +18,7 @@ export default function ProductItem({ product }) {
   };
 
   return (
-    <li className="product-list-item">
+    <div className="product-list-item">
       {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-list-item__image" />*/}
 
       <dl>
@@ -48,6 +48,6 @@ export default function ProductItem({ product }) {
       >
         {translations.detailsBtn}
       </Link>
-    </li>
+    </div>
   );
 }

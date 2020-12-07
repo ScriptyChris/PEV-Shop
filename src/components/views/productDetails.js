@@ -1,16 +1,36 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+import ProductItem from './productItem';
 
 export default function ProductDetails() {
   const { state: locationState } = useLocation();
   const translations = {
+    name: 'Name',
+    price: 'Price',
+    shortDescription: 'Short description',
     technicalSpecs: 'Specification',
     reviews: 'Reviews',
     author: 'Author',
+    relatedProducts: 'Related products',
     emptyData: 'No data!',
   };
 
   console.log('[ProductDetails] location.state: ', locationState);
+
+  const getPriceContent = () => {
+    // TODO: create price component, which will handle things like promotion and will format price according to locale and/or chosen currency
+    return <p>{translations.price}: ${locationState.price}</p>;
+  };
+
+  const getShortDescriptionContent = () => {
+    return <>
+      <ul>
+        {locationState.shortDescription.map((description, index) => {
+          return <li key={`short-description-${index}`}>{description}</li>
+        })}
+      </ul>
+    </>
+  };
 
   const getTechnicalSpecsContent = () => {
     if (!Array.isArray(locationState.technicalSpecs)) {
@@ -62,13 +82,37 @@ export default function ProductDetails() {
     );
   };
 
+  // TODO: it probably might be used as a separate component
+  const getRelatedProductsContent = () => {
+    if (!locationState.relatedProducts.length) {
+      return translations.emptyData;
+    }
+
+    return (
+        <>
+          <p>{translations.relatedProducts}</p>
+          <ul>
+            {locationState.relatedProducts.map((relatedProduct, index) => {
+              return <li key={`related-product-${index}`}>
+                  {/*TODO: ProductItem component in this case will not have full product info, so it has to somehow fetch it on it's own*/}
+                  <ProductItem product={relatedProduct} />
+              </li>;
+            })}
+          </ul>
+        </>
+    );
+  };
+
   return (
     <section>
       Product details!
-      <p>{locationState.name}</p>
+      <p>[{locationState.category}]: {locationState.name}</p>
 
+      {getShortDescriptionContent()}
+      {getPriceContent()}
       {getTechnicalSpecsContent()}
       {getReviewsContent()}
+      {getRelatedProductsContent()}
     </section>
   );
 }
