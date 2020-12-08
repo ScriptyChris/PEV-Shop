@@ -69,6 +69,10 @@ const apiService = new (class ApiService extends Ajax {
     return this.getRequest(this.PRODUCTS_URL);
   }
 
+  getProduct(id) {
+    return this.getRequest(`${this.PRODUCTS_URL}/${id}`);
+  }
+
   getUser() {
     const userId = '5f5a8dce154f830fd840dc7b';
     return this.getRequest(`${this.USERS_URL}/${userId}`, true);

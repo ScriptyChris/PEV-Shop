@@ -84,15 +84,10 @@ async function populateProducts(ProductModel, sourceDataList) {
   );
 
   function normalizeData(data, normalizersObj) {
-    const categoryName = data.nameAndCategory.category.name;
-
     const normalizedData = {
       ...data,
-      name: data.nameAndCategory.name,
-      category: normalizersObj.category(categoryName),
+      category: normalizersObj.category(data.category),
     };
-
-    delete normalizedData.nameAndCategory;
 
     const isAnyReview = data.reviews[0] !== null;
 

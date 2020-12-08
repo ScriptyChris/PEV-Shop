@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import ProductItem from './productItem';
+import apiService from "../../features/apiService";
 
 export default function ProductDetails() {
   const { state: locationState } = useLocation();
@@ -93,6 +94,10 @@ export default function ProductDetails() {
           <p>{translations.relatedProducts}</p>
           <ul>
             {locationState.relatedProducts.map((relatedProduct, index) => {
+              // some magic
+              // await apiService.getProduct(relatedProduct._id);
+
+              console.log('// relatedProduct', relatedProduct);
               return <li key={`related-product-${index}`}>
                   {/*TODO: ProductItem component in this case will not have full product info, so it has to somehow fetch it on it's own*/}
                   <ProductItem product={relatedProduct} />

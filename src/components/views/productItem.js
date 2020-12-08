@@ -11,7 +11,7 @@ export default function ProductItem({ product }) {
     detailsBtn: 'Check details!',
     addToCart: 'Add to cart!',
   };
-  const { name, price } = product;
+  const { name, price, url } = product;
 
   const handleAddToCartClick = () => {
     appStore.updateUserCartState({ name, price });
@@ -27,11 +27,6 @@ export default function ProductItem({ product }) {
           <dd>{name}</dd>
         </div>
 
-        {/*<div className="product-list-item__metadata">*/}
-        {/*  <dt>{translations.productUrl}:</dt>*/}
-        {/*  <dd>{url}</dd>*/}
-        {/*</div>*/}
-
         <div className="product-list-item__metadata">
           <dt>{translations.price}:</dt>
           <dd>{price}</dd>
@@ -42,7 +37,7 @@ export default function ProductItem({ product }) {
 
       <Link
         to={{
-          pathname: `/shop/${name/*url*/}`,
+          pathname: `/shop/${url}`,
           state: product,
         }}
       >
