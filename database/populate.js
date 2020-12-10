@@ -26,6 +26,7 @@ console.log('process.argv:', process.argv);
   const sourceDataList = await getSourceData();
 
   await populateProducts(Product, sourceDataList);
+  await assignIDsToRelatedProducts(Product);
 
   connection.close();
 })();
@@ -119,6 +120,35 @@ async function populateProducts(ProductModel, sourceDataList) {
 
     return (categoryName) => categoryName;
   }
+}
+
+async function assignIDsToRelatedProducts(Product) {
+  // temp1.forEach(product => {
+  //   product.relatedProducts.every(rp => temp1.find(p => p.url === rp.url && p.name === rp.name)) && prods.push(product)
+  // })
+
+  const productsHavingRelatedProducts = Product.find({ relatedProducts: { $ne: [] }});
+
+  for await (const withRelated of productsHavingRelatedProducts) {
+    for (const relatedProductToUpdate of withRelated.relatedProducts) {
+      const relatedProduct = await Product
+        .findOne(
+          { url: relatedProductToUpdate.url, name: relatedProductToUpdate.name },
+          ['url', '_id']
+        );
+
+      await Product.updateMany(
+        { 'relatedProducts.url': relatedProduct.url },
+        { $set: { 'relatedProducts.$.id': relatedProduct._id } }
+      );
+    }
+  }
+
+  const amountOfAllProducts = await Product.find({}).countDocuments();
+  const amountOfRelatedProductsWithID = await Product
+    .find({ 'relatedProducts.id': { $exists: true } }).countDocuments();
+
+  console.log('All done?', amountOfAllProducts === amountOfRelatedProductsWithID);
 }
 
 function getScriptParamValue(param, lenientSearch) {
