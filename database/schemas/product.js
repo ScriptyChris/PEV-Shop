@@ -20,7 +20,7 @@ const reviewsSchema = new Schema({
   },
 });
 
-const userSchema = new Schema({
+const productSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -56,8 +56,7 @@ const userSchema = new Schema({
     required: true,
   },
   relatedProducts: {
-    // TODO: consider more specific typing (to include name, url and price)
-    type: Object,
+    type: [Object],
     required: false,
   },
   reviews: {
@@ -66,7 +65,7 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.methods.toJSON = function () {
+productSchema.methods.toJSON = function () {
   const user = this.toObject();
 
   delete user.__v;
@@ -74,4 +73,4 @@ userSchema.methods.toJSON = function () {
   return user;
 };
 
-module.exports = userSchema;
+module.exports = productSchema;

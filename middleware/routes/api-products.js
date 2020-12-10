@@ -8,10 +8,12 @@ const router = Router();
 // const productList =  getProductList();
 
 router.get('/api/products', async (req, res) => {
-  console.log('[products GET]');
+  console.log('[products GET] query', req.query);
 
   try {
-    const products = await getFromDB({}, 'Product');
+    // TODO: move building query to (probably) getFromDB function
+    const query = req.query.idList ? { _id: { $in: req.query.idList.split(',') } } : {};
+    const products = await getFromDB(query, 'Product');
 
     res.status(200).json(products);
   } catch (exception) {

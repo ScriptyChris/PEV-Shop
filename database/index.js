@@ -41,7 +41,9 @@ const getFromDB = (itemQuery, modelType) => {
       itemQuery = { _id: itemQuery };
     }
 
-    const findMethod = isEmptyQuery(itemQuery) ? 'find' : 'findOne';
+    const findMethod = (
+      isEmptyQueryObject(itemQuery) || Reflect.toString.call(itemQuery._id === '[object Object]')
+    ) ? 'find' : 'findOne';
 
     // TODO: wrap it with util.promisify
     Model[findMethod](itemQuery, (error, foundItem) => {
@@ -107,6 +109,6 @@ module.exports = {
   ObjectId,
 };
 
-function isEmptyQuery(query) {
+function isEmptyQueryObject(query) {
   return typeof query === 'object' && !Object.keys(query).length;
 }
