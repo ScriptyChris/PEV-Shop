@@ -28,9 +28,11 @@ export default class ProductList extends React.Component {
       <ul className="product-list">
         {this.state.productList.length > 0
           ? this.state.productList.map((product) => {
-              return <li key={product.name}>
-                <ProductItem product={product} />
-              </li>;
+              return (
+                <li key={product.name}>
+                  <ProductItem product={product} />
+                </li>
+              );
             })
           : this.translations.lackOfProducts}
       </ul>
