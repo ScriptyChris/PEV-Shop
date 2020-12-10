@@ -2,6 +2,7 @@ const { ObjectId } = require('mongodb');
 const { connect } = require('mongoose');
 const getModel = require('./models/index');
 
+// TODO: move to ENV
 const databaseURL = 'mongodb://localhost:27017';
 connect(databaseURL, {
   useNewUrlParser: true,
@@ -20,6 +21,7 @@ const saveToDB = (itemData, modelType) => {
   const item = new Model(itemData);
 
   return new Promise((resolve, reject) => {
+    // TODO: wrap it with util.promisify
     item.save((error, savedItem) => {
       if (error) {
         return reject(error);
@@ -39,7 +41,11 @@ const getFromDB = (itemQuery, modelType) => {
       itemQuery = { _id: itemQuery };
     }
 
-    Model.findOne(itemQuery, (error, foundItem) => {
+    const findMethod =
+      isEmptyQueryObject(itemQuery) || Reflect.toString.call(itemQuery._id === '[object Object]') ? 'find' : 'findOne';
+
+    // TODO: wrap it with util.promisify
+    Model[findMethod](itemQuery, (error, foundItem) => {
       if (error) {
         return reject(error);
       }
@@ -84,6 +90,7 @@ const updateOneModelInDB = (itemQuery, updateData, modelType) => {
       [operator]: updateData.data,
     };
 
+    // TODO: wrap it with util.promisify
     Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true }, (error, updatedItem) => {
       if (error) {
         return reject(error);
@@ -100,3 +107,7 @@ module.exports = {
   updateOneModelInDB,
   ObjectId,
 };
+
+function isEmptyQueryObject(query) {
+  return typeof query === 'object' && !Object.keys(query).length;
+}

@@ -10,6 +10,9 @@ export default class ProductList extends React.Component {
     this.state = {
       productList: [],
     };
+    this.translations = {
+      lackOfProducts: 'Brak produktów...',
+    };
     this.getProductList();
   }
 
@@ -21,17 +24,17 @@ export default class ProductList extends React.Component {
   }
 
   render() {
-    const translations = {
-      lackOfProducts: 'Brak produktów...',
-    };
-
     return (
       <ul className="product-list">
         {this.state.productList.length > 0
           ? this.state.productList.map((product) => {
-              return <ProductItem key={product.name} product={product} />;
+              return (
+                <li key={product.name}>
+                  <ProductItem product={product} />
+                </li>
+              );
             })
-          : translations.lackOfProducts}
+          : this.translations.lackOfProducts}
       </ul>
     );
   }
