@@ -1,7 +1,7 @@
 // const { readFileSync } = require('fs');
 const { Router } = require('express');
 const { authMiddlewareFn: authMiddleware, userRoleMiddlewareFn } = require('../features/auth');
-const { getFromDB, saveToDB, updateOneModelInDB } = require('../../database/index');
+const { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } = require('../../database/index');
 
 const router = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
@@ -10,12 +10,20 @@ const router = Router();
 router.get('/api/products', async (req, res) => {
   console.log('[products GET] query', req.query);
 
+  // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
-    // TODO: move building query to (probably) getFromDB function
-    const query = req.query.idList ? { _id: { $in: req.query.idList.split(',') } } : {};
-    const products = await getFromDB(query, 'Product');
+    const query = queryBuilder.getIdListConfig(req.query);
+    const options = {};
 
-    res.status(200).json(products);
+    if (Object.keys(query).length === 0) {
+      options.pagination = queryBuilder.getPaginationConfig(req.query);
+    }
+
+    const paginatedProducts = await getFromDB(query, 'Product', options);
+
+    console.log('paginatedProducts:', paginatedProducts);
+
+    res.status(200).json(paginatedProducts);
   } catch (exception) {
     console.error('Retrieving product exception:', exception);
 

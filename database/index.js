@@ -1,6 +1,8 @@
 const { ObjectId } = require('mongodb');
 const { connect } = require('mongoose');
 const getModel = require('./models/index');
+const queryBuilder = require('./utils/queryBuilder');
+const getPaginatedItems = require('./utils/pagination');
 
 // TODO: move to ENV
 const databaseURL = 'mongodb://localhost:27017';
@@ -32,27 +34,24 @@ const saveToDB = (itemData, modelType) => {
   });
 };
 
-const getFromDB = (itemQuery, modelType) => {
+const getFromDB = async (itemQuery, modelType, options) => {
   const Model = getModel(modelType);
 
-  return new Promise((resolve, reject) => {
-    // TODO: improve querying via various ways
-    if (typeof itemQuery === 'string') {
-      itemQuery = { _id: itemQuery };
-    }
+  if (options.pagination) {
+    return getPaginatedItems(Model, itemQuery, options.pagination);
+  }
 
-    const findMethod =
-      isEmptyQueryObject(itemQuery) || Reflect.toString.call(itemQuery._id === '[object Object]') ? 'find' : 'findOne';
+  // TODO: improve querying via various ways
+  if (typeof itemQuery === 'string') {
+    itemQuery = { _id: itemQuery };
+  }
 
-    // TODO: wrap it with util.promisify
-    Model[findMethod](itemQuery, (error, foundItem) => {
-      if (error) {
-        return reject(error);
-      }
+  const findMethod =
+    queryBuilder.isEmptyQueryObject(itemQuery) || Reflect.toString.call(itemQuery._id === '[object Object]')
+      ? 'find'
+      : 'findOne';
 
-      resolve(foundItem);
-    });
-  });
+  return Model[findMethod](itemQuery);
 };
 
 // TODO: consider making this function either specific to update case or generic dependent on params
@@ -105,9 +104,6 @@ module.exports = {
   saveToDB,
   getFromDB,
   updateOneModelInDB,
+  queryBuilder,
   ObjectId,
 };
-
-function isEmptyQueryObject(query) {
-  return typeof query === 'object' && !Object.keys(query).length;
-}
