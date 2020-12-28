@@ -3,12 +3,11 @@ const isEmptyQueryObject = (query) => {
 };
 
 const getPaginationConfig = (reqQuery) => {
-  if (!('skip' in reqQuery) || !('limit' in reqQuery)) {
-    // when no pagination params are provided, then do pagination by default
-    return { skip: 0, limit: 10 };
+  if (!('page' in reqQuery) || !('limit' in reqQuery)) {
+    return null;
   }
 
-  return { skip: Number(reqQuery.skip), limit: Number(reqQuery.limit) };
+  return { page: Number(reqQuery.page), limit: Number(reqQuery.limit) };
 };
 
 const getIdListConfig = (reqQuery) => {

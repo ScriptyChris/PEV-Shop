@@ -1,16 +1,19 @@
+// TODO: cache pagination for each user (for next/prev page navigation)
 const getPaginatedItems = async (Model, itemQuery, paginationConfig) => {
-  const paginatedItems = await Model.paginate(itemQuery, {
-    offset: paginationConfig.skip,
-    // page: 1,
+  const options = {
+    page: paginationConfig.page,
     limit: paginationConfig.limit,
-    // useEstimatedCount: true,
     customLabels: {
-      docs: 'products',
+      docs: 'productsList',
+      totalDocs: 'totalProducts',
     },
-  });
+  };
 
-  console.log('paginatedItems:', paginatedItems);
+  const paginatedItems = await Model.paginate(itemQuery, options);
 
+  console.log(/*'paginatedItems:', paginatedItems, */' /paginationConfig:', paginationConfig, ' /options:', options);
+
+  // TODO: delete unnecessary pagination props from returning object
   return paginatedItems;
 };
 

@@ -14,14 +14,15 @@ router.get('/api/products', async (req, res) => {
   try {
     const query = queryBuilder.getIdListConfig(req.query);
     const options = {};
+    const paginationConfig = queryBuilder.getPaginationConfig(req.query);
 
-    if (Object.keys(query).length === 0) {
-      options.pagination = queryBuilder.getPaginationConfig(req.query);
+    if (queryBuilder.isEmptyQueryObject(query) && paginationConfig) {
+      options.pagination = paginationConfig;
     }
 
     const paginatedProducts = await getFromDB(query, 'Product', options);
 
-    console.log('paginatedProducts:', paginatedProducts);
+    // console.log('paginatedProducts:', paginatedProducts);
 
     res.status(200).json(paginatedProducts);
   } catch (exception) {
