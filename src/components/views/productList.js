@@ -1,6 +1,7 @@
 import React from 'react';
 import apiService from '../../features/apiService';
 import ProductItem from './productItem';
+import ReactPaginate from 'react-paginate';
 
 // TODO: consider refactoring class based component to a function based one (and so use mobx-react-lite instead of mobx-react)
 export default class ProductList extends React.Component {
@@ -13,71 +14,80 @@ export default class ProductList extends React.Component {
       allProducts: 'Wszystkie produkty'
     };
     // TODO: setup this on backend and pass via some initial config to frontend
-    this.paginationRanges = [15, 30, 60, Infinity];
+    this.productsPerPageLimits = [15, 30, 60, Infinity];
     this.state = {
       productsList: [],
-      currentPaginationPage: 1,
-      // TODO: set initial pagination range based on device that runs app (f.e. mobile should have lowest range and PC highest)
-      currentPaginationRange: this.paginationRanges[0]
+      productsCount: 0,
+      totalPages: 0,
+      currentProductPage: 1,
+      // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
+      currentProductsPerPageLimit: this.productsPerPageLimits[0]
     };
-    this.updateProductList(this.state.currentPaginationRange);
-  }
-
-  getProducts(pagination) {
-    if (pagination) {
-      return apiService.getProducts(pagination);
-    }
-
-    return apiService.getProducts();
+    this.updateProductList(this.state.currentProductsPerPageLimit).then();
   }
 
   updatePaginationNavigation() {
-    
+
   }
 
   async updateProductList(productsPerPage) {
-    let productsList = [];
-    const isHighestPaginationRange = productsPerPage === this.paginationRanges[this.paginationRanges.length - 1];
+    let productsList = this.state.productsList;
+    let productsCount = this.state.productsCount;
+    let totalPages = this.state.totalPages;
+    const isHighestProductsPerPage = productsPerPage === this.productsPerPageLimits[this.productsPerPageLimits.length - 1];
 
-    if (isHighestPaginationRange) {
-      productsList = await this.getProducts();
+    if (isHighestProductsPerPage) {
+      productsList = await apiService.getProducts();
+      productsCount = productsList.length;
+      totalPages = 1;
     } else {
-      const products = await this.getProducts({ pageNumber: this.state.currentPaginationPage, productsPerPage });
+      const products = await apiService.getProducts({ pageNumber: this.state.currentProductPage, productsPerPage });
       productsList = products.productsList;
-
-      this.updatePaginationNavigation();
+      productsCount = products.totalProducts;
+      totalPages = products.totalPages;
 
       console.log('paginated products:', products);
     }
 
+    this.updatePaginationNavigation();
+
     console.log('productsList:', productsList);
 
-    this.setState({ productsList });
+    this.setState({ productsList, currentProductsPerPageLimit: productsPerPage, productsCount, totalPages });
   }
 
-  updatePaginationRange({target}) {
+  updateProductsPerPageLimit({target}) {
     const productsPerPage = Number(target.options[target.selectedIndex].value);
-    console.log('[updatePaginationRange] productsPerPage:', productsPerPage, ' /opt index: ', target.selectedIndex);
+    console.log('[updateProductsPerPageLimit] productsPerPage:', productsPerPage, ' /opt index: ', target.selectedIndex);
 
-    this.updateProductList(productsPerPage);
+    this.updateProductList(productsPerPage).then();
   }
 
   render() {
     return (
         <>
           <div>
-            <label htmlFor="productListRangeSelect">
+            <label htmlFor="productsPerPageLimitSelect">
               {this.translations.productsPerPage}
 
-              <select onChange={this.updatePaginationRange.bind(this)} id="productListRangeSelect">
-                {this.paginationRanges.map((paginationRange, index) =>
-                    <option value={paginationRange} key={`paginationRange-${index}`}>
-                      {index === this.paginationRanges.length - 1 ? this.translations.allProducts : paginationRange}
+              <select onChange={this.updateProductsPerPageLimit.bind(this)} id="productsPerPageLimitSelect">
+                {this.productsPerPageLimits.map((productsPerPageLimit, index) =>
+                    <option value={productsPerPageLimit} key={`productsPerPageLimit-${index}`}>
+                      {index === this.productsPerPageLimits.length - 1 ? this.translations.allProducts : productsPerPageLimit}
                     </option>
                 )}
               </select>
             </label>
           </div>
+
+          count??? {this.state.productsCount} <br/>
+          range??? {this.state.totalPages}
+
+          <ReactPaginate
+              pageCount={this.state.totalPages}
+              pageRangeDisplayed={1}
+              marginPagesDisplayed={2}
+          />
 
           <ul className="product-list">
             {this.state.productsList.length > 0
