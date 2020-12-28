@@ -23,14 +23,10 @@ export default class ProductList extends React.Component {
       // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
       currentProductsPerPageLimit: this.productsPerPageLimits[0]
     };
-    this.updateProductList(this.state.currentProductsPerPageLimit).then();
+    this.updateProductsList().then();
   }
 
-  updatePaginationNavigation() {
-
-  }
-
-  async updateProductList(productsPerPage) {
+  async updateProductsList({ pageNumber = this.state.currentProductPage, productsPerPage = this.state.currentProductsPerPageLimit } = {}) {
     let productsList = this.state.productsList;
     let productsCount = this.state.productsCount;
     let totalPages = this.state.totalPages;
@@ -41,7 +37,7 @@ export default class ProductList extends React.Component {
       productsCount = productsList.length;
       totalPages = 1;
     } else {
-      const products = await apiService.getProducts({ pageNumber: this.state.currentProductPage, productsPerPage });
+      const products = await apiService.getProducts({ pageNumber, productsPerPage });
       productsList = products.productsList;
       productsCount = products.totalProducts;
       totalPages = products.totalPages;
@@ -49,18 +45,22 @@ export default class ProductList extends React.Component {
       console.log('paginated products:', products);
     }
 
-    this.updatePaginationNavigation();
-
     console.log('productsList:', productsList);
 
-    this.setState({ productsList, currentProductsPerPageLimit: productsPerPage, productsCount, totalPages });
+    this.setState({ productsList, currentProductsPerPageLimit: productsPerPage, productsCount, totalPages, currentProductPage: pageNumber });
   }
 
-  updateProductsPerPageLimit({target}) {
+  onProductsPerPageLimitChange({target}) {
     const productsPerPage = Number(target.options[target.selectedIndex].value);
-    console.log('[updateProductsPerPageLimit] productsPerPage:', productsPerPage, ' /opt index: ', target.selectedIndex);
+    console.log('[onProductsPerPageLimitChange] productsPerPage:', productsPerPage, ' /opt index: ', target.selectedIndex);
 
-    this.updateProductList(productsPerPage).then();
+    this.updateProductsList({ pageNumber: 1, productsPerPage }).then();
+  }
+
+  onProductPageChange({ selected: currentPageIndex }) {
+    console.log('currentPageIndex:', currentPageIndex);
+
+    this.updateProductsList({ pageNumber: currentPageIndex + 1 }).then();
   }
 
   render() {
@@ -70,7 +70,7 @@ export default class ProductList extends React.Component {
             <label htmlFor="productsPerPageLimitSelect">
               {this.translations.productsPerPage}
 
-              <select onChange={this.updateProductsPerPageLimit.bind(this)} id="productsPerPageLimitSelect">
+              <select onChange={this.onProductsPerPageLimitChange.bind(this)} id="productsPerPageLimitSelect">
                 {this.productsPerPageLimits.map((productsPerPageLimit, index) =>
                     <option value={productsPerPageLimit} key={`productsPerPageLimit-${index}`}>
                       {index === this.productsPerPageLimits.length - 1 ? this.translations.allProducts : productsPerPageLimit}
@@ -83,10 +83,14 @@ export default class ProductList extends React.Component {
           count??? {this.state.productsCount} <br/>
           range??? {this.state.totalPages}
 
+          {/* TODO: move to separate component with styling included */}
           <ReactPaginate
               pageCount={this.state.totalPages}
               pageRangeDisplayed={1}
               marginPagesDisplayed={2}
+              onPageChange={this.onProductPageChange.bind(this)}
+              forcePage={this.state.currentProductPage - 1}
+              containerClassName="pagination-container"
           />
 
           <ul className="product-list">

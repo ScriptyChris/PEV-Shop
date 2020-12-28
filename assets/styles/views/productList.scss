@@ -25,3 +25,10 @@
     }
   }
 }
+
+// TODO: move to pagination component
+.pagination-container {
+  .selected {
+    border: 1px solid green;
+  }
+}
