@@ -2,9 +2,15 @@ import React, { memo } from 'react';
 import ReactPaginate from 'react-paginate';
 
 function Pagination(props) {
+  // TODO: handle aria-label translations using ariaLabelBuilder(..)
+  const translations = {
+    previous: 'Poprzednia',
+    next: 'Następna',
+  };
+
   return (
-    <>
-      <select onChange={props.onItemsPerPageLimitChange}>
+    <nav className="pagination-container">
+      <select onChange={props.onItemsPerPageLimitChange} className="pagination-container__limit-selector">
         {props.itemLimitsPerPage.map((limitPerPage, index, arrayContext) => {
           const limitText = `${limitPerPage} ${props.translations.itemsPerPageSuffix}`;
           const optionText = index === arrayContext.length - 1 ? props.translations.allItems : limitText;
@@ -23,9 +29,16 @@ function Pagination(props) {
         marginPagesDisplayed={2}
         onPageChange={props.onItemPageChange}
         forcePage={props.currentItemPageIndex}
-        containerClassName="pagination-container"
+        previousLabel={translations.previous}
+        nextLabel={translations.next}
+        containerClassName="pagination-container__nav"
+        pageClassName="pagination-nav__item"
+        breakClassName="pagination-nav__break"
+        previousClassName="pagination-nav__previous-item"
+        nextClassName="pagination-nav__next-item"
+        disabledClassName="pagination-nav__disabled-item"
       />
-    </>
+    </nav>
   );
 }
 
