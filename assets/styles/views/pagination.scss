@@ -1,7 +1,5 @@
 @import '../_var';
 
-$boundaryItemsInnerHorizontalMargin: $interactiveItemDimension / 4;
-
 .pagination-container {
   display: flex;
   justify-content: space-around;
@@ -32,7 +30,6 @@ $boundaryItemsInnerHorizontalMargin: $interactiveItemDimension / 4;
 }
 
 .pagination-nav {
-  // TODO: improve items displacement considering dynamic number of &__break elements
   &__item, &__break, &__previous-item, &__next-item {
     height: $interactiveItemDimension;
     display: inline-flex;
@@ -45,11 +42,11 @@ $boundaryItemsInnerHorizontalMargin: $interactiveItemDimension / 4;
   }
 
   &__previous-item {
-    margin-right: $boundaryItemsInnerHorizontalMargin;
+    margin-right: auto;
   }
 
   &__next-item {
-    margin-left: $boundaryItemsInnerHorizontalMargin;
+    margin-left: auto;
   }
 
   &__disabled-item {

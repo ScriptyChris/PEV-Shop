@@ -2,11 +2,15 @@ import React, { memo } from 'react';
 import ReactPaginate from 'react-paginate';
 
 function Pagination(props) {
-  // TODO: handle aria-label translations using ariaLabelBuilder(..)
   const translations = {
+    page: 'Strona',
     previous: 'Poprzednia',
     next: 'Następna',
   };
+  translations.previousAriaLabel = `${translations.previous} ${translations.page.toLowerCase()}`;
+  translations.nextAriaLabel = `${translations.next} ${translations.page.toLowerCase()}`;
+
+  const updateAriaLabelForPageBtn = (pageNr) => `${translations.page} ${pageNr}`;
 
   return (
     <nav className="pagination-container">
@@ -37,6 +41,9 @@ function Pagination(props) {
         previousClassName="pagination-nav__previous-item"
         nextClassName="pagination-nav__next-item"
         disabledClassName="pagination-nav__disabled-item"
+        previousAriaLabel={translations.previousAriaLabel}
+        nextAriaLabel={translations.nextAriaLabel}
+        ariaLabelBuilder={updateAriaLabelForPageBtn}
       />
     </nav>
   );
