@@ -5,8 +5,6 @@ const middleware = require('./middleware/index');
 // TODO: handle it in better way
 process.env.NODE_ENV = 'development';
 
-// TODO: run prettier on project save
-
 module.exports = {
   mode: 'development',
   entry: './src/app.js',
@@ -18,7 +16,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        loader: ['babel-loader', 'eslint-loader'],
+        loader: ['babel-loader', 'eslint-loader', 'prettier-loader'],
         exclude: /node_modules/,
       },
       {
@@ -28,7 +26,7 @@ module.exports = {
             'css-loader',
             'sass-loader'
         ]
-      }
+      },
     ]
   },
   plugins: [
