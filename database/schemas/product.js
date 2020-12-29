@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const reviewsSchema = new Schema({
   summary: {
@@ -64,6 +65,8 @@ const productSchema = new Schema({
     required: false,
   },
 });
+
+productSchema.plugin(mongoosePaginate);
 
 productSchema.methods.toJSON = function () {
   const user = this.toObject();

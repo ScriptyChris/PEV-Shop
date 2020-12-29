@@ -1,0 +1,55 @@
+@import '../_var';
+
+.pagination-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  max-width: 30rem;
+
+  &__limit-selector {
+    height: $interactiveItemDimension;
+  }
+
+  &__nav {
+    display: flex;
+    min-width: 21rem;
+    height: $interactiveItemDimension;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    a:hover {
+      cursor: pointer;
+    }
+
+    .selected {
+      border: 1px solid green;
+    }
+  }
+}
+
+.pagination-nav {
+  &__item, &__break, &__previous-item, &__next-item {
+    height: $interactiveItemDimension;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__item {
+    width: $interactiveItemDimension;
+  }
+
+  &__previous-item {
+    margin-right: auto;
+  }
+
+  &__next-item {
+    margin-left: auto;
+  }
+
+  &__disabled-item {
+    visibility: hidden;
+  }
+}

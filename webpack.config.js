@@ -16,7 +16,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        loader: ['babel-loader', 'eslint-loader'],
+        loader: ['babel-loader', 'eslint-loader', 'prettier-loader'],
         exclude: /node_modules/,
       },
       {
@@ -26,7 +26,7 @@ module.exports = {
             'css-loader',
             'sass-loader'
         ]
-      }
+      },
     ]
   },
   plugins: [

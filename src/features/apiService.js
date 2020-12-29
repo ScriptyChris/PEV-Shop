@@ -65,7 +65,11 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(this.PRODUCTS_URL, product);
   }
 
-  getProducts() {
+  getProducts(pagination) {
+    if (pagination) {
+      return this.getRequest(`${this.PRODUCTS_URL}?page=${pagination.pageNumber}&limit=${pagination.productsPerPage}`);
+    }
+
     return this.getRequest(this.PRODUCTS_URL);
   }
 
