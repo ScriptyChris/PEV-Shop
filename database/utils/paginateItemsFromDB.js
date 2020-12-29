@@ -11,8 +11,6 @@ const getPaginatedItems = async (Model, itemQuery, paginationConfig) => {
 
   const paginatedItems = await Model.paginate(itemQuery, options);
 
-  console.log(/*'paginatedItems:', paginatedItems, */' /paginationConfig:', paginationConfig, ' /options:', options);
-
   // TODO: delete unnecessary pagination props from returning object
   return paginatedItems;
 };
