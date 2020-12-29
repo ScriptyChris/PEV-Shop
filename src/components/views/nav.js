@@ -10,29 +10,38 @@ export default observer(function Nav() {
     appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
   };
 
+  const translations = {
+    start: 'Start',
+    shop: 'Sklep',
+    addNewProduct: 'Dodaj nowy produkt',
+    logIn: 'Zaloguj się',
+    logOut: 'Wyloguj się',
+    account: 'Moje konto',
+  };
+
   return (
     <nav className="nav">
       <ul>
         <li>
-          <Link to="/">Start</Link>
+          <Link to="/">{translations.start}</Link>
         </li>
         <li>
-          <Link to="/shop">Shop</Link>
+          <Link to="/shop">{translations.shop}</Link>
         </li>
         <li>
-          <Link to="/add-new-product">Add new product</Link>
+          <Link to="/add-new-product">{translations.addNewProduct}</Link>
         </li>
         <li>
           {appStore.getUserSessionState() === USER_SESSION_STATES.LOGGED_OUT ? (
-            <Link to="/log-in">Log in</Link>
+            <Link to="/log-in">{translations.logIn}</Link>
           ) : (
             <Link to="/" onClick={logOut}>
-              Log out
+              {translations.logOut}
             </Link>
           )}
         </li>
         <li>
-          <Link to="/account">Account</Link>
+          <Link to="/account">{translations.account}</Link>
         </li>
       </ul>
     </nav>

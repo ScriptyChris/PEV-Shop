@@ -58,6 +58,7 @@ const apiService = new (class ApiService extends Ajax {
     super();
 
     this.PRODUCTS_URL = 'products';
+    this.PRODUCT_CATEGORIES_URL = 'productCategories';
     this.USERS_URL = 'users';
   }
 
@@ -80,6 +81,10 @@ const apiService = new (class ApiService extends Ajax {
   // getProduct(id) {
   //   return this.getRequest(`${this.PRODUCTS_URL}/${id}`);
   // }
+
+  getProductCategories() {
+    return this.getRequest(this.PRODUCT_CATEGORIES_URL);
+  }
 
   getUser() {
     const userId = '5f5a8dce154f830fd840dc7b';
