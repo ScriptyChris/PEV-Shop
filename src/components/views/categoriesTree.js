@@ -23,11 +23,7 @@ export default function CategoriesTree() {
       return (
         <TreeMenu
           data={treeData}
-          onClickItem={(clickedItem) => {
-            // console.log('clickedItem:', clickedItem);
-
-            toggleActiveTreeNode(clickedItem.level, clickedItem.index, clickedItem.label);
-          }}
+          onClickItem={(clickedItem) => toggleActiveTreeNode(clickedItem.level, clickedItem.index, clickedItem.label)}
           ref={treeMenuRef}
         />
       );
@@ -65,38 +61,28 @@ export default function CategoriesTree() {
 
   const toggleActiveTreeNode = (nodeLevel, nodeIndex, nodeLabel) => {
     const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
-    const isActiveTreeNode /*activeTreeNodeIndex*/ = activeTreeNodes.has(currentNodeKey); //.findIndex(({ level, index }) => level === nodeLevel && index === nodeIndex);
+    const isActiveTreeNode = activeTreeNodes.has(currentNodeKey);
 
-    if (isActiveTreeNode /*activeTreeNodeIndex*/ /* > -1*/) {
-      activeTreeNodes.delete(currentNodeKey); //.splice(activeTreeNodeIndex, 1);
+    if (isActiveTreeNode) {
+      activeTreeNodes.delete(currentNodeKey);
     } else {
-      activeTreeNodes.set(currentNodeKey, { nodeLevel, nodeIndex, nodeLabel }); //.push({ nodeLevel, nodeIndex, nodeLabel });
+      activeTreeNodes.set(currentNodeKey, nodeLabel);
     }
 
     // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
-    activeTreeNodes.forEach((label, key) => {
+    [[currentNodeKey], ...activeTreeNodes].forEach(([key], iteration) => {
+      const isCurrentNodeKey = iteration === 0;
       const [level, index] = key.split('-');
       const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
+
       const treeNodeDOM = categoriesTreeRef.current.querySelectorAll(treeNodeLevelSelector)[index];
 
       // "Force" DOM actions execution on elements controlled by React.
       requestAnimationFrame(() => {
-        treeNodeDOM.classList.add('rstm-tree-item--active');
-        treeNodeDOM.setAttribute('aria-pressed', true);
-
-        // console.log('treeNodeDOM:', treeNodeDOM, ' /classList:', treeNodeDOM.classList);
+        treeNodeDOM.classList.toggle('rstm-tree-item--active', !isCurrentNodeKey);
+        treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
       });
     });
-
-    // treeMenuRef.current.updater.enqueueSetState(treeMenuRef.current, { activeKey: '' }, (...args) => {
-    //   console.log('[updated state] args:', args);
-    //
-    //   treeMenuRef.current.updater.enqueueForceUpdate(treeMenuRef.current, (...args) =>
-    //     console.log('[rerendered] args:', args)
-    //   );
-    // });
-
-    console.warn('activeTreeNodes:', [...activeTreeNodes], ' /treeMenuRef:', treeMenuRef.current);
   };
 
   return (
