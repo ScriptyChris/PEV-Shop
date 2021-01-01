@@ -12,7 +12,18 @@ router.get('/api/products', async (req, res) => {
 
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
-    const query = queryBuilder.getIdListConfig(req.query);
+    // TODO: ... and really refactor this!
+    const idListConfig = queryBuilder.getIdListConfig(req.query);
+    const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
+
+    let query = {};
+
+    if (idListConfig) {
+      query = idListConfig;
+    } else if (chosenCategories) {
+      query = chosenCategories;
+    }
+
     const options = {};
     const paginationConfig = queryBuilder.getPaginationConfig(req.query);
 

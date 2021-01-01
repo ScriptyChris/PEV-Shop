@@ -16,11 +16,21 @@ const getIdListConfig = (reqQuery) => {
     return { _id: { $in: commaSplitIdList } };
   }
 
-  return {};
+  return null;
+};
+
+const getProductsWithChosenCategories = (reqQuery) => {
+  if (reqQuery.chosenCategories) {
+    const chosenCategories = reqQuery.chosenCategories.split(',');
+    return { category: { $in: chosenCategories } };
+  }
+
+  return null;
 };
 
 module.exports = {
   isEmptyQueryObject,
   getPaginationConfig,
   getIdListConfig,
+  getProductsWithChosenCategories,
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect, createRef } from 'react';
 import apiService from '../../features/apiService';
 import TreeMenu from 'react-simple-tree-menu';
 
-export default function CategoriesTree() {
+export default function CategoriesTree(props) {
   const [categoriesMap, setCategoriesMap] = useState(null);
   const categoriesTreeRef = createRef();
   const treeMenuRef = createRef();
@@ -23,7 +23,14 @@ export default function CategoriesTree() {
       return (
         <TreeMenu
           data={treeData}
-          onClickItem={(clickedItem) => toggleActiveTreeNode(clickedItem.level, clickedItem.index, clickedItem.label)}
+          onClickItem={(clickedItem) =>
+            toggleActiveTreeNode(
+              clickedItem.level,
+              clickedItem.index,
+              toggleActiveTreeNode.matchParentKey(treeData, clickedItem),
+              clickedItem.label
+            )
+          }
           ref={treeMenuRef}
         />
       );
@@ -59,14 +66,14 @@ export default function CategoriesTree() {
     };
   };
 
-  const toggleActiveTreeNode = (nodeLevel, nodeIndex, nodeLabel) => {
+  const toggleActiveTreeNode = (nodeLevel, nodeIndex, matchedParentKey, nodeLabel) => {
     const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
     const isActiveTreeNode = activeTreeNodes.has(currentNodeKey);
 
     if (isActiveTreeNode) {
       activeTreeNodes.delete(currentNodeKey);
     } else {
-      activeTreeNodes.set(currentNodeKey, nodeLabel);
+      activeTreeNodes.set(currentNodeKey, `${matchedParentKey}${nodeLabel}`);
     }
 
     // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
@@ -83,6 +90,13 @@ export default function CategoriesTree() {
         treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
       });
     });
+
+    const activeCategoryNames = [...activeTreeNodes.values()];
+    props.onCategorySelect(activeCategoryNames);
+  };
+  toggleActiveTreeNode.matchParentKey = (treeData, clickedItem) => {
+    const matchedParent = treeData.find((node) => clickedItem.parent && clickedItem.parent === node.key);
+    return matchedParent ? `${matchedParent.label}|` : '';
   };
 
   return (
@@ -91,9 +105,6 @@ export default function CategoriesTree() {
       both useRef() hook and React.createRef() method don't seem to
       give reference to nested functional component's DOM elements, such as used TreeMenu.
     */
-    <div ref={categoriesTreeRef}>
-      [Categories Tree...]
-      {getCategoriesTree()}
-    </div>
+    <div ref={categoriesTreeRef}>{getCategoriesTree()}</div>
   );
 }

@@ -30,11 +30,11 @@ function createCategoriesHierarchy(productCategories) {
 }
 
 router.get('/api/productCategories', async (req, res) => {
-  console.log('[productCategories GET]');
+  console.log('[productCategories GET] req.param:', req.param);
 
   try {
     const productCategories = await getFromDB('category', 'Product', { isDistinct: true });
-    console.log('productCategories:', productCategories);
+    // console.log('productCategories:', productCategories);
 
     const categoriesHierarchy = createCategoriesHierarchy(productCategories);
 
