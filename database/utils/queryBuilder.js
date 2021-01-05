@@ -20,9 +20,9 @@ const getIdListConfig = (reqQuery) => {
 };
 
 const getProductsWithChosenCategories = (reqQuery) => {
-  if (reqQuery.chosenCategories) {
-    const chosenCategories = reqQuery.chosenCategories.split(',');
-    return { category: { $in: chosenCategories } };
+  if (reqQuery.productCategories) {
+    const productCategories = reqQuery.productCategories.split(',');
+    return { category: { $in: productCategories } };
   }
 
   return null;

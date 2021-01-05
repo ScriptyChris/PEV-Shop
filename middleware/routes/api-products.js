@@ -27,7 +27,7 @@ router.get('/api/products', async (req, res) => {
     const options = {};
     const paginationConfig = queryBuilder.getPaginationConfig(req.query);
 
-    if (queryBuilder.isEmptyQueryObject(query) && paginationConfig) {
+    if (paginationConfig) {
       options.pagination = paginationConfig;
     }
 

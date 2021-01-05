@@ -23,7 +23,7 @@ export default class ProductList extends React.Component {
     this.state = {
       productsList: [],
       productsCount: 0,
-      selectedProductCategories: [],
+      productCategories: [],
       totalPages: 0,
       currentProductPage: 1,
       // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
@@ -34,12 +34,13 @@ export default class ProductList extends React.Component {
   }
 
   shouldComponentUpdate(_, nextState) {
-    return nextState.selectedProductCategories.toString() === this.state.selectedProductCategories.toString();
+    return nextState.productCategories.toString() === this.state.productCategories.toString();
   }
 
   async updateProductsList({
     pageNumber = this.state.currentProductPage,
     productsPerPage = this.state.currentProductsPerPageLimit,
+    productCategories = this.state.productCategories,
   } = {}) {
     let productsList = this.state.productsList;
     let productsCount = this.state.productsCount;
@@ -48,12 +49,12 @@ export default class ProductList extends React.Component {
       productsPerPage === this.productsPerPageLimits[this.productsPerPageLimits.length - 1];
 
     if (isHighestProductsPerPage) {
-      productsList = await apiService.getProducts();
+      productsList = await apiService.getProducts({ productCategories });
       productsCount = productsList.length;
       totalPages = 1;
     } else {
       const pagination = { pageNumber, productsPerPage };
-      const products = await apiService.getProducts({ pagination });
+      const products = await apiService.getProducts({ pagination, productCategories });
       productsList = products.productsList;
       productsCount = products.totalProducts;
       totalPages = products.totalPages;
@@ -82,15 +83,14 @@ export default class ProductList extends React.Component {
     this.updateProductsList({ pageNumber: currentPageIndex + 1 }).then();
   }
 
-  onCategorySelect(selectedProductCategories) {
-    this.setState({ selectedProductCategories });
+  onCategorySelect(productCategories) {
+    this.setState({ productCategories });
   }
 
-  async filterProducts() {
-    const productsMatchingCategories = await apiService.getProducts({
-      chosenCategories: window.encodeURIComponent(this.state.selectedProductCategories.toString()),
-    });
-    console.log('productsMatchingCategories:', productsMatchingCategories);
+  filterProducts() {
+    this.updateProductsList({
+      productCategories: this.state.productCategories.toString(),
+    }).then();
   }
 
   render() {
@@ -98,6 +98,7 @@ export default class ProductList extends React.Component {
       <>
         <CategoriesTree onCategorySelect={this.onCategorySelect.bind(this)} />
 
+        {/*TODO: disable pagination list options, which are unnecessary, because of too little products*/}
         <Pagination
           itemsName="product"
           translations={this.paginationTranslations}
