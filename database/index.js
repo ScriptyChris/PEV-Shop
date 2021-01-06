@@ -41,6 +41,10 @@ const getFromDB = async (itemQuery, modelType, options) => {
     return getPaginatedItems(Model, itemQuery, options.pagination);
   }
 
+  if (options.isDistinct) {
+    return Model.distinct(itemQuery);
+  }
+
   // TODO: improve querying via various ways
   if (typeof itemQuery === 'string') {
     itemQuery = { _id: itemQuery };

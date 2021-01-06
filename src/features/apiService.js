@@ -1,7 +1,15 @@
 class Ajax {
   constructor() {
-    this._BASE_API_URL = `${location.origin}/api`;
+    this._API_PATH_NAME = 'api';
+    this._BASE_API_URL = `${location.origin}/${this._API_PATH_NAME}`;
     this._AUTH_TOKEN = '';
+  }
+
+  get _BASE_API_URL_OBJECT() {
+    const urlObject = new URL(location.origin);
+    urlObject.pathname = `${this._API_PATH_NAME}/`;
+
+    return urlObject;
   }
 
   _getContentTypeHeader() {
@@ -14,7 +22,20 @@ class Ajax {
     return `Bearer ${this._AUTH_TOKEN}`;
   }
 
+  // TODO: fix creating URL by apiEndpoint
   getRequest(apiEndpoint, useToken) {
+    const url = this._BASE_API_URL_OBJECT;
+
+    if (typeof apiEndpoint === 'object') {
+      url.pathname += apiEndpoint.url;
+
+      apiEndpoint.searchParams.forEach((value, key) => {
+        url.searchParams.append(key, value);
+      });
+    } else {
+      url.pathname += apiEndpoint;
+    }
+
     const options = {};
 
     if (useToken) {
@@ -23,7 +44,7 @@ class Ajax {
       };
     }
 
-    return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, options).then((response) => response.json());
+    return fetch(url.toString(), options).then((response) => response.json());
   }
 
   postRequest(apiEndpoint, data, useToken) {
@@ -58,6 +79,7 @@ const apiService = new (class ApiService extends Ajax {
     super();
 
     this.PRODUCTS_URL = 'products';
+    this.PRODUCT_CATEGORIES_URL = 'productCategories';
     this.USERS_URL = 'users';
   }
 
@@ -65,12 +87,19 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(this.PRODUCTS_URL, product);
   }
 
-  getProducts(pagination) {
-    if (pagination) {
-      return this.getRequest(`${this.PRODUCTS_URL}?page=${pagination.pageNumber}&limit=${pagination.productsPerPage}`);
+  getProducts({ pagination, productCategories } = {}) {
+    const searchParams = new URLSearchParams();
+
+    if (pagination && Object.keys(pagination).length) {
+      searchParams.append('page', pagination.pageNumber);
+      searchParams.append('limit', pagination.productsPerPage);
     }
 
-    return this.getRequest(this.PRODUCTS_URL);
+    if (productCategories && productCategories.length) {
+      searchParams.append('productCategories', productCategories);
+    }
+
+    return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
   }
 
   getProductsById(idList) {
@@ -80,6 +109,10 @@ const apiService = new (class ApiService extends Ajax {
   // getProduct(id) {
   //   return this.getRequest(`${this.PRODUCTS_URL}/${id}`);
   // }
+
+  getProductCategories() {
+    return this.getRequest(this.PRODUCT_CATEGORIES_URL);
+  }
 
   getUser() {
     const userId = '5f5a8dce154f830fd840dc7b';
