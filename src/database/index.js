@@ -34,7 +34,7 @@ const saveToDB = (itemData, modelType) => {
   });
 };
 
-const getFromDB = async (itemQuery, modelType, options) => {
+const getFromDB = async (itemQuery, modelType, options = {}) => {
   const Model = getModel(modelType);
 
   if (options.pagination) {
