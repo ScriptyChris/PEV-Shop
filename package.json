@@ -19,7 +19,8 @@
   },
   "main": "src/frontend/app.js",
   "scripts": {
-    "test": "echo \"Tests not ready yet!\"",
+    "test": "jest --watch",
+    "test:debug": "node --inspect node_modules/jest/bin/jest.js --runInBand",
     "prettier": "prettier --write src/ !src/database/data",
     "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",
     "eslint:backend": "eslint src/middleware/** src/database/**",
