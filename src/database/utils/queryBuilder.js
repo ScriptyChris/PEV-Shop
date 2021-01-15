@@ -11,7 +11,7 @@ const getPaginationConfig = (reqQuery) => {
 };
 
 const getIdListConfig = (reqQuery) => {
-  if (reqQuery.idList) {
+  if (typeof reqQuery.idList === 'string') {
     const commaSplitIdList = reqQuery.idList.split(',');
     return { _id: { $in: commaSplitIdList } };
   }
@@ -20,7 +20,7 @@ const getIdListConfig = (reqQuery) => {
 };
 
 const getProductsWithChosenCategories = (reqQuery) => {
-  if (reqQuery.productCategories) {
+  if (typeof reqQuery.productCategories === 'string') {
     const productCategories = reqQuery.productCategories.split(',');
     return { category: { $in: productCategories } };
   }

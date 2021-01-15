@@ -45,9 +45,9 @@ function getPrettierFormatResults(prettierCommand) {
     .split(NEW_LINE);
 }
 
-function executeAndWait(callback, waitInMs) {
-  (async () => {
-    callback();
-    await new Promise((resolve) => setTimeout(resolve, waitInMs));
-  })();
-}
+// function executeAndWait(callback, waitInMs) {
+//   (async () => {
+//     callback();
+//     await new Promise((resolve) => setTimeout(resolve, waitInMs));
+//   })();
+// }
