@@ -5,11 +5,11 @@ const findAssociatedSrcModulePath = (() => {
     TEST: (() => {
       const DOUBLE_SEP = sep.repeat(2);
 
-      return new RegExp(`(${DOUBLE_SEP}+)test(${DOUBLE_SEP}+)`)
+      return new RegExp(`(${DOUBLE_SEP}+)test(${DOUBLE_SEP}+)`);
     })(),
     SRC: '$1src$2',
     SPEC_JS_EXT: /\.spec\.js$/,
-    JS_EXT: '.js'
+    JS_EXT: '.js',
   };
 
   return () => {
@@ -18,9 +18,9 @@ const findAssociatedSrcModulePath = (() => {
       .replace(PATH_PARTS.SPEC_JS_EXT, PATH_PARTS.JS_EXT);
 
     return srcModulePath;
-  }
-})()
+  };
+})();
 
 module.exports = {
-  findAssociatedSrcModulePath
-}
+  findAssociatedSrcModulePath,
+};
