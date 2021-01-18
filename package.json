@@ -19,7 +19,7 @@
   },
   "main": "src/frontend/app.js",
   "scripts": {
-    "test": "jest --watch",
+    "test:backend": "jest --watch --env=node",
     "test:debug": "node --inspect node_modules/jest/bin/jest.js --runInBand",
     "prettier": "prettier --write src/ !src/database/data",
     "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",

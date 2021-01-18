@@ -1,5 +1,7 @@
+const getType = require('jest-get-type');
 const mockedBcrypt = require('../../../__mocks__/bcrypt');
 const mockedJwt = require('../../../__mocks__/jsonwebtoken');
+const { getFromDB: mockedGetFromDB } = require('../../../__mocks__/database-index');
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 const { findAssociatedSrcModulePath } = require('../../index');
@@ -103,6 +105,26 @@ describe('auth', () => {
       const outerResult = verifyToken();
 
       expect(outerResult).toBe(innerResult);
+    });
+  });
+
+  describe('authMiddlewareFn()', () => {
+    const reqMock = {
+      header() {
+        return '';
+      },
+    };
+    const resMock = {};
+    const nextMock = jest.fn();
+
+    it('should return a function, which returns a promise resolved to undefined', () => {
+      const authMiddlewareFnResult = authMiddlewareFn(mockedGetFromDB);
+      expect(getType(authMiddlewareFnResult)).toBe('function');
+
+      const authMiddlewareFnResultPromise = authMiddlewareFnResult(reqMock, resMock, nextMock);
+
+      expect(getType(authMiddlewareFnResultPromise)).toBe('object');
+      expect(authMiddlewareFnResultPromise).resolves.toBe(undefined);
     });
   });
 });
