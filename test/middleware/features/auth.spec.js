@@ -1,7 +1,10 @@
 const getType = require('jest-get-type');
 const mockedBcrypt = require('../../../__mocks__/bcrypt');
 const mockedJwt = require('../../../__mocks__/jsonwebtoken');
-const { getFromDB: mockedGetFromDB } = require('../../../__mocks__/database-index');
+const {
+  succeededGetFromDB: mockedSucceededGetFromDB,
+  failedGetFromDB: mockedFailedGetFromDB,
+} = require('../../../__mocks__/database-index');
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 const { findAssociatedSrcModulePath } = require('../../index');
@@ -109,22 +112,81 @@ describe('auth', () => {
   });
 
   describe('authMiddlewareFn()', () => {
-    const reqMock = {
+    // TODO: consider moving below mocks to separate file/module
+    const getReqMock = () => ({
       header() {
-        return '';
+        return 'some token';
       },
+    });
+    const getResMock = () => {
+      const jsonMethod = jest.fn((errorObj) => {});
+      const statusMethod = jest.fn((code) => ({ json: jsonMethod }));
+
+      return {
+        status: statusMethod,
+        _jsonMethod: jsonMethod,
+      };
     };
-    const resMock = {};
-    const nextMock = jest.fn();
+    const getNextMock = () => jest.fn();
 
     it('should return a function, which returns a promise resolved to undefined', () => {
-      const authMiddlewareFnResult = authMiddlewareFn(mockedGetFromDB);
-      expect(getType(authMiddlewareFnResult)).toBe('function');
+      const succeededAuthMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+      const succeededAuthMiddlewareFnResultPromise = succeededAuthMiddlewareFnResult(
+        getReqMock(),
+        getResMock(),
+        getNextMock()
+      );
 
-      const authMiddlewareFnResultPromise = authMiddlewareFnResult(reqMock, resMock, nextMock);
+      expect(getType(succeededAuthMiddlewareFnResult)).toBe('function');
+      expect(getType(succeededAuthMiddlewareFnResultPromise)).toBe('object');
+      expect(succeededAuthMiddlewareFnResultPromise).resolves.toBe(undefined);
 
-      expect(getType(authMiddlewareFnResultPromise)).toBe('object');
-      expect(authMiddlewareFnResultPromise).resolves.toBe(undefined);
+      const failedAuthMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB);
+      const failedAuthMiddlewareFnResultPromise = failedAuthMiddlewareFnResult(
+        getReqMock(),
+        getResMock(),
+        getNextMock()
+      );
+
+      expect(getType(failedAuthMiddlewareFnResult)).toBe('function');
+      expect(getType(failedAuthMiddlewareFnResultPromise)).toBe('object');
+      expect(failedAuthMiddlewareFnResultPromise).resolves.toBe(undefined);
+    });
+
+    describe('when found user in database', () => {
+      it('should assign proper token and user props to req object', async () => {
+        const reqMock = getReqMock();
+
+        expect('token' in reqMock).toBe(false);
+        expect('user' in reqMock).toBe(false);
+
+        const token = reqMock.header();
+        const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+
+        await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+
+        expect(reqMock.token).toBe(token);
+        expect(reqMock.user instanceof mockedSucceededGetFromDB._clazz).toBe(true);
+      });
+
+      it('should call next() function', async () => {
+        const nextMock = getNextMock();
+        const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+
+        await authMiddlewareFnResult(getReqMock(), getResMock(), nextMock);
+        expect(nextMock).toHaveBeenCalled();
+      });
+    });
+
+    describe("when didn't find user in database", () => {
+      it('should call res.status(..).json(..) with appropriate params', async () => {
+        const resMock = getResMock();
+        const authMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB);
+
+        await authMiddlewareFnResult(getReqMock(), resMock, getNextMock());
+        expect(resMock.status).toHaveBeenCalledWith(401);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'You are unauthorized!' });
+      });
     });
   });
 });

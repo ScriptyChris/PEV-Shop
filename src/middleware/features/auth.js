@@ -27,7 +27,6 @@ const authMiddlewareFn = (getFromDB) => {
       const token = req.header('Authorization').replace('Bearer ', '');
       const decodedToken = verifyToken(token);
       const user = await getFromDB({ _id: decodedToken._id.toString(), 'tokens.token': token }, 'User');
-      console.log('schema class?', user.constructor, ' /class name: ', user.constructor.name);
 
       if (!user) {
         throw new Error('Auth failed!');
