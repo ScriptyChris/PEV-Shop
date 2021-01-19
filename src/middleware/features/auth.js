@@ -37,6 +37,7 @@ const authMiddlewareFn = (getFromDB) => {
 
       next();
     } catch (exception) {
+      // TODO: use a library to wrap console.error calls in a configurable function, thus they could be turned off for unit tests
       console.error('authMiddleware exception', exception);
       res.status(401).json({ error: 'You are unauthorized!' });
     }
@@ -55,12 +56,12 @@ const userRoleMiddlewareFn = (roleName) => {
         path: 'roleName',
         match: { roleName },
       });
-      console.log('Populated req.user.roleName', req.user.roleName);
 
       req.userPermissions = req.user.roleName[0].permissions;
 
       next();
     } catch (exception) {
+      // TODO: use a library to wrap console.error calls in a configurable function, thus they could be turned off for unit tests
       console.error('userRoleMiddlewareFn exception', exception);
       res.status(403).json({ error: "You don't have permissions!" });
     }

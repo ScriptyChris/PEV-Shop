@@ -130,6 +130,7 @@ describe('auth', () => {
     const getNextMock = () => jest.fn();
 
     it('should return a function, which returns a promise resolved to undefined', () => {
+      // for success case
       const succeededAuthMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
       const succeededAuthMiddlewareFnResultPromise = succeededAuthMiddlewareFnResult(
         getReqMock(),
@@ -141,6 +142,7 @@ describe('auth', () => {
       expect(getType(succeededAuthMiddlewareFnResultPromise)).toBe('object');
       expect(succeededAuthMiddlewareFnResultPromise).resolves.toBe(undefined);
 
+      // for caught error case
       const failedAuthMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB);
       const failedAuthMiddlewareFnResultPromise = failedAuthMiddlewareFnResult(
         getReqMock(),
@@ -186,6 +188,111 @@ describe('auth', () => {
         await authMiddlewareFnResult(getReqMock(), resMock, getNextMock());
         expect(resMock.status).toHaveBeenCalledWith(401);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'You are unauthorized!' });
+      });
+    });
+  });
+
+  describe('userRoleMiddlewareFn()', () => {
+    // TODO: consider moving below mocks to separate file/module
+    const getReqMock = () => {
+      const req = {
+        user: {},
+      };
+      req.user.execPopulate = jest.fn(async (obj) => {
+        req.user.roleName = [
+          {
+            permissions: [],
+          },
+        ];
+      });
+
+      return req;
+    };
+    const getResMock = () => {
+      const jsonMethod = jest.fn((errorObj) => {});
+      const statusMethod = jest.fn((code) => ({ json: jsonMethod }));
+
+      return {
+        status: statusMethod,
+        _jsonMethod: jsonMethod,
+      };
+    };
+    const getNextMock = () => jest.fn();
+    const ROLE_NAME = '';
+
+    it('should return a function, which returns a promise resolved to undefined', () => {
+      // for success case
+      const succeededUserRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
+      const succeededUserRoleMiddlewareFnResultPromise = succeededUserRoleMiddlewareFnResult(
+        getReqMock(),
+        getResMock(),
+        getNextMock()
+      );
+
+      expect(getType(succeededUserRoleMiddlewareFnResult)).toBe('function');
+      expect(getType(succeededUserRoleMiddlewareFnResultPromise)).toBe('object');
+      expect(succeededUserRoleMiddlewareFnResultPromise).resolves.toBe(undefined);
+
+      // for caught error case
+      const reqMock = getReqMock();
+      delete reqMock.user;
+
+      const failedUserRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
+      const failedUserRoleMiddlewareFnResultPromise = failedUserRoleMiddlewareFnResult(
+        reqMock,
+        getResMock(),
+        getNextMock()
+      );
+
+      expect(getType(failedUserRoleMiddlewareFnResult)).toBe('function');
+      expect(getType(failedUserRoleMiddlewareFnResultPromise)).toBe('object');
+      expect(failedUserRoleMiddlewareFnResultPromise).resolves.toBe(undefined);
+    });
+
+    describe('when req.user property is provided', () => {
+      it('should call req.user.execPopulate(..) with an object param', async () => {
+        const reqMock = getReqMock();
+        const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
+
+        await userRoleMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+
+        expect(reqMock.user.execPopulate).toHaveBeenCalledWith({
+          path: 'roleName',
+          match: { roleName: ROLE_NAME },
+        });
+      });
+
+      it('should assign userPermissions prop to req object', async () => {
+        const reqMock = getReqMock();
+
+        expect('userPermissions' in reqMock).toBe(false);
+
+        const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
+        await userRoleMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+
+        expect(reqMock.userPermissions).toStrictEqual([]);
+      });
+
+      it('should call next() function', async () => {
+        const nextMock = getNextMock();
+        const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
+
+        await userRoleMiddlewareFnResult(getReqMock(), getResMock(), nextMock);
+        expect(nextMock).toHaveBeenCalled();
+      });
+    });
+
+    describe('when user is not provided in req param', () => {
+      it('should call res.status(..).json(..) with appropriate params', async () => {
+        const reqMock = getReqMock();
+        delete reqMock.user;
+
+        const resMock = getResMock();
+        const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
+
+        await userRoleMiddlewareFnResult(reqMock, resMock, getNextMock());
+        expect(resMock.status).toHaveBeenCalledWith(403);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: "You don't have permissions!" });
       });
     });
   });
