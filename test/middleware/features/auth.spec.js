@@ -4,7 +4,7 @@ const mockedJwt = require('../../../__mocks__/jsonwebtoken');
 const {
   succeededGetFromDB: mockedSucceededGetFromDB,
   failedGetFromDB: mockedFailedGetFromDB,
-} = require('../../../__mocks__/database-index');
+} = require('../../../src/database/__mocks__/database-index');
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 const { findAssociatedSrcModulePath } = require('../../index');
