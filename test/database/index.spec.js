@@ -45,20 +45,24 @@ describe('index', () => {
       expect(ModelPrototypeSaveMock).toHaveBeenCalledWith(expect.any(Function));
     });
 
-    // it('should return promise resolved to saved item when save operation succeeded', async () => {
-    //   const savedItem = { itemSaved: true };
-    //   const ModelPrototypeSaveMock = Object.getPrototypeOf(modelMock._ModelClassMock.getMockImplementation()()).save;
-    //   ModelPrototypeSaveMock.mockImplementationOnce((callback) => {
-    //     callback(null, savedItem);
-    //   });
-    //
-    //   const saveToDBResult = await saveToDB({}, MODEL_TYPE);
-    //
-    //   expect(saveToDBResult).resolves.toBe(savedItem);
-    // });
+    it('should return promise resolved to saved item when save operation succeeded', async () => {
+      const savedItem = { itemSaved: true };
+      const ModelPrototypeSaveMock = Object.getPrototypeOf(modelMock._ModelClassMock.getMockImplementation()()).save;
+      ModelPrototypeSaveMock.mockImplementationOnce((callback) => {
+        callback(null, savedItem);
+      });
 
-    // it('should return promise rejected to error when save operation failed', async () => {
-    //   await saveToDB({}, MODEL_TYPE);
-    // });
+      expect(saveToDB({}, MODEL_TYPE)).resolves.toBe(savedItem);
+    });
+
+    it('should return promise rejected to error when save operation failed', async () => {
+      const error = 'Item save failed!';
+      const ModelPrototypeSaveMock = Object.getPrototypeOf(modelMock._ModelClassMock.getMockImplementation()()).save;
+      ModelPrototypeSaveMock.mockImplementationOnce((callback) => {
+        callback(error, null);
+      });
+
+      expect(saveToDB({}, MODEL_TYPE)).rejects.toBe(error);
+    });
   });
 });
