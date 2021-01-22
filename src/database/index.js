@@ -41,7 +41,7 @@ const getFromDB = async (itemQuery, modelType, options = {}) => {
     return getPaginatedItems(Model, itemQuery, options.pagination);
   }
 
-  if (options.isDistinct) {
+  if (options.isDistinct === true) {
     return Model.distinct(itemQuery);
   }
 
@@ -50,12 +50,11 @@ const getFromDB = async (itemQuery, modelType, options = {}) => {
     itemQuery = { _id: itemQuery };
   }
 
-  const findMethod =
-    queryBuilder.isEmptyQueryObject(itemQuery) || Reflect.toString.call(itemQuery._id === '[object Object]')
-      ? 'find'
-      : 'findOne';
+  if (queryBuilder.isEmptyQueryObject(itemQuery) || typeof itemQuery._id === 'object') {
+    return Model.find(itemQuery);
+  }
 
-  return Model[findMethod](itemQuery);
+  return Model.findOne(itemQuery);
 };
 
 // TODO: consider making this function either specific to update case or generic dependent on params
