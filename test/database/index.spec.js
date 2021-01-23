@@ -7,10 +7,10 @@ const getPaginatedItemsMock = jest
 const { findAssociatedSrcModulePath } = require('../index');
 const { saveToDB, getFromDB, updateOneModelInDB } = require(findAssociatedSrcModulePath());
 
-describe('index', () => {
+describe('#database-index', () => {
   const MODEL_TYPE = 'Test';
 
-  afterEach(() => {
+  beforeEach(() => {
     getModelMock.mockClear();
     getModelMock._ModelClassMock.mockClear();
     getModelMock._ModelClassMock.distinct.mockClear();

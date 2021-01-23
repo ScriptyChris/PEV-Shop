@@ -7,7 +7,7 @@ const {
   getProductsWithChosenCategories,
 } = require(findAssociatedSrcModulePath());
 
-describe('queryBuilder', () => {
+describe('#queryBuilder', () => {
   describe('isEmptyQueryObject()', () => {
     it('should return true if an empty object literal is passed', () => {
       expect(isEmptyQueryObject({})).toBe(true);

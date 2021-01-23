@@ -2,7 +2,7 @@
 const { findAssociatedSrcModulePath } = require('../../index');
 const getPaginatedItems = require(findAssociatedSrcModulePath());
 
-describe('paginateItemsFromDB', () => {
+describe('#paginateItemsFromDB', () => {
   describe('getPaginatedItems()', () => {
     const getModelMock = () => {
       return {

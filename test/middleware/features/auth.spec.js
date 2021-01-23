@@ -17,7 +17,7 @@ const {
   userRoleMiddlewareFn,
 } = require(findAssociatedSrcModulePath());
 
-describe('auth', () => {
+describe('#auth', () => {
   describe('comparePasswords()', () => {
     it('should call bcrypt.compare method passing through provided params', () => {
       comparePasswords('a', 'b');
