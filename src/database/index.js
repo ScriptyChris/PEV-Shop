@@ -83,7 +83,7 @@ const updateOneModelInDB = (itemQuery, updateData, modelType) => {
         break;
       }
       default: {
-        reject(`'Unrecognized update action: ${updateData.action}`);
+        reject(`Unrecognized update action: ${updateData.action}`);
       }
     }
 

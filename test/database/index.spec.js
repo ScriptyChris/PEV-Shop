@@ -16,6 +16,7 @@ describe('index', () => {
     getModelMock._ModelClassMock.distinct.mockClear();
     getModelMock._ModelClassMock.find.mockClear();
     getModelMock._ModelClassMock.findOne.mockClear();
+    getModelMock._ModelClassMock.findOneAndUpdate.mockClear();
     getModelMock._ModelPrototypeSaveMock.mockClear();
 
     getPaginatedItemsMock.mockClear();
@@ -133,6 +134,58 @@ describe('index', () => {
 
       expect(getFromDBResult3).resolves.toBe('findOne result');
       expect(getModelMock._ModelClassMock.findOne).toHaveBeenCalledWith(itemQueryNumber);
+    });
+  });
+
+  describe('updateOneModelInDB()', () => {
+    it('should call getModel(..) with modelType param', async () => {
+      const updateData = { action: 'addUnique' };
+
+      await updateOneModelInDB({}, updateData, MODEL_TYPE);
+
+      expect(getModelMock).toHaveBeenCalledWith(MODEL_TYPE);
+    });
+
+    it('should call Model.findOneAndUpdate(..) with correct params', () => {
+      const itemQuery = {};
+
+      const testPromises = [
+        { action: 'addUnique', operator: '$addToSet' },
+        { action: 'deleteAll', operator: '$pull' },
+        { action: 'modify', operator: '$set' },
+      ].map(async ({ action, operator }, index) => {
+        const updateData = { action, data: 'new value' };
+
+        await updateOneModelInDB(itemQuery, updateData, MODEL_TYPE);
+
+        const callToFindOneAndUpdateMock = getModelMock._ModelClassMock.findOneAndUpdate.mock.calls[index];
+
+        expect(callToFindOneAndUpdateMock[0]).toBe(itemQuery);
+        expect(callToFindOneAndUpdateMock[1]).toStrictEqual({ [operator]: updateData.data });
+        expect(callToFindOneAndUpdateMock[2]).toStrictEqual({ new: true });
+        expect(callToFindOneAndUpdateMock[3]).toEqual(expect.any(Function));
+      });
+
+      Promise.all(testPromises).catch((error) => console.error('Test async error:', error));
+    });
+
+    it('should return rejected promise if updateData.action prop was not matched', () => {
+      expect(updateOneModelInDB({}, {}, MODEL_TYPE)).rejects.toEqual(expect.stringContaining('undefined'));
+      expect(updateOneModelInDB({}, { action: 'add' }, MODEL_TYPE)).rejects.toEqual(expect.stringContaining('add'));
+    });
+
+    it('should return promise resolved with value or rejected with reason depend on Model.findOneAndUpdate(..) result', () => {
+      const resolveValue = 'findOne result';
+      const rejectReason = 'findOne failed';
+
+      getModelMock._ModelClassMock.findOneAndUpdate
+        .mockImplementationOnce((itemQuery, updateDataQueries, options, callback) => callback(null, resolveValue))
+        .mockImplementationOnce((itemQuery, updateDataQueries, options, callback) => callback(rejectReason));
+
+      const updateData = { action: 'addUnique' };
+
+      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toBe(resolveValue);
+      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).rejects.toBe(rejectReason);
     });
   });
 });
