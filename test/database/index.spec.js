@@ -10,7 +10,7 @@ const { saveToDB, getFromDB, updateOneModelInDB } = require(findAssociatedSrcMod
 describe('#database-index', () => {
   const MODEL_TYPE = 'Test';
 
-  beforeEach(() => {
+  afterEach(() => {
     getModelMock.mockClear();
     getModelMock._ModelClassMock.mockClear();
     getModelMock._ModelClassMock.distinct.mockClear();
@@ -18,7 +18,6 @@ describe('#database-index', () => {
     getModelMock._ModelClassMock.findOne.mockClear();
     getModelMock._ModelClassMock.findOneAndUpdate.mockClear();
     getModelMock._ModelPrototypeSaveMock.mockClear();
-
     getPaginatedItemsMock.mockClear();
   });
 
