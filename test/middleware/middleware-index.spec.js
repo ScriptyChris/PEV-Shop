@@ -11,7 +11,7 @@ const [apiProductsMock, apiProductsCategoriesMock, apiUsersMock, apiUserRolesMoc
   return jest.mock(apiFilePath).requireMock(apiFilePath);
 });
 
-const middleware = require('../../src/middleware/index');
+const middleware = require('../../src/middleware/middleware-index');
 
 describe('#middleware-index', () => {
   const appMock = Object.freeze({

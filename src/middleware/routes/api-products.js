@@ -1,7 +1,7 @@
 // const { readFileSync } = require('fs');
 const { Router } = require('express');
 const { authMiddlewareFn: authMiddleware, userRoleMiddlewareFn } = require('../features/auth');
-const { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } = require('../../database/index');
+const { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } = require('../../database/database-index');
 
 const router = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';

@@ -7,7 +7,7 @@ const {
 } = require('../../../src/database/__mocks__/database-index');
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-const { findAssociatedSrcModulePath } = require('../../index');
+const { findAssociatedSrcModulePath } = require('../../test-index');
 const {
   comparePasswords,
   hashPassword,

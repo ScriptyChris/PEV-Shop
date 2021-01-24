@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { authMiddlewareFn: authMiddleware } = require('../features/auth');
-const { saveToDB, getFromDB, updateOneModelInDB } = require('../../database/index');
+const { saveToDB, getFromDB, updateOneModelInDB } = require('../../database/database-index');
 
 const router = Router();
 

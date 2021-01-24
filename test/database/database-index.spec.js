@@ -1,10 +1,12 @@
-const getModelMock = jest.mock('../../src/database/models/index').requireMock('../../src/database/models/index');
+const getModelMock = jest
+  .mock('../../src/database/models/models-index')
+  .requireMock('../../src/database/models/models-index');
 const getPaginatedItemsMock = jest
   .mock('../../src/database/utils/paginateItemsFromDB')
   .requireMock('../../src/database/utils/paginateItemsFromDB');
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-const { findAssociatedSrcModulePath } = require('../index');
+const { findAssociatedSrcModulePath } = require('../test-index');
 const { saveToDB, getFromDB, updateOneModelInDB } = require(findAssociatedSrcModulePath());
 
 describe('#database-index', () => {

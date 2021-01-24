@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const { connect } = require('mongoose');
-const getModel = require('./models/index');
+const getModel = require('./models/models-index');
 const queryBuilder = require('./utils/queryBuilder');
 const getPaginatedItems = require('./utils/paginateItemsFromDB');
 

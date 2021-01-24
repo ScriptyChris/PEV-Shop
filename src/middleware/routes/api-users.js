@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { saveToDB, getFromDB, updateOneModelInDB, ObjectId } = require('../../database/index');
+const { saveToDB, getFromDB, updateOneModelInDB, ObjectId } = require('../../database/database-index');
 const auth = require('../features/auth');
 
 const router = Router();
