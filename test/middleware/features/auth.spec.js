@@ -2,8 +2,8 @@ const getType = require('jest-get-type');
 const mockedBcrypt = require('../../../__mocks__/bcrypt');
 const mockedJwt = require('../../../__mocks__/jsonwebtoken');
 const {
-  succeededGetFromDB: mockedSucceededGetFromDB,
-  failedGetFromDB: mockedFailedGetFromDB,
+  _succeededGetFromDB: mockedSucceededGetFromDB,
+  _failedGetFromDB: mockedFailedGetFromDB,
 } = require('../../../src/database/__mocks__/database-index');
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
