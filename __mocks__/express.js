@@ -5,5 +5,6 @@ const router = Object.freeze({
 });
 const express = jest.fn();
 express.Router = jest.fn(() => router);
+express._router = router;
 
 module.exports = express;

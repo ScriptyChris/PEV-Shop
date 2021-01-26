@@ -7,6 +7,6 @@ module.exports = {
   _succeededGetFromDB: succeededGetFromDB,
   _failedGetFromDB: failedGetFromDB,
   getFromDB: jest.fn(() => {
-    throw Error('Need to mock the implementation for unit test first!');
+    throw Error('Need to mock the getFromDB(..) implementation for unit test first!');
   }),
 };

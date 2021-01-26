@@ -19,7 +19,7 @@ describe('#api-product-categories', () => {
     const routerGet = Router().get;
 
     expect(routerGet).toHaveBeenCalledTimes(1);
-    expect(routerGet).toHaveBeenCalledWith(expect.any(String), expect.any(Function));
+    expect(routerGet).toHaveBeenCalledWith('/api/productCategories', expect.any(Function));
   });
 
   describe('router.get()', () => {
