@@ -1,3 +1,4 @@
+const logger = require('../../../utils/logger')(module.filename);
 const { Router } = require('express');
 const { getFromDB } = require('../../database/database-index');
 
@@ -30,17 +31,17 @@ function createCategoriesHierarchy(productCategories) {
 }
 
 router.get('/api/productCategories', async (req, res) => {
-  console.log('[productCategories GET] req.param:', req.param);
+  logger.log('[productCategories GET] req.param:', req.param);
 
   try {
     const productCategories = await getFromDB('category', 'Product', { isDistinct: true });
-    // console.log('productCategories:', productCategories);
+    // logger.log('productCategories:', productCategories);
 
     const categoriesHierarchy = createCategoriesHierarchy(productCategories);
 
     res.status(200).json(categoriesHierarchy);
   } catch (exception) {
-    console.error('Retrieving product categories exception:', exception);
+    logger.error('Retrieving product categories exception:', exception);
 
     res.status(500).json({ exception });
   }

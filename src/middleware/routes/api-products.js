@@ -1,3 +1,4 @@
+const logger = require('../../../utils/logger')(module.filename);
 // const { readFileSync } = require('fs');
 const { Router } = require('express');
 const { authMiddlewareFn: authMiddleware, userRoleMiddlewareFn } = require('../features/auth');
@@ -8,7 +9,7 @@ const router = Router();
 // const productList =  getProductList();
 
 router.get('/api/products', async (req, res) => {
-  console.log('[products GET] query', req.query);
+  logger.log('[products GET] query', req.query);
 
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
@@ -33,49 +34,49 @@ router.get('/api/products', async (req, res) => {
 
     const paginatedProducts = await getFromDB(query, 'Product', options);
 
-    // console.log('paginatedProducts:', paginatedProducts);
+    // logger.log('paginatedProducts:', paginatedProducts);
 
     res.status(200).json(paginatedProducts);
   } catch (exception) {
-    console.error('Retrieving product exception:', exception);
+    logger.error('Retrieving product exception:', exception);
 
     res.status(500).json({ exception });
   }
 });
 
 router.get('/api/products/:id', async (req, res) => {
-  console.log('[products/:id GET] req.param', req.params);
+  logger.log('[products/:id GET] req.param', req.params);
 
   try {
     const product = await getFromDB(req.params._id, 'Product');
 
     res.status(200).json(product);
   } catch (exception) {
-    console.error('Retrieving product exception:', exception);
+    logger.error('Retrieving product exception:', exception);
 
     res.status(500).json({ exception });
   }
 });
 
 router.post('/api/products', async (req, res) => {
-  console.log('[products POST] req.body', req.body);
+  logger.log('[products POST] req.body', req.body);
 
   try {
     const savedProduct = await saveToDB(req.body, 'Product');
 
-    console.log('Product saved', savedProduct);
+    logger.log('Product saved', savedProduct);
 
     res.status(201);
     res.end('Success!');
   } catch (exception) {
-    console.error('Saving product exception:', exception);
+    logger.error('Saving product exception:', exception);
 
     res.status(500).json({ exception });
   }
 });
 
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), async (req, res) => {
-  console.log('[products PATCH] req.body', req.body);
+  logger.log('[products PATCH] req.body', req.body);
 
   try {
     if (!req.userPermissions) {
@@ -85,10 +86,10 @@ router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('
     // TODO: prepare to be used with various product properties
     const modifiedProduct = await updateOneModelInDB(req.body.productId, req.body.modifications, 'Product');
 
-    console.log('Product modified', modifiedProduct);
+    logger.log('Product modified', modifiedProduct);
     res.status(201).json({ payload: modifiedProduct });
   } catch (exception) {
-    console.error('Modifying product exception:', exception);
+    logger.error('Modifying product exception:', exception);
 
     res.status(403).json({ exception });
   }

@@ -1,3 +1,4 @@
+const logger = require('../../../utils/logger')(module.filename);
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -37,8 +38,7 @@ const authMiddlewareFn = (getFromDB) => {
 
       next();
     } catch (exception) {
-      // TODO: use a library to wrap console.error calls in a configurable function, thus they could be turned off for unit tests
-      console.error('authMiddleware exception', exception);
+      logger.error('authMiddleware exception', exception);
       res.status(401).json({ error: 'You are unauthorized!' });
     }
   };
@@ -61,8 +61,7 @@ const userRoleMiddlewareFn = (roleName) => {
 
       next();
     } catch (exception) {
-      // TODO: use a library to wrap console.error calls in a configurable function, thus they could be turned off for unit tests
-      console.error('userRoleMiddlewareFn exception', exception);
+      logger.error('userRoleMiddlewareFn exception', exception);
       res.status(403).json({ error: "You don't have permissions!" });
     }
   };

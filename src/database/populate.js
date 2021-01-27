@@ -1,3 +1,4 @@
+const logger = require('../../utils/logger')(module.filename);
 const { connect, model, connection } = require('mongoose');
 const productSchema = require('./schemas/product');
 const { sep } = require('path');
@@ -12,7 +13,7 @@ const PARAMS = {
   GROUP_CATEGORIES: 'categoriesGroupPath=',
 };
 
-console.log('process.argv:', process.argv);
+logger.log('process.argv:', process.argv);
 
 (async () => {
   await connectToDB();
@@ -20,7 +21,7 @@ console.log('process.argv:', process.argv);
 
   if (getScriptParamValue(PARAMS.CLEAN_ALL)) {
     const removedProducts = await Product.deleteMany();
-    console.log(`Cleaning done - removed ${removedProducts.deletedCount} products.`);
+    logger.log(`Cleaning done - removed ${removedProducts.deletedCount} products.`);
   }
 
   const sourceDataList = await getSourceData();
@@ -67,7 +68,7 @@ async function getSourceData() {
     sourceDataFiles.map(async (filePath) => JSON.parse(await readFile(filePath, { encoding: 'utf8' })))
   );
 
-  console.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
+  logger.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
 
   return sourceDataList;
 }
@@ -148,7 +149,7 @@ async function assignIDsToRelatedProducts(Product) {
     'relatedProducts.id': { $exists: true },
   }).countDocuments();
 
-  console.log('All done?', amountOfAllProducts === amountOfRelatedProductsWithID);
+  logger.log('All done?', amountOfAllProducts === amountOfRelatedProductsWithID);
 }
 
 function getScriptParamValue(param, lenientSearch) {

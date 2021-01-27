@@ -1,5 +1,7 @@
+global.console.test = true;
+
 module.exports = {
-  watchPlugins: ['./jestWatchPlugin'],
+  watchPlugins: ['./utils/jestWatchPlugin'],
 };
 
 

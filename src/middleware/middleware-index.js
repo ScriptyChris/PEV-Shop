@@ -1,3 +1,4 @@
+const logger = require('../../utils/logger')(module.filename);
 const glob = require('glob');
 const bodyParser = require('body-parser');
 const apiProducts = require('./routes/api-products');
@@ -19,7 +20,7 @@ const middleware = (app) => {
         res.sendFile(image);
       })
       .catch((error) => {
-        console.log('Image searching error: ', error, ' /imagePath: ', imagePath);
+        logger.log('Image searching error: ', error, ' /imagePath: ', imagePath);
 
         res.status(404).end();
       });
@@ -33,7 +34,7 @@ if (process.env.NODE_ONLY === 'true') {
 
   middleware(app);
   app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
+    logger.log(`Server is listening on port ${port}`);
   });
 }
 

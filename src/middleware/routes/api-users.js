@@ -1,3 +1,4 @@
+const logger = require('../../../utils/logger')(module.filename);
 const { Router } = require('express');
 const { saveToDB, getFromDB, updateOneModelInDB, ObjectId } = require('../../database/database-index');
 const auth = require('../features/auth');
@@ -5,7 +6,7 @@ const auth = require('../features/auth');
 const router = Router();
 
 router.post('/api/users/', async (req, res) => {
-  console.log('[POST] /users req.body', req.body);
+  logger.log('[POST] /users req.body', req.body);
 
   try {
     req.body.password = await auth.hashPassword(req.body.password);
@@ -23,9 +24,9 @@ router.post('/api/users/', async (req, res) => {
       'User-Role'
     );
 
-    console.log('User saved', savedUser);
+    logger.log('User saved', savedUser);
   } catch (exception) {
-    console.error('Saving user exception:', exception);
+    logger.error('Saving user exception:', exception);
 
     res.status(500).json({ exception });
   }
@@ -34,7 +35,7 @@ router.post('/api/users/', async (req, res) => {
 });
 
 router.post('/api/users/login', async (req, res) => {
-  console.log('[POST] /login');
+  logger.log('[POST] /login');
 
   try {
     const user = await getFromDB({ login: req.body.login }, 'User');
@@ -48,7 +49,7 @@ router.post('/api/users/login', async (req, res) => {
 
     res.json({ payload: user, token });
   } catch (exception) {
-    console.error('Login user exception:', exception);
+    logger.error('Login user exception:', exception);
 
     res.status(500).json({ exception });
   }
@@ -61,14 +62,14 @@ router.post('/api/users/logout', auth.authMiddlewareFn(getFromDB), async (req, r
 
     res.status(200).json({ payload: 'Logged out!' });
   } catch (exception) {
-    console.error('Logout user exception:', exception);
+    logger.error('Logout user exception:', exception);
 
     res.status(500).json({ exception });
   }
 });
 
 router.get('/api/users/:id', auth.authMiddlewareFn(getFromDB), async (req, res) => {
-  console.log('[GET] /:id', req.params.id);
+  logger.log('[GET] /:id', req.params.id);
   const user = await getFromDB(req.params.id, 'User');
 
   res.json({ payload: user });

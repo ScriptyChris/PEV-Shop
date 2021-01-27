@@ -3,7 +3,14 @@ const { normalize } = require('path');
 
 const PRETTIER_FORMAT_CLI = Object.freeze({
   command: 'node',
-  args: [normalize('node_modules/prettier/bin-prettier.js'), '--write', 'test/', '__mocks__/', '**/__mocks__/*', '--check'],
+  args: [
+    normalize('node_modules/prettier/bin-prettier.js'),
+    '--write',
+    'test/',
+    '__mocks__/',
+    '**/__mocks__/*',
+    '--check',
+  ],
 });
 const NEW_LINE = '\n';
 
