@@ -1,9 +1,9 @@
+const { getResMock } = require('../../commonMocks');
 const getType = require('jest-get-type');
 const mockedBcrypt = require('../../../__mocks__/bcrypt');
 const mockedJwt = require('../../../__mocks__/jsonwebtoken');
 const {
-  _succeededGetFromDB: mockedSucceededGetFromDB,
-  _failedGetFromDB: mockedFailedGetFromDB,
+  getFromDB: { _succeededGetFromDB: mockedSucceededGetFromDB, _failedGetFromDB: mockedFailedGetFromDB },
 } = require('../../../src/database/__mocks__/database-index');
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
@@ -118,15 +118,6 @@ describe('#auth', () => {
         return 'some token';
       },
     });
-    const getResMock = () => {
-      const jsonMethod = jest.fn((errorObj) => {});
-      const statusMethod = jest.fn((code) => ({ json: jsonMethod }));
-
-      return {
-        status: statusMethod,
-        _jsonMethod: jsonMethod,
-      };
-    };
     const getNextMock = () => jest.fn();
 
     it('should return a function, which returns a promise resolved to undefined', () => {
@@ -207,15 +198,6 @@ describe('#auth', () => {
       });
 
       return req;
-    };
-    const getResMock = () => {
-      const jsonMethod = jest.fn((errorObj) => {});
-      const statusMethod = jest.fn((code) => ({ json: jsonMethod }));
-
-      return {
-        status: statusMethod,
-        _jsonMethod: jsonMethod,
-      };
     };
     const getNextMock = () => jest.fn();
     const ROLE_NAME = '';

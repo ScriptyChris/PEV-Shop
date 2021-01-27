@@ -1,3 +1,4 @@
+const { getResMock } = require('../../commonMocks');
 const { getFromDB } = jest
   .mock('../../../src/database/database-index')
   .requireMock('../../../src/database/database-index');
@@ -24,15 +25,6 @@ describe('#api-product-categories', () => {
 
   describe('router.get()', () => {
     const reqMock = Object.freeze({ param: null });
-    const getResMock = () => {
-      const jsonMethod = jest.fn((errorObj) => {});
-      const statusMethod = jest.fn((code) => ({ json: jsonMethod }));
-
-      return {
-        status: statusMethod,
-        _jsonMethod: jsonMethod,
-      };
-    };
 
     afterEach(() => {
       Object.values(Router()).forEach((httpMethod) => httpMethod.mockClear());
