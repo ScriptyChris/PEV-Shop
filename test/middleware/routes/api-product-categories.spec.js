@@ -1,4 +1,4 @@
-const { getResMock } = require('../../commonMocks');
+const { getResMock } = require('../../mockUtils');
 const { getFromDB } = jest
   .mock('../../../src/database/database-index')
   .requireMock('../../../src/database/database-index');

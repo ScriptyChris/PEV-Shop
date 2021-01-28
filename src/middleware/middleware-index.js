@@ -1,3 +1,5 @@
+// TODO: put 'use strict;' at the top
+
 const logger = require('../../utils/logger')(module.filename);
 const glob = require('glob');
 const bodyParser = require('body-parser');

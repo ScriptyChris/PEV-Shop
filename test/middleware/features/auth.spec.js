@@ -1,4 +1,4 @@
-const { getResMock } = require('../../commonMocks');
+const { getResMock } = require('../../mockUtils');
 const getType = require('jest-get-type');
 const mockedBcrypt = require('../../../__mocks__/bcrypt');
 const mockedJwt = require('../../../__mocks__/jsonwebtoken');

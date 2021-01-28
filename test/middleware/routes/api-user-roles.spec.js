@@ -1,4 +1,4 @@
-const { getResMock } = require('../../commonMocks');
+const { getResMock } = require('../../mockUtils');
 const { Router, _router } = jest.mock('express').requireMock('express');
 const { authMiddlewareFn: authMiddlewareFnMock } = jest
   .mock('../../../src/middleware/features/auth')
@@ -8,18 +8,7 @@ const { getFromDB: getFromDBMock, saveToDB: saveToDBMock, updateOneModelInDB: up
   .requireMock('../../../src/database/database-index');
 
 describe('#api-user-roles', () => {
-  const routerPostLastCbMock = jest.fn().mockName('postLastCallback');
-  const routerPatchLastCbMock = jest.fn().mockName('patchLastCallback');
-  const routerGetLastCbMock = jest.fn().mockName('getLastCallback');
-
   const authMiddlewareReturnedFn = () => {};
-  let routerPostHTTPMethod = () => {};
-  let routerPatchHTTPMethod = () => {};
-  let routerGetHTTPMethod = () => {};
-
-  let apiUserRolesRouter = null;
-  let originalLastCallbacks = {};
-
   const reqMock = Object.freeze({
     body: {
       roleName: '',
@@ -30,13 +19,9 @@ describe('#api-user-roles', () => {
     },
   });
 
-  beforeAll(() => {
-    originalLastCallbacks = interceptLastCallbacksFromMockedHTTPMethods([
-      routerPostLastCbMock,
-      routerPatchLastCbMock,
-      routerGetLastCbMock,
-    ]);
+  let apiUserRolesRouter = null;
 
+  beforeAll(() => {
     authMiddlewareFnMock
       .mockImplementationOnce(() => authMiddlewareReturnedFn)
       .mockName('postFirstCallback')
@@ -46,10 +31,6 @@ describe('#api-user-roles', () => {
       .mockName('getFirstCallback');
 
     apiUserRolesRouter = require('../../../src/middleware/routes/api-user-roles');
-
-    routerPostHTTPMethod = apiUserRolesRouter.post.mock.calls[0][2];
-    routerPatchHTTPMethod = apiUserRolesRouter.patch.mock.calls[0][2];
-    routerGetHTTPMethod = apiUserRolesRouter.get.mock.calls[0][2];
   });
 
   afterAll(() => {
@@ -69,21 +50,21 @@ describe('#api-user-roles', () => {
     expect(apiUserRolesRouter.post).toHaveBeenCalledWith(
       '/api/user-roles',
       authMiddlewareReturnedFn,
-      routerPostLastCbMock
+      apiUserRolesRouter._saveUserRole
     );
     expect(apiUserRolesRouter.patch).toHaveBeenCalledWith(
       '/api/user-roles',
       authMiddlewareReturnedFn,
-      routerPatchLastCbMock
+      apiUserRolesRouter._updateUserRole
     );
     expect(apiUserRolesRouter.get).toHaveBeenCalledWith(
       '/api/user-roles/:roleName',
       authMiddlewareReturnedFn,
-      routerGetLastCbMock
+      apiUserRolesRouter._getUserRole
     );
   });
 
-  describe('router.post(..) last callback', () => {
+  describe('router.post(..) callback saveUserRole(..)', () => {
     beforeEach(() => {
       saveToDBMock.mockImplementationOnce(saveToDBMock._succeededCall);
     });
@@ -93,7 +74,7 @@ describe('#api-user-roles', () => {
     });
 
     it('should call saveToDB(..) once with correct params', async () => {
-      await originalLastCallbacks.post(reqMock, getResMock());
+      await apiUserRolesRouter._saveUserRole(reqMock, getResMock());
 
       expect(saveToDBMock).toHaveBeenCalledTimes(1);
       expect(saveToDBMock).toHaveBeenCalledWith(
@@ -108,7 +89,7 @@ describe('#api-user-roles', () => {
         // clear mock from results of above call
         .mockClear();
 
-      await originalLastCallbacks.post(reqMock, getResMock());
+      await apiUserRolesRouter._saveUserRole(reqMock, getResMock());
 
       expect(saveMock).toHaveBeenCalledTimes(1);
       expect(saveMock).toHaveBeenCalledWith();
@@ -118,14 +99,14 @@ describe('#api-user-roles', () => {
       saveToDBMock.mockImplementationOnce(saveToDBMock._succeededCall);
       const resMock = getResMock();
 
-      await originalLastCallbacks.post(reqMock, resMock);
+      await apiUserRolesRouter._saveUserRole(reqMock, resMock);
 
       expect(resMock.status).toHaveBeenCalledWith(200);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await saveToDBMock() });
     });
   });
 
-  describe('router.patch(..) last callback', () => {
+  describe('router.patch(..) callback updateUserRole(..)', () => {
     beforeEach(() => {
       updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._succeededCall);
     });
@@ -135,7 +116,7 @@ describe('#api-user-roles', () => {
     });
 
     it('should call updateOneModelInDB(..) once with correct params', async () => {
-      await originalLastCallbacks.patch(reqMock, getResMock());
+      await apiUserRolesRouter._updateUserRole(reqMock, getResMock());
 
       expect(updateOneModelInDBMock).toHaveBeenCalledTimes(1);
       expect(updateOneModelInDBMock).toHaveBeenCalledWith(
@@ -149,14 +130,14 @@ describe('#api-user-roles', () => {
       updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._succeededCall);
       const resMock = getResMock();
 
-      await originalLastCallbacks.patch(reqMock, resMock);
+      await apiUserRolesRouter._updateUserRole(reqMock, resMock);
 
       expect(resMock.status).toHaveBeenCalledWith(200);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await updateOneModelInDBMock() });
     });
   });
 
-  describe('router.get(..) last callback', () => {
+  describe('router.get(..) callback getUserRole(..)', () => {
     beforeEach(() => {
       getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
     });
@@ -166,7 +147,7 @@ describe('#api-user-roles', () => {
     });
 
     it('should call getFromDB(..) once with correct params', async () => {
-      await originalLastCallbacks.get(reqMock, getResMock());
+      await apiUserRolesRouter._getUserRole(reqMock, getResMock());
 
       expect(getFromDBMock).toHaveBeenCalledTimes(1);
       expect(getFromDBMock).toHaveBeenCalledWith({ roleName: reqMock.params.roleName }, 'User-Role');
@@ -178,7 +159,7 @@ describe('#api-user-roles', () => {
         // clear mock from results of above call
         .mockClear();
 
-      await originalLastCallbacks.get(reqMock, getResMock());
+      await apiUserRolesRouter._getUserRole(reqMock, getResMock());
 
       expect(execPopulateMock).toHaveBeenCalledTimes(1);
       expect(execPopulateMock).toHaveBeenCalledWith('owners');
@@ -188,39 +169,10 @@ describe('#api-user-roles', () => {
       getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
       const resMock = getResMock();
 
-      await originalLastCallbacks.get(reqMock, resMock);
+      await apiUserRolesRouter._getUserRole(reqMock, resMock);
 
       expect(resMock.status).toHaveBeenCalledWith(200);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await getFromDBMock() });
     });
   });
 });
-
-function interceptLastCallbacksFromMockedHTTPMethods(mockedCallbacks) {
-  const originalLastCallbacks = {};
-
-  [
-    ['post', mockedCallbacks[0]],
-    ['patch', mockedCallbacks[1]],
-    ['get', mockedCallbacks[2]],
-  ].forEach(([httpMethodName, mockedCallback]) => {
-    const mockHTTPMethod = _router[httpMethodName];
-
-    mockHTTPMethod.mockImplementationOnce(
-      // use Proxy to intercept mockHTTPMethod call and change the last callback passed to it to be mock
-      new Proxy(() => {}, {
-        apply(target, thisArg, argumentsList) {
-          const argsExceptLast = argumentsList.slice(0, -1);
-          originalLastCallbacks[httpMethodName] = argumentsList[argumentsList.length - 1];
-
-          // clear before calling it via proxy
-          mockHTTPMethod.mockClear();
-
-          mockHTTPMethod(...argsExceptLast, mockedCallback);
-        },
-      })
-    );
-  });
-
-  return originalLastCallbacks;
-}

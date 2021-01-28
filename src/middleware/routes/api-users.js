@@ -1,15 +1,27 @@
 const logger = require('../../../utils/logger')(module.filename);
 const { Router } = require('express');
 const { saveToDB, getFromDB, updateOneModelInDB, ObjectId } = require('../../database/database-index');
-const auth = require('../features/auth');
+const { authMiddlewareFn, hashPassword } = require('../features/auth');
 
 const router = Router();
+router.post('/api/users/', updateUser);
+router.post('/api/users/login', logInUser);
+router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
+router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 
-router.post('/api/users/', async (req, res) => {
+// expose functions for unit tests
+router._updateUser = updateUser;
+router._logInUser = logInUser;
+router._logOutUser = logOutUser;
+router._getUser = getUser;
+
+module.exports = router;
+
+async function updateUser(req, res) {
   logger.log('[POST] /users req.body', req.body);
 
   try {
-    req.body.password = await auth.hashPassword(req.body.password);
+    req.body.password = await hashPassword(req.body.password);
     const savedUser = await saveToDB(req.body, 'User');
 
     // TODO: expose appropriate function from user role module?
@@ -32,9 +44,9 @@ router.post('/api/users/', async (req, res) => {
   }
 
   res.status(201).json({ msg: 'Success!' });
-});
+}
 
-router.post('/api/users/login', async (req, res) => {
+async function logInUser(req, res) {
   logger.log('[POST] /login');
 
   try {
@@ -53,9 +65,9 @@ router.post('/api/users/login', async (req, res) => {
 
     res.status(500).json({ exception });
   }
-});
+}
 
-router.post('/api/users/logout', auth.authMiddlewareFn(getFromDB), async (req, res) => {
+async function logOutUser(req, res) {
   try {
     req.user.tokens = req.user.tokens.filter((tokenItem) => tokenItem.token !== req.token);
     await req.user.save();
@@ -66,13 +78,11 @@ router.post('/api/users/logout', auth.authMiddlewareFn(getFromDB), async (req, r
 
     res.status(500).json({ exception });
   }
-});
+}
 
-router.get('/api/users/:id', auth.authMiddlewareFn(getFromDB), async (req, res) => {
+async function getUser(req, res) {
   logger.log('[GET] /:id', req.params.id);
   const user = await getFromDB(req.params.id, 'User');
 
   res.json({ payload: user });
-});
-
-module.exports = router;
+}

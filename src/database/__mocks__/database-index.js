@@ -1,4 +1,4 @@
-const { getMockImplementationError } = require('../../../test/commonMocks');
+const { getMockImplementationError } = require('../../../test/mockUtils');
 
 const DataBaseResult = class {};
 DataBaseResult.prototype.save = jest.fn();
@@ -26,4 +26,10 @@ updateOneModelInDB._succeededCall = jest.fn((itemQuery, updateData, modelType) =
 );
 updateOneModelInDB._succeededCall._clazz = DataBaseResult;
 
-module.exports = { getFromDB, saveToDB, updateOneModelInDB };
+class ObjectId {
+  constructor(id = 'test') {
+    return { _id: id };
+  }
+}
+
+module.exports = { getFromDB, saveToDB, updateOneModelInDB, ObjectId };
