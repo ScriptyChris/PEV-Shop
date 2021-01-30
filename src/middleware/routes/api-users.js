@@ -18,9 +18,9 @@ router._getUser = getUser;
 module.exports = router;
 
 async function updateUser(req, res) {
-  logger.log('[POST] /users req.body', req.body);
-
   try {
+    logger.log('[POST] /users req.body', req.body);
+
     req.body.password = await hashPassword(req.body.password);
     const savedUser = await saveToDB(req.body, 'User');
 
@@ -37,13 +37,13 @@ async function updateUser(req, res) {
     );
 
     logger.log('User saved', savedUser);
+
+    res.status(201).json({ msg: 'Success!' });
   } catch (exception) {
     logger.error('Saving user exception:', exception);
 
     res.status(500).json({ exception });
   }
-
-  res.status(201).json({ msg: 'Success!' });
 }
 
 async function logInUser(req, res) {
@@ -59,7 +59,7 @@ async function logInUser(req, res) {
 
     const token = await user.generateAuthToken();
 
-    res.json({ payload: user, token });
+    res.status(200).json({ payload: user, token });
   } catch (exception) {
     logger.error('Login user exception:', exception);
 

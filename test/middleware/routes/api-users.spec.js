@@ -1,6 +1,6 @@
 const { getResMock } = require('../../mockUtils');
 const { Router, _router } = jest.mock('express').requireMock('express');
-const { authMiddlewareFn: authMiddlewareFnMock, hashPassword } = jest
+const { authMiddlewareFn: authMiddlewareFnMock, hashPassword: hashPasswordMock } = jest
   .mock('../../../src/middleware/features/auth')
   .requireMock('../../../src/middleware/features/auth');
 const {
@@ -12,6 +12,14 @@ const {
 
 describe('#api-users', () => {
   const authMiddlewareReturnedFn = () => {};
+  const getReqMock = () => ({
+    body: {
+      login: 'user123',
+      password: 'password123',
+      roleName: 'role123',
+    },
+  });
+
   let apiUsersRouter = null;
 
   beforeAll(() => {
@@ -48,5 +56,163 @@ describe('#api-users', () => {
       authMiddlewareReturnedFn,
       apiUsersRouter._getUser
     );
+  });
+
+  describe('updateUser(..)', () => {
+    beforeEach(() => {
+      hashPasswordMock.mockImplementationOnce(hashPasswordMock._succeededCall);
+      saveToDBMock.mockImplementationOnce(saveToDBMock._succeededCall);
+      updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._succeededCall);
+    });
+
+    afterEach(() => {
+      hashPasswordMock.mockClear();
+      saveToDBMock.mockClear();
+      updateOneModelInDBMock.mockClear();
+    });
+
+    describe('when succeeded', () => {
+      it('should call hashPassword(..) with correct param', async () => {
+        await apiUsersRouter._updateUser(getReqMock(), getResMock());
+        expect(hashPasswordMock).toHaveBeenCalledWith(getReqMock().body.password);
+      });
+
+      it('should call saveToDB(..) with correct params', async () => {
+        const reqMock = getReqMock();
+
+        await apiUsersRouter._updateUser(reqMock, getResMock());
+
+        expect(saveToDBMock).toHaveBeenCalledWith(reqMock.body, 'User');
+      });
+
+      it('should call updateOneModelInDB(..) with correct params', async () => {
+        const reqMock = getReqMock();
+        saveToDBMock.mockImplementationOnce(saveToDBMock._succeededCall);
+
+        await apiUsersRouter._updateUser(reqMock, getResMock());
+
+        expect(updateOneModelInDBMock).toHaveBeenCalledWith(
+          { roleName: reqMock.body.roleName },
+          {
+            action: 'addUnique',
+            data: {
+              owners: new ObjectIdMock(await saveToDBMock(reqMock.body)._id),
+            },
+          },
+          'User-Role'
+        );
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
+
+        await apiUsersRouter._updateUser(getReqMock(), resMock);
+
+        expect(resMock.status).toHaveBeenCalledWith(201);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ msg: 'Success!' });
+      });
+    });
+
+    describe('when failed', () => {
+      it('should call res.status(..).json(..) with correct params', () => {
+        const resMock = getResMock();
+        const rejectionReason = TypeError(`Cannot read property 'password' of undefined`);
+
+        apiUsersRouter._updateUser({}, resMock).catch(() => {
+          expect(resMock.status).toHaveBeenCalledWith(500);
+          expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception: rejectionReason });
+        });
+      });
+    });
+  });
+
+  describe('logInUser(..)', () => {
+    const {
+      matchPassword: matchPasswordMock,
+      generateAuthToken: generateAuthTokenMock,
+    } = getFromDBMock._succeededCall._clazz.prototype;
+
+    describe('when succeeded', () => {
+      beforeEach(() => {
+        getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
+        matchPasswordMock.mockImplementationOnce(matchPasswordMock._succeededCall);
+      });
+
+      afterEach(() => {
+        getFromDBMock.mockClear();
+        matchPasswordMock.mockClear();
+      });
+
+      it('should call getFromDB(..) with correct params', async () => {
+        const reqMock = getReqMock();
+
+        await apiUsersRouter._logInUser(reqMock, getResMock());
+
+        expect(getFromDBMock).toHaveBeenCalledWith({ login: reqMock.body.login }, 'User');
+      });
+
+      it('should call user.matchPassword(..) with correct param', async () => {
+        const reqMock = getReqMock();
+
+        await apiUsersRouter._logInUser(reqMock, getResMock());
+
+        expect(matchPasswordMock).toHaveBeenCalledWith(reqMock.body.password);
+      });
+
+      it('should call user.generateAuthToken() without params', async () => {
+        await apiUsersRouter._logInUser(getReqMock(), getResMock());
+
+        expect(generateAuthTokenMock).toHaveBeenCalledWith();
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const reqMock = getReqMock();
+
+        await apiUsersRouter._logInUser(reqMock, getResMock());
+
+        expect(generateAuthTokenMock).toHaveBeenCalledWith();
+      });
+    });
+
+    describe('when failed', () => {
+      afterAll(() => {
+        getFromDBMock.mockClear();
+        matchPasswordMock.mockClear();
+      });
+
+      it('should not call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
+        getFromDBMock.mockImplementation(getFromDBMock._succeededCall);
+
+        // first case
+        await apiUsersRouter._logInUser({}, resMock);
+
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          exception: TypeError(`Cannot read property 'login' of undefined`),
+        });
+
+        resMock._jsonMethod.mockClear();
+
+        // second case
+        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall);
+
+        await apiUsersRouter._logInUser(getReqMock(), resMock);
+
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          exception: TypeError(`Cannot read property 'matchPassword' of null`),
+        });
+
+        // third case
+        matchPasswordMock.mockImplementationOnce(matchPasswordMock._failedCall);
+
+        await apiUsersRouter._logInUser(getReqMock(), resMock);
+
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception: Error(`Invalid credentials`) });
+
+        // all cases
+        expect(resMock.status).toHaveBeenCalledWith(500);
+        expect(resMock.status).toHaveBeenCalledTimes(3);
+      });
+    });
   });
 });

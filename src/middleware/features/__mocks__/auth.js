@@ -14,13 +14,7 @@ authMiddlewareFn._failedCall = async (req, res, next) => null;
 const hashPassword = jest.fn((password) => {
   throw getMockImplementationError('hashPassword');
 });
-hashPassword._succeededCall = (password) => Promise.resolve(password);
+hashPassword._succeededCall = (password) => Promise.resolve(Buffer.from(password).toString('base64'));
 hashPassword._failedCall = (password) => Promise.reject(Error('hashing failed'));
 
-// const matchPassword = jest.fn((password) => {
-//   throw getMockImplementationError('matchPassword')
-// })
-// matchPassword._succeededCall = (password) => Promise.resolve(true)
-// matchPassword._failedCall = (password) => Promise.resolve(false);
-
-module.exports = { authMiddlewareFn };
+module.exports = { authMiddlewareFn, hashPassword };
