@@ -215,4 +215,127 @@ describe('#api-users', () => {
       });
     });
   });
+
+  describe('logOutUser(..)', () => {
+    describe('when succeeded', () => {
+      const getReqMock = () => {
+        const user = new getFromDBMock._succeededCall._clazz();
+        user.tokens = ['some token'];
+
+        return {
+          token: 'a token',
+          user,
+        };
+      };
+
+      it('should call req.user.save()', async () => {
+        await apiUsersRouter._logOutUser(getReqMock(), getResMock());
+
+        expect(getFromDBMock._succeededCall._clazz.prototype.save).toHaveBeenCalledWith();
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
+
+        await apiUsersRouter._logOutUser(getReqMock(), resMock);
+
+        expect(resMock.status).toHaveBeenCalledWith(200);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: 'Logged out!' });
+      });
+    });
+
+    describe('when failed', () => {
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
+
+        // empty req case
+        const emptyReqMock = {};
+
+        await apiUsersRouter._logOutUser(emptyReqMock, resMock);
+
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          exception: TypeError(`Cannot read property 'tokens' of undefined`),
+        });
+
+        // empty req.user case
+        const reqMockWithEmptyUser = {
+          user: {},
+        };
+
+        await apiUsersRouter._logOutUser(reqMockWithEmptyUser, resMock);
+
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          exception: TypeError(`Cannot read property 'tokens' of undefined`),
+        });
+
+        // all cases
+        expect(resMock.status).toHaveBeenCalledWith(500);
+        expect(resMock.status).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
+
+  describe('getUser(..)', () => {
+    describe('when succeeded', () => {
+      const getReqMock = () => ({
+        params: {
+          id: 'test',
+        },
+      });
+
+      beforeEach(() => {
+        getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
+      });
+
+      afterEach(() => {
+        getFromDBMock.mockClear();
+      });
+
+      it('should call getFromDB(..) with correct params', async () => {
+        const reqMock = getReqMock();
+
+        await apiUsersRouter._getUser(reqMock, getResMock());
+
+        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params.id, 'User');
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
+
+        await apiUsersRouter._getUser(getReqMock(), resMock);
+
+        expect(resMock.status).toHaveBeenCalledWith(200);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          payload: await getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall)(),
+        });
+      });
+    });
+
+    describe('when failed', () => {
+      it('should return promise rejected with correct reason', () => {
+        const emptyReqMock = {};
+        const resMock = getResMock();
+
+        return apiUsersRouter._getUser(emptyReqMock, resMock).catch((error) => {
+          expect(error).toEqual(TypeError(`Cannot read property 'id' of undefined`));
+        });
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
+        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall);
+
+        const emptyReqMock = {
+          params: {
+            id: 'test',
+          },
+        };
+        const resMock = getResMock();
+
+        await apiUsersRouter._getUser(emptyReqMock, resMock);
+
+        expect(resMock.status).toHaveBeenCalledWith(200);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: null });
+      });
+    });
+  });
 });

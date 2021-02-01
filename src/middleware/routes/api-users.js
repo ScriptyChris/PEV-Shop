@@ -69,6 +69,7 @@ async function logInUser(req, res) {
 
 async function logOutUser(req, res) {
   try {
+    // TODO: what if .filter(..) returns an empty array? should req.user be saved then?
     req.user.tokens = req.user.tokens.filter((tokenItem) => tokenItem.token !== req.token);
     await req.user.save();
 
@@ -82,7 +83,8 @@ async function logOutUser(req, res) {
 
 async function getUser(req, res) {
   logger.log('[GET] /:id', req.params.id);
+  // TODO: handle case when user is not found in database
   const user = await getFromDB(req.params.id, 'User');
 
-  res.json({ payload: user });
+  res.status(200).json({ payload: user });
 }
