@@ -3,13 +3,10 @@ const { getMockImplementationError } = require('../../../../test/mockUtils');
 const authMiddlewareFn = jest.fn((getFromDB) => {
   throw getMockImplementationError('authMiddlewareFn');
 });
-authMiddlewareFn._succeededCall = async (req, res, next) => {
-  req.token = 'test token';
-  req.user = { _id: 'user id' };
-
-  next();
+authMiddlewareFn._succeededCall = (getFromDB) => {
+  return async (req, res, next) => {};
 };
-authMiddlewareFn._failedCall = async (req, res, next) => null;
+authMiddlewareFn._failedCall = (getFromDB) => null;
 
 const hashPassword = jest.fn((password) => {
   throw getMockImplementationError('hashPassword');
@@ -17,4 +14,14 @@ const hashPassword = jest.fn((password) => {
 hashPassword._succeededCall = (password) => Promise.resolve(Buffer.from(password).toString('base64'));
 hashPassword._failedCall = (password) => Promise.reject(Error('hashing failed'));
 
-module.exports = { authMiddlewareFn, hashPassword };
+const userRoleMiddlewareFn = jest.fn(() => {
+  throw getMockImplementationError('userRoleMiddlewareFn');
+});
+userRoleMiddlewareFn._succeededCall = jest.fn((roleName) => {
+  return async (req, res, next) => {};
+});
+userRoleMiddlewareFn._failedCall = jest.fn((roleName) => {
+  return (req, res, next) => Promise.reject(false);
+});
+
+module.exports = { authMiddlewareFn, hashPassword, userRoleMiddlewareFn };

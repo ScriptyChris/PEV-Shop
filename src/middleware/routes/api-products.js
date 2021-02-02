@@ -8,11 +8,25 @@ const router = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 // const productList =  getProductList();
 
-router.get('/api/products', async (req, res) => {
-  logger.log('[products GET] query', req.query);
+router.get('/api/products', getProducts);
+router.get('/api/products/:id', getProductById);
+// TODO: add auth and user-role middlewares
+router.post('/api/products', addProduct);
+router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
 
+// expose for unit tests
+router._getProducts = getProducts;
+router._getProductById = getProductById;
+router._addProduct = addProduct;
+router._modifyProduct = modifyProduct;
+
+module.exports = router;
+
+async function getProducts(req, res) {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
+    logger.log('[products GET] query', req.query);
+
     // TODO: ... and really refactor this!
     const idListConfig = queryBuilder.getIdListConfig(req.query);
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
@@ -42,12 +56,12 @@ router.get('/api/products', async (req, res) => {
 
     res.status(500).json({ exception });
   }
-});
+}
 
-router.get('/api/products/:id', async (req, res) => {
-  logger.log('[products/:id GET] req.param', req.params);
-
+async function getProductById(req, res) {
   try {
+    logger.log('[products/:id GET] req.param', req.params);
+
     const product = await getFromDB(req.params._id, 'Product');
 
     res.status(200).json(product);
@@ -56,29 +70,28 @@ router.get('/api/products/:id', async (req, res) => {
 
     res.status(500).json({ exception });
   }
-});
+}
 
-router.post('/api/products', async (req, res) => {
-  logger.log('[products POST] req.body', req.body);
-
+async function addProduct(req, res) {
   try {
+    logger.log('[products POST] req.body', req.body);
+
     const savedProduct = await saveToDB(req.body, 'Product');
 
     logger.log('Product saved', savedProduct);
 
-    res.status(201);
-    res.end('Success!');
+    res.status(201).json({ msg: 'Success!' });
   } catch (exception) {
     logger.error('Saving product exception:', exception);
 
     res.status(500).json({ exception });
   }
-});
+}
 
-router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), async (req, res) => {
-  logger.log('[products PATCH] req.body', req.body);
-
+async function modifyProduct(req, res) {
   try {
+    logger.log('[products PATCH] req.body', req.body);
+
     if (!req.userPermissions) {
       throw new Error('User has no permissions!');
     }
@@ -93,9 +106,7 @@ router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('
 
     res.status(403).json({ exception });
   }
-});
-
-module.exports = router;
+}
 
 // function getProductList() {
 //   const [firstCategory] = JSON.parse(readFileSync(`${databaseDirname}/raw-data-formatted.json`, 'utf8'));

@@ -40,4 +40,35 @@ class ObjectId {
   }
 }
 
-module.exports = { getFromDB, saveToDB, updateOneModelInDB, ObjectId };
+const queryBuilder = (() => {
+  const _queryBuilder = {
+    getIdListConfig: jest.fn(() => {
+      throw getMockImplementationError('getIdListConfig');
+    }),
+    getProductsWithChosenCategories: jest.fn(() => {
+      throw getMockImplementationError('getProductsWithChosenCategories');
+    }),
+    getPaginationConfig: jest.fn(() => {
+      throw getMockImplementationError('getPaginationConfig');
+    }),
+  };
+  _queryBuilder.getIdListConfig._succeededCall = jest.fn((reqQuery) => ({
+    _id: { $in: ['123'] },
+  }));
+  _queryBuilder.getIdListConfig._failedCall = jest.fn((reqQuery) => null);
+  _queryBuilder.getProductsWithChosenCategories._succeededCall = jest.fn((reqQuery) => ({
+    category: {
+      $in: ['test category'],
+    },
+  }));
+  _queryBuilder.getProductsWithChosenCategories._failedCall = jest.fn((reqQuery) => null);
+  _queryBuilder.getPaginationConfig._succeededCall = jest.fn((reqQuery) => ({
+    page: 1,
+    limit: 10,
+  }));
+  _queryBuilder.getPaginationConfig._failedCall = jest.fn((reqQuery) => null);
+
+  return Object.freeze(_queryBuilder);
+})();
+
+module.exports = { getFromDB, saveToDB, updateOneModelInDB, ObjectId, queryBuilder };

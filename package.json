@@ -20,7 +20,7 @@
   "main": "src/frontend/app.js",
   "scripts": {
     "test:backend": "jest --watch --env=node",
-    "test:debug": "node --inspect node_modules/jest/bin/jest.js --runInBand",
+    "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
     "prettier": "prettier --write src/ !src/frontend/assets !src/database/data",
     "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",
     "eslint:backend": "eslint src/middleware/** src/database/**",
