@@ -1,13 +1,13 @@
 const { resolve } = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const middleware = require('./middleware/index');
+const middleware = require('./src/middleware/middleware-index');
 
 // TODO: handle it in better way
 process.env.NODE_ENV = 'development';
 
 module.exports = {
   mode: 'development',
-  entry: './src/app.js',
+  entry: './src/frontend/app.js',
   output: {
     filename: 'main.js',
     path: resolve(__dirname, 'dist'),

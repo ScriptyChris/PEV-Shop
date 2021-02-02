@@ -1,3 +1,4 @@
 .idea/
 node_modules/
-database/data
+src/database/data
+dist/

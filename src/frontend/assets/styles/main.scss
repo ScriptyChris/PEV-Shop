@@ -1,0 +1,38 @@
+@import 'views/shop';
+@import 'views/categoriesTree';
+@import 'views/productList';
+@import 'views/cart';
+@import 'views/pagination';
+
+.app-root {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: 10vh auto 10vh;
+  grid-template-areas:
+    "header header"
+    "main aside"
+    "footer footer";
+
+  & > * {
+    border: 1px solid red;
+  }
+}
+
+.header {
+  grid-area: header;
+}
+
+.nav {
+  ul {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}
+
+.main {
+  grid-area: main;
+}
+
+.footer {
+  grid-area: footer;
+}

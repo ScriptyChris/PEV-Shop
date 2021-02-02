@@ -5,7 +5,7 @@ const config = {
     extends: isNodeOnly ? "" : "plugin:react/recommended",
     jsx: !isNodeOnly,
     plugins: isNodeOnly ? [] : ["react"],
-    ignorePatterns: isNodeOnly ? ["database/data"] : [],
+    ignorePatterns: isNodeOnly ? ["src/database/data", "test/", "__mocks__/"] : [],
 };
 
 module.exports = {
