@@ -30,7 +30,7 @@ const middleware = (app) => {
 };
 
 // TODO: refactor to use ENV
-if (process.env.NODE_ONLY === 'true') {
+if (process.env.BACKEND_ONLY === 'true') {
   const app = require('express')();
   const port = 3000;
 

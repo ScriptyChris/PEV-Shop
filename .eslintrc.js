@@ -1,5 +1,5 @@
 // TODO: refactor to use ENV
-const isNodeOnly = process.env.NODE_ONLY === 'true';
+const isNodeOnly = process.env.BACKEND_ONLY === 'true';
 const config = {
     browser: !isNodeOnly,
     extends: isNodeOnly ? "" : "plugin:react/recommended",
