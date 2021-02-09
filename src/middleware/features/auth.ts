@@ -1,33 +1,37 @@
-const logger = require('../../../utils/logger')(module.filename);
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+import getLogger from '../../../utils/logger';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
+const logger = getLogger(module.filename)
 const SALT_ROUNDS = 8;
 // TODO: move to ENV
 const SECRET_KEY = 'secret-key';
 
-const comparePasswords = (password, passwordPattern) => {
+type TToken = { _id: number };
+
+const comparePasswords = (password: string, passwordPattern: string): Promise<boolean> => {
   return bcrypt.compare(password, passwordPattern);
 };
 
-const hashPassword = (password) => {
+const hashPassword = (password: string): Promise<string> => {
   return bcrypt.hash(password, SALT_ROUNDS);
 };
 
-const getToken = (payloadObj) => {
+const getToken = (payloadObj: TToken): string => {
   return jwt.sign(payloadObj, SECRET_KEY);
 };
 
-const verifyToken = (token) => {
-  return jwt.verify(token, SECRET_KEY);
+const verifyToken = (token: string): TToken => {
+  return (jwt.verify(token, SECRET_KEY) as TToken);
 };
 
-const authMiddlewareFn = (getFromDB) => {
-  return async (req, res, next) => {
+const authMiddlewareFn = (getFromDB: /* TODO: user explicit type */ Function) => {
+  return async (req: Request & { token: string, user: any }, res: Response, next: NextFunction) => {
     try {
-      const token = req.header('Authorization').replace('Bearer ', '');
-      const decodedToken = verifyToken(token);
-      const user = await getFromDB({ _id: decodedToken._id.toString(), 'tokens.token': token }, 'User');
+      const token: string = (req.header('Authorization') as string).replace('Bearer ', '');
+      const decodedToken: TToken = verifyToken(token);
+      const user: any = await getFromDB({ _id: decodedToken._id.toString(), 'tokens.token': token }, 'User');
 
       if (!user) {
         throw new Error('Auth failed!');
@@ -44,8 +48,8 @@ const authMiddlewareFn = (getFromDB) => {
   };
 };
 
-const userRoleMiddlewareFn = (roleName) => {
-  return async (req, res, next) => {
+const userRoleMiddlewareFn = (roleName: string): any => {
+  return async (req: Request & { user: any, userPermissions: string[] }, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new Error('No user provided - probably forgot to do auth first.');
@@ -67,7 +71,7 @@ const userRoleMiddlewareFn = (roleName) => {
   };
 };
 
-module.exports = {
+export {
   comparePasswords,
   hashPassword,
   getToken,

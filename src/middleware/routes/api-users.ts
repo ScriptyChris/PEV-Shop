@@ -1,9 +1,12 @@
-const logger = require('../../../utils/logger')(module.filename);
-const { Router } = require('express');
-const { saveToDB, getFromDB, updateOneModelInDB, ObjectId } = require('../../database/database-index');
-const { authMiddlewareFn, hashPassword } = require('../features/auth');
+import getLogger from '../../../utils/logger';
+import { Router, Request, Response } from'express';
+import { saveToDB, getFromDB, updateOneModelInDB, ObjectId } from '../../database/database-index';
+import { authMiddlewareFn, hashPassword } from '../features/auth';
+import { IUser } from '../../database/models/_user';
 
-const router = Router();
+const logger = getLogger(module.filename);
+
+const router: any = Router();
 router.post('/api/users/', updateUser);
 router.post('/api/users/login', logInUser);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
@@ -15,14 +18,14 @@ router._logInUser = logInUser;
 router._logOutUser = logOutUser;
 router._getUser = getUser;
 
-module.exports = router;
+export default router;
 
-async function updateUser(req, res) {
+async function updateUser(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[POST] /users req.body', req.body);
 
     req.body.password = await hashPassword(req.body.password);
-    const savedUser = await saveToDB(req.body, 'User');
+    const savedUser = await saveToDB(req.body, 'User') as IUser;
 
     // TODO: expose appropriate function from user role module?
     await updateOneModelInDB(
@@ -46,11 +49,11 @@ async function updateUser(req, res) {
   }
 }
 
-async function logInUser(req, res) {
+async function logInUser(req: Request, res: Response): Promise<void> {
   logger.log('[POST] /login');
 
   try {
-    const user = await getFromDB({ login: req.body.login }, 'User');
+    const user = await getFromDB({ login: req.body.login }, 'User') as IUser;
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
@@ -67,10 +70,10 @@ async function logInUser(req, res) {
   }
 }
 
-async function logOutUser(req, res) {
+async function logOutUser(req: Request & {user: any, token: string}, res: Response): Promise<void> {
   try {
     // TODO: what if .filter(..) returns an empty array? should req.user be saved then?
-    req.user.tokens = req.user.tokens.filter((tokenItem) => tokenItem.token !== req.token);
+    req.user.tokens = req.user.tokens.filter((tokenItem: {token: string}) => tokenItem.token !== req.token);
     await req.user.save();
 
     res.status(200).json({ payload: 'Logged out!' });
@@ -81,7 +84,7 @@ async function logOutUser(req, res) {
   }
 }
 
-async function getUser(req, res) {
+async function getUser(req: Request, res: Response): Promise<void> {
   logger.log('[GET] /:id', req.params.id);
   // TODO: handle case when user is not found in database
   const user = await getFromDB(req.params.id, 'User');

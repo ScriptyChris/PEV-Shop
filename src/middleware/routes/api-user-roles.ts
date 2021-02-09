@@ -1,5 +1,7 @@
+import { Request, Response } from 'express';
+
 const logger = require('../../../utils/logger')(module.filename);
-const { Router } = require('express');
+const { Router, Request, Response } = require('express');
 const { authMiddlewareFn: authMiddleware } = require('../features/auth');
 const { saveToDB, getFromDB, updateOneModelInDB } = require('../../database/database-index');
 
@@ -13,9 +15,9 @@ router._saveUserRole = saveUserRole;
 router._updateUserRole = updateUserRole;
 router._getUserRole = getUserRole;
 
-module.exports = router;
+export default router;
 
-async function saveUserRole(req, res) {
+async function saveUserRole(req: Request, res: Response): Promise<void> {
   logger.log('[POST] /user-roles:', req.body);
 
   const userRole = {
@@ -32,7 +34,7 @@ async function saveUserRole(req, res) {
   res.status(200).json({ payload: savedUserRole });
 }
 
-async function updateUserRole(req, res) {
+async function updateUserRole(req: Request, res: Response): Promise<void> {
   logger.log('[PATCH] /user-roles:', req.body);
 
   const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'User-Role');
@@ -41,7 +43,7 @@ async function updateUserRole(req, res) {
   res.status(200).json({ payload: updatedUserRole });
 }
 
-async function getUserRole(req, res) {
+async function getUserRole(req: Request, res: Response): Promise<void> {
   logger.log('[GET] /user-roles:', req.params);
 
   const userRole = await getFromDB({ roleName: req.params.roleName }, 'User-Role');

@@ -1,10 +1,13 @@
-const logger = require('../../../utils/logger')(module.filename);
-// const { readFileSync } = require('fs');
-const { Router } = require('express');
-const { authMiddlewareFn: authMiddleware, userRoleMiddlewareFn } = require('../features/auth');
-const { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } = require('../../database/database-index');
+import getLogger from '../../../utils/logger'
+import { Router, Request, Response } from 'express';
+import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
+import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../database/database-index';
+import { TIdListReq, TPageLimit, TProductsCategoriesReq } from '../../database/utils/queryBuilder';
+import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 
-const router = Router();
+// const { readFileSync } = require('fs');
+const logger = getLogger(module.filename)
+const router: any = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 // const productList =  getProductList();
 
@@ -20,9 +23,9 @@ router._getProductById = getProductById;
 router._addProduct = addProduct;
 router._modifyProduct = modifyProduct;
 
-module.exports = router;
+export default router;
 
-async function getProducts(req, res) {
+async function getProducts(req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit }, res: Response): Promise<void> {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
     logger.log('[products GET] query', req.query);
@@ -39,7 +42,7 @@ async function getProducts(req, res) {
       query = chosenCategories;
     }
 
-    const options = {};
+    const options: { pagination?: TPaginationConfig } = {};
     const paginationConfig = queryBuilder.getPaginationConfig(req.query);
 
     if (paginationConfig) {
@@ -58,7 +61,7 @@ async function getProducts(req, res) {
   }
 }
 
-async function getProductById(req, res) {
+async function getProductById(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[products/:id GET] req.param', req.params);
 
@@ -72,7 +75,7 @@ async function getProductById(req, res) {
   }
 }
 
-async function addProduct(req, res) {
+async function addProduct(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[products POST] req.body', req.body);
 
@@ -88,7 +91,7 @@ async function addProduct(req, res) {
   }
 }
 
-async function modifyProduct(req, res) {
+async function modifyProduct(req: Request & {userPermissions: any}, res: Response): Promise<void> {
   try {
     logger.log('[products PATCH] req.body', req.body);
 

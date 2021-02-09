@@ -1,7 +1,7 @@
-const { Schema } = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate-v2');
+import { Schema, Document } from 'mongoose';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 
-const reviewsSchema = new Schema({
+const reviewsSchema: Schema = new Schema({
   summary: {
     type: {
       rating: {
@@ -76,4 +76,21 @@ productSchema.methods.toJSON = function () {
   return user;
 };
 
-module.exports = productSchema;
+export interface IReviews extends Document {
+  summary: string,
+  list: []
+}
+
+export interface IProduct extends Document {
+  name: string,
+  url: string,
+  category: string,
+  price: number,
+  shortDescription: string[],
+  technicalSpecs: Object[],
+  images: Object[],
+  relatedProducts: Object[],
+  reviews: IReviews
+}
+
+export default productSchema;

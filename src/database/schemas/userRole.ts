@@ -1,4 +1,4 @@
-const { Schema } = require('mongoose');
+import { Schema, Document } from 'mongoose';
 
 const userRoleSchema = new Schema({
   roleName: {
@@ -9,7 +9,7 @@ const userRoleSchema = new Schema({
     type: [String],
     required: true,
     // TODO: use validation in all other database Schemas
-    validate(value) {
+    validate(value: /* TODO: declare more strict type than string */ string[]) {
       return Array.isArray(value) && value.length > 0;
     },
   },
@@ -33,4 +33,10 @@ userRoleSchema.methods.toJSON = function () {
   return userRole;
 };
 
-module.exports = userRoleSchema;
+export interface IUserRole extends Document {
+  roleName: string,
+  permissions: string[],
+  owners: Schema.Types.ObjectId[]
+}
+
+export default userRoleSchema;

@@ -1,8 +1,9 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./src/database", "./src/middleware"],
+  "include": ["./src/database/*.ts", "./src/middleware/*.ts"],
   "exclude": ["./src/database/data"],
   "compilerOptions": {
-    "module": "commonjs"
+    "module": "commonjs",
+    "moduleResolution": "node",
   }
 }
