@@ -1,9 +1,11 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./src/database/*.ts", "./src/middleware/*.ts"],
-  "exclude": ["./src/database/data"],
+  "include": ["./src/database/**/*.ts", "./src/middleware/**/*.ts"],
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist"
   }
 }

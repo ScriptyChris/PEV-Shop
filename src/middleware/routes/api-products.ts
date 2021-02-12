@@ -5,7 +5,7 @@ import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../dat
 import { TIdListReq, TPageLimit, TProductsCategoriesReq } from '../../database/utils/queryBuilder';
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 
-// const { readFileSync } = require('fs');
+// import { readFileSync } from 'fs';
 const logger = getLogger(module.filename)
 const router: any = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';

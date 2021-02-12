@@ -1,8 +1,9 @@
 {
-  "exclude": ["./node_modules", "./src/**/__mocks__"],
+  "exclude": [
+    "./node_modules", "./src/**/__mocks__", "./src/database/data"
+  ],
   "compilerOptions": {
     "target": "ES6",
-    "allowJs": true,
     "strict": true
   }
 }

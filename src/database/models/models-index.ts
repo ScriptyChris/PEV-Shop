@@ -5,9 +5,9 @@ import { default as UserRole, IUserRole } from './_userRole'
 
 
 const MODELS = {
-  Product: Product, //require('./_product'),
-  User: User, // require('./_user'),
-  'User-Role': UserRole //require('./_userRole'),
+  Product: Product,
+  User: User,
+  'User-Role': UserRole,
 };
 
 export type IModel = IProduct | IUser | IUserRole;

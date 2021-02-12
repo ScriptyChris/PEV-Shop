@@ -1,10 +1,10 @@
-import * as Express from 'express';
+// @ts-ignore
+import Express from 'express';
 import { Application } from 'express';
 
-console.log('helellellllooooo:', process.env.BACKEND_ONLY);
-
 import getLogger from '../../utils/logger';
-import * as glob from 'glob';
+// @ts-ignore
+import glob from 'glob';
 import * as bodyParser from 'body-parser';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
@@ -69,7 +69,7 @@ const getImage = (() => {
 function findFileRecursively(fileName: string): Promise<string[]> {
   return new Promise((resolve, reject) => {
     // TODO: wrap it with util.promisify
-    glob(`${databaseDirname}/web-scraped/images/**/${fileName}`, (err, files) => {
+    glob(`${databaseDirname}/web-scraped/images/**/${fileName}`, (err: Error | null, files: string[]) => {
       if (err || !files.length) {
         reject(err || 'No files found!');
         return;

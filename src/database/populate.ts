@@ -5,12 +5,11 @@ import { TGenericModel } from './models/models-index';
 import { sep } from 'path';
 import { promisify } from 'util';
 import * as G from 'glob';
+import { readFile, readFileSync } from 'fs';
 
 const glob = promisify(G.glob);
 const logger = getLogger(module.filename);
-
-let { readFile, readFileSync } = require('fs');
-readFile = promisify(readFile);
+const promisifiedReadFile = promisify(readFile);
 
 const PARAMS: { CLEAN_ALL: string, GROUP_CATEGORIES: string } = {
   CLEAN_ALL: 'cleanAll=true',
@@ -70,7 +69,7 @@ async function getSourceData(): Promise<Object[]> {
   const sourceDataPath: string = isFileInPath ? path : `${path}${sep}**${sep}${fileName}.json`;
   const sourceDataFiles: string[] = await glob(sourceDataPath) as string[];
   const sourceDataList: Object[] = await Promise.all(
-    sourceDataFiles.map(async (filePath: string) => JSON.parse(await readFile(filePath, { encoding: 'utf8' })))
+    sourceDataFiles.map(async (filePath: string) => JSON.parse(await promisifiedReadFile(filePath, { encoding: 'utf8' })))
   );
 
   logger.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
@@ -114,7 +113,7 @@ async function populateProducts(ProductModel: TGenericModel, sourceDataList: Obj
     type CustomRegExp = RegExp & { matcher: string, replacer: string };
 
     const categoriesGroupPath: string = getScriptParamValue(PARAMS.GROUP_CATEGORIES, true);
-    const categoryRegExps: CustomRegExp[] = JSON.parse(readFileSync(categoriesGroupPath.split('=').pop(), { encoding: 'utf8' }));
+    const categoryRegExps: CustomRegExp[] = JSON.parse(readFileSync(categoriesGroupPath.split('=').pop() as string, { encoding: 'utf8' }));
 
     if (categoriesGroupPath) {
       return (categoryName: string) => {

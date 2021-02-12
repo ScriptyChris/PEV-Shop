@@ -9,7 +9,7 @@ module.exports = {
   mode: 'development',
   entry: './src/frontend/app.js',
   output: {
-    filename: 'main.js',
+    filename: 'frontend.js',
     path: resolve(__dirname, 'dist'),
   },
   module: {
@@ -31,7 +31,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: 'styles.css',
       chunkFilename: '[id].css'
     })
   ],

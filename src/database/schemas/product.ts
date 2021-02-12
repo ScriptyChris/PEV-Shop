@@ -1,5 +1,6 @@
 import { Schema, Document } from 'mongoose';
-import * as mongoosePaginate from 'mongoose-paginate-v2';
+// @ts-ignore
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const reviewsSchema: Schema = new Schema({
   summary: {

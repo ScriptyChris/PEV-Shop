@@ -2,12 +2,12 @@
   "name": "fake-pev-shopping",
   "version": "1.0.0",
   "description": "Fake Personal Electric Vehicle Shopping application built with React. Browse, compare, buy, review vehicles and their accessories.",
-  "author": "JSHoliq",
+  "author": "ScriptyChris",
   "license": "ISC",
-  "homepage": "https://github.com/JSHoliq/Fake-PEV-Shopping#readme",
+  "homepage": "https://github.com/ScriptyChris/Fake-PEV-Shopping#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JSHoliq/Fake-PEV-Shopping.git"
+    "url": "git+https://github.com/ScriptyChris/Fake-PEV-Shopping.git"
   },
   "keywords": [
     "shopping",
@@ -15,20 +15,21 @@
     "react"
   ],
   "bugs": {
-    "url": "https://github.com/JSHoliq/Fake-PEV-Shopping/issues"
+    "url": "https://github.com/ScriptyChris/Fake-PEV-Shopping/issues"
   },
-  "main": "src/frontend/app.js",
   "scripts": {
     "test:backend": "jest --watch --env=node",
     "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
     "prettier": "prettier --write src/ !src/frontend/assets !src/database/data",
     "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",
     "eslint:backend": "eslint src/middleware/** src/database/**",
-    "start": "set \"BACKEND_ONLY=false\" && webpack-dev-server",
-    "serve": "set \"BACKEND_ONLY=true\" && nodemon --exec \"npm run eslint:backend && npm run prettier:backend && node src/middleware/middleware-index.js\"",
-    "compile:backend": "tsc -w --project tsconfig.backend.json",
+    "serve": "set \"BACKEND_ONLY=true\" && node dist/src/middleware/middleware-index.js",
+    "frontend": "set \"BACKEND_ONLY=false\" && webpack-dev-server",
+    "backend": "set \"BACKEND_ONLY=true\" && nodemon --exec \"npm run eslint:backend && npm run prettier:backend && node src/middleware/middleware-index.js\"",
     "prebuild": "npm run prettier",
-    "build": "webpack"
+    "build:backend": "rimraf dist/src dist/utils && tsc --project tsconfig.backend.json",
+    "build:frontend": "webpack",
+    "build": "npm run build:backend && npm run build:frontend"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
