@@ -1,11 +1,19 @@
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-const { findAssociatedSrcModulePath } = require('../../test-index');
+import { findAssociatedSrcModulePath } from '../../test-index';
+
+let queryBuilder: any = {};
+
+(async () => {
+  // @ts-ignore
+  queryBuilder = await import(findAssociatedSrcModulePath());
+})();
+
 const {
   isEmptyQueryObject,
   getPaginationConfig,
   getIdListConfig,
   getProductsWithChosenCategories,
-} = require(findAssociatedSrcModulePath());
+} = queryBuilder;
 
 describe('#queryBuilder', () => {
   describe('isEmptyQueryObject()', () => {

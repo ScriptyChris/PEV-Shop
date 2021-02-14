@@ -1,4 +1,4 @@
-const getMockImplementationError = (fnName) =>
+const getMockImplementationError = (fnName: string) =>
   Error(`Need to mock the ${fnName}(..) implementation for unit test first!`);
 
 const getResMock = () => {
@@ -11,4 +11,4 @@ const getResMock = () => {
   };
 };
 
-module.exports = { getResMock, getMockImplementationError };
+export { getResMock, getMockImplementationError };

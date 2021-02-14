@@ -63,6 +63,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@types/jest": "^26.0.20",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "jsonwebtoken": "^8.5.1",

@@ -1,3 +1,3 @@
 module.exports = {
-  watchPlugins: ['./utils/jestWatchPlugin'],
+  watchPlugins: ['./test/jestWatchPlugin'],
 };
