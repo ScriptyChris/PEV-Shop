@@ -1,23 +1,40 @@
-const { getResMock } = require('../../mockUtils');
-const getType = require('jest-get-type');
-const mockedBcrypt = require('../../../__mocks__/bcrypt');
-const mockedJwt = require('../../../__mocks__/jsonwebtoken');
-const {
-  getFromDB: { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFromDB },
-} = require('../../../src/database/__mocks__/database-index');
+
+
+import { getResMock } from '../../mockUtils';
+// @ts-ignore
+import getType from '../../../node_modules/jest-get-type/build/index';
+import mockedBcrypt from '../../../__mocks__/bcrypt';
+import { default as mockedJwt } from '../../../__mocks__/jsonwebtoken';
+import { getFromDB } from '../../../src/database/__mocks__/database-index';
+
+const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFromDB } = getFromDB;
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 const { findAssociatedSrcModulePath } = require('../../test-index');
-const {
-  comparePasswords,
-  hashPassword,
-  getToken,
-  verifyToken,
-  authMiddlewareFn,
-  userRoleMiddlewareFn,
-} = require(findAssociatedSrcModulePath());
 
 describe('#auth', () => {
+  let comparePasswords: any,
+    hashPassword: any,
+    getToken: any,
+    verifyToken: any,
+    authMiddlewareFn: any,
+    userRoleMiddlewareFn: any;
+
+  beforeAll(async () => {
+    try {
+
+
+      ({
+        comparePasswords,
+        hashPassword,
+        getToken,
+        verifyToken,
+        authMiddlewareFn,
+        userRoleMiddlewareFn,
+      } = await import(findAssociatedSrcModulePath()));
+    } catch(e) { console.error('[auth]',e)}
+  });
+
   describe('comparePasswords()', () => {
     it('should call bcrypt.compare method passing through provided params', () => {
       comparePasswords('a', 'b');
@@ -27,8 +44,8 @@ describe('#auth', () => {
     it('should return result returned by bcrypt.compare, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
       mockedBcrypt.compare
-        .mockImplementationOnce((password, passwordPattern) => null)
-        .mockImplementationOnce((password, passwordPattern) => null);
+        .mockImplementationOnce(() => null)
+        .mockImplementationOnce(() => null);
 
       const innerResult = mockedBcrypt.compare();
       const outerResult = comparePasswords();
@@ -51,8 +68,8 @@ describe('#auth', () => {
     it('should return result returned by bcrypt.hash, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
       mockedBcrypt.hash
-        .mockImplementationOnce((password, SALT_ROUNDS) => null)
-        .mockImplementationOnce((password, SALT_ROUNDS) => null);
+        .mockImplementationOnce(() => null)
+        .mockImplementationOnce(() => null);
 
       const innerResult = mockedBcrypt.hash();
       const outerResult = hashPassword();
@@ -76,8 +93,8 @@ describe('#auth', () => {
     it('should return result returned by jwt.sign, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
       mockedJwt.sign
-        .mockImplementationOnce((payloadObj, SECRET_KEY) => null)
-        .mockImplementationOnce((payloadObj, SECRET_KEY) => null);
+        .mockImplementationOnce(() => null)
+        .mockImplementationOnce(() => null);
 
       const innerResult = mockedJwt.sign();
       const outerResult = getToken();
@@ -101,8 +118,8 @@ describe('#auth', () => {
     it('should return result returned by jwt.verify, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
       mockedJwt.verify
-        .mockImplementationOnce((token, SECRET_KEY) => null)
-        .mockImplementationOnce((token, SECRET_KEY) => null);
+        .mockImplementationOnce(() => null)
+        .mockImplementationOnce(() => null);
 
       const innerResult = mockedJwt.verify();
       const outerResult = verifyToken();
@@ -113,7 +130,7 @@ describe('#auth', () => {
 
   describe('authMiddlewareFn()', () => {
     // TODO: consider moving below mocks to separate file/module
-    const getReqMock = () => ({
+    const getReqMock: () => { header: () => string, token?: string, user?: Object } = () => ({
       header() {
         return 'some token';
       },
@@ -184,13 +201,14 @@ describe('#auth', () => {
   });
 
   describe('userRoleMiddlewareFn()', () => {
+    type TReqUser = { execPopulate?: TJestMock,  roleName?: Array<{ permissions: [] }> };
     // TODO: consider moving below mocks to separate file/module
     const getReqMock = () => {
-      const req = {
+      const req: { user?: TReqUser, userPermissions?: [] } = {
         user: {},
       };
-      req.user.execPopulate = jest.fn(async (obj) => {
-        req.user.roleName = [
+      (req.user as TReqUser).execPopulate = jest.fn(async () => {
+        (req.user as TReqUser).roleName = [
           {
             permissions: [],
           },
@@ -238,7 +256,7 @@ describe('#auth', () => {
 
         await userRoleMiddlewareFnResult(reqMock, getResMock(), getNextMock());
 
-        expect(reqMock.user.execPopulate).toHaveBeenCalledWith({
+        expect((reqMock.user as TReqUser).execPopulate).toHaveBeenCalledWith({
           path: 'roleName',
           match: { roleName: ROLE_NAME },
         });

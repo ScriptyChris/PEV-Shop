@@ -1,21 +1,19 @@
+
+
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 import { findAssociatedSrcModulePath } from '../../test-index';
 
-let queryBuilder: any = {};
-
-(async () => {
-  // @ts-ignore
-  queryBuilder = await import(findAssociatedSrcModulePath());
-})();
-
-const {
-  isEmptyQueryObject,
-  getPaginationConfig,
-  getIdListConfig,
-  getProductsWithChosenCategories,
-} = queryBuilder;
-
 describe('#queryBuilder', () => {
+  let isEmptyQueryObject: any, getPaginationConfig: any, getIdListConfig: any, getProductsWithChosenCategories: any;
+
+  beforeAll(async () => {
+    try {
+    ({ isEmptyQueryObject, getPaginationConfig, getIdListConfig, getProductsWithChosenCategories } = await import(
+      findAssociatedSrcModulePath()
+    ));
+    } catch(e) { console.error('[query build]',e)}
+  });
+
   describe('isEmptyQueryObject()', () => {
     it('should return true if an empty object literal is passed', () => {
       expect(isEmptyQueryObject({})).toBe(true);

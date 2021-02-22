@@ -1,18 +1,21 @@
+
+
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 import { findAssociatedSrcModulePath } from '../../test-index';
 
-let getPaginatedItems: (...args: any[]) => {}
-
-(async () => {
-  // @ts-ignore
-  getPaginatedItems = await import(findAssociatedSrcModulePath());
-})();
-
 describe('#paginateItemsFromDB', () => {
+  let getPaginatedItems: (...args: any[]) => {};
+
+  beforeAll(async () => {
+    try {
+    getPaginatedItems = (await import(findAssociatedSrcModulePath())).default;
+    } catch(e) { console.error('[paginate db]',e)}
+  })
+
   describe('getPaginatedItems()', () => {
     const getModelMock = () => {
       return {
-        paginate: jest.fn(async (itemQuery?, options?) => ({ pagination: null })),
+        paginate: jest.fn(async () => ({ pagination: null })),
       };
     };
     const itemQueryMock = { query: 'test' };

@@ -1,3 +1,3 @@
 const mongooseMock = jest.createMockFromModule('mongoose');
 
-module.exports = mongooseMock;
+export default mongooseMock;

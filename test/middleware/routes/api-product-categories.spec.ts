@@ -1,15 +1,30 @@
-const { getResMock } = require('../../mockUtils');
+
+
+import { getResMock } from '../../mockUtils';
+import { findAssociatedSrcModulePath } from '../../test-index';
+
 const { getFromDB } = jest
   .mock('../../../src/database/database-index')
   .requireMock('../../../src/database/database-index');
-const { Router } = jest.mock('express').requireMock('express');
-const { get: apiProductCategoriesRouterGet } = require('../../../src/middleware/routes/api-product-categories');
-const routerGetCallback = apiProductCategoriesRouterGet.mock.calls[0][1];
+const { Router } = jest.mock('express').requireMock('express').default;
 
 describe('#api-product-categories', () => {
+  let apiProductCategoriesRouterGet: any;
+  let routerGetCallback: any;
+
+  beforeAll(async () => {
+    try {
+      apiProductCategoriesRouterGet = (await import(findAssociatedSrcModulePath())).default.get;
+      // console.log('[api-product-cat spec] apiProductCategoriesRouterGet:', apiProductCategoriesRouterGet);
+      routerGetCallback = apiProductCategoriesRouterGet.mock.calls[0][1];
+    } catch (e) {
+      console.error('[api-product-cat spec] e', e)
+    }
+  })
+
   afterAll(() => {
     Router.mockClear();
-    Object.values(Router()).forEach((httpMethod) => httpMethod.mockClear());
+    Object.values(Router() as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
   });
 
   it('should call Router() once', () => {
@@ -27,7 +42,7 @@ describe('#api-product-categories', () => {
     const reqMock = Object.freeze({ param: null });
 
     afterEach(() => {
-      Object.values(Router()).forEach((httpMethod) => httpMethod.mockClear());
+      Object.values(Router() as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
       getFromDB.mockClear();
     });
 

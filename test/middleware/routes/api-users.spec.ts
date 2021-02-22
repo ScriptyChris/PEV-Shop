@@ -1,5 +1,8 @@
-const { getResMock } = require('../../mockUtils');
-const { Router, _router } = jest.mock('express').requireMock('express');
+
+
+import { getResMock } from '../../mockUtils';
+
+const { Router, _router } = jest.mock('express').requireMock('express').default;
 const { authMiddlewareFn: authMiddlewareFnMock, hashPassword: hashPasswordMock } = jest
   .mock('../../../src/middleware/features/auth')
   .requireMock('../../../src/middleware/features/auth');
@@ -20,19 +23,21 @@ describe('#api-users', () => {
     },
   });
 
-  let apiUsersRouter = null;
+  let apiUsersRouter: any = null;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     authMiddlewareFnMock
       .mockImplementationOnce(() => authMiddlewareReturnedFn)
       .mockImplementationOnce(() => authMiddlewareReturnedFn);
 
-    apiUsersRouter = require('../../../src/middleware/routes/api-users');
+    try {
+    apiUsersRouter = (await import('../../../src/middleware/routes/api-users')).default;
+    } catch(e) { console.error('[api users]',e)}
   });
 
   afterAll(() => {
     Router.mockClear();
-    Object.values(_router).forEach((httpMethod) => httpMethod.mockClear());
+    Object.values(_router as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
   });
 
   it('should call Router() once', () => {
@@ -316,7 +321,7 @@ describe('#api-users', () => {
         const emptyReqMock = {};
         const resMock = getResMock();
 
-        return apiUsersRouter._getUser(emptyReqMock, resMock).catch((error) => {
+        return apiUsersRouter._getUser(emptyReqMock, resMock).catch((error: Error) => {
           expect(error).toEqual(TypeError(`Cannot read property 'id' of undefined`));
         });
       });

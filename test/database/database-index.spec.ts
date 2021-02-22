@@ -1,16 +1,24 @@
+
+
 const getModelMock = jest
   .mock('../../src/database/models/models-index')
-  .requireMock('../../src/database/models/models-index');
+  .requireMock('../../src/database/models/models-index').default;
 const getPaginatedItemsMock = jest
   .mock('../../src/database/utils/paginateItemsFromDB')
-  .requireMock('../../src/database/utils/paginateItemsFromDB');
+  .requireMock('../../src/database/utils/paginateItemsFromDB').default;
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-const { findAssociatedSrcModulePath } = require('../test-index');
-const { saveToDB, getFromDB, updateOneModelInDB } = require(findAssociatedSrcModulePath());
+import { findAssociatedSrcModulePath } from '../test-index';
 
 describe('#database-index', () => {
   const MODEL_TYPE = 'Test';
+  let saveToDB: any, getFromDB: any, updateOneModelInDB: any;
+
+  beforeAll(async () => {
+    try {
+    ({ saveToDB, getFromDB, updateOneModelInDB } = await import(findAssociatedSrcModulePath()));
+    } catch(e) { console.error('[db index]',e)}
+  })
 
   afterEach(() => {
     getModelMock.mockClear();
@@ -24,15 +32,12 @@ describe('#database-index', () => {
   });
 
   describe('saveToDB()', () => {
-    // TODO: this test may be unnecessary when that function will be refactored to TypeScript
-    it('should return null when itemData is falsy or not an object or modelType is falsy or not a string', () => {
-      expect(saveToDB()).toBe(null);
-      expect(saveToDB('itemData')).toBe(null);
-      expect(saveToDB({}, null)).toBe(null);
-      expect(saveToDB({}, {})).toBe(null);
-    });
+    const getModelPrototypeSaveMock = () => Object.getPrototypeOf(getModelMock._ModelClassMock.getMockImplementation()()).save;
 
     it('should call getModel(..) with modelType param', async () => {
+      const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
+      ModelPrototypeSaveMock.mockImplementationOnce(ModelPrototypeSaveMock._succeededCall);
+
       await saveToDB({}, MODEL_TYPE);
 
       expect(getModelMock).toHaveBeenCalledWith(MODEL_TYPE);
@@ -40,39 +45,36 @@ describe('#database-index', () => {
 
     it('should call Model constructor with itemData param', async () => {
       const itemData = { dataItem: true };
+      const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
+      ModelPrototypeSaveMock.mockImplementationOnce(ModelPrototypeSaveMock._succeededCall);
 
       await saveToDB(itemData, MODEL_TYPE);
 
       expect(getModelMock._ModelClassMock).toHaveBeenCalledWith(itemData);
     });
 
-    it('should call item.save(..) once with callback param', async () => {
-      const ModelPrototypeSaveMock = Object.getPrototypeOf(getModelMock._ModelClassMock.getMockImplementation()()).save;
+    it('should call item.save(..) once without callback param', async () => {
+      const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
+      ModelPrototypeSaveMock.mockImplementationOnce(ModelPrototypeSaveMock._succeededCall);
 
       await saveToDB({}, MODEL_TYPE);
 
       expect(ModelPrototypeSaveMock).toHaveBeenCalledTimes(1);
-      expect(ModelPrototypeSaveMock).toHaveBeenCalledWith(expect.any(Function));
+      expect(ModelPrototypeSaveMock).toHaveBeenCalledWith();
     });
 
     it('should return promise resolved to saved item when save operation succeeded', async () => {
-      const savedItem = { itemSaved: true };
-      const ModelPrototypeSaveMock = Object.getPrototypeOf(getModelMock._ModelClassMock.getMockImplementation()()).save;
-      ModelPrototypeSaveMock.mockImplementationOnce((callback) => {
-        callback(null, savedItem);
-      });
+      const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
+      ModelPrototypeSaveMock.mockImplementationOnce(ModelPrototypeSaveMock._succeededCall);
 
-      expect(saveToDB({}, MODEL_TYPE)).resolves.toBe(savedItem);
+      expect(saveToDB({}, MODEL_TYPE)).resolves.toStrictEqual(new getModelMock._ModelClassMock());
     });
 
-    it('should return promise rejected to error when save operation failed', async () => {
-      const error = 'Item save failed!';
-      const ModelPrototypeSaveMock = Object.getPrototypeOf(getModelMock._ModelClassMock.getMockImplementation()()).save;
-      ModelPrototypeSaveMock.mockImplementationOnce((callback) => {
-        callback(error, null);
-      });
+    it('should return promise rejected to null when save operation failed', async () => {
+      const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
+      ModelPrototypeSaveMock.mockImplementationOnce(ModelPrototypeSaveMock._failedCall);
 
-      expect(saveToDB({}, MODEL_TYPE)).rejects.toBe(error);
+      expect(saveToDB({}, MODEL_TYPE)).rejects.toBe(null);
     });
   });
 
@@ -141,6 +143,8 @@ describe('#database-index', () => {
   describe('updateOneModelInDB()', () => {
     it('should call getModel(..) with modelType param', async () => {
       const updateData = { action: 'addUnique' };
+      getModelMock._ModelClassMock.findOneAndUpdate
+          .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._succeededCall)
 
       await updateOneModelInDB({}, updateData, MODEL_TYPE);
 
@@ -150,11 +154,13 @@ describe('#database-index', () => {
     it('should call Model.findOneAndUpdate(..) with correct params', () => {
       const itemQuery = {};
 
-      const testPromises = [
+      [
         { action: 'addUnique', operator: '$addToSet' },
         { action: 'deleteAll', operator: '$pull' },
         { action: 'modify', operator: '$set' },
-      ].map(async ({ action, operator }, index) => {
+      ].forEach(async ({ action, operator }, index) => {
+        getModelMock._ModelClassMock.findOneAndUpdate
+            .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._succeededCall)
         const updateData = { action, data: 'new value' };
 
         await updateOneModelInDB(itemQuery, updateData, MODEL_TYPE);
@@ -164,29 +170,23 @@ describe('#database-index', () => {
         expect(callToFindOneAndUpdateMock[0]).toBe(itemQuery);
         expect(callToFindOneAndUpdateMock[1]).toStrictEqual({ [operator]: updateData.data });
         expect(callToFindOneAndUpdateMock[2]).toStrictEqual({ new: true });
-        expect(callToFindOneAndUpdateMock[3]).toEqual(expect.any(Function));
       });
-
-      Promise.all(testPromises).catch((error) => console.error('Test async error:', error));
     });
 
-    it('should return rejected promise if updateData.action prop was not matched', () => {
-      expect(updateOneModelInDB({}, {}, MODEL_TYPE)).rejects.toEqual(expect.stringContaining('undefined'));
-      expect(updateOneModelInDB({}, { action: 'add' }, MODEL_TYPE)).rejects.toEqual(expect.stringContaining('add'));
+    it('should return null if updateData.action prop was not matched', () => {
+      expect(updateOneModelInDB({}, {}, MODEL_TYPE)).toBeNull();
+      expect(updateOneModelInDB({}, { action: 'add' }, MODEL_TYPE)).toBeNull();
     });
 
-    it('should return promise resolved with value or rejected with reason depend on Model.findOneAndUpdate(..) result', () => {
-      const resolveValue = 'findOne result';
-      const rejectReason = 'findOne failed';
-
+    it('should return value or null depend on Model.findOneAndUpdate(..) result', () => {
       getModelMock._ModelClassMock.findOneAndUpdate
-        .mockImplementationOnce((itemQuery, updateDataQueries, options, callback) => callback(null, resolveValue))
-        .mockImplementationOnce((itemQuery, updateDataQueries, options, callback) => callback(rejectReason));
+        .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._succeededCall)
+        .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._failedCall);
 
       const updateData = { action: 'addUnique' };
 
-      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toBe(resolveValue);
-      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).rejects.toBe(rejectReason);
+      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).toStrictEqual(new getModelMock._ModelClassMock.findOneAndUpdate._clazz());
+      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).toBeNull();
     });
   });
 });

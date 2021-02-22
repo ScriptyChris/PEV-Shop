@@ -1,5 +1,8 @@
-const { getResMock } = require('../../mockUtils');
-const { Router, _router } = jest.mock('express').requireMock('express');
+
+
+import { getResMock } from '../../mockUtils';
+
+const { Router, _router } = jest.mock('express').requireMock('express').default;
 const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMiddlewareMock } = jest
   .mock('../../../src/middleware/features/auth')
   .requireMock('../../../src/middleware/features/auth');
@@ -11,13 +14,17 @@ const {
 } = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
 
 describe('#api-products', () => {
-  let apiProductsRouter = null;
+  let apiProductsRouter: any = null;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     authMiddlewareFnMock.mockImplementationOnce(authMiddlewareFnMock._succeededCall);
     userRoleMiddlewareMock.mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
 
-    apiProductsRouter = require('../../../src/middleware/routes/api-products');
+    try {
+      apiProductsRouter = (await import('../../../src/middleware/routes/api-products')).default;
+    } catch (e) {
+      console.error('[api prod spec] e:', e);
+    }
   });
 
   afterAll(() => {
@@ -25,7 +32,7 @@ describe('#api-products', () => {
     userRoleMiddlewareMock.mockClear();
 
     Router.mockClear();
-    Object.values(_router).forEach((httpMethod) => httpMethod.mockClear());
+    Object.values(_router as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
   });
 
   it('should call Router() once', () => {

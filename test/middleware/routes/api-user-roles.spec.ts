@@ -1,5 +1,8 @@
-const { getResMock } = require('../../mockUtils');
-const { Router, _router } = jest.mock('express').requireMock('express');
+
+
+import { getResMock } from '../../mockUtils';
+
+const { default: { Router, _router } } = jest.mock('express').requireMock('express');
 const { authMiddlewareFn: authMiddlewareFnMock } = jest
   .mock('../../../src/middleware/features/auth')
   .requireMock('../../../src/middleware/features/auth');
@@ -19,9 +22,9 @@ describe('#api-user-roles', () => {
     },
   });
 
-  let apiUserRolesRouter = null;
+  let apiUserRolesRouter: any = null;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     authMiddlewareFnMock
       .mockImplementationOnce(() => authMiddlewareReturnedFn)
       .mockName('postFirstCallback')
@@ -30,12 +33,14 @@ describe('#api-user-roles', () => {
       .mockImplementationOnce(() => authMiddlewareReturnedFn)
       .mockName('getFirstCallback');
 
-    apiUserRolesRouter = require('../../../src/middleware/routes/api-user-roles');
+    apiUserRolesRouter = jest
+        .mock('../../../src/middleware/routes/api-user-roles')
+        .requireActual('../../../src/middleware/routes/api-user-roles').default;
   });
 
   afterAll(() => {
     Router.mockClear();
-    Object.values(_router).forEach((httpMethod) => httpMethod.mockClear());
+    Object.values(_router as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
   });
 
   it('should call Router() once', () => {
@@ -155,7 +160,7 @@ describe('#api-user-roles', () => {
 
     it('should call .execPopulate(..) once with correct param', async () => {
       getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
-      const execPopulateMock = (await getFromDBMock()).execPopulate
+      const execPopulateMock = (await getFromDBMock()).populate
         // clear mock from results of above call
         .mockClear();
 

@@ -1,6 +1,9 @@
-const globMock = require('../../__mocks__/glob');
-const bodyParserMock = require('../../__mocks__/body-parser');
-const [apiProductsMock, apiProductsCategoriesMock, apiUsersMock, apiUserRolesMock] = [
+
+
+import globMock from '../../__mocks__/glob';
+import bodyParserMock from '../../__mocks__/body-parser';
+
+const [{ default: apiProductsMock }, { default: apiProductsCategoriesMock }, { default: apiUsersMock }, { default: apiUserRolesMock }] = [
   'api-products',
   'api-product-categories',
   'api-users',
@@ -11,14 +14,14 @@ const [apiProductsMock, apiProductsCategoriesMock, apiUsersMock, apiUserRolesMoc
   return jest.mock(apiFilePath).requireMock(apiFilePath);
 });
 
-const middleware = require('../../src/middleware/middleware-index');
+import middleware from '../../src/middleware/middleware-index';
 
 describe('#middleware-index', () => {
-  const appMock = Object.freeze({
+  const appMock: any = Object.freeze({
     use: jest.fn(),
     get: jest.fn((path, callback) => callback(reqMock, resMock)),
   });
-  const reqUrlMock = jest.fn(() => `test${reqUrlMock.index++}`);
+  const reqUrlMock: TJestMock & { index?: number } = jest.fn(() => `test${(reqUrlMock as { index: number }).index++}`);
   reqUrlMock.index = 0;
   const reqMock = Object.freeze(
     Object.defineProperty({}, 'url', {
@@ -28,13 +31,13 @@ describe('#middleware-index', () => {
   const resEndMock = jest.fn(() => {});
   const resMock = Object.freeze({
     sendFile: jest.fn((image) => image),
-    status: jest.fn((code) => ({
+    status: jest.fn(() => ({
       end: resEndMock,
     })),
   });
 
   afterEach(() => {
-    globMock.mockClear();
+    (globMock as TJestMock).mockClear();
     bodyParserMock.json.mockClear();
     appMock.use.mockClear();
     appMock.get.mockClear();
@@ -47,7 +50,10 @@ describe('#middleware-index', () => {
   it('should call app.use(..) and app.get(..) methods with correct params', () => {
     middleware(appMock);
 
-    expect(appMock.use).toHaveBeenCalledWith(bodyParserMock.json());
+    var res = bodyParserMock.json();
+    // console.log('bodyParserMock.json():', res);
+
+    expect(appMock.use).toHaveBeenCalledWith(res);
     expect(appMock.use).toHaveBeenCalledWith(
       apiProductsMock,
       apiProductsCategoriesMock,
@@ -66,12 +72,12 @@ describe('#middleware-index', () => {
 
   describe('inside callback passed to app.get(..)', () => {
     afterEach(() => {
-      globMock.mockClear();
+      (globMock as TJestMock).mockClear();
     });
 
-    it('should call res.sendFile(..) when image is found', async () => {
-      let imageFoundPromise = new Promise((resolve) => {
-        globMock.mockImplementationOnce((path, callback) => {
+    it('should call res.sendFile(..) when image is found', async (): Promise<void> => {
+      let imageFoundPromise: Promise<string> | string = new Promise((resolve) => {
+        (globMock as TJestMock).mockImplementationOnce((path, callback) => {
           const images = ['some image'];
 
           callback(null, images);
@@ -97,9 +103,9 @@ describe('#middleware-index', () => {
       });
     });
 
-    it('should call res.status(..).end(..) when image is not found', async () => {
+    it('should call res.status(..).end(..) when image is not found', async (): Promise<void> => {
       const imageNotFoundPromise = new Promise((resolve, reject) => {
-        globMock.mockImplementationOnce((path, callback) => {
+        (globMock as TJestMock).mockImplementationOnce((path, callback) => {
           const error = 'image not found';
 
           callback(error);
