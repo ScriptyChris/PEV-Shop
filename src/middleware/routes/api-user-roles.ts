@@ -1,24 +1,26 @@
-import { Router, Request, Response } from 'express';
+import * as express from 'express';
+import { Router as IRouter, Request, Response } from 'express-serve-static-core'
 import getLogger from  '../../../utils/logger';
 import { authMiddlewareFn as authMiddleware } from '../features/auth';
 import { saveToDB, getFromDB, updateOneModelInDB } from '../../database/database-index';
 import { IUserRole } from '../../database/schemas/userRole';
 
-
+// @ts-ignore
+const { Router } = express.default;
 const logger = getLogger(module.filename);
-
-const router: Router & Partial<{
+const router: IRouter & Partial<{
   _saveUserRole: TSaveUserRole, _updateUserRole: TUpdateUserRole, _getUserRole: TGetUserRole
 }> = Router();
+
 // @ts-ignore
 router.post('/api/user-roles', authMiddleware(getFromDB), saveUserRole);
 // @ts-ignore
 router.patch('/api/user-roles', authMiddleware(getFromDB), updateUserRole);
 // @ts-ignore
 router.get('/api/user-roles/:roleName', authMiddleware(getFromDB), getUserRole);
-
+//
 type TSaveUserRole = (req: Request, res: Response) => Promise<void>;
-type TUpdateUserRole = (req: Request, res: Response) => Promise<void>;
+type TUpdateUserRole = (req: Request, res: Response) => void;
 type TGetUserRole = (req: Request, res: Response) => Promise<void>;
 
 // expose functions for unit tests
@@ -45,10 +47,10 @@ async function saveUserRole(req: Request, res: Response): Promise<void> {
   res.status(200).json({ payload: savedUserRole });
 }
 
-async function updateUserRole(req: Request, res: Response): Promise<void> {
+function updateUserRole(req: Request, res: Response): void {
   logger.log('[PATCH] /user-roles:', req.body);
 
-  const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'User-Role');
+  const updatedUserRole = updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'User-Role');
   logger.log('updatedUserRole:', updatedUserRole);
 
   res.status(200).json({ payload: updatedUserRole });

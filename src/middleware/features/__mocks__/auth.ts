@@ -1,27 +1,29 @@
-const { getMockImplementationError } = require('../../../../test/mockUtils');
+import { getMockImplementationError } from '../../../../test/mockUtils';
 
-const authMiddlewareFn = jest.fn((getFromDB) => {
-  throw getMockImplementationError('authMiddlewareFn');
-});
-authMiddlewareFn._succeededCall = (getFromDB) => {
-  return async (req, res, next) => {};
-};
-authMiddlewareFn._failedCall = (getFromDB) => null;
+const authMiddlewareFn: TJestMock & { _succeededCall?: () => () => Promise<void>; _failedCall?: () => null } = jest.fn(
+  () => {
+    throw getMockImplementationError('authMiddlewareFn');
+  }
+);
+authMiddlewareFn._succeededCall = () => async () => {};
+authMiddlewareFn._failedCall = () => null;
 
-const hashPassword = jest.fn((password) => {
+const hashPassword: TJestMock & {
+  _succeededCall?: (password: string) => Promise<string>;
+  _failedCall?: () => Promise<Error>;
+} = jest.fn(() => {
   throw getMockImplementationError('hashPassword');
 });
-hashPassword._succeededCall = (password) => Promise.resolve(Buffer.from(password).toString('base64'));
-hashPassword._failedCall = (password) => Promise.reject(Error('hashing failed'));
+hashPassword._succeededCall = (password: string) => Promise.resolve(Buffer.from(password).toString('base64'));
+hashPassword._failedCall = () => Promise.reject(Error('hashing failed'));
 
-const userRoleMiddlewareFn = jest.fn(() => {
+const userRoleMiddlewareFn: TJestMock & {
+  _succeededCall?: () => () => Promise<void>;
+  _failedCall?: () => () => Promise<boolean>;
+} = jest.fn(() => {
   throw getMockImplementationError('userRoleMiddlewareFn');
 });
-userRoleMiddlewareFn._succeededCall = jest.fn((roleName) => {
-  return async (req, res, next) => {};
-});
-userRoleMiddlewareFn._failedCall = jest.fn((roleName) => {
-  return (req, res, next) => Promise.reject(false);
-});
+userRoleMiddlewareFn._succeededCall = () => async () => {};
+userRoleMiddlewareFn._failedCall = () => () => Promise.reject(false);
 
-module.exports = { authMiddlewareFn, hashPassword, userRoleMiddlewareFn };
+export { authMiddlewareFn, hashPassword, userRoleMiddlewareFn };

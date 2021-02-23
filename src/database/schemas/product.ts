@@ -1,8 +1,11 @@
-import { Schema, Document } from 'mongoose';
-// @ts-ignore
-import mongoosePaginate from 'mongoose-paginate-v2';
+import * as mongooseModule from 'mongoose';
+import { Document } from 'mongoose';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 
-const reviewsSchema: Schema = new Schema({
+// @ts-ignore
+const { default: { Schema } } = mongooseModule
+
+const reviewsSchema = new Schema({
   summary: {
     type: {
       rating: {
@@ -67,7 +70,8 @@ const productSchema = new Schema({
   },
 });
 
-productSchema.plugin(mongoosePaginate);
+// @ts-ignore
+productSchema.plugin(mongoosePaginate.default);
 
 productSchema.methods.toJSON = function () {
   const user = this.toObject();

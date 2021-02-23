@@ -1,9 +1,13 @@
 import getLogger from '../../../utils/logger'
-import { Router, Request, Response } from 'express';
+import * as expressModule from 'express'
+import { Request, Response } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
 import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../database/database-index';
 import { TIdListReq, TPageLimit, TProductsCategoriesReq } from '../../database/utils/queryBuilder';
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
+
+// @ts-ignore
+const { default: { Router } } = expressModule;
 
 // import { readFileSync } from 'fs';
 const logger = getLogger(module.filename)
@@ -91,7 +95,7 @@ async function addProduct(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function modifyProduct(req: Request & {userPermissions: any}, res: Response): Promise<void> {
+function modifyProduct(req: Request & {userPermissions: any}, res: Response): void {
   try {
     logger.log('[products PATCH] req.body', req.body);
 
@@ -100,7 +104,7 @@ async function modifyProduct(req: Request & {userPermissions: any}, res: Respons
     }
 
     // TODO: prepare to be used with various product properties
-    const modifiedProduct = await updateOneModelInDB(req.body.productId, req.body.modifications, 'Product');
+    const modifiedProduct = updateOneModelInDB(req.body.productId, req.body.modifications, 'Product');
 
     logger.log('Product modified', modifiedProduct);
     res.status(201).json({ payload: modifiedProduct });

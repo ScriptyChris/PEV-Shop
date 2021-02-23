@@ -1,5 +1,3 @@
-
-
 const getModelMock = jest
   .mock('../../src/database/models/models-index')
   .requireMock('../../src/database/models/models-index').default;
@@ -15,10 +13,8 @@ describe('#database-index', () => {
   let saveToDB: any, getFromDB: any, updateOneModelInDB: any;
 
   beforeAll(async () => {
-    try {
     ({ saveToDB, getFromDB, updateOneModelInDB } = await import(findAssociatedSrcModulePath()));
-    } catch(e) { console.error('[db index]',e)}
-  })
+  });
 
   afterEach(() => {
     getModelMock.mockClear();
@@ -32,7 +28,8 @@ describe('#database-index', () => {
   });
 
   describe('saveToDB()', () => {
-    const getModelPrototypeSaveMock = () => Object.getPrototypeOf(getModelMock._ModelClassMock.getMockImplementation()()).save;
+    const getModelPrototypeSaveMock = () =>
+      Object.getPrototypeOf(getModelMock._ModelClassMock.getMockImplementation()()).save;
 
     it('should call getModel(..) with modelType param', async () => {
       const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
@@ -141,12 +138,13 @@ describe('#database-index', () => {
   });
 
   describe('updateOneModelInDB()', () => {
-    it('should call getModel(..) with modelType param', async () => {
+    it('should call getModel(..) with modelType param', () => {
       const updateData = { action: 'addUnique' };
-      getModelMock._ModelClassMock.findOneAndUpdate
-          .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._succeededCall)
+      getModelMock._ModelClassMock.findOneAndUpdate.mockImplementationOnce(
+        getModelMock._ModelClassMock.findOneAndUpdate._succeededCall
+      );
 
-      await updateOneModelInDB({}, updateData, MODEL_TYPE);
+      updateOneModelInDB({}, updateData, MODEL_TYPE);
 
       expect(getModelMock).toHaveBeenCalledWith(MODEL_TYPE);
     });
@@ -158,12 +156,13 @@ describe('#database-index', () => {
         { action: 'addUnique', operator: '$addToSet' },
         { action: 'deleteAll', operator: '$pull' },
         { action: 'modify', operator: '$set' },
-      ].forEach(async ({ action, operator }, index) => {
-        getModelMock._ModelClassMock.findOneAndUpdate
-            .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._succeededCall)
+      ].forEach(({ action, operator }, index) => {
+        getModelMock._ModelClassMock.findOneAndUpdate.mockImplementationOnce(
+          getModelMock._ModelClassMock.findOneAndUpdate._succeededCall
+        );
         const updateData = { action, data: 'new value' };
 
-        await updateOneModelInDB(itemQuery, updateData, MODEL_TYPE);
+        updateOneModelInDB(itemQuery, updateData, MODEL_TYPE);
 
         const callToFindOneAndUpdateMock = getModelMock._ModelClassMock.findOneAndUpdate.mock.calls[index];
 
@@ -185,7 +184,9 @@ describe('#database-index', () => {
 
       const updateData = { action: 'addUnique' };
 
-      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).toStrictEqual(new getModelMock._ModelClassMock.findOneAndUpdate._clazz());
+      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).toStrictEqual(
+        new getModelMock._ModelClassMock.findOneAndUpdate._clazz()
+      );
       expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).toBeNull();
     });
   });

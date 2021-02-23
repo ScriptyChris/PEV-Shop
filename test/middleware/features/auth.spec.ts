@@ -1,5 +1,3 @@
-
-
 import { getResMock } from '../../mockUtils';
 // @ts-ignore
 import getType from '../../../node_modules/jest-get-type/build/index';
@@ -21,18 +19,9 @@ describe('#auth', () => {
     userRoleMiddlewareFn: any;
 
   beforeAll(async () => {
-    try {
-
-
-      ({
-        comparePasswords,
-        hashPassword,
-        getToken,
-        verifyToken,
-        authMiddlewareFn,
-        userRoleMiddlewareFn,
-      } = await import(findAssociatedSrcModulePath()));
-    } catch(e) { console.error('[auth]',e)}
+    ({ comparePasswords, hashPassword, getToken, verifyToken, authMiddlewareFn, userRoleMiddlewareFn } = await import(
+      findAssociatedSrcModulePath()
+    ));
   });
 
   describe('comparePasswords()', () => {
@@ -43,9 +32,7 @@ describe('#auth', () => {
 
     it('should return result returned by bcrypt.compare, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
-      mockedBcrypt.compare
-        .mockImplementationOnce(() => null)
-        .mockImplementationOnce(() => null);
+      mockedBcrypt.compare.mockImplementationOnce(() => null).mockImplementationOnce(() => null);
 
       const innerResult = mockedBcrypt.compare();
       const outerResult = comparePasswords();
@@ -67,9 +54,7 @@ describe('#auth', () => {
 
     it('should return result returned by bcrypt.hash, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
-      mockedBcrypt.hash
-        .mockImplementationOnce(() => null)
-        .mockImplementationOnce(() => null);
+      mockedBcrypt.hash.mockImplementationOnce(() => null).mockImplementationOnce(() => null);
 
       const innerResult = mockedBcrypt.hash();
       const outerResult = hashPassword();
@@ -92,9 +77,7 @@ describe('#auth', () => {
 
     it('should return result returned by jwt.sign, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
-      mockedJwt.sign
-        .mockImplementationOnce(() => null)
-        .mockImplementationOnce(() => null);
+      mockedJwt.sign.mockImplementationOnce(() => null).mockImplementationOnce(() => null);
 
       const innerResult = mockedJwt.sign();
       const outerResult = getToken();
@@ -117,9 +100,7 @@ describe('#auth', () => {
 
     it('should return result returned by jwt.verify, cause this is its internal implementation', () => {
       // mock returning same value twice: first for direct mock fn call; second for indirect call by intermediate function
-      mockedJwt.verify
-        .mockImplementationOnce(() => null)
-        .mockImplementationOnce(() => null);
+      mockedJwt.verify.mockImplementationOnce(() => null).mockImplementationOnce(() => null);
 
       const innerResult = mockedJwt.verify();
       const outerResult = verifyToken();
@@ -130,7 +111,7 @@ describe('#auth', () => {
 
   describe('authMiddlewareFn()', () => {
     // TODO: consider moving below mocks to separate file/module
-    const getReqMock: () => { header: () => string, token?: string, user?: Object } = () => ({
+    const getReqMock: () => { header: () => string; token?: string; user?: Object } = () => ({
       header() {
         return 'some token';
       },
@@ -201,10 +182,10 @@ describe('#auth', () => {
   });
 
   describe('userRoleMiddlewareFn()', () => {
-    type TReqUser = { execPopulate?: TJestMock,  roleName?: Array<{ permissions: [] }> };
+    type TReqUser = { execPopulate?: TJestMock; roleName?: Array<{ permissions: [] }> };
     // TODO: consider moving below mocks to separate file/module
     const getReqMock = () => {
-      const req: { user?: TReqUser, userPermissions?: [] } = {
+      const req: { user?: TReqUser; userPermissions?: [] } = {
         user: {},
       };
       (req.user as TReqUser).execPopulate = jest.fn(async () => {

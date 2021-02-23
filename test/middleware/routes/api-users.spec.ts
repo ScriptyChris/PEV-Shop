@@ -1,5 +1,3 @@
-
-
 import { getResMock } from '../../mockUtils';
 
 const { Router, _router } = jest.mock('express').requireMock('express').default;
@@ -30,9 +28,7 @@ describe('#api-users', () => {
       .mockImplementationOnce(() => authMiddlewareReturnedFn)
       .mockImplementationOnce(() => authMiddlewareReturnedFn);
 
-    try {
     apiUsersRouter = (await import('../../../src/middleware/routes/api-users')).default;
-    } catch(e) { console.error('[api users]',e)}
   });
 
   afterAll(() => {

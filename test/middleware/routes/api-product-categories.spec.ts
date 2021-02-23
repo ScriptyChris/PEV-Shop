@@ -1,5 +1,3 @@
-
-
 import { getResMock } from '../../mockUtils';
 import { findAssociatedSrcModulePath } from '../../test-index';
 
@@ -13,14 +11,9 @@ describe('#api-product-categories', () => {
   let routerGetCallback: any;
 
   beforeAll(async () => {
-    try {
-      apiProductCategoriesRouterGet = (await import(findAssociatedSrcModulePath())).default.get;
-      // console.log('[api-product-cat spec] apiProductCategoriesRouterGet:', apiProductCategoriesRouterGet);
-      routerGetCallback = apiProductCategoriesRouterGet.mock.calls[0][1];
-    } catch (e) {
-      console.error('[api-product-cat spec] e', e)
-    }
-  })
+    apiProductCategoriesRouterGet = (await import(findAssociatedSrcModulePath())).default.get;
+    routerGetCallback = apiProductCategoriesRouterGet.mock.calls[0][1];
+  });
 
   afterAll(() => {
     Router.mockClear();

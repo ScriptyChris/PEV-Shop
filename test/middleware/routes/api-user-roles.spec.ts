@@ -1,8 +1,8 @@
-
-
 import { getResMock } from '../../mockUtils';
 
-const { default: { Router, _router } } = jest.mock('express').requireMock('express');
+const {
+  default: { Router, _router },
+} = jest.mock('express').requireMock('express');
 const { authMiddlewareFn: authMiddlewareFnMock } = jest
   .mock('../../../src/middleware/features/auth')
   .requireMock('../../../src/middleware/features/auth');
@@ -34,8 +34,8 @@ describe('#api-user-roles', () => {
       .mockName('getFirstCallback');
 
     apiUserRolesRouter = jest
-        .mock('../../../src/middleware/routes/api-user-roles')
-        .requireActual('../../../src/middleware/routes/api-user-roles').default;
+      .mock('../../../src/middleware/routes/api-user-roles')
+      .requireActual('../../../src/middleware/routes/api-user-roles').default;
   });
 
   afterAll(() => {
@@ -120,8 +120,8 @@ describe('#api-user-roles', () => {
       updateOneModelInDBMock.mockClear();
     });
 
-    it('should call updateOneModelInDB(..) once with correct params', async () => {
-      await apiUserRolesRouter._updateUserRole(reqMock, getResMock());
+    it('should call updateOneModelInDB(..) once with correct params', () => {
+      apiUserRolesRouter._updateUserRole(reqMock, getResMock());
 
       expect(updateOneModelInDBMock).toHaveBeenCalledTimes(1);
       expect(updateOneModelInDBMock).toHaveBeenCalledWith(
@@ -131,14 +131,14 @@ describe('#api-user-roles', () => {
       );
     });
 
-    it('should call res.status(..).json(..) with correct params', async () => {
+    it('should call res.status(..).json(..) with correct params', () => {
       updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._succeededCall);
       const resMock = getResMock();
 
-      await apiUserRolesRouter._updateUserRole(reqMock, resMock);
+      apiUserRolesRouter._updateUserRole(reqMock, resMock);
 
       expect(resMock.status).toHaveBeenCalledWith(200);
-      expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await updateOneModelInDBMock() });
+      expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: updateOneModelInDBMock() });
     });
   });
 

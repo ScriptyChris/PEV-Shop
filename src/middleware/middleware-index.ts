@@ -1,11 +1,11 @@
 // @ts-ignore
 import Express from 'express';
 import { Application } from 'express';
-
 import getLogger from '../../utils/logger';
 // @ts-ignore
 import glob from 'glob';
-import * as bodyParser from 'body-parser';
+// @ts-ignore
+import bodyParser from 'body-parser';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
@@ -44,7 +44,7 @@ if (process.env.BACKEND_ONLY === 'true') {
   });
 }
 
-module.exports = middleware;
+export default middleware;
 
 // TODO: change string type to probably ArrayBuffer
 const getImage = (() => {

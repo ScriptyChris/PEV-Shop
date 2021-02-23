@@ -3,6 +3,10 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
+// @ts-ignore
+const { default: { compare, hash } } = bcrypt;
+// @ts-ignore
+const { default: { sign, verify } } = jwt;
 const logger = getLogger(module.filename)
 const SALT_ROUNDS = 8;
 // TODO: move to ENV
@@ -11,19 +15,19 @@ const SECRET_KEY = 'secret-key';
 type TToken = { _id: number };
 
 const comparePasswords = (password: string, passwordPattern: string): Promise<boolean> => {
-  return bcrypt.compare(password, passwordPattern);
+  return compare(password, passwordPattern);
 };
 
 const hashPassword = (password: string): Promise<string> => {
-  return bcrypt.hash(password, SALT_ROUNDS);
+  return hash(password, SALT_ROUNDS);
 };
 
 const getToken = (payloadObj: TToken): string => {
-  return jwt.sign(payloadObj, SECRET_KEY);
+  return sign(payloadObj, SECRET_KEY);
 };
 
 const verifyToken = (token: string): TToken => {
-  return (jwt.verify(token, SECRET_KEY) as TToken);
+  return verify(token, SECRET_KEY) as TToken;
 };
 
 const authMiddlewareFn = (getFromDB: /* TODO: user explicit type */ Function) => {

@@ -1,13 +1,13 @@
 import { getMockImplementationError } from '../../../test/mockUtils';
 
-type TMockWithProps = TJestMock &  Partial<{ _succeededCall: any, _failedCall: any }>;
+type TMockWithProps = TJestMock & Partial<{ _succeededCall: any; _failedCall: any }>;
 
 const DataBaseResult = function () {};
 DataBaseResult.prototype.save = jest.fn();
 DataBaseResult.prototype.populate = jest.fn(() => ({
   execPopulate() {
     return Promise.resolve(true);
-  }
+  },
 }));
 DataBaseResult.prototype.matchPassword = jest.fn(() => {
   throw getMockImplementationError('matchPassword');

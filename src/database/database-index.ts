@@ -1,8 +1,11 @@
 import { ObjectId } from 'mongodb';
-import { connect } from 'mongoose';
+import * as mongoose from 'mongoose';
 import getModel, { TModelType, IModel, TGenericModel } from './models/models-index';
 import * as queryBuilder from './utils/queryBuilder';
-import getPaginatedItems, { TPaginateResult, TPaginationConfig } from './utils/paginateItemsFromDB';
+import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
+
+// @ts-ignore
+const { default: { connect } } = mongoose;
 
 // TODO: move to ENV
 const databaseURL: string = 'mongodb://localhost:27017';
@@ -11,11 +14,9 @@ connect(databaseURL, {
   useUnifiedTopology: true,
 });
 
-// TODO: create script and optionally use it to populate example database data
-
-const saveToDB = async (itemData: any, modelType: TModelType): Promise<IModel | string> => {
+const saveToDB = (itemData: any, modelType: TModelType): Promise<IModel | string> => {
   // TODO: improve validation
-  if (!itemData || typeof itemData !== 'object' /*|| !modelType || typeof modelType !== 'string'*/) {
+  if (!itemData || typeof itemData !== 'object') {
     return Promise.reject('itemData must be an object!');
   }
 
@@ -23,7 +24,7 @@ const saveToDB = async (itemData: any, modelType: TModelType): Promise<IModel | 
   const item: IModel = new Model(itemData);
 
   // @ts-ignore
-  return await item.save();
+  return item.save();
 };
 
 const getFromDB = async (itemQuery: any, modelType: TModelType, options: {pagination?: TPaginationConfig, isDistinct?: boolean} = {}) => {
@@ -50,52 +51,40 @@ const getFromDB = async (itemQuery: any, modelType: TModelType, options: {pagina
 };
 
 // TODO: consider making this function either specific to update case or generic dependent on params
-const updateOneModelInDB = (itemQuery: any, updateData: any, modelType: TModelType): any | null => {
+const updateOneModelInDB = (itemQuery: any, updateData: any, modelType: TModelType): ReturnType<typeof Model.findOneAndUpdate> | null => {
   const Model = getModel(modelType);
 
-  // return new Promise((resolve, reject) => {
-    // TODO: improve querying via various ways
-    if (typeof itemQuery === 'string') {
-      itemQuery = { _id: itemQuery };
+  // TODO: improve querying via various ways
+  if (typeof itemQuery === 'string') {
+    itemQuery = { _id: itemQuery };
+  }
+
+  let operator: string = '';
+
+  switch (updateData.action) {
+    case 'addUnique': {
+      operator = '$addToSet';
+      break;
     }
-
-    let operator: string = '';
-
-    switch (updateData.action) {
-      case 'addUnique': {
-        operator = '$addToSet';
-        break;
-      }
-      case 'deleteAll': {
-        operator = '$pull';
-        break;
-      }
-      case 'modify': {
-        operator = '$set';
-        break;
-      }
-      default: {
-        // reject(`Unrecognized update action: ${updateData.action}`);
-        return null;
-      }
+    case 'deleteAll': {
+      operator = '$pull';
+      break;
     }
+    case 'modify': {
+      operator = '$set';
+      break;
+    }
+    default: {
+      return null;
+    }
+  }
 
-    // TODO: handle multiple values, most likely by $each operator
-    const updateDataQueries = {
-      [operator]: updateData.data,
-    };
+  // TODO: handle multiple values, most likely by $each operator
+  const updateDataQueries = {
+    [operator]: updateData.data,
+  };
 
-    return Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
-
-    // // TODO: wrap it with util.promisify
-    // Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true }, (error, updatedItem) => {
-    //   if (error) {
-    //     return reject(error);
-    //   }
-    //
-    //   resolve(updatedItem);
-    // });
-  // });
+  return Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 };
 
 export {

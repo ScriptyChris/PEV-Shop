@@ -1,9 +1,12 @@
 import getLogger from '../../../utils/logger';
-import { Router, Request, Response } from 'express';
+import { Request, Response } from 'express';
+import * as expressModule from 'express';
 import { getFromDB } from '../../database/database-index';
 
-const logger = getLogger(module.filename);
+// @ts-ignore
+const { default: { Router } } = expressModule;
 const router = Router();
+const logger = getLogger(module.filename);
 
 function createCategoriesHierarchy(productCategories: string[]): string[] {
   const categoriesHierarchy: Array<any> = [];

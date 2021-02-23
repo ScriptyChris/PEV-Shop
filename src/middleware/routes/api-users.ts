@@ -1,9 +1,12 @@
 import getLogger from '../../../utils/logger';
-import { Router, Request, Response } from'express';
+import * as expressModule from 'express';
+import { Request, Response } from 'express';
 import { saveToDB, getFromDB, updateOneModelInDB, ObjectId } from '../../database/database-index';
 import { authMiddlewareFn, hashPassword } from '../features/auth';
 import { IUser } from '../../database/models/_user';
 
+// @ts-ignore
+const { default: { Router } } = expressModule;
 const logger = getLogger(module.filename);
 
 const router: any = Router();
@@ -28,7 +31,7 @@ async function updateUser(req: Request, res: Response): Promise<void> {
     const savedUser = await saveToDB(req.body, 'User') as IUser;
 
     // TODO: expose appropriate function from user role module?
-    await updateOneModelInDB(
+    updateOneModelInDB(
       { roleName: req.body.roleName },
       {
         action: 'addUnique',

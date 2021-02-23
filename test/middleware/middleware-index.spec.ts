@@ -1,14 +1,12 @@
-
-
 import globMock from '../../__mocks__/glob';
 import bodyParserMock from '../../__mocks__/body-parser';
 
-const [{ default: apiProductsMock }, { default: apiProductsCategoriesMock }, { default: apiUsersMock }, { default: apiUserRolesMock }] = [
-  'api-products',
-  'api-product-categories',
-  'api-users',
-  'api-user-roles',
-].map((apiFileName) => {
+const [
+  { default: apiProductsMock },
+  { default: apiProductsCategoriesMock },
+  { default: apiUsersMock },
+  { default: apiUserRolesMock },
+] = ['api-products', 'api-product-categories', 'api-users', 'api-user-roles'].map((apiFileName) => {
   const apiFilePath = `../../src/middleware/routes/${apiFileName}`;
 
   return jest.mock(apiFilePath).requireMock(apiFilePath);
@@ -50,10 +48,7 @@ describe('#middleware-index', () => {
   it('should call app.use(..) and app.get(..) methods with correct params', () => {
     middleware(appMock);
 
-    var res = bodyParserMock.json();
-    // console.log('bodyParserMock.json():', res);
-
-    expect(appMock.use).toHaveBeenCalledWith(res);
+    expect(appMock.use).toHaveBeenCalledWith(bodyParserMock.json());
     expect(appMock.use).toHaveBeenCalledWith(
       apiProductsMock,
       apiProductsCategoriesMock,

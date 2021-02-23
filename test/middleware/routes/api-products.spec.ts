@@ -1,5 +1,3 @@
-
-
 import { getResMock } from '../../mockUtils';
 
 const { Router, _router } = jest.mock('express').requireMock('express').default;
@@ -20,11 +18,7 @@ describe('#api-products', () => {
     authMiddlewareFnMock.mockImplementationOnce(authMiddlewareFnMock._succeededCall);
     userRoleMiddlewareMock.mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
 
-    try {
-      apiProductsRouter = (await import('../../../src/middleware/routes/api-products')).default;
-    } catch (e) {
-      console.error('[api prod spec] e:', e);
-    }
+    apiProductsRouter = (await import('../../../src/middleware/routes/api-products')).default;
   });
 
   afterAll(() => {
@@ -262,10 +256,10 @@ describe('#api-products', () => {
         updateOneModelInDBMock.mockClear();
       });
 
-      it('should call updateOneModelInDB(..) with correct params', async () => {
+      it('should call updateOneModelInDB(..) with correct params', () => {
         const reqMock = getReqMock();
 
-        await apiProductsRouter._modifyProduct(reqMock, getResMock());
+        apiProductsRouter._modifyProduct(reqMock, getResMock());
 
         expect(updateOneModelInDBMock).toHaveBeenCalledWith(
           reqMock.body.productId,
@@ -274,29 +268,29 @@ describe('#api-products', () => {
         );
       });
 
-      it('should call res.status(..).json(..) with correct params', async () => {
+      it('should call res.status(..).json(..) with correct params', () => {
         const resMock = getResMock();
 
-        await apiProductsRouter._modifyProduct(getReqMock(), resMock);
+        apiProductsRouter._modifyProduct(getReqMock(), resMock);
 
         updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._succeededCall);
 
         expect(resMock.status).toHaveBeenCalledWith(201);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await updateOneModelInDBMock() });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: updateOneModelInDBMock() });
       });
     });
 
     describe('when failed', () => {
-      it('should call res.status(..).json(..) with correct params', async () => {
+      it('should call res.status(..).json(..) with correct params', () => {
         const resMock = getResMock();
 
         // no user permissions case
-        await apiProductsRouter._modifyProduct({ userPermissions: false }, resMock);
+        apiProductsRouter._modifyProduct({ userPermissions: false }, resMock);
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception: Error('User has no permissions!') });
 
         // null req.body case
-        await apiProductsRouter._modifyProduct({ userPermissions: true, body: null }, resMock);
+        apiProductsRouter._modifyProduct({ userPermissions: true, body: null }, resMock);
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
           exception: TypeError(`Cannot read property 'productId' of null`),
