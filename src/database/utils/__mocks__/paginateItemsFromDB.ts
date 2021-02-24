@@ -1,3 +1,1 @@
-export default jest.fn(async (Model, itemQuery, paginationConfig) => ({
-  paginatedItems: [],
-}));
+export default jest.fn(async () => ({ paginatedItems: [] }));

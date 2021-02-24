@@ -2,7 +2,7 @@
 import { findAssociatedSrcModulePath } from '../../test-index';
 
 describe('#paginateItemsFromDB', () => {
-  let getPaginatedItems: (...args: any[]) => {};
+  let getPaginatedItems: (...args: any[]) => void;
 
   beforeAll(async () => {
     getPaginatedItems = (await import(findAssociatedSrcModulePath())).default;

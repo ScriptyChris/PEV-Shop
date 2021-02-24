@@ -1,9 +1,9 @@
-const getMockImplementationError = (fnName: string) =>
+const getMockImplementationError = (fnName: string): Error =>
   Error(`Need to mock the ${fnName}(..) implementation for unit test first!`);
 
-const getResMock = () => {
-  const jsonMethod = jest.fn((errorObj) => {});
-  const statusMethod = jest.fn((code) => ({ json: jsonMethod }));
+const getResMock = (): { status: TJestMock, _jsonMethod: TJestMock } => {
+  const jsonMethod = jest.fn(() => undefined);
+  const statusMethod = jest.fn(() => ({ json: jsonMethod }));
 
   return {
     status: statusMethod,

@@ -8,7 +8,7 @@ import { getFromDB } from '../../../src/database/__mocks__/database-index';
 const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFromDB } = getFromDB;
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-const { findAssociatedSrcModulePath } = require('../../test-index');
+import { findAssociatedSrcModulePath } from '../../test-index';
 
 describe('#auth', () => {
   let comparePasswords: any,
@@ -111,7 +111,7 @@ describe('#auth', () => {
 
   describe('authMiddlewareFn()', () => {
     // TODO: consider moving below mocks to separate file/module
-    const getReqMock: () => { header: () => string; token?: string; user?: Object } = () => ({
+    const getReqMock: () => { header: () => string; token?: string; user?: Record<string, unknown> } = () => ({
       header() {
         return 'some token';
       },

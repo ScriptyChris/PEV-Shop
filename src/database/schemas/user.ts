@@ -30,6 +30,7 @@ userSchema.virtual('roleName', {
 });
 
 userSchema.methods.generateAuthToken = async function (): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
   const token = getToken({ _id: user._id });
 

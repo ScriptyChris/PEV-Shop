@@ -5,7 +5,7 @@ const authMiddlewareFn: TJestMock & { _succeededCall?: () => () => Promise<void>
     throw getMockImplementationError('authMiddlewareFn');
   }
 );
-authMiddlewareFn._succeededCall = () => async () => {};
+authMiddlewareFn._succeededCall = () => async () => undefined;
 authMiddlewareFn._failedCall = () => null;
 
 const hashPassword: TJestMock & {
@@ -23,7 +23,7 @@ const userRoleMiddlewareFn: TJestMock & {
 } = jest.fn(() => {
   throw getMockImplementationError('userRoleMiddlewareFn');
 });
-userRoleMiddlewareFn._succeededCall = () => async () => {};
+userRoleMiddlewareFn._succeededCall = () => async () => undefined;
 userRoleMiddlewareFn._failedCall = () => () => Promise.reject(false);
 
 export { authMiddlewareFn, hashPassword, userRoleMiddlewareFn };

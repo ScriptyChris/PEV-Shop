@@ -11,7 +11,7 @@ const { getFromDB: getFromDBMock, saveToDB: saveToDBMock, updateOneModelInDB: up
   .requireMock('../../../src/database/database-index');
 
 describe('#api-user-roles', () => {
-  const authMiddlewareReturnedFn = () => {};
+  const authMiddlewareReturnedFn = () => undefined;
   const reqMock = Object.freeze({
     body: {
       roleName: '',

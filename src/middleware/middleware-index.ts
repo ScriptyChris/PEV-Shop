@@ -12,9 +12,9 @@ import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
 
 const logger = getLogger(module.filename);
-const databaseDirname: string = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
+const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
-const middleware = (app: Application) => {
+const middleware = (app: Application): void => {
   app.use(bodyParser.json());
   app.use(apiProducts, apiProductCategories, apiUsers, apiUserRoles);
 
@@ -36,7 +36,7 @@ const middleware = (app: Application) => {
 // TODO: refactor to use ENV
 if (process.env.BACKEND_ONLY === 'true') {
   const app: Application = Express();
-  const port: number = 3000;
+  const port = 3000;
 
   middleware(app);
   app.listen(port, () => {

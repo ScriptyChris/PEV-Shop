@@ -16,6 +16,8 @@ const PARAMS: { CLEAN_ALL: string, GROUP_CATEGORIES: string } = {
   GROUP_CATEGORIES: 'categoriesGroupPath=',
 };
 
+type TPopulatedData = Record<any, unknown>;
+
 logger.log('process.argv:', process.argv);
 
 (async () => {
@@ -28,7 +30,7 @@ logger.log('process.argv:', process.argv);
     logger.log(`Cleaning done - removed ${removedProducts.deletedCount} products.`);
   }
 
-  const sourceDataList: Object[] = await getSourceData();
+  const sourceDataList = await getSourceData();
 
   await populateProducts(Product, sourceDataList);
   await assignIDsToRelatedProducts(Product);
@@ -50,7 +52,7 @@ function getProductModel(): TGenericModel {
   return model('Product', productSchema);
 }
 
-async function getSourceData(): Promise<Object[]> {
+async function getSourceData(): Promise<Parameters<keyof typeof populateProducts>['sourceDataList']> {
   const path: string = process.argv[2];
 
   if (!path) {
@@ -67,17 +69,15 @@ async function getSourceData(): Promise<Object[]> {
   }
 
   const sourceDataPath: string = isFileInPath ? path : `${path}${sep}**${sep}${fileName}.json`;
-  const sourceDataFiles: string[] = await glob(sourceDataPath) as string[];
-  const sourceDataList: Object[] = await Promise.all(
-    sourceDataFiles.map(async (filePath: string) => JSON.parse(await promisifiedReadFile(filePath, { encoding: 'utf8' })))
-  );
-
   logger.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
+  const sourceDataFiles: string[] = await glob(sourceDataPath) as string[];
+  const sourceDataList: Promise<TPopulatedData>[] = sourceDataFiles
+      .map(async (filePath: string) => JSON.parse(await promisifiedReadFile(filePath, { encoding: 'utf8' })));
 
-  return sourceDataList;
+  return Promise.all(sourceDataList);
 }
 
-async function populateProducts(ProductModel: TGenericModel, sourceDataList: Object[]) {
+async function populateProducts(ProductModel: TGenericModel, sourceDataList: string | TPopulatedData[]) {
   type TCategoryNameGrouper = (categoryName: string) => string
   type TNormalizersObj = { category: TCategoryNameGrouper }
 
@@ -165,7 +165,7 @@ async function assignIDsToRelatedProducts(Product: TGenericModel) {
   logger.log('All done?', amountOfAllProducts === amountOfRelatedProductsWithID);
 }
 
-function getScriptParamValue(param: string, lenientSearch: boolean = false): string {
+function getScriptParamValue(param: string, lenientSearch = false): string {
   return process.argv.find((arg: string) => {
     if (lenientSearch) {
       return arg.includes(param);

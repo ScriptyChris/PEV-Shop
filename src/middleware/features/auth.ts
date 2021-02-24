@@ -30,7 +30,7 @@ const verifyToken = (token: string): TToken => {
   return verify(token, SECRET_KEY) as TToken;
 };
 
-const authMiddlewareFn = (getFromDB: /* TODO: user explicit type */ Function) => {
+const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ (...args: [Record<string, string>, string]) => any): (...args: any) => Promise<void> => {
   return async (req: Request & { token: string, user: any }, res: Response, next: NextFunction) => {
     try {
       const token: string = (req.header('Authorization') as string).replace('Bearer ', '');

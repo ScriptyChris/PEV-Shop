@@ -26,7 +26,7 @@ describe('#middleware-index', () => {
       get: reqUrlMock,
     })
   );
-  const resEndMock = jest.fn(() => {});
+  const resEndMock = jest.fn(() => undefined);
   const resMock = Object.freeze({
     sendFile: jest.fn((image) => image),
     status: jest.fn(() => ({
@@ -109,7 +109,7 @@ describe('#middleware-index', () => {
       });
 
       middleware(appMock);
-      await imageNotFoundPromise.catch(() => {});
+      await imageNotFoundPromise.catch(() => Promise.resolve(undefined));
 
       return new Promise((resolve) => {
         setImmediate(() => {

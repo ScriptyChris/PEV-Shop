@@ -12,7 +12,7 @@ const {
 } = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
 
 describe('#api-users', () => {
-  const authMiddlewareReturnedFn = () => {};
+  const authMiddlewareReturnedFn = () => undefined;
   const getReqMock = () => ({
     body: {
       login: 'user123',

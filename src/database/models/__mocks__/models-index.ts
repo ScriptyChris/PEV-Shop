@@ -1,5 +1,6 @@
 import { getMockImplementationError } from '../../../../test/mockUtils';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 function Model() {}
 Model.prototype.save = jest.fn(() => {
   return Promise.reject(getMockImplementationError('save'));

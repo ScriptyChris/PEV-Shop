@@ -2,7 +2,8 @@ import { getMockImplementationError } from '../../../test/mockUtils';
 
 type TMockWithProps = TJestMock & Partial<{ _succeededCall: any; _failedCall: any }>;
 
-const DataBaseResult = function () {};
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+function DataBaseResult() {}
 DataBaseResult.prototype.save = jest.fn();
 DataBaseResult.prototype.populate = jest.fn(() => ({
   execPopulate() {

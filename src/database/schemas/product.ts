@@ -92,9 +92,9 @@ export interface IProduct extends Document {
   category: string,
   price: number,
   shortDescription: string[],
-  technicalSpecs: Object[],
-  images: Object[],
-  relatedProducts: Object[],
+  technicalSpecs: Record<string, unknown>[],
+  images: Record<string, unknown>[],
+  relatedProducts: Record<string, unknown>[],
   reviews: IReviews
 }
 

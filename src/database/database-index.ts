@@ -8,13 +8,13 @@ import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromD
 const { default: { connect } } = mongoose;
 
 // TODO: move to ENV
-const databaseURL: string = 'mongodb://localhost:27017';
+const databaseURL = 'mongodb://localhost:27017';
 connect(databaseURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-const saveToDB = (itemData: any, modelType: TModelType): Promise<IModel | string> => {
+function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string> {
   // TODO: improve validation
   if (!itemData || typeof itemData !== 'object') {
     return Promise.reject('itemData must be an object!');
@@ -25,9 +25,10 @@ const saveToDB = (itemData: any, modelType: TModelType): Promise<IModel | string
 
   // @ts-ignore
   return item.save();
-};
+}
 
-const getFromDB = async (itemQuery: any, modelType: TModelType, options: {pagination?: TPaginationConfig, isDistinct?: boolean} = {}) => {
+async function getFromDB(itemQuery: any, modelType: TModelType, options: {pagination?: TPaginationConfig, isDistinct?: boolean} = {})
+    : ReturnType<typeof getPaginatedItems | Model.distinct | Model.find | Model.findOne> {
   const Model = getModel(modelType);
 
   if (options.pagination) {
@@ -48,10 +49,10 @@ const getFromDB = async (itemQuery: any, modelType: TModelType, options: {pagina
   }
 
   return Model.findOne(itemQuery);
-};
+}
 
 // TODO: consider making this function either specific to update case or generic dependent on params
-const updateOneModelInDB = (itemQuery: any, updateData: any, modelType: TModelType): ReturnType<typeof Model.findOneAndUpdate> | null => {
+function updateOneModelInDB(itemQuery: any, updateData: any, modelType: TModelType): ReturnType<typeof Model.findOneAndUpdate> | null {
   const Model = getModel(modelType);
 
   // TODO: improve querying via various ways
@@ -59,7 +60,7 @@ const updateOneModelInDB = (itemQuery: any, updateData: any, modelType: TModelTy
     itemQuery = { _id: itemQuery };
   }
 
-  let operator: string = '';
+  let operator = '';
 
   switch (updateData.action) {
     case 'addUnique': {
@@ -85,7 +86,7 @@ const updateOneModelInDB = (itemQuery: any, updateData: any, modelType: TModelTy
   };
 
   return Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
-};
+}
 
 export {
   saveToDB,

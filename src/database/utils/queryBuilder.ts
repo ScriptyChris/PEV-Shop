@@ -1,4 +1,4 @@
-const isEmptyQueryObject = (query: Object): boolean => {
+const isEmptyQueryObject = (query: Record<string, unknown>): boolean => {
   return typeof query === 'object' && !Object.keys(query).length;
 };
 
