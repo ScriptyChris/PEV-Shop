@@ -34,9 +34,9 @@ userRoleSchema.methods.toJSON = function () {
 };
 
 export interface IUserRole extends Document {
-  roleName: string,
-  permissions: string[],
-  owners: Schema.Types.ObjectId[]
+  roleName: string;
+  permissions: string[];
+  owners: Schema.Types.ObjectId[];
 }
 
 export default userRoleSchema;

@@ -1,7 +1,8 @@
+import { TJestMock } from '../src/types';
 const getMockImplementationError = (fnName: string): Error =>
   Error(`Need to mock the ${fnName}(..) implementation for unit test first!`);
 
-const getResMock = (): { status: TJestMock, _jsonMethod: TJestMock } => {
+const getResMock = (): { status: TJestMock; _jsonMethod: TJestMock } => {
   const jsonMethod = jest.fn(() => undefined);
   const statusMethod = jest.fn(() => ({ json: jsonMethod }));
 

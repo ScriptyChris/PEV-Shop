@@ -3,11 +3,15 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
-// @ts-ignore
-const { default: { compare, hash } } = bcrypt;
-// @ts-ignore
-const { default: { sign, verify } } = jwt;
-const logger = getLogger(module.filename)
+const {
+  // @ts-ignore
+  default: { compare, hash },
+} = bcrypt;
+const {
+  // @ts-ignore
+  default: { sign, verify },
+} = jwt;
+const logger = getLogger(module.filename);
 const SALT_ROUNDS = 8;
 // TODO: move to ENV
 const SECRET_KEY = 'secret-key';
@@ -30,8 +34,8 @@ const verifyToken = (token: string): TToken => {
   return verify(token, SECRET_KEY) as TToken;
 };
 
-const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ (...args: [Record<string, string>, string]) => any): (...args: any) => Promise<void> => {
-  return async (req: Request & { token: string, user: any }, res: Response, next: NextFunction) => {
+const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ any): ((...args: any) => Promise<void>) => {
+  return async (req: Request & { token: string; user: any }, res: Response, next: NextFunction) => {
     try {
       const token: string = (req.header('Authorization') as string).replace('Bearer ', '');
       const decodedToken: TToken = verifyToken(token);
@@ -53,7 +57,7 @@ const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ (...args: [Recor
 };
 
 const userRoleMiddlewareFn = (roleName: string): any => {
-  return async (req: Request & { user: any, userPermissions: string[] }, res: Response, next: NextFunction) => {
+  return async (req: Request & { user: any; userPermissions: string[] }, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new Error('No user provided - probably forgot to do auth first.');
@@ -75,11 +79,4 @@ const userRoleMiddlewareFn = (roleName: string): any => {
   };
 };
 
-export {
-  comparePasswords,
-  hashPassword,
-  getToken,
-  verifyToken,
-  authMiddlewareFn,
-  userRoleMiddlewareFn,
-};
+export { comparePasswords, hashPassword, getToken, verifyToken, authMiddlewareFn, userRoleMiddlewareFn };

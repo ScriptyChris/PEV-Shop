@@ -1,6 +1,6 @@
 import * as express from 'express';
-import { Router as IRouter, Request, Response } from 'express-serve-static-core'
-import getLogger from  '../../../utils/logger';
+import { Router as IRouter, Request, Response } from 'express-serve-static-core';
+import getLogger from '../../../utils/logger';
 import { authMiddlewareFn as authMiddleware } from '../features/auth';
 import { saveToDB, getFromDB, updateOneModelInDB } from '../../database/database-index';
 import { IUserRole } from '../../database/schemas/userRole';
@@ -8,9 +8,12 @@ import { IUserRole } from '../../database/schemas/userRole';
 // @ts-ignore
 const { Router } = express.default;
 const logger = getLogger(module.filename);
-const router: IRouter & Partial<{
-  _saveUserRole: TSaveUserRole, _updateUserRole: TUpdateUserRole, _getUserRole: TGetUserRole
-}> = Router();
+const router: IRouter &
+  Partial<{
+    _saveUserRole: TSaveUserRole;
+    _updateUserRole: TUpdateUserRole;
+    _getUserRole: TGetUserRole;
+  }> = Router();
 
 // @ts-ignore
 router.post('/api/user-roles', authMiddleware(getFromDB), saveUserRole);
@@ -39,7 +42,7 @@ async function saveUserRole(req: Request, res: Response): Promise<void> {
   };
   logger.log('userRole: ', userRole);
 
-  const savedUserRole = await saveToDB(userRole, 'User-Role') as IUserRole;
+  const savedUserRole = (await saveToDB(userRole, 'User-Role')) as IUserRole;
   await savedUserRole.save();
 
   logger.log('savedUserRole:', savedUserRole);
@@ -59,7 +62,7 @@ function updateUserRole(req: Request, res: Response): void {
 async function getUserRole(req: Request, res: Response): Promise<void> {
   logger.log('[GET] /user-roles:', req.params);
 
-  const userRole = await getFromDB({ roleName: req.params.roleName }, 'User-Role') as IUserRole;
+  const userRole = (await getFromDB({ roleName: req.params.roleName }, 'User-Role')) as IUserRole;
   await userRole.populate('owners').execPopulate();
 
   res.status(200).json({ payload: userRole });

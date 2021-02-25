@@ -2,8 +2,6 @@
 const isBackendOnly = process.env.BACKEND_ONLY === 'true';
 const isTestEnv = process.env.TEST_ENV === 'true';
 
-console.log('isBackendOnly', isBackendOnly, ' /isTestEnv',isTestEnv);
-
 const config = {
     browser: !isBackendOnly,
     extends: isBackendOnly ? ['plugin:@typescript-eslint/recommended'] : ['plugin:react/recommended'],
@@ -22,8 +20,6 @@ const DEFAULT_PARSER = 'espree';
 if (!isTestEnv && isBackendOnly) {
     config.ignorePatterns.push('test/', '__mocks__/', '**/__mocks__', 'src/**/*.js');
 }
-
-console.log('config.rules', config.rules);
 
 module.exports = {
     'env': {
@@ -46,4 +42,4 @@ module.exports = {
     'plugins': config.plugins,
     'rules': config.rules,
     ignorePatterns: config.ignorePatterns,
-}
+};

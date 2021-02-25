@@ -1,16 +1,18 @@
-import getLogger from '../../../utils/logger'
-import * as expressModule from 'express'
+import getLogger from '../../../utils/logger';
+import * as expressModule from 'express';
 import { Request, Response } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
 import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../database/database-index';
 import { TIdListReq, TPageLimit, TProductsCategoriesReq } from '../../database/utils/queryBuilder';
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 
-// @ts-ignore
-const { default: { Router } } = expressModule;
+const {
+  // @ts-ignore
+  default: { Router },
+} = expressModule;
 
 // import { readFileSync } from 'fs';
-const logger = getLogger(module.filename)
+const logger = getLogger(module.filename);
 const router: any = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 // const productList =  getProductList();
@@ -29,7 +31,10 @@ router._modifyProduct = modifyProduct;
 
 export default router;
 
-async function getProducts(req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit }, res: Response): Promise<void> {
+async function getProducts(
+  req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit },
+  res: Response
+): Promise<void> {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
     logger.log('[products GET] query', req.query);
@@ -95,7 +100,7 @@ async function addProduct(req: Request, res: Response): Promise<void> {
   }
 }
 
-function modifyProduct(req: Request & {userPermissions: any}, res: Response): void {
+function modifyProduct(req: Request & { userPermissions: any }, res: Response): void {
   try {
     logger.log('[products PATCH] req.body', req.body);
 

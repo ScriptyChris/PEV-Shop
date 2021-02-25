@@ -2,8 +2,10 @@ import * as mongooseModule from 'mongoose';
 import { Document } from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
 
-// @ts-ignore
-const { default: { Schema } } = mongooseModule
+const {
+  // @ts-ignore
+  default: { Schema },
+} = mongooseModule;
 
 const reviewsSchema = new Schema({
   summary: {
@@ -82,20 +84,20 @@ productSchema.methods.toJSON = function () {
 };
 
 export interface IReviews extends Document {
-  summary: string,
-  list: []
+  summary: string;
+  list: [];
 }
 
 export interface IProduct extends Document {
-  name: string,
-  url: string,
-  category: string,
-  price: number,
-  shortDescription: string[],
-  technicalSpecs: Record<string, unknown>[],
-  images: Record<string, unknown>[],
-  relatedProducts: Record<string, unknown>[],
-  reviews: IReviews
+  name: string;
+  url: string;
+  category: string;
+  price: number;
+  shortDescription: string[];
+  technicalSpecs: Record<string, unknown>[];
+  images: Record<string, unknown>[];
+  relatedProducts: Record<string, unknown>[];
+  reviews: IReviews;
 }
 
 export default productSchema;

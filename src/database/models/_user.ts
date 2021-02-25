@@ -1,5 +1,5 @@
 import { model } from 'mongoose';
-import userSchema, { IUser }  from '../schemas/user';
+import userSchema, { IUser } from '../schemas/user';
 
 export { IUser };
 

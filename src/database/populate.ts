@@ -1,4 +1,4 @@
-import getLogger from '../../utils/logger'
+import getLogger from '../../utils/logger';
 import { connect, model, connection } from 'mongoose';
 import productSchema from './schemas/product';
 import { TGenericModel } from './models/models-index';
@@ -11,7 +11,7 @@ const glob = promisify(G.glob);
 const logger = getLogger(module.filename);
 const promisifiedReadFile = promisify(readFile);
 
-const PARAMS: { CLEAN_ALL: string, GROUP_CATEGORIES: string } = {
+const PARAMS: { CLEAN_ALL: string; GROUP_CATEGORIES: string } = {
   CLEAN_ALL: 'cleanAll=true',
   GROUP_CATEGORIES: 'categoriesGroupPath=',
 };
@@ -52,7 +52,7 @@ function getProductModel(): TGenericModel {
   return model('Product', productSchema);
 }
 
-async function getSourceData(): Promise<Parameters<keyof typeof populateProducts>['sourceDataList']> {
+async function getSourceData(): Promise<TPopulatedData[]> {
   const path: string = process.argv[2];
 
   if (!path) {
@@ -70,23 +70,24 @@ async function getSourceData(): Promise<Parameters<keyof typeof populateProducts
 
   const sourceDataPath: string = isFileInPath ? path : `${path}${sep}**${sep}${fileName}.json`;
   logger.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
-  const sourceDataFiles: string[] = await glob(sourceDataPath) as string[];
-  const sourceDataList: Promise<TPopulatedData>[] = sourceDataFiles
-      .map(async (filePath: string) => JSON.parse(await promisifiedReadFile(filePath, { encoding: 'utf8' })));
+  const sourceDataFiles: string[] = (await glob(sourceDataPath)) as string[];
+  const sourceDataList: Promise<TPopulatedData>[] = sourceDataFiles.map(async (filePath: string) =>
+    JSON.parse(await promisifiedReadFile(filePath, { encoding: 'utf8' }))
+  );
 
   return Promise.all(sourceDataList);
 }
 
-async function populateProducts(ProductModel: TGenericModel, sourceDataList: string | TPopulatedData[]) {
-  type TCategoryNameGrouper = (categoryName: string) => string
-  type TNormalizersObj = { category: TCategoryNameGrouper }
+async function populateProducts(ProductModel: TGenericModel, sourceDataList: TPopulatedData[]) {
+  type TCategoryNameGrouper = (categoryName: string) => string;
+  type TNormalizersObj = { category: TCategoryNameGrouper };
 
   const normalizersObj: TNormalizersObj = {
     category: categoryNameGrouper(),
   };
 
   return Promise.all(
-    sourceDataList.map((data) => {
+    sourceDataList.map((data: any) => {
       const product = new ProductModel(normalizeData(data, normalizersObj));
       // @ts-ignore
       return product.save();
@@ -110,15 +111,17 @@ async function populateProducts(ProductModel: TGenericModel, sourceDataList: str
   }
 
   function categoryNameGrouper(): TCategoryNameGrouper {
-    type CustomRegExp = RegExp & { matcher: string, replacer: string };
+    type CustomRegExp = RegExp & { matcher: string; replacer: string };
 
     const categoriesGroupPath: string = getScriptParamValue(PARAMS.GROUP_CATEGORIES, true);
-    const categoryRegExps: CustomRegExp[] = JSON.parse(readFileSync(categoriesGroupPath.split('=').pop() as string, { encoding: 'utf8' }));
+    const categoryRegExps: CustomRegExp[] = JSON.parse(
+      readFileSync(categoriesGroupPath.split('=').pop() as string, { encoding: 'utf8' })
+    );
 
     if (categoriesGroupPath) {
       return (categoryName: string) => {
         const matchedRegExp: CustomRegExp | undefined = categoryRegExps.find(
-          (regExp ) => typeof regExp.matcher === 'string' && new RegExp(regExp.matcher).test(categoryName)
+          (regExp) => typeof regExp.matcher === 'string' && new RegExp(regExp.matcher).test(categoryName)
         );
 
         if (matchedRegExp) {
@@ -149,9 +152,9 @@ async function assignIDsToRelatedProducts(Product: TGenericModel) {
       );
 
       await Product.updateMany(
-          // @ts-ignore
+        // @ts-ignore
         { 'relatedProducts.url': relatedProduct.url },
-          // @ts-ignore
+        // @ts-ignore
         { $set: { 'relatedProducts.$.id': relatedProduct._id } }
       );
     }
@@ -166,11 +169,13 @@ async function assignIDsToRelatedProducts(Product: TGenericModel) {
 }
 
 function getScriptParamValue(param: string, lenientSearch = false): string {
-  return process.argv.find((arg: string) => {
-    if (lenientSearch) {
-      return arg.includes(param);
-    }
+  return (
+    process.argv.find((arg: string) => {
+      if (lenientSearch) {
+        return arg.includes(param);
+      }
 
-    return arg === param;
-  }) || '';
+      return arg === param;
+    }) || ''
+  );
 }

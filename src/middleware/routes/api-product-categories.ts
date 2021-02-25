@@ -3,8 +3,10 @@ import { Request, Response } from 'express';
 import * as expressModule from 'express';
 import { getFromDB } from '../../database/database-index';
 
-// @ts-ignore
-const { default: { Router } } = expressModule;
+const {
+  // @ts-ignore
+  default: { Router },
+} = expressModule;
 const router = Router();
 const logger = getLogger(module.filename);
 
@@ -42,7 +44,7 @@ async function getProductCategoriesHierarchy(req: Request, res: Response): Promi
   logger.log('[productCategories GET] req.param:', req.param);
 
   try {
-    const productCategories = await getFromDB('category', 'Product', { isDistinct: true }) as string[];
+    const productCategories = (await getFromDB('category', 'Product', { isDistinct: true })) as string[];
     // logger.log('productCategories:', productCategories);
 
     const categoriesHierarchy = createCategoriesHierarchy(productCategories);

@@ -4,8 +4,10 @@ import getModel, { TModelType, IModel, TGenericModel } from './models/models-ind
 import * as queryBuilder from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
 
-// @ts-ignore
-const { default: { connect } } = mongoose;
+const {
+  // @ts-ignore
+  default: { connect },
+} = mongoose;
 
 // TODO: move to ENV
 const databaseURL = 'mongodb://localhost:27017';
@@ -27,8 +29,11 @@ function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string
   return item.save();
 }
 
-async function getFromDB(itemQuery: any, modelType: TModelType, options: {pagination?: TPaginationConfig, isDistinct?: boolean} = {})
-    : ReturnType<typeof getPaginatedItems | Model.distinct | Model.find | Model.findOne> {
+async function getFromDB(
+  itemQuery: any,
+  modelType: TModelType,
+  options: { pagination?: TPaginationConfig; isDistinct?: boolean } = {}
+): Promise<ReturnType<typeof getPaginatedItems> | any> {
   const Model = getModel(modelType);
 
   if (options.pagination) {
@@ -52,7 +57,11 @@ async function getFromDB(itemQuery: any, modelType: TModelType, options: {pagina
 }
 
 // TODO: consider making this function either specific to update case or generic dependent on params
-function updateOneModelInDB(itemQuery: any, updateData: any, modelType: TModelType): ReturnType<typeof Model.findOneAndUpdate> | null {
+function updateOneModelInDB(
+  itemQuery: any,
+  updateData: any,
+  modelType: TModelType
+): ReturnType<typeof Model.findOneAndUpdate> | null {
   const Model = getModel(modelType);
 
   // TODO: improve querying via various ways
@@ -88,10 +97,4 @@ function updateOneModelInDB(itemQuery: any, updateData: any, modelType: TModelTy
   return Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 }
 
-export {
-  saveToDB,
-  getFromDB,
-  updateOneModelInDB,
-  queryBuilder,
-  ObjectId,
-};
+export { saveToDB, getFromDB, updateOneModelInDB, queryBuilder, ObjectId };

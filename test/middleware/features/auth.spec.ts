@@ -1,3 +1,4 @@
+import { TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 // @ts-ignore
 import getType from '../../../node_modules/jest-get-type/build/index';

@@ -1,4 +1,4 @@
-import { PaginateResult, PaginateOptions } from 'mongoose'
+import { PaginateResult, PaginateOptions } from 'mongoose';
 
 // TODO: cache pagination for each user (for next/prev page navigation)
 const getPaginatedItems = async (Model: any, itemQuery: any, paginationConfig: TPaginationConfig): TPaginateResult => {
@@ -17,7 +17,7 @@ const getPaginatedItems = async (Model: any, itemQuery: any, paginationConfig: T
   return paginatedItems;
 };
 
-export type TPaginationConfig = { page: number, limit: number };
-export type TPaginateResult = Promise<PaginateResult<any>>
+export type TPaginationConfig = { page: number; limit: number };
+export type TPaginateResult = Promise<PaginateResult<any>>;
 
 export default getPaginatedItems;

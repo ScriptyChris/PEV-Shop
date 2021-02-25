@@ -71,12 +71,12 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
 };
 
 export interface IUser extends Document {
-  login: string,
-  password: string,
-  tokens: string[],
-  generateAuthToken(): Promise<string>,
-  toJSON(): IUser,
-  matchPassword(password: string): Promise<boolean>
+  login: string;
+  password: string;
+  tokens: string[];
+  generateAuthToken(): Promise<string>;
+  toJSON(): IUser;
+  matchPassword(password: string): Promise<boolean>;
 }
 
 export default userSchema;

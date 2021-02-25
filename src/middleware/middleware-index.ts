@@ -19,7 +19,7 @@ const middleware = (app: Application): void => {
   app.use(apiProducts, apiProductCategories, apiUsers, apiUserRoles);
 
   app.get('/images/*', (req, res) => {
-    const imagePath = (req.url.split('/').pop() as string);
+    const imagePath = req.url.split('/').pop() as string;
 
     getImage(imagePath)
       .then((image) => {
@@ -63,7 +63,7 @@ const getImage = (() => {
     }
 
     return Promise.resolve(cachedImage);
-  }
+  };
 })();
 
 function findFileRecursively(fileName: string): Promise<string[]> {

@@ -1,3 +1,5 @@
+import { TJestMock } from '../src/types';
+
 const jwt: TJestMock & {
   verify: TJestMock;
   sign: TJestMock;

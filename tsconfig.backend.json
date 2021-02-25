@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "include": ["./src/database/**/*.ts", "./src/middleware/**/*.ts"],
   "compilerOptions": {
+    "target": "ES2020",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,

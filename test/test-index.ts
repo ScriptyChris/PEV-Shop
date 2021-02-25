@@ -1,9 +1,5 @@
 import { sep } from 'path';
 
-declare global {
-  type TJestMock<T = void> = jest.Mock<any, T | any>;
-}
-
 const findAssociatedSrcModulePath = (() => {
   const PATH_PARTS = {
     TEST: (() => {

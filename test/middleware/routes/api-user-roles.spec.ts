@@ -1,3 +1,4 @@
+import { TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 
 const {
@@ -40,7 +41,11 @@ describe('#api-user-roles', () => {
 
   afterAll(() => {
     Router.mockClear();
-    Object.values(_router as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
+
+    Object.getOwnPropertyNames(_router).forEach((httpMethodName) => {
+      const httpMethod: TJestMock = _router[httpMethodName];
+      httpMethod.mockClear();
+    });
   });
 
   it('should call Router() once', () => {

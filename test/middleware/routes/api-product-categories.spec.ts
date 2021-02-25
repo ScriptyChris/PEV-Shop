@@ -1,3 +1,4 @@
+import { TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 import { findAssociatedSrcModulePath } from '../../test-index';
 
@@ -17,7 +18,13 @@ describe('#api-product-categories', () => {
 
   afterAll(() => {
     Router.mockClear();
-    Object.values(Router() as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
+
+    const router = Router();
+
+    Object.getOwnPropertyNames(router).forEach((httpMethodName) => {
+      const httpMethod: TJestMock = router[httpMethodName];
+      httpMethod.mockClear();
+    });
   });
 
   it('should call Router() once', () => {
@@ -35,7 +42,12 @@ describe('#api-product-categories', () => {
     const reqMock = Object.freeze({ param: null });
 
     afterEach(() => {
-      Object.values(Router() as TJestMock).forEach((httpMethod) => httpMethod.mockClear());
+      const router = Router();
+      Object.getOwnPropertyNames(router).forEach((httpMethodName) => {
+        const httpMethod: TJestMock = router[httpMethodName];
+        httpMethod.mockClear();
+      });
+
       getFromDB.mockClear();
     });
 

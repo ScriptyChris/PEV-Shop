@@ -2,7 +2,7 @@ const isEmptyQueryObject = (query: Record<string, unknown>): boolean => {
   return typeof query === 'object' && !Object.keys(query).length;
 };
 
-const getPaginationConfig = (reqQuery: TPageLimit): { page: number, limit: number } | null => {
+const getPaginationConfig = (reqQuery: TPageLimit): { page: number; limit: number } | null => {
   if (!('page' in reqQuery) || !('limit' in reqQuery)) {
     return null;
   }
@@ -28,13 +28,8 @@ const getProductsWithChosenCategories = (reqQuery: TProductsCategoriesReq): { ca
   return null;
 };
 
-export type TPageLimit = { page: number, limit: number }
-export type TIdListReq = { idList: string }
-export type TProductsCategoriesReq = { productCategories: string }
+export type TPageLimit = { page: number; limit: number };
+export type TIdListReq = { idList: string };
+export type TProductsCategoriesReq = { productCategories: string };
 
-export {
-  isEmptyQueryObject,
-  getPaginationConfig,
-  getIdListConfig,
-  getProductsWithChosenCategories,
-};
+export { isEmptyQueryObject, getPaginationConfig, getIdListConfig, getProductsWithChosenCategories };

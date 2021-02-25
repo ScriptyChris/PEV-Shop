@@ -5,8 +5,10 @@ import { saveToDB, getFromDB, updateOneModelInDB, ObjectId } from '../../databas
 import { authMiddlewareFn, hashPassword } from '../features/auth';
 import { IUser } from '../../database/models/_user';
 
-// @ts-ignore
-const { default: { Router } } = expressModule;
+const {
+  // @ts-ignore
+  default: { Router },
+} = expressModule;
 const logger = getLogger(module.filename);
 
 const router: any = Router();
@@ -28,7 +30,7 @@ async function updateUser(req: Request, res: Response): Promise<void> {
     logger.log('[POST] /users req.body', req.body);
 
     req.body.password = await hashPassword(req.body.password);
-    const savedUser = await saveToDB(req.body, 'User') as IUser;
+    const savedUser = (await saveToDB(req.body, 'User')) as IUser;
 
     // TODO: expose appropriate function from user role module?
     updateOneModelInDB(
@@ -56,7 +58,7 @@ async function logInUser(req: Request, res: Response): Promise<void> {
   logger.log('[POST] /login');
 
   try {
-    const user = await getFromDB({ login: req.body.login }, 'User') as IUser;
+    const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
@@ -73,10 +75,10 @@ async function logInUser(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function logOutUser(req: Request & {user: any, token: string}, res: Response): Promise<void> {
+async function logOutUser(req: Request & { user: any; token: string }, res: Response): Promise<void> {
   try {
     // TODO: what if .filter(..) returns an empty array? should req.user be saved then?
-    req.user.tokens = req.user.tokens.filter((tokenItem: {token: string}) => tokenItem.token !== req.token);
+    req.user.tokens = req.user.tokens.filter((tokenItem: { token: string }) => tokenItem.token !== req.token);
     await req.user.save();
 
     res.status(200).json({ payload: 'Logged out!' });

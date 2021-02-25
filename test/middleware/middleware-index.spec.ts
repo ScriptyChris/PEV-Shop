@@ -1,3 +1,4 @@
+import { TJestMock } from '../../src/types';
 import globMock from '../../__mocks__/glob';
 import bodyParserMock from '../../__mocks__/body-parser';
 
@@ -72,7 +73,7 @@ describe('#middleware-index', () => {
 
     it('should call res.sendFile(..) when image is found', async (): Promise<void> => {
       let imageFoundPromise: Promise<string> | string = new Promise((resolve) => {
-        (globMock as TJestMock).mockImplementationOnce((path, callback) => {
+        (globMock as TJestMock).mockImplementationOnce((path: any, callback: any) => {
           const images = ['some image'];
 
           callback(null, images);
@@ -100,7 +101,7 @@ describe('#middleware-index', () => {
 
     it('should call res.status(..).end(..) when image is not found', async (): Promise<void> => {
       const imageNotFoundPromise = new Promise((resolve, reject) => {
-        (globMock as TJestMock).mockImplementationOnce((path, callback) => {
+        (globMock as TJestMock).mockImplementationOnce((path: any, callback: any) => {
           const error = 'image not found';
 
           callback(error);
