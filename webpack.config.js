@@ -1,6 +1,6 @@
 const { resolve } = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const middleware = require('./src/middleware/middleware-index');
+const { default: middleware } = require('./dist/src/middleware/middleware-index');
 
 // TODO: handle it in better way
 process.env.NODE_ENV = 'development';
