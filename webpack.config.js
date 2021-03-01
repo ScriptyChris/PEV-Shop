@@ -1,6 +1,6 @@
 const { resolve } = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const middleware = require('./src/middleware/middleware-index');
+const { default: middleware } = require('./dist/src/middleware/middleware-index');
 
 // TODO: handle it in better way
 process.env.NODE_ENV = 'development';
@@ -9,7 +9,7 @@ module.exports = {
   mode: 'development',
   entry: './src/frontend/app.js',
   output: {
-    filename: 'main.js',
+    filename: 'frontend.js',
     path: resolve(__dirname, 'dist'),
   },
   module: {
@@ -31,7 +31,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: 'styles.css',
       chunkFilename: '[id].css'
     })
   ],
