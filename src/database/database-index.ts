@@ -14,6 +14,7 @@ const databaseURL = 'mongodb://localhost:27017';
 connect(databaseURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
 });
 
 function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string> {

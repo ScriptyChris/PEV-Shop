@@ -6,6 +6,7 @@ import getLogger from '../../utils/logger';
 import glob from 'glob';
 // @ts-ignore
 import bodyParser from 'body-parser';
+import { resolve } from 'path';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
@@ -38,6 +39,8 @@ if (process.env.BACKEND_ONLY === 'true') {
   const app: Application = Express();
   const port = 3000;
 
+  handleStaticFileRequests(app);
+
   middleware(app);
   app.listen(port, () => {
     logger.log(`Server is listening on port ${port}`);
@@ -45,6 +48,12 @@ if (process.env.BACKEND_ONLY === 'true') {
 }
 
 export default middleware;
+
+function handleStaticFileRequests(app: Application) {
+  const root = resolve(__dirname, '../../');
+
+  app.use(Express.static(root));
+}
 
 // TODO: change string type to probably ArrayBuffer
 const getImage = (() => {
