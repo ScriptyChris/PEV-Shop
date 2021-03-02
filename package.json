@@ -18,21 +18,25 @@
     "url": "https://github.com/ScriptyChris/Fake-PEV-Shopping/issues"
   },
   "scripts": {
-    "test": "npm run eslint:test && jest --env=node",
-    "test:dev": "jest --watch --env=node",
-    "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
     "prettier": "prettier --write src/ !src/frontend/assets !src/database/data",
     "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",
     "eslint:backend": "set \"BACKEND_ONLY=true\" && eslint src/middleware/** src/database/**",
     "eslint:test": "set \"BACKEND_ONLY=true\" && set \"TEST_ENV=true\" && eslint \"test/**\" \"__mocks__/*\" \"src/**/__mocks__/*\"",
-    "serve": "set \"BACKEND_ONLY=true\" && node dist/src/middleware/middleware-index.js",
+
+    "test": "npm run eslint:test && jest --env=node",
+    "test:dev": "jest --watch --env=node",
+    "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
+
     "dev:frontend": "set \"BACKEND_ONLY=false\" && webpack-dev-server --env development",
     "dev:backend": "set \"BACKEND_ONLY=true\" && nodemon --exec \"npm run eslint:backend && npm run prettier:backend && ts-node --project tsconfig.backend.json src/middleware/middleware-index.ts\"",
+
     "prebuild": "npm run prettier",
     "prebuild:backend": "npm run test",
-    "build:backend": "rimraf dist/src dist/utils && tsc --project tsconfig.backend.json",
-    "build:frontend": "rimraf dist/frontend.js dist/styles.css dist/index.html && webpack --env production",
-    "build": "npm run build:backend && npm run build:frontend"
+    "build:backend": "rimraf dist/src/middleware dust/src/database dist/utils && tsc --project tsconfig.backend.json",
+    "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
+    "build": "npm run build:backend && npm run build:frontend",
+
+    "serve": "set \"BACKEND_ONLY=true\" && node dist/src/middleware/middleware-index.js"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",

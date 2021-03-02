@@ -11,10 +11,10 @@ module.exports = (env) => {
 
   return {
     mode: env,
-    entry: './src/frontend/app.js',
+    entry: './src/frontend/index.js',
     output: {
-      filename: 'frontend.js',
-      path: resolve(__dirname, 'dist'),
+      filename: 'index.js',
+      path: resolve(__dirname, './dist/src/frontend'),
     },
     module: {
       rules: [
@@ -39,7 +39,7 @@ module.exports = (env) => {
         chunkFilename: '[id].css'
       }),
       new HtmlWebpackPlugin({
-        template: './index.html',
+        template: './src/frontend/index.html',
       }),
     ],
     devtool: 'source-map',

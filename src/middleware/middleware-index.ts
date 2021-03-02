@@ -6,7 +6,7 @@ import getLogger from '../../utils/logger';
 import glob from 'glob';
 // @ts-ignore
 import bodyParser from 'body-parser';
-import { resolve } from 'path';
+import { resolve, sep } from 'path';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
@@ -50,7 +50,10 @@ if (process.env.BACKEND_ONLY === 'true') {
 export default middleware;
 
 function handleStaticFileRequests(app: Application) {
-  const root = resolve(__dirname, '../../');
+  const relativeDist = __dirname.includes(`${sep}dist${sep}`) ? '' : 'dist/';
+  const path = `../../${relativeDist}src/frontend`;
+
+  const root = resolve(__dirname, path);
 
   app.use(Express.static(root));
 }
