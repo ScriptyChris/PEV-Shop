@@ -3,9 +3,9 @@ import { sep } from 'path';
 const findAssociatedSrcModulePath = (() => {
   const PATH_PARTS = {
     TEST: (() => {
-      const DOUBLE_SEP = sep.repeat(2);
+      const OS_SEP = sep === '/' ? '/' : sep.repeat(2);
 
-      return new RegExp(`(${DOUBLE_SEP}+)test(${DOUBLE_SEP}+)`);
+      return new RegExp(`(${OS_SEP}+)test(${OS_SEP}+)`);
     })(),
     SRC: '$1src$2',
     SPEC_TS_EXT: /\.spec\.ts$/,
