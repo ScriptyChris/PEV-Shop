@@ -30,8 +30,6 @@
     "dev:frontend": "set \"BACKEND_ONLY=false\" && webpack-dev-server --env development",
     "dev:backend": "set \"BACKEND_ONLY=true\" && nodemon --exec \"npm run eslint:backend && npm run prettier:backend && ts-node --project tsconfig.backend.json src/middleware/middleware-index.ts\"",
 
-    "prebuild": "npm run prettier",
-    "prebuild:backend": "npm run test",
     "build:backend": "rimraf dist/src/middleware dust/src/database dist/utils && tsc --project tsconfig.backend.json",
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend",
