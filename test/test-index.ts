@@ -14,9 +14,15 @@ const findAssociatedSrcModulePath = (() => {
 
   return (): string => {
     // @ts-ignore
-    const srcModulePath = require.main.filename
+    let srcModulePath = require.main.filename;
+
+    console.log('???[0] srcModulePath:', srcModulePath, ' /PATH_PARTS:', Object.entries(PATH_PARTS));
+
+    srcModulePath = srcModulePath
       .replace(PATH_PARTS.TEST, PATH_PARTS.SRC)
       .replace(PATH_PARTS.SPEC_TS_EXT, PATH_PARTS.TS_EXT);
+
+    console.log('???[1] srcModulePath:', srcModulePath);
 
     return srcModulePath;
   };
