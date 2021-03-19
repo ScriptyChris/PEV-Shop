@@ -44,7 +44,7 @@ module.exports = (env) => {
     ],
     devtool: 'source-map',
     devServer: {
-      publicPath: '/dist/',
+      publicPath: '/',
       watchContentBase: true,
       historyApiFallback: true,
       before: middleware,

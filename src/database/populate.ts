@@ -6,6 +6,10 @@ import { sep } from 'path';
 import { promisify } from 'util';
 import * as G from 'glob';
 import { readFile, readFileSync } from 'fs';
+import * as dotenv from 'dotenv';
+
+// @ts-ignore
+dotenv.default.config();
 
 const glob = promisify(G.glob);
 const logger = getLogger(module.filename);
@@ -39,10 +43,7 @@ logger.log('process.argv:', process.argv);
 })();
 
 function connectToDB() {
-  // TODO: move to ENV
-  const databaseURL = 'mongodb://localhost:27017';
-
-  return connect(databaseURL, {
+  return connect(process.env.DATABASE_URL as string, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });

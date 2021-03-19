@@ -36,6 +36,12 @@ const middleware = (app: Application): void => {
 
 // TODO: refactor to use ENV
 if (process.env.BACKEND_ONLY === 'true') {
+  wrappedMiddleware();
+}
+
+export default middleware;
+
+function wrappedMiddleware(): void {
   const app: Application = Express();
   const port = 3000;
 
@@ -47,9 +53,7 @@ if (process.env.BACKEND_ONLY === 'true') {
   });
 }
 
-export default middleware;
-
-function handleStaticFileRequests(app: Application) {
+function handleStaticFileRequests(app: Application): void {
   const relativeDist = __dirname.includes(`${sep}dist${sep}`) ? '' : 'dist/';
   const path = `../../${relativeDist}src/frontend`;
 

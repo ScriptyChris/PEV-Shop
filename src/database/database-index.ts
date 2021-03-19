@@ -3,15 +3,18 @@ import * as mongoose from 'mongoose';
 import getModel, { TModelType, IModel, TGenericModel } from './models/models-index';
 import * as queryBuilder from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
+import * as dotenv from 'dotenv';
+
+// @ts-ignore
+dotenv.default.config();
 
 const {
   // @ts-ignore
   default: { connect },
 } = mongoose;
 
-// TODO: move to ENV
-const databaseURL = 'mongodb://localhost:27017';
-connect(databaseURL, {
+// @ts-ignore
+connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
