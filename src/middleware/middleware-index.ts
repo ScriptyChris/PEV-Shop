@@ -11,6 +11,10 @@ import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
+import * as dotenv from 'dotenv';
+
+// @ts-ignore
+dotenv.default.config();
 
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
@@ -34,7 +38,6 @@ const middleware = (app: Application): void => {
   });
 };
 
-// TODO: refactor to use ENV
 if (process.env.BACKEND_ONLY === 'true') {
   wrappedMiddleware();
 }
@@ -43,13 +46,12 @@ export default middleware;
 
 function wrappedMiddleware(): void {
   const app: Application = Express();
-  const port = 3000;
 
   handleStaticFileRequests(app);
 
   middleware(app);
-  app.listen(port, () => {
-    logger.log(`Server is listening on port ${port}`);
+  app.listen(process.env.PORT, () => {
+    logger.log(`Server is listening on port ${process.env.PORT}`);
   });
 }
 

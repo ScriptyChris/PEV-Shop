@@ -1,6 +1,9 @@
 const { resolve } = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Dotenv = require('html-webpack-plugin');
+
+require('dotenv').config();
 
 module.exports = (env) => {
   // TODO: handle it in better way
@@ -34,6 +37,7 @@ module.exports = (env) => {
       ]
     },
     plugins: [
+      new Dotenv(),
       new MiniCssExtractPlugin({
         filename: 'styles.css',
         chunkFilename: '[id].css'
@@ -48,7 +52,7 @@ module.exports = (env) => {
       watchContentBase: true,
       historyApiFallback: true,
       before: middleware,
-      port: 3000,
+      port: process.env.PORT,
     }
   };
 };

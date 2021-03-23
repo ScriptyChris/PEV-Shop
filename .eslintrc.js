@@ -20,8 +20,6 @@ if (!isTestEnv && isBackendOnly) {
     config.ignorePatterns.push('test/', '__mocks__/', '**/__mocks__', 'src/**/*.js');
 }
 
-console.log('??? isTestEnv:', isTestEnv, ' /isBackendOnly:', isBackendOnly, ' /config:', JSON.stringify(config));
-
 module.exports = {
     'env': {
         'browser': config.browser,

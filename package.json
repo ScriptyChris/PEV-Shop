@@ -18,19 +18,18 @@
     "url": "https://github.com/ScriptyChris/Fake-PEV-Shopping/issues"
   },
   "scripts": {
-    "prettier": "prettier --write src/ !src/frontend/assets !src/database/data",
     "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",
-    "eslint:backend": "export \"BACKEND_ONLY=true\" && eslint src/middleware/** src/database/**",
-    "eslint:test": "export \"BACKEND_ONLY=true\" && export \"TEST_ENV=true\" && eslint \"test/**\" \"__mocks__/*\" \"src/**/__mocks__/*\"",
+    "eslint:backend": "cross-env BACKEND_ONLY=true eslint src/middleware/** src/database/**",
+    "eslint:test": "cross-env BACKEND_ONLY=true TEST_ENV=true && eslint \"test/**\" \"__mocks__/*\" \"src/**/__mocks__/*\"",
     "test": "npm run eslint:test && jest --env=node",
     "test:dev": "jest --watch --env=node",
     "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
     "dev:frontend": "webpack-dev-server --env development",
-    "dev:backend": "export \"BACKEND_ONLY=true\" && nodemon --exec \"npm run eslint:backend && npm run prettier:backend && ts-node --project tsconfig.backend.json src/middleware/middleware-index.ts\"",
+    "dev:backend": "cross-env BACKEND_ONLY=true nodemon --exec \"npm run eslint:backend && npm run prettier:backend && ts-node --project tsconfig.backend.json src/middleware/middleware-index.ts\"",
     "build:backend": "rimraf dist/src/middleware dist/src/database dist/utils && tsc --project tsconfig.backend.json",
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend",
-    "serve": "export \"BACKEND_ONLY=true\" && node dist/src/middleware/middleware-index.js"
+    "serve": "cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
@@ -48,6 +47,7 @@
     "babel-loader": "^8.1.0",
     "babel-preset-react-app": "^9.1.2",
     "css-loader": "^4.2.1",
+    "dotenv-webpack": "^7.0.2",
     "eslint": "^7.7.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-react": "^7.20.6",
@@ -73,6 +73,7 @@
   "dependencies": {
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "mobx": "^5.15.6",
