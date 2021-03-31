@@ -1,7 +1,9 @@
 name: Build production Docker image
 
 on:
-  push:
+  #push:
+    #branches: [ develop ]
+  pull_request:
     branches: [ develop ]
 
 jobs:

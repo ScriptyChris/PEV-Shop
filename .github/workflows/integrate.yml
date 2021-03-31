@@ -1,7 +1,8 @@
 name: Integrate
 
 on:
-  pull_request:
+  issues:
+  #pull_request:
     branches: [ develop ]
 
 jobs:
