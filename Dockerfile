@@ -6,8 +6,8 @@ FROM node:lts-alpine3.13
 WORKDIR /app
 
 COPY ./package*.json ./
-RUN npm ci
-RUN npm run build
+RUN npm ci && ls ./
+RUN npm run build && ls ./
 
 COPY ./dist .env ./
 
