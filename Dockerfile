@@ -9,7 +9,7 @@ COPY ./package*.json ./
 RUN npm ci
 
 COPY ["./src", "./utils", "./.env", "./tsconfig*", "./webpack.config.js", "./"]
-RUN npm run build
+RUN /bin/bash -c "ls ./ && npm run build"
 
 COPY ./dist ./
 
