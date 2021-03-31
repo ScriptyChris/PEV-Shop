@@ -20,7 +20,7 @@
   "scripts": {
     "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",
     "eslint:backend": "cross-env BACKEND_ONLY=true eslint src/middleware/** src/database/**",
-    "eslint:test": "cross-env BACKEND_ONLY=true TEST_ENV=true && eslint \"test/**\" \"__mocks__/*\" \"src/**/__mocks__/*\"",
+    "eslint:test": "cross-env BACKEND_ONLY=true TEST_ENV=true eslint \"test/**\" \"__mocks__/*\" \"src/**/__mocks__/*\"",
     "test": "npm run eslint:test && jest --env=node",
     "test:dev": "jest --watch --env=node",
     "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
