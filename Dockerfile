@@ -6,10 +6,12 @@ FROM node:lts-alpine3.13
 WORKDIR /app
 
 COPY ./package*.json ./
-RUN npm ci && ls ./
-RUN npm run build && ls ./
+RUN npm ci
 
-COPY ./dist .env ./
+COPY ["./src", "./utils", "./.env", "./tsconfig*", "./webpack.config.js", "./"]
+RUN npm run build
+
+COPY ./dist ./
 
 CMD ["npm", "run", "serve"]
 
