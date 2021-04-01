@@ -4,6 +4,7 @@ import getModel, { TModelType, IModel, TGenericModel } from './models/models-ind
 import * as queryBuilder from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
 import * as dotenv from 'dotenv';
+import getLogger from '../../utils/logger';
 
 // @ts-ignore
 dotenv.default.config();
@@ -12,13 +13,26 @@ const {
   // @ts-ignore
   default: { connect },
 } = mongoose;
+const logger = getLogger(module.filename);
 
-// @ts-ignore
-connect(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-});
+(function tryToConnect(attempts) {
+  logger.log('Connection attemps:', attempts);
+
+  // @ts-ignore
+  connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  }, function(err: unknown) {
+    if (err && attempts < 5) {
+      // @ts-ignore
+      logger.error('Failed to connect to MongoDB by URL:', process.env.DATABASE_URL);
+      setTimeout(() => tryToConnect(attempts + 1), 2000);
+    } else if (!err) {
+      logger.log('Connected to MongoDB!');
+    }
+  });
+})(1);
 
 function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string> {
   // TODO: improve validation
