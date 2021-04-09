@@ -1,12 +1,13 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./src/database/**/*.ts", "./src/middleware/**/*.ts"],
+  "include": ["./src/database/**/*.ts", "./src/middleware/**/*.ts", "./src/database/populate/**.json"],
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "outDir": "./dist"
   }
 }
