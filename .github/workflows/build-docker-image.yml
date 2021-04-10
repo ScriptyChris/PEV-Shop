@@ -28,6 +28,10 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # just for debugging
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Lowercase author and repository name
         run: echo "REPO_LOWERCASE=ghcr.io/scriptychris/fake-pev-shopping" >> $GITHUB_ENV
       - name: Build and push
