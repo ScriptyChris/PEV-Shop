@@ -31,6 +31,10 @@ jobs:
       - name: Lowercase author and repository name
         #run: echo "REPO_LOWERCASE=ghcr.io/scriptychris/fake-pev-shopping" >> $GITHUB_ENV
         run: echo "REPO_LOWERCASE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      # just for debugging
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       
       - name: Manually push docker image to registry
         run: >
@@ -42,7 +46,3 @@ jobs:
       #  with:
       #    push: true
       #    tags: ghcr.io/scriptychris/fake-pev-shopping:latest #${{ env.REPO_LOWERCASE }}
-
-      # just for debugging
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
