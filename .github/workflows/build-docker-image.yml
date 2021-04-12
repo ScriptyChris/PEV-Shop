@@ -32,6 +32,13 @@ jobs:
         #run: echo "REPO_LOWERCASE=ghcr.io/scriptychris/fake-pev-shopping" >> $GITHUB_ENV
         run: echo "REPO_LOWERCASE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+      #    push: true
+          outputs: type=local,dest=./
+          tags: ghcr.io/scriptychris/fake-pev-shopping:latest #${{ env.REPO_LOWERCASE }}
+
       # just for debugging
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
@@ -40,9 +47,3 @@ jobs:
         run: >
           docker tag fake-pev-shopping ghcr.io/scriptychris/fake-pev-shopping:latest && 
           docker push ghcr.io/scriptychris/fake-pev-shopping:latest
-
-      #- name: Build and push
-      #  uses: docker/build-push-action@v2
-      #  with:
-      #    push: true
-      #    tags: ghcr.io/scriptychris/fake-pev-shopping:latest #${{ env.REPO_LOWERCASE }}
