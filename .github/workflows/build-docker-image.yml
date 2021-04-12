@@ -33,7 +33,7 @@ jobs:
         run: echo "REPO_LOWERCASE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
       
       - name: Manually push docker image to registry
-        run: docker push ghcr.io/scriptychris/fake-pev-shopping:latest
+        run: docker push fake-pev-shopping:latest
 
       #- name: Build and push
       #  uses: docker/build-push-action@v2
