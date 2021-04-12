@@ -10,7 +10,6 @@ const MODELS = {
 };
 
 export type IModel = IProduct | IUser | IUserRole;
-export type TModels = typeof MODELS;
 export type TModelType = keyof typeof MODELS;
 export type TGenericModel = Model<IModel>;
 

@@ -6,10 +6,15 @@ import getLogger from '../../utils/logger';
 import glob from 'glob';
 // @ts-ignore
 import bodyParser from 'body-parser';
+import { resolve, sep } from 'path';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
+import * as dotenv from 'dotenv';
+
+// @ts-ignore
+dotenv.default.config();
 
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
@@ -33,18 +38,31 @@ const middleware = (app: Application): void => {
   });
 };
 
-// TODO: refactor to use ENV
 if (process.env.BACKEND_ONLY === 'true') {
-  const app: Application = Express();
-  const port = 3000;
-
-  middleware(app);
-  app.listen(port, () => {
-    logger.log(`Server is listening on port ${port}`);
-  });
+  wrappedMiddleware();
 }
 
 export default middleware;
+
+function wrappedMiddleware(): void {
+  const app: Application = Express();
+
+  handleStaticFileRequests(app);
+
+  middleware(app);
+  app.listen(process.env.PORT, () => {
+    logger.log(`Server is listening on port ${process.env.PORT}`);
+  });
+}
+
+function handleStaticFileRequests(app: Application): void {
+  const relativeDist = __dirname.includes(`${sep}dist${sep}`) ? '' : 'dist/';
+  const path = `../../${relativeDist}src/frontend`;
+
+  const root = resolve(__dirname, path);
+
+  app.use(Express.static(root));
+}
 
 // TODO: change string type to probably ArrayBuffer
 const getImage = (() => {

@@ -1,0 +1,6 @@
+[
+	{
+		"matcher": "(Parts)- (\\w+)",
+		"replacer": "$1|$2"
+	}
+]

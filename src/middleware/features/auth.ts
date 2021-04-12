@@ -2,6 +2,10 @@ import getLogger from '../../../utils/logger';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import * as dotenv from 'dotenv';
+
+// @ts-ignore
+dotenv.default.config();
 
 const {
   // @ts-ignore
@@ -13,8 +17,6 @@ const {
 } = jwt;
 const logger = getLogger(module.filename);
 const SALT_ROUNDS = 8;
-// TODO: move to ENV
-const SECRET_KEY = 'secret-key';
 
 type TToken = { _id: number };
 
@@ -27,11 +29,11 @@ const hashPassword = (password: string): Promise<string> => {
 };
 
 const getToken = (payloadObj: TToken): string => {
-  return sign(payloadObj, SECRET_KEY);
+  return sign(payloadObj, process.env.SECRET_KEY);
 };
 
 const verifyToken = (token: string): TToken => {
-  return verify(token, SECRET_KEY) as TToken;
+  return verify(token, process.env.SECRET_KEY) as TToken;
 };
 
 const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ any): ((...args: any) => Promise<void>) => {

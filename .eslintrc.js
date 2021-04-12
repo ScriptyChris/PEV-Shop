@@ -1,4 +1,3 @@
-// TODO: refactor to use ENV
 const isBackendOnly = process.env.BACKEND_ONLY === 'true';
 const isTestEnv = process.env.TEST_ENV === 'true';
 
