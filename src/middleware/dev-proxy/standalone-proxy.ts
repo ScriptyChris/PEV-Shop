@@ -1,7 +1,8 @@
 // @ts-ignore
 import Express from 'express';
 import { Application } from 'express';
-import proxy from 'http-proxy-middleware';
+// @ts-ignore
+import proxy from '../../../../node_modules/webpack-dev-server/node_modules/http-proxy-middleware';
 import getLogger from '../../../utils/logger';
 
 const logger = getLogger(module.filename);

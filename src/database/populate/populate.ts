@@ -40,10 +40,7 @@ logger.log('? envVar:', envVar, ' /__dirname:', __dirname, ' /INIT_CWD:', proces
         logger.log(`Cleaning done - removed ${removedProducts.deletedCount} products.`);
     }
 
-    debugger;
-
     const sourceDataList = await getSourceData();
-    // logger.log('sourceDataList:', sourceDataList);
 
     await populateProducts(Product, sourceDataList);
 
