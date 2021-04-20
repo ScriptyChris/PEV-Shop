@@ -11,5 +11,5 @@ const url = process.argv[3] || '/dev-proxy';
 const target = process.argv[4] || 'https://secure.snd.payu.com/api/v2_1/orders';
 const app: Application = Express();
 
-app.use(proxy(url, { target }));
+app.use(proxy(url, { target, changeOrigin: true }));
 app.listen(port, () => logger.log('Proxy server is listening on port:', port));

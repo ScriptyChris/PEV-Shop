@@ -11,6 +11,7 @@ import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
+import apiOrders from './routes/api-orders';
 import * as dotenv from 'dotenv';
 
 // @ts-ignore
@@ -21,7 +22,7 @@ const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
 const middleware = (app: Application): void => {
   app.use(bodyParser.json());
-  app.use(apiProducts, apiProductCategories, apiUsers, apiUserRoles);
+  app.use(apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
 
   app.get('/images/*', (req, res) => {
     const imagePath = req.url.split('/').pop() as string;
