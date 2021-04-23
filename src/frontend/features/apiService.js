@@ -60,7 +60,7 @@ class Ajax {
       body: JSON.stringify(data || {}),
     })
       .then((response) => {
-        console.warn('POST response headers', response.headers);
+        console.warn('POST response headers', ...response.headers);
 
         return response.json();
       })
@@ -81,6 +81,7 @@ const apiService = new (class ApiService extends Ajax {
     this.PRODUCTS_URL = 'products';
     this.PRODUCT_CATEGORIES_URL = 'productCategories';
     this.USERS_URL = 'users';
+    this.ORDERS_URL = 'orders';
   }
 
   addProduct(product) {
@@ -117,6 +118,10 @@ const apiService = new (class ApiService extends Ajax {
   getUser() {
     const userId = '5f5a8dce154f830fd840dc7b';
     return this.getRequest(`${this.USERS_URL}/${userId}`, true);
+  }
+
+  submitCart(cart) {
+    return this.postRequest(this.ORDERS_URL, { products: cart });
   }
 
   loginUser(credentials) {

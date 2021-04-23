@@ -41,7 +41,7 @@ router.get('/api/productCategories', getProductCategoriesHierarchy);
 export default router;
 
 async function getProductCategoriesHierarchy(req: Request, res: Response): Promise<void> {
-  logger.log('[productCategories GET] req.param:', req.param);
+  logger.log('[productCategories GET] req.params:', req.params);
 
   try {
     const productCategories = (await getFromDB('category', 'Product', { isDistinct: true })) as string[];

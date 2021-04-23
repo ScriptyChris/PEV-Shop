@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import appStore from '../../features/appStore';
 import { getUserCartStateFromStorage, saveUserCartStateToStorage } from '../../features/storageApi';
+import apiService from '../../features/apiService';
 
 export default observer(function Cart() {
   const [cartVisibility, updateCartVisibility] = useState(false);
@@ -13,6 +14,7 @@ export default observer(function Cart() {
     productPriceHeader: 'Price',
     lackOfProducts: 'No products yet...',
     productsTotals: 'Totals',
+    submitCart: 'Submit cart',
     cleanupCart: 'Cleanup cart',
   };
 
@@ -34,6 +36,17 @@ export default observer(function Cart() {
 
   const handleCartCleanup = () => {
     appStore.clearUserCartState();
+  };
+
+  const handleCartSubmission = () => {
+    apiService
+      .submitCart(appStore.userCartProducts)
+      .then(({ redirectUri }) => {
+        appStore.clearUserCartState();
+        window.location = redirectUri;
+      })
+      // TODO: handle error in better way
+      .catch((error) => console.error('submitCart error:', error));
   };
 
   return (
@@ -83,6 +96,9 @@ export default observer(function Cart() {
 
         <button className="cart-cleanup-button" onClick={handleCartCleanup}>
           {translations.cleanupCart}
+        </button>
+        <button className="cart-submit-button" onClick={handleCartSubmission}>
+          {translations.submitCart}
         </button>
       </section>
     </>

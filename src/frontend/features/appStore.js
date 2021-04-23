@@ -26,8 +26,7 @@ class AppStore {
   }
 
   updateUserCartState(userCartState) {
-    // TODO: improve converting price to number
-    this._userCartState.totalPrice += Number(userCartState.price.replace(/\D/g, ''));
+    this._userCartState.totalPrice += userCartState.price;
 
     const productIndexInCart = this._userCartState.products.findIndex(
       (productItem) => productItem.name === userCartState.name

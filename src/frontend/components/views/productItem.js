@@ -11,10 +11,10 @@ export default function ProductItem({ product }) {
     detailsBtn: 'Check details!',
     addToCart: 'Add to cart!',
   };
-  const { name, price, url } = product;
+  const { name, price, url, _id } = product;
 
   const handleAddToCartClick = () => {
-    appStore.updateUserCartState({ name, price });
+    appStore.updateUserCartState({ name, price, _id });
   };
 
   return (
