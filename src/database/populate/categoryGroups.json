@@ -1,6 +1,6 @@
 [
-	{
-		"matcher": "(Parts)- (\\w+)",
-		"replacer": "$1|$2"
-	}
+  {
+    "matcher": "(Parts)- (\\w+)",
+    "replacer": "$1|$2"
+  }
 ]
