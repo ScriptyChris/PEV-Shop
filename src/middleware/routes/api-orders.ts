@@ -1,9 +1,11 @@
 import getLogger from '../../../utils/logger';
 import { Request, Response } from 'express';
 import * as expressModule from 'express';
-import fetch, { FetchError, RequestInit, Response as FetchResponse } from 'node-fetch';
+import fetch, { FetchError, RequestInit, Response as FetchResponse, ResponseType } from 'node-fetch';
 import { getFromDB } from '../../database/database-index';
-import { IProductInOrder } from '../../types';
+import { authToPayU as getToken } from '../features/auth';
+import { IPayByLinkMethod, IProductInOrder } from '../../types';
+import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '../helpers/payu-api';
 
 const {
   // @ts-ignore
@@ -42,69 +44,42 @@ router.post('/api/orders', async (req: Request, res: Response) => {
   );
   logger.log('products:', products);
 
-  const url = process.env.NODE_ENV === 'development' ? PAYMENT_URL.VPS : PAYMENT_URL.PAY_U;
+  const token: string | Error = await getToken();
+  if (typeof token !== 'string') {
+    // TODO: improve error handling
+    const payload = {
+      errorMsg: 'Server failed to auth to PayU API...',
+      error: token,
+    };
+    res.status(511).json({ payload });
+  }
+
+  const [minPrice, maxPrice] = getMinAndMaxPrice(products);
+  const payMethod: Partial<IPayByLinkMethod> = await getOrderPaymentMethod(token as string, minPrice, maxPrice);
+  logger.log('PayU order /minPrice:', minPrice, ' /maxPrice:', maxPrice, ' /payMethod:', payMethod);
+
+  const PAYU_PAYMENT_URL = process.env.NODE_ENV === 'development' ? PAYMENT_URL.VPS : PAYMENT_URL.PAY_U;
   const requestOptions = {
     method: 'POST',
     redirect: 'manual',
-    headers: getHeaders(),
-    body: JSON.stringify(getBody(products)),
+    headers: getOrderHeaders(token as string),
+    body: JSON.stringify(getOrderBody(products, payMethod)),
   };
 
-  fetch(url, requestOptions as RequestInit)
+  logger.log('PayU order /PAYU_PAYMENT_URL:', PAYU_PAYMENT_URL, ' /requestOptions:', requestOptions);
+
+  fetch(PAYU_PAYMENT_URL, requestOptions as RequestInit)
     .then(async (response: FetchResponse) => {
       const resValue = await response.json();
-      logger.log('PayU response:', resValue);
+      logger.log('PayU order response:', resValue, ' /status:', response.status, ' /statusText:', response.statusText);
 
       res.status(response.status).json({ payload: resValue });
     })
     .catch((error: FetchError) => {
-      logger.error('PayU error:', error);
+      logger.error('PayU order error:', error);
 
-      res.send(error);
+      res.status(500).json(error);
     });
 });
 
 export default router;
-
-function getTotalPrice(products: IProductInOrder[]) {
-  return products.reduce((sum: number, { unitPrice, quantity }) => sum + unitPrice * quantity, 0);
-}
-
-function getBody(products: IProductInOrder[]) {
-  return {
-    // notifyUrl: 'http://127.0.0.1:3000',
-    customerIp: '127.0.0.1',
-    continueUrl: 'http://127.0.0.1:3000/',
-    merchantPosId: '300746',
-    description: 'RTV market',
-    currencyCode: 'PLN',
-    totalAmount: getTotalPrice(products), //'21000',
-    buyer: {
-      email: 'john.doe@example.com',
-      phone: '654111654',
-      firstName: 'John',
-      lastName: 'Doe',
-      language: 'pl',
-    },
-    products /*: [
-      {
-        name: 'Wireless Mouse for Laptop',
-        unitPrice: '15000',
-        quantity: '1',
-      },
-      {
-        name: 'HDMI cable',
-        unitPrice: '6000',
-        quantity: '1',
-      },
-    ]*/,
-  };
-}
-
-function getHeaders() {
-  return {
-    Content: 'application/json',
-    Authorization: 'Bearer d9a4536e-62ba-4f60-8017-6053211d3f47',
-    'Content-Type': 'application/json',
-  };
-}

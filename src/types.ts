@@ -5,3 +5,12 @@ export interface IProductInOrder {
     unitPrice: number;
     quantity: number;
 }
+
+export interface IPayByLinkMethod {
+    type?: 'PBL' | 'PAYMENT_WALL',
+    value: string,
+    name: string,
+    status: 'ENABLED' | 'DISABLED' | 'TEMPORARY_DISABLED',
+    minAmount: number,
+    maxAmount: number,
+}
