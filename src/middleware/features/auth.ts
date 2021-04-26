@@ -89,47 +89,49 @@ const userRoleMiddlewareFn = (roleName: string): any => {
 const authToPayU: () => Promise<string | Error> = (() => {
   const clientId: string = process.env.CLIENT_ID || /* PayU default */ '300746';
   const clientSecret: string = process.env.CLIENT_SECRET || /* PayU default */ '2ee86a66e5d97e3fadc400c9f19b065d';
-  const PAYU_AUTH_URL: string = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
+  const PAYU_AUTH_URL = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
   const options: RequestInit = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`
+    body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
   };
 
   interface IPayUToken {
-    access_token: string
-    token_type: 'bearer'
-    expires_in: number
-    grant_type: 'client_credentials'
+    access_token: string;
+    token_type: 'bearer';
+    expires_in: number;
+    grant_type: 'client_credentials';
   }
   let token: IPayUToken | null = null;
-  let tokenReceiveTimeInSec: number = 0;
+  let tokenReceiveTimeInSec = 0;
 
   return function getToken(): Promise<string | Error> {
     if (isTokenValid()) {
-      return Promise.resolve((token as unknown as IPayUToken).access_token);
+      return Promise.resolve(((token as unknown) as IPayUToken).access_token);
     }
 
     logger.log('authToPayU /PAYU_AUTH_URL:', PAYU_AUTH_URL, ' /options:', options);
 
-    return fetch(PAYU_AUTH_URL, options)
-      .then((response: FetchResponse) => response.json())
-      .then((response: IPayUToken) => {
-        token = response;
-        tokenReceiveTimeInSec = getCurrentTimeInSec();
+    return (
+      fetch(PAYU_AUTH_URL, options)
+        .then((response: FetchResponse) => response.json())
+        .then((response: IPayUToken) => {
+          token = response;
+          tokenReceiveTimeInSec = getCurrentTimeInSec();
 
-        logger.log('PayU auth token:', token);
+          logger.log('PayU auth token:', token);
 
-        return token.access_token;
-      })
-      // TODO: handle error in a better way
-      .catch((error: Error) => {
-        logger.error('PayU token fetching error:', error);
+          return token.access_token;
+        })
+        // TODO: handle error in a better way
+        .catch((error: Error) => {
+          logger.error('PayU token fetching error:', error);
 
-        return error;
-      });
+          return error;
+        })
+    );
   };
 
   function isTokenValid(): boolean {

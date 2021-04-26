@@ -58,7 +58,7 @@ router.post('/api/orders', async (req: Request, res: Response) => {
   const payMethod: Partial<IPayByLinkMethod> = await getOrderPaymentMethod(token as string, minPrice, maxPrice);
   logger.log('PayU order /minPrice:', minPrice, ' /maxPrice:', maxPrice, ' /payMethod:', payMethod);
 
-  const PAYU_PAYMENT_URL = process.env.NODE_ENV === 'development' ? PAYMENT_URL.VPS : PAYMENT_URL.PAY_U;
+  const PAYU_PAYMENT_URL: string = process.env.NODE_ENV === 'development' ? PAYMENT_URL.VPS : PAYMENT_URL.PAY_U;
   const requestOptions = {
     method: 'POST',
     redirect: 'manual',
