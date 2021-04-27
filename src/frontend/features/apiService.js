@@ -54,23 +54,26 @@ class Ajax {
       headers.append('Authorization', this._getAuthHeader());
     }
 
-    return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data || {}),
-    })
-      .then((response) => {
-        console.warn('POST response headers', ...response.headers);
-
-        return response.json();
+    return (
+      fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data || {}),
       })
-      .then((body) => {
-        if (body.token) {
-          this._AUTH_TOKEN = body.token;
-        }
+        .then((response) => {
+          console.warn('POST response headers', ...response.headers);
 
-        return body.payload;
-      });
+          return response.json();
+        })
+        // TODO: handle error cases (like 401)
+        .then((body) => {
+          if (body.token) {
+            this._AUTH_TOKEN = body.token;
+          }
+
+          return body.payload;
+        })
+    );
   }
 }
 

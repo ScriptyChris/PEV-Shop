@@ -1,7 +1,7 @@
 import getLogger from '../../../utils/logger';
 import { Request, Response } from 'express';
 import * as expressModule from 'express';
-import fetch, { FetchError, RequestInit, Response as FetchResponse, ResponseType } from 'node-fetch';
+import fetch, { FetchError, RequestInit, Response as FetchResponse } from 'node-fetch';
 import { getFromDB } from '../../database/database-index';
 import { authToPayU as getToken } from '../features/auth';
 import { IPayByLinkMethod, IProductInOrder } from '../../types';

@@ -4,6 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
 import fetch, { FetchError, RequestInit, Response as FetchResponse } from 'node-fetch';
+import { PAYU_DEFAULTS } from '../helpers/payu-api';
 
 // @ts-ignore
 dotenv.default.config();
@@ -87,8 +88,8 @@ const userRoleMiddlewareFn = (roleName: string): any => {
 };
 
 const authToPayU: () => Promise<string | Error> = (() => {
-  const clientId: string = process.env.CLIENT_ID || /* PayU default */ '300746';
-  const clientSecret: string = process.env.CLIENT_SECRET || /* PayU default */ '2ee86a66e5d97e3fadc400c9f19b065d';
+  const clientId: string = process.env.CLIENT_ID || PAYU_DEFAULTS.CLIENT_ID;
+  const clientSecret: string = process.env.CLIENT_SECRET || PAYU_DEFAULTS.CLIENT_SECRET;
   const PAYU_AUTH_URL = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
   const options: RequestInit = {
     method: 'POST',

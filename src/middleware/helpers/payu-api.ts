@@ -31,16 +31,23 @@ function getTotalPrice(products: IProductInOrder[]) {
   return products.reduce((sum: number, { unitPrice, quantity }) => sum + unitPrice * quantity, 0);
 }
 
+export enum PAYU_DEFAULTS {
+  CLIENT_ID = '300746',
+  CLIENT_SECRET = '2ee86a66e5d97e3fadc400c9f19b065d',
+}
+
 export function getOrderBody(products: IProductInOrder[], payMethod: Partial<IPayByLinkMethod>) {
+  const host: string = process.env.NODE_ENV === 'development' ? '127.0.0.1' : 'pev-demo.store';
+
   return {
     // notifyUrl: 'http://127.0.0.1:3000',
     customerIp: '127.0.0.1',
-    continueUrl: 'http://127.0.0.1:3000/',
-    merchantPosId: process.env.CLIENT_ID, // '300746',
-    description: 'RTV market',
+    continueUrl: `http://${host}:${process.env.PORT}/`,
+    merchantPosId: process.env.CLIENT_ID || PAYU_DEFAULTS.CLIENT_ID,
+    description: 'PEV-Shop order',
     // TODO: pass it dynamically by User's chosen currency in shop
     currencyCode: 'PLN',
-    totalAmount: getTotalPrice(products), //'21000',
+    totalAmount: getTotalPrice(products),
     payMethods: { payMethod },
     // TODO: pass User data from session
     buyer: {
@@ -57,7 +64,7 @@ export function getOrderBody(products: IProductInOrder[], payMethod: Partial<IPa
 export function getOrderHeaders(token: string) {
   return {
     Content: 'application/json',
-    Authorization: `Bearer ${token}`, //d9a4536e-62ba-4f60-8017-6053211d3f47,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
 }
