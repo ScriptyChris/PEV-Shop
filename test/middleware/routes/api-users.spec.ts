@@ -193,7 +193,7 @@ describe('#api-users', () => {
         await apiUsersRouter._logInUser({}, resMock);
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property 'login' of undefined`),
+          payload: TypeError(`Cannot read property 'login' of undefined`),
         });
 
         resMock._jsonMethod.mockClear();
@@ -204,7 +204,7 @@ describe('#api-users', () => {
         await apiUsersRouter._logInUser(getReqMock(), resMock);
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property 'matchPassword' of null`),
+          payload: TypeError(`Cannot read property 'matchPassword' of null`),
         });
 
         // third case
@@ -212,7 +212,12 @@ describe('#api-users', () => {
 
         await apiUsersRouter._logInUser(getReqMock(), resMock);
 
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception: Error(`Invalid credentials`) });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          payload: {
+            message: `Invalid credentials`,
+            status: 401,
+          },
+        });
 
         // all cases
         expect(resMock.status).toHaveBeenCalledWith(500);

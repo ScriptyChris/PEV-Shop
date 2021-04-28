@@ -7,7 +7,8 @@ const [
   { default: apiProductsCategoriesMock },
   { default: apiUsersMock },
   { default: apiUserRolesMock },
-] = ['api-products', 'api-product-categories', 'api-users', 'api-user-roles'].map((apiFileName) => {
+  { default: apiOrdersMock },
+] = ['api-products', 'api-product-categories', 'api-users', 'api-user-roles', 'api-orders'].map((apiFileName) => {
   const apiFilePath = `../../src/middleware/routes/${apiFileName}`;
 
   return jest.mock(apiFilePath).requireMock(apiFilePath);
@@ -54,7 +55,8 @@ describe('#middleware-index', () => {
       apiProductsMock,
       apiProductsCategoriesMock,
       apiUsersMock,
-      apiUserRolesMock
+      apiUserRolesMock,
+      apiOrdersMock
     );
     expect(appMock.use).toHaveBeenCalledTimes(2);
     expect(appMock.get).toHaveBeenCalledTimes(1);
