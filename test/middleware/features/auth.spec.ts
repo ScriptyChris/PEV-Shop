@@ -71,7 +71,7 @@ describe('#auth', () => {
       getToken(payloadObj);
 
       // this is auth's module private variable
-      const SECRET_KEY = 'secret-key';
+      const SECRET_KEY = 'VeRy-SeCrEt-KeY';
 
       expect(mockedJwt.sign).toHaveBeenCalledWith(payloadObj, SECRET_KEY);
     });
@@ -94,7 +94,7 @@ describe('#auth', () => {
       verifyToken(token);
 
       // this is auth's module private variable
-      const SECRET_KEY = 'secret-key';
+      const SECRET_KEY = 'VeRy-SeCrEt-KeY';
 
       expect(mockedJwt.verify).toHaveBeenCalledWith(token, SECRET_KEY);
     });

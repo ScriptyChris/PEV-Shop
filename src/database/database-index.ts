@@ -19,19 +19,23 @@ const logger = getLogger(module.filename);
   logger.log('Connection attemps:', attempts);
 
   // @ts-ignore
-  connect(process.env.DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  }, function(err: unknown) {
-    if (err && attempts < 5) {
-      // @ts-ignore
-      logger.error('Failed to connect to MongoDB by URL:', process.env.DATABASE_URL);
-      setTimeout(() => tryToConnect(attempts + 1), 2000);
-    } else if (!err) {
-      logger.log('Connected to MongoDB!');
+  connect(
+    process.env.DATABASE_URL,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    },
+    function (err: unknown) {
+      if (err && attempts < 5) {
+        // @ts-ignore
+        logger.error('Failed to connect to MongoDB by URL:', process.env.DATABASE_URL);
+        setTimeout(() => tryToConnect(attempts + 1), 2000);
+      } else if (!err) {
+        logger.log('Connected to MongoDB!');
+      }
     }
-  });
+  );
 })(1);
 
 function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string> {

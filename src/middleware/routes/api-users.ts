@@ -25,6 +25,7 @@ router._getUser = getUser;
 
 export default router;
 
+// TODO: implement updating various user data
 async function updateUser(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[POST] /users req.body', req.body);
@@ -62,7 +63,7 @@ async function logInUser(req: Request, res: Response): Promise<void> {
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      throw new Error('Invalid credentials');
+      throw { message: 'Invalid credentials', status: 401 };
     }
 
     const token = await user.generateAuthToken();
@@ -71,7 +72,7 @@ async function logInUser(req: Request, res: Response): Promise<void> {
   } catch (exception) {
     logger.error('Login user exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(exception.status || 500).json({ payload: exception });
   }
 }
 

@@ -54,23 +54,26 @@ class Ajax {
       headers.append('Authorization', this._getAuthHeader());
     }
 
-    return fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data || {}),
-    })
-      .then((response) => {
-        console.warn('POST response headers', response.headers);
-
-        return response.json();
+    return (
+      fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data || {}),
       })
-      .then((body) => {
-        if (body.token) {
-          this._AUTH_TOKEN = body.token;
-        }
+        .then((response) => {
+          console.warn('POST response headers', ...response.headers);
 
-        return body.payload;
-      });
+          return response.json();
+        })
+        // TODO: handle error cases (like 401)
+        .then((body) => {
+          if (body.token) {
+            this._AUTH_TOKEN = body.token;
+          }
+
+          return body.payload;
+        })
+    );
   }
 }
 
@@ -81,6 +84,7 @@ const apiService = new (class ApiService extends Ajax {
     this.PRODUCTS_URL = 'products';
     this.PRODUCT_CATEGORIES_URL = 'productCategories';
     this.USERS_URL = 'users';
+    this.ORDERS_URL = 'orders';
   }
 
   addProduct(product) {
@@ -117,6 +121,10 @@ const apiService = new (class ApiService extends Ajax {
   getUser() {
     const userId = '5f5a8dce154f830fd840dc7b';
     return this.getRequest(`${this.USERS_URL}/${userId}`, true);
+  }
+
+  submitCart(cart) {
+    return this.postRequest(this.ORDERS_URL, { products: cart });
   }
 
   loginUser(credentials) {

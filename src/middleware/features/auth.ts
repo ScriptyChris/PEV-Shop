@@ -3,9 +3,15 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
+import fetch, { FetchError, RequestInit, Response as FetchResponse } from 'node-fetch';
+import { PAYU_DEFAULTS } from '../helpers/payu-api';
 
 // @ts-ignore
 dotenv.default.config();
+
+if (!process.env.SECRET_KEY) {
+  process.env.SECRET_KEY = 'VeRy-SeCrEt-KeY';
+}
 
 const {
   // @ts-ignore
@@ -81,4 +87,61 @@ const userRoleMiddlewareFn = (roleName: string): any => {
   };
 };
 
-export { comparePasswords, hashPassword, getToken, verifyToken, authMiddlewareFn, userRoleMiddlewareFn };
+const authToPayU: () => Promise<string | Error> = (() => {
+  const clientId: string = process.env.CLIENT_ID || PAYU_DEFAULTS.CLIENT_ID;
+  const clientSecret: string = process.env.CLIENT_SECRET || PAYU_DEFAULTS.CLIENT_SECRET;
+  const PAYU_AUTH_URL = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
+  const options: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+  };
+
+  interface IPayUToken {
+    access_token: string;
+    token_type: 'bearer';
+    expires_in: number;
+    grant_type: 'client_credentials';
+  }
+  let token: IPayUToken | null = null;
+  let tokenReceiveTimeInSec = 0;
+
+  return function getToken(): Promise<string | Error> {
+    if (isTokenValid()) {
+      return Promise.resolve(((token as unknown) as IPayUToken).access_token);
+    }
+
+    logger.log('authToPayU /PAYU_AUTH_URL:', PAYU_AUTH_URL, ' /options:', options);
+
+    return (
+      fetch(PAYU_AUTH_URL, options)
+        .then((response: FetchResponse) => response.json())
+        .then((response: IPayUToken) => {
+          token = response;
+          tokenReceiveTimeInSec = getCurrentTimeInSec();
+
+          logger.log('PayU auth token:', token);
+
+          return token.access_token;
+        })
+        // TODO: handle error in a better way
+        .catch((error: Error) => {
+          logger.error('PayU token fetching error:', error);
+
+          return error;
+        })
+    );
+  };
+
+  function isTokenValid(): boolean {
+    return !!token && tokenReceiveTimeInSec + token.expires_in < getCurrentTimeInSec();
+  }
+
+  function getCurrentTimeInSec(): number {
+    return Math.floor(Date.now() / 1000);
+  }
+})();
+
+export { comparePasswords, hashPassword, getToken, verifyToken, authMiddlewareFn, userRoleMiddlewareFn, authToPayU };
