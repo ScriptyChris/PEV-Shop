@@ -2,16 +2,13 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import appStore from '../../features/appStore';
+import { Link } from 'react-router-dom';
 
 export const CompareProductsList = observer(function CompareProducts() {
   const translations = {
     compareProducts: 'Compare',
     removeComparableProduct: 'Remove',
     clearComparableProducts: 'Clear',
-  };
-
-  const handleCompareSelectedProducts = () => {
-    console.log('comparable click...');
   };
 
   const handleRemoveComparableProduct = (productIndex) => {
@@ -37,7 +34,7 @@ export const CompareProductsList = observer(function CompareProducts() {
         })}
       </ol>
 
-      <button onClick={handleCompareSelectedProducts}>{translations.compareProducts}</button>
+      <Link to={{ pathname: `/compare` }}> {translations.compareProducts}</Link>
       <button onClick={handleClearCompareProducts}>{translations.clearComparableProducts}</button>
     </aside>
   );
