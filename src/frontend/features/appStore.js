@@ -15,14 +15,11 @@ class AppStore {
   constructor() {
     this._userSessionState = USER_SESSION_STATES.LOGGED_OUT;
     this._userCartState = { ...USER_CART_STATE };
+    this._productComparisonState = [];
   }
 
   updateUserSessionState(userSessionState) {
     this._userSessionState = userSessionState;
-  }
-
-  getUserSessionState() {
-    return this._userSessionState;
   }
 
   updateUserCartState(userCartState) {
@@ -54,6 +51,23 @@ class AppStore {
     }
   }
 
+  updateProductComparisonState({ add, remove }) {
+    console.log('updateProductComparisonState() /add:', add, ' /remove:', remove);
+
+    if (add) {
+      this._productComparisonState.push(add);
+    } else if (typeof remove.index === 'number') {
+      this._productComparisonState.splice(remove.index, 1);
+    } else if (remove._id) {
+      const removeIndex = this._productComparisonState.findIndex((product) => product._id === remove._id);
+      this._productComparisonState.splice(removeIndex, 1);
+    }
+  }
+
+  clearProductComparisonState() {
+    this._productComparisonState.length = 0;
+  }
+
   get userCartState() {
     return this._userCartState;
   }
@@ -69,6 +83,14 @@ class AppStore {
   get userCartProductsCount() {
     return this._userCartState.totalCount;
   }
+
+  get userSessionState() {
+    return this._userSessionState;
+  }
+
+  get productComparisonState() {
+    return this._productComparisonState;
+  }
 }
 
 decorate(AppStore, {
@@ -78,6 +100,10 @@ decorate(AppStore, {
   _userCartState: observable,
   updateUserCartState: action,
   clearUserCartState: action,
+
+  _productComparisonState: observable,
+  updateProductComparisonState: action,
+  clearProductComparisonState: action,
 });
 
 const appStore = new AppStore();

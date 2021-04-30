@@ -1,0 +1,17 @@
+.compare-products {
+  width: fit-content;
+  border: 1px solid orange;
+}
+
+.compare-products__list {
+  list-style: none;
+  display: inline-flex;
+  justify-content: space-around;
+  padding: 0;
+}
+
+.compare-products__list-item {
+  display: flex;
+  flex-direction: column;
+  margin: 0 10px;
+}

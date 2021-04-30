@@ -3,6 +3,7 @@ import apiService from '../../features/apiService';
 import ProductItem from './productItem';
 import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
+import { CompareProductsList } from './compareProducts';
 
 // TODO: consider refactoring class based component to a function based one (and so use mobx-react-lite instead of mobx-react)
 export default class ProductList extends React.Component {
@@ -110,6 +111,8 @@ export default class ProductList extends React.Component {
         />
 
         <button onClick={this.filterProducts.bind(this)}>{this.translations.filterProducts}</button>
+
+        <CompareProductsList />
 
         <ul className="product-list">
           {this.state.productsList.length > 0
