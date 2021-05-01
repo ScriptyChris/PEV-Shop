@@ -45,7 +45,7 @@ export default function ProductItem({ product }) {
         {translations.detailsBtn}
       </Link>
 
-      <ComparableProductToggler productData={{ _id, name }} />
+      <ComparableProductToggler product={product} />
     </div>
   );
 }

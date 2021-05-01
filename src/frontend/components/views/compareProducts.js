@@ -20,11 +20,13 @@ export const CompareProductsList = observer(function CompareProducts() {
   };
 
   return (
-    <aside className="compare-products">
-      <ol className="compare-products__list">
+    <aside className="compare-products-candidates">
+      <ol className="compare-products-candidates__list">
         {appStore.productComparisonState.map((product, index) => {
+          console.log('product to compare...:', product);
+
           return (
-            <li key={product._id} className="compare-products__list-item">
+            <li key={product._id} className="compare-products-candidates__list-item">
               <span>{product.name}</span>
               <button onClick={() => handleRemoveComparableProduct(index)}>
                 {translations.removeComparableProduct}
@@ -40,7 +42,7 @@ export const CompareProductsList = observer(function CompareProducts() {
   );
 });
 
-export const ComparableProductToggler = observer(function ToggleProductComparable({ productData: { _id, name } }) {
+export const ComparableProductToggler = observer(function ToggleProductComparable({ product }) {
   const [isProductComparable, setIsProductComparable] = useState(false);
 
   const translations = {
@@ -48,7 +50,9 @@ export const ComparableProductToggler = observer(function ToggleProductComparabl
   };
 
   autorun(() => {
-    const isComparable = appStore.productComparisonState.some((product) => product._id === _id);
+    const isComparable = appStore.productComparisonState.some(
+      (comparableProduct) => comparableProduct._id === product._id
+    );
 
     if (isProductComparable !== isComparable) {
       setIsProductComparable(isComparable);
@@ -57,9 +61,9 @@ export const ComparableProductToggler = observer(function ToggleProductComparabl
 
   const handleComparableToggle = ({ target }) => {
     if (target.checked) {
-      appStore.updateProductComparisonState({ add: { _id, name } });
+      appStore.updateProductComparisonState({ add: product });
     } else {
-      appStore.updateProductComparisonState({ remove: { _id } });
+      appStore.updateProductComparisonState({ remove: { _id: product._id } });
     }
   };
 

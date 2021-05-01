@@ -3,9 +3,9 @@ import { useLocation } from 'react-router-dom';
 import ProductItem from './productItem';
 import apiService from '../../features/apiService';
 
-export default function ProductDetails() {
+export default function ProductDetails({ product }) {
   // TODO: fetch product data independently when page is loaded explicitly (not navigated to from other page)
-  const { state: product } = useLocation();
+  product = product || useLocation().state;
   const translations = {
     name: 'Name',
     price: 'Price',

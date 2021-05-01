@@ -1,17 +1,27 @@
-.compare-products {
+.compare-products-candidates {
   width: fit-content;
   border: 1px solid orange;
 }
 
-.compare-products__list {
+.compare-products-candidates__list {
   list-style: none;
   display: inline-flex;
   justify-content: space-around;
   padding: 0;
 }
 
-.compare-products__list-item {
+.compare-products-candidates__list-item {
   display: flex;
   flex-direction: column;
   margin: 0 10px;
+}
+
+.compare-products-list {
+  display: flex;
+  list-style: none;
+}
+
+.compare-products-list__item {
+  margin: 0 10px;
+  border: 1px solid orange;
 }
