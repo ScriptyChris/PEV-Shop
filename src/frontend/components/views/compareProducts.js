@@ -20,6 +20,7 @@ export const CompareProductsList = observer(function CompareProducts() {
   };
 
   return (
+    // TODO: shrink/collapse widget to an expandable button on mobile
     <aside className="compare-products-candidates">
       <ol className="compare-products-candidates__list">
         {appStore.productComparisonState.map((product, index) => {
@@ -36,8 +37,10 @@ export const CompareProductsList = observer(function CompareProducts() {
         })}
       </ol>
 
-      <Link to={{ pathname: `/compare` }}> {translations.compareProducts}</Link>
-      <button onClick={handleClearCompareProducts}>{translations.clearComparableProducts}</button>
+      <div className="compare-products-candidates__actions">
+        <Link to={{ pathname: `/compare` }}> {translations.compareProducts}</Link>
+        <button onClick={handleClearCompareProducts}>{translations.clearComparableProducts}</button>
+      </div>
     </aside>
   );
 });

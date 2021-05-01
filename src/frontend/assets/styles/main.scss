@@ -5,6 +5,10 @@
 @import 'views/pagination';
 @import 'views/compareProducts';
 
+html {
+  font-size: 16px;
+}
+
 .app-root {
   display: grid;
   grid-template-columns: 3fr 1fr;

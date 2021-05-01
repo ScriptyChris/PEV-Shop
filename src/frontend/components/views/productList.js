@@ -114,6 +114,7 @@ export default class ProductList extends React.Component {
 
         <CompareProductsList />
 
+        {/*TODO: implement changeable layout (tiles vs list)*/}
         <ul className="product-list">
           {this.state.productsList.length > 0
             ? this.state.productsList.map((product) => {
