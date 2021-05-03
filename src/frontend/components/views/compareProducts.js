@@ -4,7 +4,7 @@ import { autorun } from 'mobx';
 import appStore from '../../features/appStore';
 import { Link } from 'react-router-dom';
 
-export const CompareProductsList = observer(function CompareProducts() {
+const List = observer(function CompareProducts() {
   const translations = {
     compareProducts: 'Compare',
     removeComparableProduct: 'Remove',
@@ -45,7 +45,7 @@ export const CompareProductsList = observer(function CompareProducts() {
   );
 });
 
-export const ComparableProductToggler = observer(function ToggleProductComparable({ product }) {
+const Toggler = observer(function ToggleProductComparable({ product }) {
   const [isProductComparable, setIsProductComparable] = useState(false);
 
   const translations = {
@@ -77,3 +77,5 @@ export const ComparableProductToggler = observer(function ToggleProductComparabl
     </label>
   );
 });
+
+export default { List, Toggler };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import appStore from '../../features/appStore';
-import { ComparableProductToggler } from './compareProducts';
+import CompareProduct from './compareProducts';
 
 export default function ProductItem({ product }) {
   const translations = {
@@ -45,7 +45,7 @@ export default function ProductItem({ product }) {
         {translations.detailsBtn}
       </Link>
 
-      <ComparableProductToggler product={product} />
+      <CompareProduct.Toggler product={product} />
     </div>
   );
 }
