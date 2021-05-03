@@ -8,7 +8,7 @@ export default function Compare() {
     <section className="compare-products">
       <Scroller
         render={(listRef) => (
-          <ol ref={listRef} className="compare-products-list">
+          <ol ref={listRef} data-scrollable="true" className="compare-products-list">
             {appStore.productComparisonState.map((product) => {
               return (
                 <li key={product._id} className="compare-products-list__item">

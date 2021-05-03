@@ -44,7 +44,7 @@ export default function ProductDetails({ product }) {
   const getShortDescriptionContent = () => {
     return (
       <>
-        <ul>
+        <ul className="compare-products-list__item-short-description">
           {product.shortDescription.map((description, index) => {
             return <li key={`short-description-${index}`}>{description}</li>;
           })}
