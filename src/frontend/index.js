@@ -1,5 +1,7 @@
 import './assets/styles/main.scss';
 
+import 'react-hot-loader';
+import { hot } from 'react-hot-loader/root';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -18,4 +20,4 @@ const App = (
   </>
 );
 
-ReactDOM.render(App, document.querySelector('#app'));
+hot(ReactDOM.render(App, document.querySelector('#app')));
