@@ -1,24 +1,36 @@
 import React from 'react';
 import appStore from '../../features/appStore';
-import ProductDetails from '../views/productDetails';
-import Scroller from '../utils/scroller';
+import { getProductDetailsData, prepareSpecificProductDetail, getProductDetailsHeaders } from '../views/productDetails';
+// import Scroller from '../utils/scroller';
 
 export default function Compare() {
+  const productDetailsHeaders = getProductDetailsHeaders();
+  const productDetailsHeadersKeys = Object.keys(productDetailsHeaders).filter((header) => header !== 'relatedProducts');
+  const comparableProductsData = appStore.productComparisonState.map((product) => getProductDetailsData(product));
+
   return (
     <section className="compare-products">
-      <Scroller
-        render={(listRef) => (
-          <ol ref={listRef} data-scrollable="true" className="compare-products-list">
-            {appStore.productComparisonState.map((product) => {
-              return (
-                <li key={product._id} className="compare-products-list__item">
-                  <ProductDetails product={product} />
-                </li>
-              );
-            })}
-          </ol>
-        )}
-      />
+      {/*<Scroller*/}
+      {/*  render={(listRef) => (*/}
+      {/*    <>*/}
+      <table>
+        <thead>
+          {productDetailsHeadersKeys.map((detailHeader, index) => (
+            <tr key={`header-row-${index}`}>
+              <th>{productDetailsHeaders[detailHeader]}</th>
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {productDetailsHeadersKeys.map((detailHeader, index) => (
+            <tr key={`body-row-${index}`}>
+              {comparableProductsData.map((productData, i) => (
+                <td key={`cell-${i}`}>{prepareSpecificProductDetail(detailHeader, productData[detailHeader])}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </section>
   );
 }
