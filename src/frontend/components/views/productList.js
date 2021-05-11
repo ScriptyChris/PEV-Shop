@@ -30,8 +30,12 @@ export default class ProductList extends React.Component {
       // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
       currentProductsPerPageLimit: this.productsPerPageLimits[0],
     };
+  }
 
-    this.updateProductsList().then();
+  componentDidMount() {
+    this.updateProductsList().catch((updateProductsListError) => {
+      console.error('updateProductsListError:', updateProductsListError);
+    });
   }
 
   shouldComponentUpdate(_, nextState) {
