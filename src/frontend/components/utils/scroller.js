@@ -13,8 +13,8 @@ function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, te
   );
 }
 
-export default function Scroller({ render }) {
-  const [listRef, setListRef] = useState(createRef());
+export default function Scroller({ render, forwardProps }) {
+  const [elementRef] = useState(createRef());
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
   const [rightBtnDisabled, setRightBtnDisabled] = useState(false);
@@ -26,42 +26,37 @@ export default function Scroller({ render }) {
   const SCROLL_DIRECTION = { LEFT: 1, RIGHT: -1 };
 
   useEffect(() => {
-    checkIfElementOverflows(true);
     window.addEventListener('resize', checkIfElementOverflows);
-    listRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
+    elementRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
+    elementRef.current.dataset.scrollable = 'true';
+
+    checkIfElementOverflows();
 
     return () => {
       window.removeEventListener('resize', checkIfElementOverflows);
-      listRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
+      elementRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
     };
   }, []);
 
-  useEffect(() => {
-    if (!listRef.current) {
-      setListRef(createRef());
-    }
-  });
-
-  const checkIfElementOverflows = (ignoreHandlingOffset) => {
-    const target = listRef.current.parentNode;
+  const checkIfElementOverflows = (resizeEvent) => {
+    const target = elementRef.current.parentNode;
     const doesElementOverflow = target.clientWidth < target.scrollWidth;
 
     scrollToDirection(null, SCROLL_VARIABLE.LEFT_EDGE);
-    toggleScrollButtons(doesElementOverflow, ignoreHandlingOffset);
+    toggleScrollButtons(doesElementOverflow, resizeEvent);
   };
 
-  const toggleScrollButtons = (showScrollingButtons, ignoreHandlingOffset) => {
+  const toggleScrollButtons = (showScrollingButtons, resizeEvent) => {
     setScrollingBtnVisible(showScrollingButtons);
 
-    if (!ignoreHandlingOffset) {
+    if (resizeEvent) {
       handleElementToParentOffsetChange();
     }
   };
 
   const handleElementToParentOffsetChange = () => {
-    const elementRef = listRef.current;
-    const { left: elementLeftOffset, right: elementRightOffset } = elementRef.getBoundingClientRect();
-    const { left: parentLeftOffset, right: parentRightOffset } = elementRef.parentNode.getBoundingClientRect();
+    const { left: elementLeftOffset, right: elementRightOffset } = elementRef.current.getBoundingClientRect();
+    const { left: parentLeftOffset, right: parentRightOffset } = elementRef.current.parentNode.getBoundingClientRect();
     const leftOffsetGreaterThanParent = Math.round(elementLeftOffset) >= Math.round(parentLeftOffset);
     const rightOffsetLessThanParent = Math.round(elementRightOffset) <= Math.round(parentRightOffset);
 
@@ -71,18 +66,18 @@ export default function Scroller({ render }) {
     if (leftOffsetGreaterThanParent) {
       scrollToDirection(null, SCROLL_VARIABLE.LEFT_EDGE);
     } else if (rightOffsetLessThanParent) {
-      const rightEdge = elementRef.parentNode.offsetWidth - elementRef.offsetWidth;
+      const rightEdge = elementRef.current.parentNode.offsetWidth - elementRef.current.offsetWidth;
       scrollToDirection(null, rightEdge);
     }
   };
 
   const scrollToDirection = (direction, value) => {
-    const oldScrollValue = Number(listRef.current.style.getPropertyValue(SCROLL_VARIABLE.NAME));
+    const oldScrollValue = Number(elementRef.current.style.getPropertyValue(SCROLL_VARIABLE.NAME));
     const newScrollValue = oldScrollValue + SCROLL_VARIABLE.BASE_VALUE * direction;
 
     const scrollValue = direction === null ? value : newScrollValue;
 
-    listRef.current.style.setProperty(SCROLL_VARIABLE.NAME, scrollValue);
+    elementRef.current.style.setProperty(SCROLL_VARIABLE.NAME, scrollValue);
   };
 
   return (
@@ -94,7 +89,7 @@ export default function Scroller({ render }) {
         text={'&larr;'}
         handleClick={scrollToDirection}
       />
-      <div className="scrollable">{render(listRef)}</div>
+      <div>{render(elementRef, forwardProps)}</div>
       <ScrollButton
         directionPointer={SCROLL_DIRECTION.RIGHT}
         isVisible={scrollingBtnVisible}

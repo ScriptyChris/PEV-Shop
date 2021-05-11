@@ -1,8 +1,10 @@
-.scrollable {
+.scrollable-parent {
   overflow: hidden;
   width: 100%;
   height: 100%;
   position: relative;
+
+  margin-left: 100px;
 
   [data-scrollable] {
     position: absolute;
@@ -25,7 +27,7 @@
   border-radius: 50px;
   color: orange;
 
-  &:hover {
+  &:not([disabled]):hover {
     cursor: pointer;
   }
 
