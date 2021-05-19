@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { createRef, useCallback, useEffect, useRef, useState } from 'react';
 
 function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, text }) {
   return (
@@ -18,6 +18,8 @@ export default function Scroller({ render, forwardProps }) {
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
   const [rightBtnDisabled, setRightBtnDisabled] = useState(false);
+  const resizedObservedRefs = useRef([]);
+
   const SCROLL_VARIABLE = {
     NAME: '--scrollValue',
     BASE_VALUE: 15,
@@ -30,12 +32,24 @@ export default function Scroller({ render, forwardProps }) {
     elementRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
     elementRef.current.dataset.scrollable = 'true';
 
+    console.warn('resizedObservedRefs:', resizedObservedRefs);
+
     checkIfElementOverflows();
 
     return () => {
       window.removeEventListener('resize', checkIfElementOverflows);
       elementRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
     };
+  }, []);
+
+  const resizedObservedRef = useCallback((ref) => {
+    // const refIndex = [...ref.parentNode.children].findIndex(child => child === ref);
+    resizedObservedRefs.current = resizedObservedRefs.current.concat({
+      body: ref,
+      header: null,
+    });
+
+    return ref;
   }, []);
 
   const checkIfElementOverflows = (resizeEvent) => {
@@ -89,7 +103,7 @@ export default function Scroller({ render, forwardProps }) {
         text={'&larr;'}
         handleClick={scrollToDirection}
       />
-      <div>{render(elementRef, forwardProps)}</div>
+      {render({ elementRef, forwardProps, resizedObservedRef })}
       <ScrollButton
         directionPointer={SCROLL_DIRECTION.RIGHT}
         isVisible={scrollingBtnVisible}

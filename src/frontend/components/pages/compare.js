@@ -11,37 +11,42 @@ export default function Compare() {
 
   useEffect(() => {
     tableRef.current.style.setProperty('--compare-rows-number', productDetailsHeadersKeys.length);
+    tableRef.current.style.setProperty('--compare-columns-number', Object.keys(comparableProductsData).length);
   }, []);
 
   return (
     <section className="compare-products">
-      <Scroller
-        forwardProps={{ productDetailsHeadersKeys, tableRef }}
-        render={(elementRef, { tableRef }) => {
-          // console.warn('[render] elementRef:', elementRef, ' /curr:', elementRef.current);
+      <div ref={tableRef} className="compare-products__table">
+        <div className="compare-products__head">
+          {productDetailsHeadersKeys.map((detailHeader, index) => (
+            <div className="compare-products__cell" key={`header-row-${index}`}>
+              {productDetailsHeaders[detailHeader]}
+            </div>
+          ))}
+        </div>
+        <Scroller
+          forwardProps={{ productDetailsHeadersKeys }}
+          render={({ elementRef, resizedObservedRef }) => {
+            // console.warn('[render] elementRef:', elementRef, ' /curr:', elementRef.current);
 
-          return (
-            <table ref={tableRef} className="compare-products__table scrollable-parent">
-              <thead>
-                {productDetailsHeadersKeys.map((detailHeader, index) => (
-                  <tr key={`header-row-${index}`}>
-                    <th>{productDetailsHeaders[detailHeader]}</th>
-                  </tr>
-                ))}
-              </thead>
-              <tbody ref={elementRef}>
-                {productDetailsHeadersKeys.map((detailHeader, index) => (
-                  <tr key={`body-row-${index}`}>
-                    {comparableProductsData.map((productData, i) => (
-                      <td key={`cell-${i}`}>{prepareSpecificProductDetail(detailHeader, productData[detailHeader])}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          );
-        }}
-      />
+            return (
+              <div className="scrollable-parent">
+                <div className="compare-products__body" ref={elementRef}>
+                  {productDetailsHeadersKeys.map((detailHeader, headerIndex) => (
+                    <div className="compare-products__row" ref={resizedObservedRef} key={`body-row-${headerIndex}`}>
+                      {comparableProductsData.map((productData, dataIndex) => (
+                        <div className="compare-products__cell" key={`cell-${dataIndex}`}>
+                          {prepareSpecificProductDetail(detailHeader, productData[detailHeader])}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }}
+        />
+      </div>
     </section>
   );
 }
