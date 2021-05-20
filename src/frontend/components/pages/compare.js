@@ -30,9 +30,41 @@ export default function Compare() {
     []
   );
 
-  useEffect(() => {
-    setTableStylingCSSVariables();
-  }, []);
+  const getTableHeadContent = (resizedObservedHeadRef) =>
+    function TableHeadContent(detailHeader, headerIndex) {
+      return (
+        <div
+          className={`${getClassForNameHeader(headerIndex)}`}
+          ref={resizedObservedHeadRef}
+          role="row"
+          key={`header-row-${headerIndex}`}
+        >
+          <span className="compare-products__cell" role="cell">
+            {headerIndex === 0 ? getProductsAmountText() : productDetailsHeaders[detailHeader]}
+          </span>
+        </div>
+      );
+    };
+
+  const getTableBodyContent = (resizedObservedBodyRef) =>
+    function TableBodyContent(detailHeader, headerIndex) {
+      return (
+        <div
+          className={`compare-products__row ${getClassForNameHeader(headerIndex)}`}
+          ref={resizedObservedBodyRef}
+          role="row"
+          key={`body-row-${headerIndex}`}
+        >
+          {comparableProductsData.map((productData, dataIndex) => (
+            <div className="compare-products__cell" role="cell" key={`cell-${dataIndex}`}>
+              {prepareSpecificProductDetail(detailHeader, productData[detailHeader])}
+            </div>
+          ))}
+        </div>
+      );
+    };
+
+  useEffect(setTableStylingCSSVariables, []);
 
   return (
     <section className="compare-products">
@@ -42,36 +74,12 @@ export default function Compare() {
           render={({ elementRef, resizedObservedHeadRef, resizedObservedBodyRef }) => (
             <>
               <div className="compare-products__head" role="rowgroup">
-                {productDetailsHeadersKeys.map((detailHeader, headerIndex) => (
-                  <div
-                    className={`${getClassForNameHeader(headerIndex)}`}
-                    ref={resizedObservedHeadRef}
-                    role="row"
-                    key={`header-row-${headerIndex}`}
-                  >
-                    <span className="compare-products__cell" role="cell">
-                      {headerIndex === 0 ? getProductsAmountText() : productDetailsHeaders[detailHeader]}
-                    </span>
-                  </div>
-                ))}
+                {productDetailsHeadersKeys.map(getTableHeadContent(resizedObservedHeadRef))}
               </div>
 
-              <div className="scrollable-parent">
+              <div>
                 <div className="compare-products__body" ref={elementRef} role="rowgroup">
-                  {productDetailsHeadersKeys.map((detailHeader, headerIndex) => (
-                    <div
-                      className={`compare-products__row ${getClassForNameHeader(headerIndex)}`}
-                      ref={resizedObservedBodyRef}
-                      role="row"
-                      key={`body-row-${headerIndex}`}
-                    >
-                      {comparableProductsData.map((productData, dataIndex) => (
-                        <div className="compare-products__cell" role="cell" key={`cell-${dataIndex}`}>
-                          {prepareSpecificProductDetail(detailHeader, productData[detailHeader])}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
+                  {productDetailsHeadersKeys.map(getTableBodyContent(resizedObservedBodyRef))}
                 </div>
               </div>
             </>

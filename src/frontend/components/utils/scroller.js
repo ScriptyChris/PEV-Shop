@@ -37,6 +37,7 @@ export default function Scroller({ render, forwardProps }) {
     window.addEventListener('resize', checkIfElementOverflows);
     elementRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
     elementRef.current.dataset.scrollable = 'true';
+    elementRef.current.parentNode.dataset.scrollableParent = 'true';
 
     setupResizeObserver();
     checkIfElementOverflows();
@@ -48,26 +49,28 @@ export default function Scroller({ render, forwardProps }) {
     };
   }, []);
 
-  const createRefGetter = (type) => {
-    return (ref) => {
+  const createRefGetter = (refType) => {
+    return function refGetter(ref) {
       if (!ref) {
         return null;
       }
 
-      if (type === REF_TYPE.HEAD) {
-        if (!headRefs.current.some((hRef) => hRef === ref)) {
-          headRefs.current = headRefs.current.concat(ref);
-        }
-      } else if (type === REF_TYPE.BODY) {
-        if (!bodyRefs.current.some((bRef) => bRef === ref)) {
-          bodyRefs.current = bodyRefs.current.concat(ref);
-        }
+      if (refType === REF_TYPE.HEAD) {
+        updateHeadOrBodyRefs(headRefs, ref);
+      } else if (refType === REF_TYPE.BODY) {
+        updateHeadOrBodyRefs(bodyRefs, ref);
       } else {
-        throw TypeError(`Got incorrect "type" variable "${type}"!`);
+        throw TypeError(`Got incorrect "refType" variable "${refType}"!`);
       }
 
       return ref;
     };
+
+    function updateHeadOrBodyRefs(refs, ref) {
+      if (!refs.current.some((refOfType) => refOfType === ref)) {
+        refs.current = refs.current.concat(ref);
+      }
+    }
   };
 
   const setupResizeObserver = () => {
