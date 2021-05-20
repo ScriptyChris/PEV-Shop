@@ -175,7 +175,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
     }
 
     default: {
-      console.error(`detailName '${detailName}' was not matched!`);
+      throw TypeError(`detailName '${detailName}' was not matched!`);
     }
   }
 }

@@ -38,8 +38,6 @@ export default function Scroller({ render, forwardProps }) {
     elementRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
     elementRef.current.dataset.scrollable = 'true';
 
-    console.warn('headRefs:', headRefs, ' /bodyRefs:', bodyRefs);
-
     setupResizeObserver();
     checkIfElementOverflows();
 
@@ -79,8 +77,6 @@ export default function Scroller({ render, forwardProps }) {
       headRefs.current.length === bodyRefs.current.length
     ) {
       resizeObserverRef.current = new window.ResizeObserver((entries) => {
-        // console.log('entries:', entries);
-
         const refIndexes = bodyRefs.current
           .map((ref) => entries.findIndex(({ target }) => target === ref))
           .filter((refIndex) => refIndex > -1);
