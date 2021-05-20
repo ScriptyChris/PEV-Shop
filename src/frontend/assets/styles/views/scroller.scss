@@ -10,8 +10,10 @@
   left: 0;
   margin: 0; // remove margin to correctly calculate offset to parent
 
-  transition: transform 0.25s;
-  transform: translateX(calc(var(--scrollValue, 0) * 1px));
+  &:not(.initial-render) {
+    transition: transform 0.25s;
+    transform: translateX(calc(var(--scrollValue, 0) * 1px));
+  }
 }
 
 .scroller-btn {

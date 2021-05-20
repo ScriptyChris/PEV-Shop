@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useRef, useState } from 'react';
+import React, { createRef, useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, text }) {
   return (
@@ -21,6 +21,17 @@ export default function Scroller({ render, forwardProps }) {
   const headRowRefs = useRef([]);
   const bodyRowRefs = useRef([]);
   const resizeObserverRef = useRef(null);
+  const handleInitialRender = useMemo(() => {
+    const initialRenderClassName = 'initial-render';
+
+    return {
+      on: () => elementRef.current.classList.add(initialRenderClassName),
+      off: () => {
+        elementRef.current.classList.remove(initialRenderClassName);
+        window.requestAnimationFrame(handleElementOverflow);
+      },
+    };
+  }, []);
 
   const REF_TYPE = {
     HEAD: 'head',
@@ -33,17 +44,19 @@ export default function Scroller({ render, forwardProps }) {
   };
   const SCROLL_DIRECTION = { LEFT: 1, RIGHT: -1 };
 
+  useLayoutEffect(handleInitialRender.on, []);
+
   useEffect(() => {
-    window.addEventListener('resize', checkIfElementOverflows);
+    window.addEventListener('resize', handleElementOverflow);
     elementRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
     elementRef.current.dataset.scrollable = 'true';
     elementRef.current.parentNode.dataset.scrollableParent = 'true';
 
     setupResizeObserver();
-    checkIfElementOverflows();
+    handleInitialRender.off();
 
     return () => {
-      window.removeEventListener('resize', checkIfElementOverflows);
+      window.removeEventListener('resize', handleElementOverflow);
       elementRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
       resizeObserverRef.current.disconnect();
     };
@@ -100,20 +113,17 @@ export default function Scroller({ render, forwardProps }) {
     }
   };
 
-  const checkIfElementOverflows = (resizeEvent) => {
+  const handleElementOverflow = () => {
     const target = elementRef.current.parentNode;
     const doesElementOverflow = target.clientWidth < target.scrollWidth;
 
     scrollToDirection(null, SCROLL_VARIABLE.LEFT_EDGE);
-    toggleScrollButtons(doesElementOverflow, resizeEvent);
+    toggleScrollButtons(doesElementOverflow);
   };
 
-  const toggleScrollButtons = (showScrollingButtons, resizeEvent) => {
+  const toggleScrollButtons = (showScrollingButtons) => {
     setScrollingBtnVisible(showScrollingButtons);
-
-    if (resizeEvent) {
-      handleElementToParentOffsetChange();
-    }
+    handleElementToParentOffsetChange();
   };
 
   const handleElementToParentOffsetChange = () => {
