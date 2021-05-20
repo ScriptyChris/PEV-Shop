@@ -3,16 +3,32 @@ import { Link } from 'react-router-dom';
 import appStore from '../../features/appStore';
 import CompareProduct from './compareProducts';
 
+const translations = {
+  productName: 'Name',
+  productImage: 'Image of ',
+  productUrl: 'URL',
+  price: 'Price',
+  detailsBtn: 'Check details!',
+  addToCart: 'Add to cart!',
+};
+
+export function ProductItemLink({ productData }) {
+  // TODO: maybe state should be just index or prop name of the element and target component should get it from store?
+
+  return (
+    <Link
+      to={{
+        pathname: `/shop/${productData.url}`,
+        state: productData,
+      }}
+    >
+      {translations.detailsBtn}
+    </Link>
+  );
+}
+
 export default function ProductItem({ product }) {
-  const translations = {
-    productName: 'Name',
-    productImage: 'Image of ',
-    productUrl: 'URL',
-    price: 'Price',
-    detailsBtn: 'Check details!',
-    addToCart: 'Add to cart!',
-  };
-  const { name, price, url, _id } = product;
+  const { name, price, _id } = product;
 
   const handleAddToCartClick = () => {
     appStore.updateUserCartState({ name, price, _id });
@@ -36,14 +52,7 @@ export default function ProductItem({ product }) {
 
       <button onClick={handleAddToCartClick}>{translations.addToCart}</button>
 
-      <Link
-        to={{
-          pathname: `/shop/${url}`,
-          state: product,
-        }}
-      >
-        {translations.detailsBtn}
-      </Link>
+      <ProductItemLink productData={product} />
 
       <CompareProduct.Toggler product={product} />
     </div>

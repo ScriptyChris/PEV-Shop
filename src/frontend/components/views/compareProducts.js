@@ -23,18 +23,12 @@ const List = observer(function CompareProducts() {
     // TODO: shrink/collapse widget to an expandable button on mobile
     <aside className="compare-products-candidates">
       <ol className="compare-products-candidates__list">
-        {appStore.productComparisonState.map((product, index) => {
-          console.log('product to compare...:', product);
-
-          return (
-            <li key={product._id} className="compare-products-candidates__list-item">
-              <span>{product.name}</span>
-              <button onClick={() => handleRemoveComparableProduct(index)}>
-                {translations.removeComparableProduct}
-              </button>
-            </li>
-          );
-        })}
+        {appStore.productComparisonState.map((product, index) => (
+          <li key={product._id} className="compare-products-candidates__list-item">
+            <span>{product.name}</span>
+            <button onClick={() => handleRemoveComparableProduct(index)}>{translations.removeComparableProduct}</button>
+          </li>
+        ))}
       </ol>
 
       <div className="compare-products-candidates__actions">

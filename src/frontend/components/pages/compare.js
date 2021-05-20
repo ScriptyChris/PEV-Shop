@@ -1,7 +1,9 @@
+import { toJS } from 'mobx';
 import React, { useRef, createRef, useEffect, useCallback } from 'react';
 import appStore from '../../features/appStore';
 import { getProductDetailsData, prepareSpecificProductDetail, getProductDetailsHeaders } from '../views/productDetails';
 import Scroller from '../utils/scroller';
+import { ProductItemLink } from '../views/productItem';
 
 const translations = {
   productsAmount: 'produktów',
@@ -58,6 +60,12 @@ export default function Compare() {
           {comparableProductsData.map((productData, dataIndex) => (
             <div className="compare-products__cell" role="cell" key={`cell-${dataIndex}`}>
               {prepareSpecificProductDetail(detailHeader, productData[detailHeader])}
+
+              {detailHeader === 'name' && (
+                <ProductItemLink
+                  productData={toJS(appStore.productComparisonState[dataIndex], { recurseEverything: true })}
+                />
+              )}
             </div>
           ))}
         </div>

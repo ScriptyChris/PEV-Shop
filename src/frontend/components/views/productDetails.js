@@ -35,6 +35,7 @@ export function getProductDetailsData(product) {
     shortDescription: product.shortDescription,
     technicalSpecs: product.technicalSpecs,
     reviews: product.reviews,
+    url: product.url,
     relatedProducts,
   };
 }
@@ -188,6 +189,7 @@ export default function ProductDetails({ product }) {
 
   const productDetails = getProductDetailsData(product);
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
+  const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {
     productDetails.relatedProducts
@@ -199,16 +201,18 @@ export default function ProductDetails({ product }) {
       .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
   }, []);
 
+  const getMainDetailsContent = () =>
+    Object.entries(productDetails)
+      .filter(([key]) => !ignoredProductKeys.includes(key))
+      .map(([key, value]) => <Fragment key={key}>{prepareSpecificProductDetail(key, value, true)}</Fragment>);
+
   return (
     <section>
       <p>
         [{productDetails.category}]: {productDetails.name}
       </p>
-      {Object.entries(productDetails)
-        .filter(([key]) => key !== 'relatedProducts')
-        .map(([key, value]) => (
-          <Fragment key={key}>{prepareSpecificProductDetail(key, value, true)}</Fragment>
-        ))}
+
+      {getMainDetailsContent()}
 
       {renderRelatedProducts && prepareSpecificProductDetail('relatedProducts', productDetails.relatedProducts, true)}
     </section>
