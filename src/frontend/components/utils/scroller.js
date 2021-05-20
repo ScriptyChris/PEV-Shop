@@ -1,4 +1,4 @@
-import React, { createRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { createRef, useEffect, useRef, useState } from 'react';
 
 function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, text }) {
   return (
@@ -18,8 +18,14 @@ export default function Scroller({ render, forwardProps }) {
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
   const [rightBtnDisabled, setRightBtnDisabled] = useState(false);
-  const resizedObservedRefs = useRef([]);
+  const headRefs = useRef([]);
+  const bodyRefs = useRef([]);
+  const resizeObserverRef = useRef(null);
 
+  const REF_TYPE = {
+    HEAD: 'head',
+    BODY: 'body',
+  };
   const SCROLL_VARIABLE = {
     NAME: '--scrollValue',
     BASE_VALUE: 15,
@@ -32,25 +38,67 @@ export default function Scroller({ render, forwardProps }) {
     elementRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
     elementRef.current.dataset.scrollable = 'true';
 
-    console.warn('resizedObservedRefs:', resizedObservedRefs);
+    console.warn('headRefs:', headRefs, ' /bodyRefs:', bodyRefs);
 
+    setupResizeObserver();
     checkIfElementOverflows();
 
     return () => {
       window.removeEventListener('resize', checkIfElementOverflows);
       elementRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
+      resizeObserverRef.current.disconnect();
     };
   }, []);
 
-  const resizedObservedRef = useCallback((ref) => {
-    // const refIndex = [...ref.parentNode.children].findIndex(child => child === ref);
-    resizedObservedRefs.current = resizedObservedRefs.current.concat({
-      body: ref,
-      header: null,
-    });
+  const createRefGetter = (type) => {
+    return (ref) => {
+      if (!ref) {
+        return null;
+      }
 
-    return ref;
-  }, []);
+      if (type === REF_TYPE.HEAD) {
+        if (!headRefs.current.some((hRef) => hRef === ref)) {
+          headRefs.current = headRefs.current.concat(ref);
+        }
+      } else if (type === REF_TYPE.BODY) {
+        if (!bodyRefs.current.some((bRef) => bRef === ref)) {
+          bodyRefs.current = bodyRefs.current.concat(ref);
+        }
+      } else {
+        throw TypeError(`Got incorrect "type" variable "${type}"!`);
+      }
+
+      return ref;
+    };
+  };
+
+  const setupResizeObserver = () => {
+    if (
+      headRefs.current.length > 0 &&
+      bodyRefs.current.length > 0 &&
+      headRefs.current.length === bodyRefs.current.length
+    ) {
+      resizeObserverRef.current = new window.ResizeObserver((entries) => {
+        // console.log('entries:', entries);
+
+        const refIndexes = bodyRefs.current
+          .map((ref) => entries.findIndex(({ target }) => target === ref))
+          .filter((refIndex) => refIndex > -1);
+
+        refIndexes.forEach((refIndex) => {
+          headRefs.current[refIndex].style.height = `${bodyRefs.current[refIndex].clientHeight}px`;
+        });
+      });
+
+      bodyRefs.current.forEach((element) => resizeObserverRef.current.observe(element));
+    } else {
+      throw Error(
+        `headRefs or bodyRefs are empty or have different sizes. headRefs: ${[...headRefs.current]}, bodyRefs: ${[
+          ...bodyRefs.current,
+        ]}`
+      );
+    }
+  };
 
   const checkIfElementOverflows = (resizeEvent) => {
     const target = elementRef.current.parentNode;
@@ -103,7 +151,12 @@ export default function Scroller({ render, forwardProps }) {
         text={'&larr;'}
         handleClick={scrollToDirection}
       />
-      {render({ elementRef, forwardProps, resizedObservedRef })}
+      {render({
+        elementRef,
+        forwardProps,
+        resizedObservedHeadRef: createRefGetter(REF_TYPE.HEAD),
+        resizedObservedBodyRef: createRefGetter(REF_TYPE.BODY),
+      })}
       <ScrollButton
         directionPointer={SCROLL_DIRECTION.RIGHT}
         isVisible={scrollingBtnVisible}

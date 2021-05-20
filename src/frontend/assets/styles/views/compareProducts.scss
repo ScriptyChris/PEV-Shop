@@ -45,9 +45,13 @@
   }
 
   &__head, &__body {
-    display: grid;
-    grid-template-rows: repeat(var(--compare-rows-number, auto), auto);
+    //display: grid;
+    //grid-template-rows: repeat(var(--compare-rows-number, auto), auto);
     height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   &__row {
