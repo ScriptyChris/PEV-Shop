@@ -18,8 +18,8 @@ export default function Scroller({ render, forwardProps }) {
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
   const [rightBtnDisabled, setRightBtnDisabled] = useState(false);
-  const headRefs = useRef([]);
-  const bodyRefs = useRef([]);
+  const headRowRefs = useRef([]);
+  const bodyRowRefs = useRef([]);
   const resizeObserverRef = useRef(null);
 
   const REF_TYPE = {
@@ -56,9 +56,9 @@ export default function Scroller({ render, forwardProps }) {
       }
 
       if (refType === REF_TYPE.HEAD) {
-        updateHeadOrBodyRefs(headRefs, ref);
+        updateHeadOrBodyRefs(headRowRefs, ref);
       } else if (refType === REF_TYPE.BODY) {
-        updateHeadOrBodyRefs(bodyRefs, ref);
+        updateHeadOrBodyRefs(bodyRowRefs, ref);
       } else {
         throw TypeError(`Got incorrect "refType" variable "${refType}"!`);
       }
@@ -75,26 +75,27 @@ export default function Scroller({ render, forwardProps }) {
 
   const setupResizeObserver = () => {
     if (
-      headRefs.current.length > 0 &&
-      bodyRefs.current.length > 0 &&
-      headRefs.current.length === bodyRefs.current.length
+      headRowRefs.current.length > 0 &&
+      bodyRowRefs.current.length > 0 &&
+      headRowRefs.current.length === bodyRowRefs.current.length
     ) {
-      resizeObserverRef.current = new window.ResizeObserver((entries) => {
-        const refIndexes = bodyRefs.current
+      const equalizeTableHeaderRowsHeightToAssociatedBodyRows = (entries) => {
+        const refIndexes = bodyRowRefs.current
           .map((ref) => entries.findIndex(({ target }) => target === ref))
           .filter((refIndex) => refIndex > -1);
 
         refIndexes.forEach((refIndex) => {
-          headRefs.current[refIndex].style.height = `${bodyRefs.current[refIndex].clientHeight}px`;
+          headRowRefs.current[refIndex].style.height = `${bodyRowRefs.current[refIndex].clientHeight}px`;
         });
-      });
+      };
 
-      bodyRefs.current.forEach((element) => resizeObserverRef.current.observe(element));
+      resizeObserverRef.current = new window.ResizeObserver(equalizeTableHeaderRowsHeightToAssociatedBodyRows);
+      bodyRowRefs.current.forEach((bodyRow) => resizeObserverRef.current.observe(bodyRow));
     } else {
       throw Error(
-        `headRefs or bodyRefs are empty or have different sizes. headRefs: ${[...headRefs.current]}, bodyRefs: ${[
-          ...bodyRefs.current,
-        ]}`
+        `headRowRefs or bodyRowRefs are empty or have different sizes. headRowRefs: ${[
+          ...headRowRefs.current,
+        ]}, bodyRowRefs: ${[...bodyRowRefs.current]}`
       );
     }
   };
@@ -153,8 +154,8 @@ export default function Scroller({ render, forwardProps }) {
       {render({
         elementRef,
         forwardProps,
-        resizedObservedHeadRef: createRefGetter(REF_TYPE.HEAD),
-        resizedObservedBodyRef: createRefGetter(REF_TYPE.BODY),
+        headRowRefGetter: createRefGetter(REF_TYPE.HEAD),
+        bodyRowRefGetter: createRefGetter(REF_TYPE.BODY),
       })}
       <ScrollButton
         directionPointer={SCROLL_DIRECTION.RIGHT}

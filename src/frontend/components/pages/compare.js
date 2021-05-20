@@ -30,12 +30,12 @@ export default function Compare() {
     []
   );
 
-  const getTableHeadContent = (resizedObservedHeadRef) =>
+  const getTableHeadContent = (headRowRefGetter) =>
     function TableHeadContent(detailHeader, headerIndex) {
       return (
         <div
           className={`${getClassForNameHeader(headerIndex)}`}
-          ref={resizedObservedHeadRef}
+          ref={headRowRefGetter}
           role="row"
           key={`header-row-${headerIndex}`}
         >
@@ -46,12 +46,12 @@ export default function Compare() {
       );
     };
 
-  const getTableBodyContent = (resizedObservedBodyRef) =>
+  const getTableBodyContent = (bodyRowRefGetter) =>
     function TableBodyContent(detailHeader, headerIndex) {
       return (
         <div
           className={`compare-products__row ${getClassForNameHeader(headerIndex)}`}
-          ref={resizedObservedBodyRef}
+          ref={bodyRowRefGetter}
           role="row"
           key={`body-row-${headerIndex}`}
         >
@@ -71,15 +71,15 @@ export default function Compare() {
       <div ref={tableRef} className="compare-products__table" role="table">
         <Scroller
           forwardProps={{ productDetailsHeadersKeys }}
-          render={({ elementRef, resizedObservedHeadRef, resizedObservedBodyRef }) => (
+          render={({ elementRef, headRowRefGetter, bodyRowRefGetter }) => (
             <>
               <div className="compare-products__head" role="rowgroup">
-                {productDetailsHeadersKeys.map(getTableHeadContent(resizedObservedHeadRef))}
+                {productDetailsHeadersKeys.map(getTableHeadContent(headRowRefGetter))}
               </div>
 
               <div>
                 <div className="compare-products__body" ref={elementRef} role="rowgroup">
-                  {productDetailsHeadersKeys.map(getTableBodyContent(resizedObservedBodyRef))}
+                  {productDetailsHeadersKeys.map(getTableBodyContent(bodyRowRefGetter))}
                 </div>
               </div>
             </>
