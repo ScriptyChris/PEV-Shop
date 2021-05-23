@@ -32,11 +32,12 @@ export default function Scroller({ render, forwardProps }) {
       },
     };
   }, []);
+  const [multipleRefsGetterUsed, setMultipleRefsGetterUsed] = useState(false);
 
-  const REF_TYPE = {
+  const REF_TYPE = Object.freeze({
     HEAD: 'head',
     BODY: 'body',
-  };
+  });
   const SCROLL_VARIABLE = {
     NAME: '--scrollValue',
     BASE_VALUE: 15,
@@ -58,9 +59,14 @@ export default function Scroller({ render, forwardProps }) {
     return () => {
       window.removeEventListener('resize', handleElementOverflow);
       elementRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
-      resizeObserverRef.current.disconnect();
+
+      if (multipleRefsGetterUsed) {
+        resizeObserverRef.current.disconnect();
+      }
     };
   }, []);
+
+  useEffect(() => handleElementOverflow(), [forwardProps && forwardProps.trackedChanges]);
 
   const createRefGetter = (refType) => {
     return function refGetter(ref) {
@@ -87,29 +93,31 @@ export default function Scroller({ render, forwardProps }) {
   };
 
   const setupResizeObserver = () => {
-    if (
-      headRowRefs.current.length > 0 &&
-      bodyRowRefs.current.length > 0 &&
-      headRowRefs.current.length === bodyRowRefs.current.length
-    ) {
-      const equalizeTableHeaderRowsHeightToAssociatedBodyRows = (entries) => {
-        const refIndexes = bodyRowRefs.current
-          .map((ref) => entries.findIndex(({ target }) => target === ref))
-          .filter((refIndex) => refIndex > -1);
+    if (multipleRefsGetterUsed) {
+      if (
+        headRowRefs.current.length > 0 &&
+        bodyRowRefs.current.length > 0 &&
+        headRowRefs.current.length === bodyRowRefs.current.length
+      ) {
+        const equalizeTableHeaderRowsHeightToAssociatedBodyRows = (entries) => {
+          const refIndexes = bodyRowRefs.current
+            .map((ref) => entries.findIndex(({ target }) => target === ref))
+            .filter((refIndex) => refIndex > -1);
 
-        refIndexes.forEach((refIndex) => {
-          headRowRefs.current[refIndex].style.height = `${bodyRowRefs.current[refIndex].clientHeight}px`;
-        });
-      };
+          refIndexes.forEach((refIndex) => {
+            headRowRefs.current[refIndex].style.height = `${bodyRowRefs.current[refIndex].clientHeight}px`;
+          });
+        };
 
-      resizeObserverRef.current = new window.ResizeObserver(equalizeTableHeaderRowsHeightToAssociatedBodyRows);
-      bodyRowRefs.current.forEach((bodyRow) => resizeObserverRef.current.observe(bodyRow));
-    } else {
-      throw Error(
-        `headRowRefs or bodyRowRefs are empty or have different sizes. headRowRefs: ${[
-          ...headRowRefs.current,
-        ]}, bodyRowRefs: ${[...bodyRowRefs.current]}`
-      );
+        resizeObserverRef.current = new window.ResizeObserver(equalizeTableHeaderRowsHeightToAssociatedBodyRows);
+        bodyRowRefs.current.forEach((bodyRow) => resizeObserverRef.current.observe(bodyRow));
+      } else {
+        throw Error(
+          `headRowRefs or bodyRowRefs are empty or have different sizes. headRowRefs: ${[
+            ...headRowRefs.current,
+          ]}, bodyRowRefs: ${[...bodyRowRefs.current]}`
+        );
+      }
     }
   };
 
@@ -164,8 +172,13 @@ export default function Scroller({ render, forwardProps }) {
       {render({
         elementRef,
         forwardProps,
-        headRowRefGetter: createRefGetter(REF_TYPE.HEAD),
-        bodyRowRefGetter: createRefGetter(REF_TYPE.BODY),
+        get multipleRefsGetter() {
+          if (!multipleRefsGetterUsed) {
+            setMultipleRefsGetterUsed(true);
+          }
+
+          return { createRefGetter, REF_TYPE };
+        },
       })}
       <ScrollButton
         directionPointer={SCROLL_DIRECTION.RIGHT}

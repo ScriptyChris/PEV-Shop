@@ -78,20 +78,27 @@ export default function Compare() {
     <section className="compare-products">
       <div ref={tableRef} className="compare-products__table" role="table">
         <Scroller
-          forwardProps={{ productDetailsHeadersKeys }}
-          render={({ elementRef, headRowRefGetter, bodyRowRefGetter }) => (
-            <>
-              <div className="compare-products__head" role="rowgroup">
-                {productDetailsHeadersKeys.map(getTableHeadContent(headRowRefGetter))}
-              </div>
+          render={({ elementRef, multipleRefsGetter }) => {
+            const { createRefGetter, REF_TYPE } = multipleRefsGetter;
+            const [headRowRefGetter, bodyRowRefGetter] = [
+              createRefGetter(REF_TYPE.HEAD),
+              createRefGetter(REF_TYPE.BODY),
+            ];
 
-              <div>
-                <div className="compare-products__body" ref={elementRef} role="rowgroup">
-                  {productDetailsHeadersKeys.map(getTableBodyContent(bodyRowRefGetter))}
+            return (
+              <>
+                <div className="compare-products__head" role="rowgroup">
+                  {productDetailsHeadersKeys.map(getTableHeadContent(headRowRefGetter))}
                 </div>
-              </div>
-            </>
-          )}
+
+                <div>
+                  <div className="compare-products__body" ref={elementRef} role="rowgroup">
+                    {productDetailsHeadersKeys.map(getTableBodyContent(bodyRowRefGetter))}
+                  </div>
+                </div>
+              </>
+            );
+          }}
         />
       </div>
     </section>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import appStore from '../../features/appStore';
 import { Link } from 'react-router-dom';
+import Scroller from '../utils/scroller';
 
 const List = observer(function CompareProducts() {
   const translations = {
@@ -22,14 +24,23 @@ const List = observer(function CompareProducts() {
   return (
     // TODO: shrink/collapse widget to an expandable button on mobile
     <aside className="compare-products-candidates">
-      <ol className="compare-products-candidates__list">
-        {appStore.productComparisonState.map((product, index) => (
-          <li key={product._id} className="compare-products-candidates__list-item">
-            <span>{product.name}</span>
-            <button onClick={() => handleRemoveComparableProduct(index)}>{translations.removeComparableProduct}</button>
-          </li>
-        ))}
-      </ol>
+      <Scroller
+        forwardProps={{ trackedChanges: toJS(appStore.productComparisonState) }}
+        render={({ elementRef, forwardProps: { trackedChanges: productComparisonState } }) => (
+          <div>
+            <ol ref={elementRef} className="compare-products-candidates__list">
+              {productComparisonState.map((product, index) => (
+                <li className="compare-products-candidates__list-item" key={product._id}>
+                  <span>{product.name}</span>
+                  <button onClick={() => handleRemoveComparableProduct(index)}>
+                    {translations.removeComparableProduct}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+      />
 
       <div className="compare-products-candidates__actions">
         <Link to={{ pathname: `/compare` }}> {translations.compareProducts}</Link>
