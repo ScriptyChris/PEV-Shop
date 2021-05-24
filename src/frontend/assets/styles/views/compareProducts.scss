@@ -1,6 +1,10 @@
+.compare-products-candidates,
+.compare-products {
+  --product-list-item-width: 200px;
+}
+
 .compare-products-candidates {
   display: flex;
-  width: fit-content;
   border: 1px solid orange;
   margin: 1rem;
 
@@ -19,6 +23,7 @@
     justify-content: space-between;
     margin: 0 0.5rem;
     height: 3rem;
+    width: var(--product-list-item-width);
   }
 
   &__actions {
@@ -55,7 +60,7 @@
 
   &__row {
     display: grid;
-    grid-template-columns: repeat(var(--compare-columns-number, auto), minmax(200px,1fr));
+    grid-template-columns: repeat(var(--compare-columns-number, auto), minmax(var(--product-list-item-width),1fr));
   }
 
   &__cell {
@@ -76,5 +81,11 @@
 
   &__item-short-description {
     padding-left: 1.5rem;
+  }
+}
+
+@media screen and (min-width: 1366px) {
+  .compare-products-candidates {
+    max-width: 75%;
   }
 }

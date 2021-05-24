@@ -78,6 +78,10 @@ export default function Compare() {
     <section className="compare-products">
       <div ref={tableRef} className="compare-products__table" role="table">
         <Scroller
+          scrollerBaseValueMeta={{
+            selector: '.compare-products-candidates, .compare-products',
+            varName: '--product-list-item-width',
+          }}
           render={({ elementRef, multipleRefsGetter }) => {
             const { createRefGetter, REF_TYPE } = multipleRefsGetter;
             const [headRowRefGetter, bodyRowRefGetter] = [

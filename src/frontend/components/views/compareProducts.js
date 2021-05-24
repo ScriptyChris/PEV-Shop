@@ -21,10 +21,17 @@ const List = observer(function CompareProducts() {
     appStore.clearProductComparisonState();
   };
 
-  return (
-    // TODO: shrink/collapse widget to an expandable button on mobile
+  return appStore.productComparisonState.length ? (
+    /** TODO:
+     * - shrink/collapse widget to an expandable button on mobile
+     * - mobile should have full width widget probably sticked to viewport's top
+     */
     <aside className="compare-products-candidates">
       <Scroller
+        scrollerBaseValueMeta={{
+          selector: '.compare-products-candidates, .compare-products',
+          varName: '--product-list-item-width',
+        }}
         forwardProps={{ trackedChanges: toJS(appStore.productComparisonState) }}
         render={({ elementRef, forwardProps: { trackedChanges: productComparisonState } }) => (
           <div>
@@ -47,6 +54,8 @@ const List = observer(function CompareProducts() {
         <button onClick={handleClearCompareProducts}>{translations.clearComparableProducts}</button>
       </div>
     </aside>
+  ) : (
+    ''
   );
 });
 

@@ -1,5 +1,25 @@
 import React, { createRef, useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+const getScrollBaseValue = ({ selector = '', varName = '' } = {}) => {
+  if (typeof selector !== 'string' || selector.length === 0 || typeof varName !== 'string' || varName.length === 0) {
+    return NaN;
+  }
+
+  for (const sheet of document.styleSheets) {
+    const scrollerBaseValue = [...sheet.cssRules].find(
+      (rule) => rule.selectorText === selector && rule.style && [...rule.style].includes(varName)
+    );
+
+    if (scrollerBaseValue) {
+      return Number.parseInt(scrollerBaseValue.style.getPropertyValue(varName));
+    }
+  }
+
+  throw Error(
+    `Values of {selector: '${selector}'} and {varName: '${varName}'} were not matched in any CSS on the page!`
+  );
+};
+
 function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, text }) {
   return (
     <button
@@ -13,7 +33,7 @@ function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, te
   );
 }
 
-export default function Scroller({ render, forwardProps }) {
+export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }) {
   const [elementRef] = useState(createRef());
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
@@ -33,6 +53,7 @@ export default function Scroller({ render, forwardProps }) {
     };
   }, []);
   const [multipleRefsGetterUsed, setMultipleRefsGetterUsed] = useState(false);
+  const scrollBaseValue = useMemo(() => getScrollBaseValue(scrollerBaseValueMeta), []);
 
   const REF_TYPE = Object.freeze({
     HEAD: 'head',
@@ -40,7 +61,7 @@ export default function Scroller({ render, forwardProps }) {
   });
   const SCROLL_VARIABLE = {
     NAME: '--scrollValue',
-    BASE_VALUE: 15,
+    BASE_VALUE: scrollBaseValue || 15,
     LEFT_EDGE: 0,
   };
   const SCROLL_DIRECTION = { LEFT: 1, RIGHT: -1 };
