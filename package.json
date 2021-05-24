@@ -63,6 +63,7 @@
     "prettier-loader": "^3.3.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-hot-loader": "^4.13.0",
     "react-router-dom": "^5.2.0",
     "sass-loader": "^9.0.3",
     "ts-jest": "^26.5.1",

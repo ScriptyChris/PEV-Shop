@@ -14,7 +14,7 @@ module.exports = (env) => {
 
   return {
     mode: env,
-    entry: './src/frontend/index.js',
+    entry: ['react-hot-loader/patch','./src/frontend/index.js'],
     output: {
       filename: 'index.js',
       path: resolve(__dirname, './dist/src/frontend'),
@@ -29,7 +29,12 @@ module.exports = (env) => {
         {
           test: /\.scss$/,
           use: [
-            MiniCssExtractPlugin.loader,
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                hmr: env === 'development',
+              },
+            },
             'css-loader',
             'sass-loader'
           ]
@@ -53,6 +58,8 @@ module.exports = (env) => {
       historyApiFallback: true,
       before: middleware,
       port: process.env.PORT,
+      hotOnly: true,
+      liveReload: false,
     }
   };
 };

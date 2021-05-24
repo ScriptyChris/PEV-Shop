@@ -32,7 +32,7 @@ export default observer(function Nav() {
           <Link to="/add-new-product">{translations.addNewProduct}</Link>
         </li>
         <li>
-          {appStore.getUserSessionState() === USER_SESSION_STATES.LOGGED_OUT ? (
+          {appStore.userSessionState === USER_SESSION_STATES.LOGGED_OUT ? (
             <Link to="/log-in">{translations.logIn}</Link>
           ) : (
             <Link to="/" onClick={logOut}>

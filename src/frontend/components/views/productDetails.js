@@ -1,69 +1,91 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import ProductItem from './productItem';
 import apiService from '../../features/apiService';
 
-export default function ProductDetails() {
-  // TODO: fetch product data independently when page is loaded explicitly (not navigated to from other page)
-  const { state: product } = useLocation();
-  const translations = {
-    name: 'Name',
-    price: 'Price',
-    shortDescription: 'Short description',
-    technicalSpecs: 'Specification',
-    reviews: 'Reviews',
-    author: 'Author',
-    relatedProducts: 'Related products',
-    emptyData: 'No data!',
+const productDetailsTranslations = Object.freeze({
+  category: 'Category',
+  name: 'Name',
+  price: 'Price',
+  shortDescription: 'Short description',
+  technicalSpecs: 'Specification',
+  reviews: 'Reviews',
+  author: 'Author',
+  relatedProducts: 'Related products',
+  emptyData: 'No data!',
+});
+
+export function getProductDetailsHeaders() {
+  const detailKeys = ['category', 'name', 'price', 'shortDescription', 'technicalSpecs', 'reviews', 'relatedProducts'];
+
+  return detailKeys.reduce((detailsHeaders, key) => {
+    detailsHeaders[key] = productDetailsTranslations[key];
+
+    return detailsHeaders;
+  }, {});
+}
+
+export function getProductDetailsData(product) {
+  const relatedProducts = apiService.getProductsById(product.relatedProducts.map((item) => item.id).toString());
+
+  return {
+    category: product.category,
+    name: product.name,
+    price: product.price,
+    shortDescription: product.shortDescription,
+    technicalSpecs: product.technicalSpecs,
+    reviews: product.reviews,
+    url: product.url,
+    relatedProducts,
   };
+}
 
-  console.log('[ProductDetails] product received from navigation: ', product);
+export function prepareSpecificProductDetail(detailName, detailValue, includeHeader) {
+  const getOptionalHeaderContent = (headerContent) => (includeHeader ? headerContent : null);
 
-  const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
-  const [standaloneRelatedProducts, setStandaloneRelatedProducts] = useState(null);
+  switch (detailName) {
+    case 'name':
+    case 'category': {
+      return detailValue;
+    }
 
-  useEffect(() => {
-    (async () => {
-      const relatedProducts = await apiService.getProductsById(
-        product.relatedProducts.map((item) => item.id).toString()
-      );
-      setStandaloneRelatedProducts(relatedProducts);
-      setRenderRelatedProducts(true);
-    })();
-  }, [product]);
+    case 'price': {
+      // TODO: create price component, which will handle things like promotion and will format price according to locale and/or chosen currency
+      const optionalHeaderContent = getOptionalHeaderContent(`${productDetailsTranslations.price}: `);
 
-  const getPriceContent = () => {
-    // TODO: create price component, which will handle things like promotion and will format price according to locale and/or chosen currency
-    return (
-      <p>
-        {translations.price}: ${product.price}
-      </p>
-    );
-  };
+      if (optionalHeaderContent) {
+        return (
+          <p>
+            {optionalHeaderContent}
+            {detailValue}
+          </p>
+        );
+      }
 
-  const getShortDescriptionContent = () => {
-    return (
-      <>
-        <ul>
-          {product.shortDescription.map((description, index) => {
+      return detailValue;
+    }
+
+    case 'shortDescription': {
+      return (
+        <ul className="compare-products-list__item-short-description">
+          {detailValue.map((description, index) => {
             return <li key={`short-description-${index}`}>{description}</li>;
           })}
         </ul>
-      </>
-    );
-  };
-
-  const getTechnicalSpecsContent = () => {
-    if (!Array.isArray(product.technicalSpecs)) {
-      return translations.emptyData;
+      );
     }
 
-    return (
-      // TODO: collapse it on mobile by default and expand on PC by default
-      <details>
-        <summary>{translations.technicalSpecs}:</summary>
+    case 'technicalSpecs': {
+      if (!Array.isArray(detailValue)) {
+        return productDetailsTranslations.emptyData;
+      }
+
+      const optionalHeaderContent = getOptionalHeaderContent(
+        <summary>{productDetailsTranslations.technicalSpecs}:</summary>
+      );
+      const getBodyContent = () => (
         <dl>
-          {product.technicalSpecs.map((productDetail, index) => {
+          {detailValue.map((productDetail, index) => {
             return (
               <div key={`spec-${index}`}>
                 <dt>{productDetail.heading}</dt>
@@ -72,80 +94,127 @@ export default function ProductDetails() {
             );
           })}
         </dl>
-      </details>
-    );
-  };
+      );
 
-  // TODO: move to separate component as it will likely has some additional logic (like pagination, sorting, filtering)
-  const getReviewsContent = () => {
-    if (!product.reviews.list.length) {
-      return translations.emptyData;
-    }
-
-    return (
       // TODO: collapse it on mobile by default and expand on PC by default
-      <details>
-        {/*TODO: do it in more esthetic way*/}
-        <summary>
-          {translations.reviews}: {product.reviews.summary.rating}/5 [{product.reviews.summary.reviewsAmount}]
-        </summary>
-        <ul>
-          {product.reviews.list.map((reviewEntry, index) => {
-            return (
-              <li key={`review-${index}`}>
-                <article>
-                  <header>
-                    ({reviewEntry.reviewRate}) &nbsp;
-                    <b>
-                      {translations.author}: {reviewEntry.reviewAuthor}
-                    </b>
-                    &nbsp;
-                    <time>[{reviewEntry.reviewMeta.join() /*TODO: fix empty strings in array in some cases*/}]</time>
-                  </header>
-                  <cite>{reviewEntry.content}</cite>
-                </article>
-              </li>
-            );
-          })}
-        </ul>
-      </details>
-    );
-  };
+      if (includeHeader) {
+        return (
+          <>
+            <details>
+              {optionalHeaderContent}
+              {getBodyContent()}
+            </details>
+          </>
+        );
+      }
 
-  // TODO: it probably might be used as a separate component
-  const getRelatedProductsContent = () => {
-    if (!product.relatedProducts.length || !renderRelatedProducts) {
-      return translations.emptyData;
+      return getBodyContent();
     }
 
-    return (
-      <>
-        <p>{translations.relatedProducts}</p>
-        <ul>
-          {standaloneRelatedProducts.map((relatedProduct, index) => {
-            return (
-              <li key={`related-product-${index}`}>
-                {/*TODO: ProductItem component in this case will not have full product info, so it has to somehow fetch it on it's own*/}
-                <ProductItem product={relatedProduct} />
-              </li>
-            );
-          })}
-        </ul>
-      </>
-    );
-  };
+    case 'reviews': {
+      // TODO: move to separate component as it will likely has some additional logic (like pagination, sorting, filtering)
+      if (!detailValue.list.length) {
+        return productDetailsTranslations.emptyData;
+      }
+
+      const optionalHeaderContent = getOptionalHeaderContent(`${productDetailsTranslations.reviews}: `);
+
+      return (
+        // TODO: collapse it on mobile by default and expand on PC by default
+        <details>
+          {/*TODO: do it in more aesthetic way*/}
+          <summary>
+            {optionalHeaderContent}
+            {detailValue.summary.rating}/5 [{detailValue.summary.reviewsAmount}]
+          </summary>
+          <ul>
+            {detailValue.list.map((reviewEntry, index) => {
+              return (
+                <li key={`review-${index}`}>
+                  <article>
+                    <header>
+                      ({reviewEntry.reviewRate}) &nbsp;
+                      <b>
+                        {productDetailsTranslations._author}: {reviewEntry.reviewAuthor}
+                      </b>
+                      &nbsp;
+                      <time>[{reviewEntry.reviewMeta.join() /*TODO: fix empty strings in array in some cases*/}]</time>
+                    </header>
+                    <cite>{reviewEntry.content}</cite>
+                  </article>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      );
+    }
+
+    case 'relatedProducts': {
+      // TODO: it probably might be used as a separate component
+      if (!detailValue) {
+        return productDetailsTranslations.emptyData;
+      }
+
+      const optionalHeaderContent = getOptionalHeaderContent(<p>{productDetailsTranslations.relatedProducts}</p>);
+
+      return (
+        <>
+          {optionalHeaderContent}
+          <ul>
+            {detailValue.map((relatedProduct, index) => {
+              return (
+                <li key={`related-product-${index}`}>
+                  {/*TODO: ProductItem component in this case will not have full product info, so it has to somehow fetch it on it's own*/}
+                  <ProductItem product={relatedProduct} />
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      );
+    }
+
+    default: {
+      throw TypeError(`detailName '${detailName}' was not matched!`);
+    }
+  }
+}
+
+export default function ProductDetails({ product }) {
+  // TODO: fetch product data independently when page is loaded explicitly (not navigated to from other page)
+  product = product || useLocation().state;
+
+  console.log('[ProductDetails] product received from navigation: ', product);
+
+  const productDetails = getProductDetailsData(product);
+  const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
+  const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
+
+  useEffect(() => {
+    productDetails.relatedProducts
+      .then((relatedProducts) => {
+        if (relatedProducts.length) {
+          setRenderRelatedProducts(true);
+        }
+      })
+      .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
+  }, []);
+
+  const getMainDetailsContent = () =>
+    Object.entries(productDetails)
+      .filter(([key]) => !ignoredProductKeys.includes(key))
+      .map(([key, value]) => <Fragment key={key}>{prepareSpecificProductDetail(key, value, true)}</Fragment>);
 
   return (
     <section>
-      Product details!
       <p>
-        [{product.category}]: {product.name}
+        [{productDetails.category}]: {productDetails.name}
       </p>
-      {getShortDescriptionContent()}
-      {getPriceContent()}
-      {getTechnicalSpecsContent()}
-      {getReviewsContent()}
-      {getRelatedProductsContent()}
+
+      {getMainDetailsContent()}
+
+      {renderRelatedProducts && prepareSpecificProductDetail('relatedProducts', productDetails.relatedProducts, true)}
     </section>
   );
 }

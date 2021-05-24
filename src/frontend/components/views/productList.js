@@ -3,6 +3,7 @@ import apiService from '../../features/apiService';
 import ProductItem from './productItem';
 import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
+import CompareProducts from './compareProducts';
 
 // TODO: consider refactoring class based component to a function based one (and so use mobx-react-lite instead of mobx-react)
 export default class ProductList extends React.Component {
@@ -29,8 +30,12 @@ export default class ProductList extends React.Component {
       // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
       currentProductsPerPageLimit: this.productsPerPageLimits[0],
     };
+  }
 
-    this.updateProductsList().then();
+  componentDidMount() {
+    this.updateProductsList().catch((updateProductsListError) => {
+      console.error('updateProductsListError:', updateProductsListError);
+    });
   }
 
   shouldComponentUpdate(_, nextState) {
@@ -111,6 +116,9 @@ export default class ProductList extends React.Component {
 
         <button onClick={this.filterProducts.bind(this)}>{this.translations.filterProducts}</button>
 
+        <CompareProducts.List />
+
+        {/*TODO: implement changeable layout (tiles vs list)*/}
         <ul className="product-list">
           {this.state.productsList.length > 0
             ? this.state.productsList.map((product) => {
