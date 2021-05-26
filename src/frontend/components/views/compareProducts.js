@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toJS } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import appStore from '../../features/appStore';
 import { Link } from 'react-router-dom';
