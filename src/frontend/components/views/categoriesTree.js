@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef } from 'react';
+import React, { useState, useEffect, createRef, useRef } from 'react';
 import apiService from '../../features/apiService';
 import TreeMenu from 'react-simple-tree-menu';
 
@@ -6,7 +6,7 @@ export default function CategoriesTree(props) {
   const [categoriesMap, setCategoriesMap] = useState(null);
   const categoriesTreeRef = createRef();
   const treeMenuRef = createRef();
-  const activeTreeNodes = new Map();
+  const activeTreeNodes = useRef(new Map());
 
   useEffect(() => {
     (async () => {
@@ -39,6 +39,7 @@ export default function CategoriesTree(props) {
     return null;
   };
   getCategoriesTree.levels = ['first', 'second', 'third', 'fourth'];
+  // TODO: handle selecting tree node wrapper (as "Parts") - it should auto-select all it's descendants and not consider node itself being selected
   getCategoriesTree.recursiveMapper = (categoryItem, index, _, level = 0) => {
     if (!getCategoriesTree.levels[level]) {
       throw new RangeError('Product categories hierarchy has more levels than prepared list!');
@@ -68,16 +69,16 @@ export default function CategoriesTree(props) {
 
   const toggleActiveTreeNode = (nodeLevel, nodeIndex, matchedParentKey, nodeLabel) => {
     const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
-    const isActiveTreeNode = activeTreeNodes.has(currentNodeKey);
+    const isActiveTreeNode = activeTreeNodes.current.has(currentNodeKey);
 
     if (isActiveTreeNode) {
-      activeTreeNodes.delete(currentNodeKey);
+      activeTreeNodes.current.delete(currentNodeKey);
     } else {
-      activeTreeNodes.set(currentNodeKey, `${matchedParentKey}${nodeLabel}`);
+      activeTreeNodes.current.set(currentNodeKey, `${matchedParentKey}${nodeLabel}`);
     }
 
     // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
-    [[currentNodeKey], ...activeTreeNodes].forEach(([key], iteration) => {
+    [[currentNodeKey], ...activeTreeNodes.current].forEach(([key], iteration) => {
       const isCurrentNodeKey = iteration === 0;
       const [level, index] = key.split('-');
       const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
@@ -91,7 +92,7 @@ export default function CategoriesTree(props) {
       });
     });
 
-    const activeCategoryNames = [...activeTreeNodes.values()];
+    const activeCategoryNames = [...activeTreeNodes.current.values()];
     props.onCategorySelect(activeCategoryNames);
   };
   toggleActiveTreeNode.matchParentKey = (treeData, clickedItem) => {

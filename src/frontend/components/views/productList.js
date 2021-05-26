@@ -33,10 +33,6 @@ export default function ProductList() {
     });
   }, []);
 
-  // shouldComponentUpdate(_, nextState) {
-  //   return nextState.productCategories.toString() === this.state.productCategories.toString();
-  // }
-
   const updateProductsList = async ({
     pageNumber = currentProductPage,
     productsPerPage = currentProductsPerPageLimit,
@@ -76,7 +72,7 @@ export default function ProductList() {
   };
 
   const onCategorySelect = (categories) => {
-    setProductCategories((prev) => [...prev, ...categories]);
+    setProductCategories(categories);
   };
 
   const filterProducts = () => {
