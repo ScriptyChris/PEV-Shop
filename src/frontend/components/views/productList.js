@@ -5,7 +5,6 @@ import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
 import CompareProducts from './compareProducts';
 
-// TODO: consider refactoring class based component to a function based one (and so use mobx-react-lite instead of mobx-react)
 export default function ProductList() {
   const translations = {
     lackOfProducts: 'Brak produktów...',
