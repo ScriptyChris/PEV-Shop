@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import appStore from '../../features/appStore';
 import { getUserCartStateFromStorage, saveUserCartStateToStorage } from '../../features/storageApi';
 import apiService from '../../features/apiService';

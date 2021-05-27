@@ -41,6 +41,7 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
   const headRowRefs = useRef([]);
   const bodyRowRefs = useRef([]);
   const resizeObserverRef = useRef(null);
+  // TODO: consider if useMemo is really needed if value is only used on first render
   const handleInitialRender = useMemo(() => {
     const initialRenderClassName = 'initial-render';
 
@@ -53,6 +54,7 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
     };
   }, []);
   const [multipleRefsGetterUsed, setMultipleRefsGetterUsed] = useState(false);
+  // TODO: consider if useMemo is needed if scrollBaseValue is used just once
   const scrollBaseValue = useMemo(() => getScrollBaseValue(scrollerBaseValueMeta), []);
 
   const REF_TYPE = Object.freeze({
