@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { toJS } from 'mobx';
+import React, { useEffect, useState } from 'react';
+import { reaction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { autorun } from 'mobx';
 import appStore from '../../features/appStore';
 import { Link } from 'react-router-dom';
 import Scroller from '../utils/scroller';
@@ -66,15 +65,17 @@ const Toggler = observer(function ToggleProductComparable({ product }) {
     addToCompare: 'Add to compare',
   };
 
-  autorun(() => {
-    const isComparable = appStore.productComparisonState.some(
-      (comparableProduct) => comparableProduct._id === product._id
-    );
-
-    if (isProductComparable !== isComparable) {
-      setIsProductComparable(isComparable);
-    }
-  });
+  useEffect(() =>
+    reaction(
+      () => appStore.productComparisonState.some((comparableProduct) => comparableProduct._id === product._id),
+      (isComparable) => {
+        if (isProductComparable !== isComparable) {
+          setIsProductComparable(isComparable);
+        }
+      },
+      { fireImmediately: true }
+    )
+  );
 
   const handleComparableToggle = ({ target }) => {
     if (target.checked) {
