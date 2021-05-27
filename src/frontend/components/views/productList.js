@@ -4,11 +4,13 @@ import ProductItem from './productItem';
 import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
 import CompareProducts from './compareProducts';
+import Search from './search';
 
 export default function ProductList() {
   const translations = {
     lackOfProducts: 'Brak produktów...',
     filterProducts: 'Filtruj produkty',
+    typeProductName: 'Type product name:',
   };
   const paginationTranslations = {
     itemsPerPageSuffix: 'produktów',
@@ -80,6 +82,10 @@ export default function ProductList() {
     }).then();
   };
 
+  const handleInputSearchChange = (searchValue) => {
+    console.log('searchValue:', searchValue);
+  };
+
   return (
     <>
       <CategoriesTree onCategorySelect={onCategorySelect} />
@@ -98,6 +104,13 @@ export default function ProductList() {
       <button onClick={filterProducts}>{translations.filterProducts}</button>
 
       <CompareProducts.List />
+
+      <Search
+        label={translations.typeProductName}
+        searchingTarget="productName"
+        debounceTimeMs={750}
+        onInputChange={handleInputSearchChange}
+      />
 
       {/*TODO: implement changeable layout (tiles vs list)*/}
       <ul className="product-list">
