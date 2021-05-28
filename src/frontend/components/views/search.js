@@ -1,12 +1,13 @@
 import React, { memo, useRef, useState } from 'react';
 import apiService from '../../features/apiService';
 
-const transaction = {
+const translations = {
   defaultLabel: 'Search for:',
+  caseSensitiveSearch: 'Is case sensitive?',
 };
 
 const SearchProductsByName = (props) => {
-  const [isCaseSensitive /*, setCaseSensitive*/] = useState(false);
+  const [isCaseSensitive, setCaseSensitive] = useState(false);
 
   const handleInputSearchChange = (searchValue) => {
     console.log('searchValue:', searchValue, ' /pagination:', props.pagination);
@@ -18,20 +19,23 @@ const SearchProductsByName = (props) => {
     props.onReceivedProductsByName(apiService.getProductsByName(searchValue, isCaseSensitive, pagination));
   };
 
-  // const handleCaseSensitiveChange = ({ target: { value } }) => {
-  //   setCaseSensitive(value);
-  // }
+  const handleCaseSensitiveChange = ({ target: { checked } }) => {
+    setCaseSensitive(checked);
+  };
 
   return (
-    <div>
+    <div className="search">
       <Search {...props} onInputChange={handleInputSearchChange} />
-      {/*<input type="checkbox" onChange={handleCaseSensitiveChange} value={isCaseSensitive} />*/}
+      <label>
+        {translations.caseSensitiveSearch}
+        <input type="checkbox" onChange={handleCaseSensitiveChange} checked={isCaseSensitive} />
+      </label>
     </div>
   );
 };
 
 const Search = memo(function Search({
-  label = transaction.defaultLabel,
+  label = translations.defaultLabel,
   searchingTarget = Math.random(),
   debounceTimeMs = 0,
   onInputChange,
