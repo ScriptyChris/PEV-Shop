@@ -2,7 +2,11 @@ const isEmptyQueryObject = (query: Record<string, unknown>): boolean => {
   return typeof query === 'object' && !Object.keys(query).length;
 };
 
-const getSearchByNameConfig = (reqQuery: TProductNameReq): { name: RegExp } => {
+const getSearchByNameConfig = (reqQuery: TProductNameReq): { name: RegExp } | null => {
+  if (!reqQuery.name) {
+    return null;
+  }
+
   const caseSensitiveFlag: string = reqQuery.caseSensitive === 'true' ? '' : 'i';
   const nameQuery = new RegExp(reqQuery.name, caseSensitiveFlag);
 
