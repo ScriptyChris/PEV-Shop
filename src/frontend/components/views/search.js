@@ -1,10 +1,36 @@
 import React, { memo, useRef, useState } from 'react';
+import apiService from '../../features/apiService';
 
 const transaction = {
   defaultLabel: 'Search for:',
 };
 
-export default memo(function Search({
+const SearchProductsByName = (props) => {
+  const [isCaseSensitive /*, setCaseSensitive*/] = useState(false);
+
+  const handleInputSearchChange = (searchValue) => {
+    console.log('searchValue:', searchValue, ' /pagination:', props.pagination);
+    const pagination = {
+      pageNumber: props.pagination.currentProductPage,
+      productsPerPage: props.pagination.currentProductsPerPageLimit,
+    };
+
+    props.onReceivedProductsByName(apiService.getProductsByName(searchValue, isCaseSensitive, pagination));
+  };
+
+  // const handleCaseSensitiveChange = ({ target: { value } }) => {
+  //   setCaseSensitive(value);
+  // }
+
+  return (
+    <div>
+      <Search {...props} onInputChange={handleInputSearchChange} />
+      {/*<input type="checkbox" onChange={handleCaseSensitiveChange} value={isCaseSensitive} />*/}
+    </div>
+  );
+};
+
+const Search = memo(function Search({
   label = transaction.defaultLabel,
   searchingTarget = Math.random(),
   debounceTimeMs = 0,
@@ -45,3 +71,5 @@ export default memo(function Search({
     </div>
   );
 });
+
+export { Search as default, SearchProductsByName };

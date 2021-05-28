@@ -4,7 +4,7 @@ import ProductItem from './productItem';
 import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
 import CompareProducts from './compareProducts';
-import Search from './search';
+import { SearchProductsByName } from './search';
 
 export default function ProductList() {
   const translations = {
@@ -21,7 +21,6 @@ export default function ProductList() {
   const productsPerPageLimits = [15, 30, 60, Infinity];
 
   const [productsList, setProductsList] = useState([]);
-  const [, setProductsCount] = useState(0);
   const [productCategories, setProductCategories] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentProductPage, setCurrentProductPage] = useState(1);
@@ -38,25 +37,20 @@ export default function ProductList() {
     pageNumber = currentProductPage,
     productsPerPage = currentProductsPerPageLimit,
     productCategories = productCategories,
+    products,
   } = {}) => {
     const isHighestProductsPerPage = productsPerPage === productsPerPageLimits[productsPerPageLimits.length - 1];
 
     if (isHighestProductsPerPage) {
-      setProductsList(await apiService.getProducts({ productCategories }));
-      setProductsCount(productsList.length);
+      setProductsList(products || (await apiService.getProducts({ productCategories })));
       setTotalPages(1);
     } else {
       const pagination = { pageNumber, productsPerPage };
-      const products = await apiService.getProducts({ pagination, productCategories });
+      products = products || (await apiService.getProducts({ pagination, productCategories }));
 
       setProductsList(products.productsList);
-      setProductsCount(products.totalProducts);
       setTotalPages(products.totalPages);
-
-      // console.log('paginated products:', products, ' /totalPages:', totalPages);
     }
-
-    // console.log('productsList:', productsList);
 
     setCurrentProductsPerPageLimit(productsPerPage);
     setCurrentProductPage(pageNumber);
@@ -82,8 +76,11 @@ export default function ProductList() {
     }).then();
   };
 
-  const handleInputSearchChange = (searchValue) => {
-    console.log('searchValue:', searchValue);
+  const handleSearchedProducts = async (products) => {
+    products = await products;
+    console.log('(handleSearchedProducts) products:', products);
+
+    updateProductsList({ products }).then();
   };
 
   return (
@@ -105,11 +102,12 @@ export default function ProductList() {
 
       <CompareProducts.List />
 
-      <Search
+      <SearchProductsByName
         label={translations.typeProductName}
         searchingTarget="productName"
         debounceTimeMs={750}
-        onInputChange={handleInputSearchChange}
+        pagination={{ currentProductPage: 1, currentProductsPerPageLimit }}
+        onReceivedProductsByName={handleSearchedProducts}
       />
 
       {/*TODO: implement changeable layout (tiles vs list)*/}
