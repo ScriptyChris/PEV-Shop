@@ -77,10 +77,7 @@ export default function ProductList() {
   };
 
   const handleSearchedProducts = async (products) => {
-    products = await products;
-    console.log('(handleSearchedProducts) products:', products);
-
-    updateProductsList({ products }).then();
+    updateProductsList({ products: await products }).then();
   };
 
   return (

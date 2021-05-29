@@ -9,8 +9,8 @@ const translations = {
 const SearchProductsByName = (props) => {
   const [isCaseSensitive, setCaseSensitive] = useState(false);
 
+  // TODO: fix issue with stale isCaseSensitive value when checkbox is ticked between user types query and debounce delays reaction
   const handleInputSearchChange = (searchValue) => {
-    console.log('searchValue:', searchValue, ' /pagination:', props.pagination);
     const pagination = {
       pageNumber: props.pagination.currentProductPage,
       productsPerPage: props.pagination.currentProductsPerPageLimit,
