@@ -2,7 +2,18 @@ const isEmptyQueryObject = (query: Record<string, unknown>): boolean => {
   return typeof query === 'object' && !Object.keys(query).length;
 };
 
-const getPaginationConfig = (reqQuery: TPageLimit): { page: number; limit: number } | null => {
+const getSearchByNameConfig = (reqQuery: TProductNameReq): { name: RegExp } | null => {
+  if (!reqQuery.name) {
+    return null;
+  }
+
+  const caseSensitiveFlag: string = reqQuery.caseSensitive === 'true' ? '' : 'i';
+  const nameQuery = new RegExp(reqQuery.name, caseSensitiveFlag);
+
+  return { name: nameQuery };
+};
+
+const getPaginationConfig = (reqQuery: TPageLimit): TPageLimit | null => {
   if (!('page' in reqQuery) || !('limit' in reqQuery)) {
     return null;
   }
@@ -31,5 +42,12 @@ const getProductsWithChosenCategories = (reqQuery: TProductsCategoriesReq): { ca
 export type TPageLimit = { page: number; limit: number };
 export type TIdListReq = { idList: string };
 export type TProductsCategoriesReq = { productCategories: string };
+export type TProductNameReq = { name: string; caseSensitive: string | boolean };
 
-export { isEmptyQueryObject, getPaginationConfig, getIdListConfig, getProductsWithChosenCategories };
+export {
+  isEmptyQueryObject,
+  getSearchByNameConfig,
+  getPaginationConfig,
+  getIdListConfig,
+  getProductsWithChosenCategories,
+};

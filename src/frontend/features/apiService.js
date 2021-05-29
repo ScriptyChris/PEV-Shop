@@ -87,6 +87,17 @@ const apiService = new (class ApiService extends Ajax {
     this.ORDERS_URL = 'orders';
   }
 
+  _preparePaginationParams(searchParams, pagination) {
+    if (!pagination || !Object.keys(pagination).length) {
+      return;
+    } else if (!searchParams || !(searchParams instanceof URLSearchParams)) {
+      throw ReferenceError('searchParams as an instance of URLSearchParams must be provided!');
+    }
+
+    searchParams.append('page', pagination.pageNumber);
+    searchParams.append('limit', pagination.productsPerPage);
+  }
+
   addProduct(product) {
     return this.postRequest(this.PRODUCTS_URL, product);
   }
@@ -94,10 +105,7 @@ const apiService = new (class ApiService extends Ajax {
   getProducts({ pagination, productCategories } = {}) {
     const searchParams = new URLSearchParams();
 
-    if (pagination && Object.keys(pagination).length) {
-      searchParams.append('page', pagination.pageNumber);
-      searchParams.append('limit', pagination.productsPerPage);
-    }
+    this._preparePaginationParams(searchParams, pagination);
 
     if (productCategories && productCategories.length) {
       searchParams.append('productCategories', productCategories);
@@ -108,6 +116,16 @@ const apiService = new (class ApiService extends Ajax {
 
   getProductsById(idList) {
     return this.getRequest(`${this.PRODUCTS_URL}?idList=${idList}`);
+  }
+
+  getProductsByName(name, caseSensitive = 'false', pagination) {
+    const searchParams = new URLSearchParams();
+    searchParams.append('name', name);
+    searchParams.append('caseSensitive', caseSensitive);
+
+    this._preparePaginationParams(searchParams, pagination);
+
+    return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
   }
 
   // getProduct(id) {

@@ -2,12 +2,20 @@
 import { findAssociatedSrcModulePath } from '../../test-index';
 
 describe('#queryBuilder', () => {
-  let isEmptyQueryObject: any, getPaginationConfig: any, getIdListConfig: any, getProductsWithChosenCategories: any;
+  let isEmptyQueryObject: any,
+    getPaginationConfig: any,
+    getIdListConfig: any,
+    getProductsWithChosenCategories: any,
+    getSearchByNameConfig: any;
 
   beforeAll(async () => {
-    ({ isEmptyQueryObject, getPaginationConfig, getIdListConfig, getProductsWithChosenCategories } = await import(
-      findAssociatedSrcModulePath()
-    ));
+    ({
+      isEmptyQueryObject,
+      getPaginationConfig,
+      getIdListConfig,
+      getProductsWithChosenCategories,
+      getSearchByNameConfig,
+    } = await import(findAssociatedSrcModulePath()));
   });
 
   describe('isEmptyQueryObject()', () => {
@@ -78,6 +86,24 @@ describe('#queryBuilder', () => {
 
       expect(Array.isArray(getIdListConfigResult._id.$in)).toBe(true);
       expect(getIdListConfigResult._id.$in).toStrictEqual(['hello', 'world']);
+    });
+  });
+
+  describe('getSearchByNameConfig()', () => {
+    it('should return null when passed object with falsy "name" prop', () => {
+      expect(getSearchByNameConfig({})).toBeNull();
+      expect(getSearchByNameConfig({ name: '' })).toBeNull();
+      expect(getSearchByNameConfig({ name: 0 })).toBeNull();
+      expect(getSearchByNameConfig({ name: false })).toBeNull();
+      expect(getSearchByNameConfig({ name: null })).toBeNull();
+      expect(getSearchByNameConfig({ name: undefined })).toBeNull();
+    });
+
+    it('should return an object with "name" prop containing query as RegExp based on passed value with "i" flag when caseSensitive param is equal to "true"', () => {
+      expect(getSearchByNameConfig({ name: 'test' })).toStrictEqual({ name: /test/i });
+      expect(getSearchByNameConfig({ name: 'test', caseSensitive: 'false' })).toStrictEqual({ name: /test/i });
+      expect(getSearchByNameConfig({ name: 'test', caseSensitive: '' })).toStrictEqual({ name: /test/i });
+      expect(getSearchByNameConfig({ name: 'test', caseSensitive: 'true' })).toStrictEqual({ name: /test/ });
     });
   });
 });

@@ -56,6 +56,9 @@ const queryBuilder = (() => {
     getPaginationConfig: jest.fn(() => {
       throw getMockImplementationError('getPaginationConfig');
     }),
+    getSearchByNameConfig: jest.fn(() => {
+      throw getMockImplementationError('getSearchByNameConfig');
+    }),
   };
   _queryBuilder.getIdListConfig._succeededCall = () => ({
     _id: { $in: ['123'] },
@@ -72,6 +75,10 @@ const queryBuilder = (() => {
     limit: 10,
   });
   _queryBuilder.getPaginationConfig._failedCall = () => null;
+  _queryBuilder.getSearchByNameConfig._succeededCall = () => ({
+    name: /test/,
+  });
+  _queryBuilder.getSearchByNameConfig._failedCall = () => null;
 
   return Object.freeze(_queryBuilder);
 })();

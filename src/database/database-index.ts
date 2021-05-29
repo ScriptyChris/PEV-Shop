@@ -71,7 +71,7 @@ async function getFromDB(
     itemQuery = { _id: itemQuery };
   }
 
-  if (queryBuilder.isEmptyQueryObject(itemQuery) || typeof itemQuery._id === 'object') {
+  if (queryBuilder.isEmptyQueryObject(itemQuery) || typeof itemQuery._id === 'object' || (itemQuery instanceof Object && 'name' in itemQuery)) {
     return Model.find(itemQuery);
   }
 

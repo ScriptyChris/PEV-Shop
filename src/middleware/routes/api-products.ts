@@ -3,7 +3,7 @@ import * as expressModule from 'express';
 import { Request, Response } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
 import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../database/database-index';
-import { TIdListReq, TPageLimit, TProductsCategoriesReq } from '../../database/utils/queryBuilder';
+import { TIdListReq, TPageLimit, TProductNameReq, TProductsCategoriesReq } from '../../database/utils/queryBuilder';
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 
 const {
@@ -32,16 +32,17 @@ router._modifyProduct = modifyProduct;
 export default router;
 
 async function getProducts(
-  req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit },
+  req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq },
   res: Response
 ): Promise<void> {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
-    logger.log('[products GET] query', req.query);
+    logger.log('[products GET] req.query', req.query);
 
     // TODO: ... and really refactor this!
     const idListConfig = queryBuilder.getIdListConfig(req.query);
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
+    const searchByName = queryBuilder.getSearchByNameConfig(req.query);
 
     let query = {};
 
@@ -49,6 +50,8 @@ async function getProducts(
       query = idListConfig;
     } else if (chosenCategories) {
       query = chosenCategories;
+    } else if (searchByName) {
+      query = searchByName;
     }
 
     const options: { pagination?: TPaginationConfig } = {};
@@ -60,7 +63,7 @@ async function getProducts(
 
     const paginatedProducts = await getFromDB(query, 'Product', options);
 
-    // logger.log('paginatedProducts:', paginatedProducts);
+    // logger.log('query:', query, ' /paginatedProducts:', paginatedProducts.length);
 
     res.status(200).json(paginatedProducts);
   } catch (exception) {

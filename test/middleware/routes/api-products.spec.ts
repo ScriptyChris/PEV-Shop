@@ -64,6 +64,9 @@ describe('#api-products', () => {
         queryBuilderMock.getPaginationConfig.mockImplementationOnce(
           queryBuilderMock.getPaginationConfig._succeededCall
         );
+        queryBuilderMock.getSearchByNameConfig.mockImplementationOnce(
+          queryBuilderMock.getSearchByNameConfig._succeededCall
+        );
         getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
       });
 
