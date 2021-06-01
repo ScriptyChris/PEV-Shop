@@ -5,6 +5,7 @@ import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
 import CompareProducts from './compareProducts';
 import { SearchProductsByName } from './search';
+import ProductsFilter from './productsFilter';
 
 export default function ProductList() {
   const translations = {
@@ -94,6 +95,8 @@ export default function ProductList() {
         onItemsPerPageLimitChange={onProductsPerPageLimitChange}
         onItemPageChange={onProductPageChange}
       />
+
+      <ProductsFilter />
 
       <button onClick={filterProducts}>{translations.filterProducts}</button>
 

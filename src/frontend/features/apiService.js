@@ -102,13 +102,17 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(this.PRODUCTS_URL, product);
   }
 
-  getProducts({ pagination, productCategories } = {}) {
+  getProducts({ pagination, productCategories, productSpecs } = {}) {
     const searchParams = new URLSearchParams();
 
     this._preparePaginationParams(searchParams, pagination);
 
     if (productCategories && productCategories.length) {
       searchParams.append('productCategories', productCategories);
+    }
+
+    if (productSpecs && productSpecs.length) {
+      searchParams.append('productSpecs', productSpecs);
     }
 
     return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
@@ -134,6 +138,24 @@ const apiService = new (class ApiService extends Ajax {
 
   getProductCategories() {
     return this.getRequest(this.PRODUCT_CATEGORIES_URL);
+  }
+
+  // TODO: switch mock to real API data
+  getProductsSpecifications() {
+    return [
+      {
+        category: 'Accessories',
+        specHeaders: ['Weight', 'Dimensions'],
+      },
+      {
+        category: 'Electric Scooters & eBikes',
+        specHeaders: ['Range', 'Cruising Speed'],
+      },
+      {
+        category: 'Advanced Electric Wheels',
+        specHeaders: ['Range', 'Cruising Speed', 'Weight'],
+      },
+    ];
   }
 
   getUser() {
