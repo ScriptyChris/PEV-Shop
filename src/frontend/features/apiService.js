@@ -145,15 +145,62 @@ const apiService = new (class ApiService extends Ajax {
     return [
       {
         category: 'Accessories',
-        specHeaders: ['Weight', 'Dimensions'],
+        specs: [
+          {
+            name: 'Weight',
+            value: [[1, 15]],
+            type: 'inputNumber',
+          },
+          {
+            name: 'Colour',
+            value: ['Lime Green', 'Black', 'Blue', 'Red'],
+            type: 'inputCheckbox',
+          },
+          {
+            name: 'Dimensions',
+            value: [
+              [5, 20],
+              [5, 20],
+              [1, 7],
+            ],
+            type: 'inputNumber',
+          },
+        ],
       },
       {
         category: 'Electric Scooters & eBikes',
-        specHeaders: ['Range', 'Cruising Speed'],
+        specs: [
+          {
+            name: 'Range',
+            value: [[5, 45]],
+            type: 'inputNumber',
+          },
+          {
+            name: 'Cruising Speed',
+            value: [[10, 35]],
+            type: 'inputNumber',
+          },
+        ],
       },
       {
         category: 'Advanced Electric Wheels',
-        specHeaders: ['Range', 'Cruising Speed', 'Weight'],
+        specs: [
+          {
+            name: 'Range',
+            value: [[5, 45]],
+            type: 'inputNumber',
+          },
+          {
+            name: 'Cruising Speed',
+            value: [[10, 35]],
+            type: 'inputNumber',
+          },
+          {
+            name: 'Weight',
+            value: [[7, 25]],
+            type: 'inputNumber',
+          },
+        ],
       },
     ];
   }

@@ -96,7 +96,7 @@ export default function ProductList() {
         onItemPageChange={onProductPageChange}
       />
 
-      <ProductsFilter />
+      <ProductsFilter selectedCategories={productCategories} />
 
       <button onClick={filterProducts}>{translations.filterProducts}</button>
 
