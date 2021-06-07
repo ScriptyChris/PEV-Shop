@@ -142,67 +142,37 @@ const apiService = new (class ApiService extends Ajax {
 
   // TODO: switch mock to real API data
   getProductsSpecifications() {
-    return [
-      {
-        category: 'Accessories',
-        specs: [
-          {
-            name: 'Weight',
-            value: [[1, 15]],
-            type: 'inputNumber',
-          },
-          {
-            name: 'Colour',
-            value: ['Lime Green', 'Black', 'Blue', 'Red'],
-            type: 'inputCheckbox',
-          },
-          {
-            name: 'Dimensions',
-            value: [
-              [5, 20],
-              [5, 20],
-              [1, 7],
-            ],
-            type: 'inputNumber',
-          },
-        ],
-      },
-      {
-        category: 'Electric Scooters & eBikes',
-        specs: [
-          {
-            name: 'Range',
-            value: [[5, 45]],
-            type: 'inputNumber',
-          },
-          {
-            name: 'Cruising Speed',
-            value: [[10, 35]],
-            type: 'inputNumber',
-          },
-        ],
-      },
-      {
-        category: 'Advanced Electric Wheels',
-        specs: [
-          {
-            name: 'Range',
-            value: [[5, 45]],
-            type: 'inputNumber',
-          },
-          {
-            name: 'Cruising Speed',
-            value: [[10, 35]],
-            type: 'inputNumber',
-          },
-          {
-            name: 'Weight',
-            value: [[7, 25]],
-            type: 'inputNumber',
-          },
-        ],
-      },
-    ];
+    return {
+      specs: [
+        { name: 'Weight', value: [[1, 15]], type: 'inputNumber' },
+        { name: 'Colour', value: ['Lime Green', 'Black', 'Blue', 'Red'], type: 'inputCheckbox' },
+        {
+          name: 'Dimensions',
+          value: [
+            [5, 20],
+            [5, 20],
+            [1, 7],
+          ],
+          type: 'inputNumber',
+        },
+        { name: 'Range', value: [[5, 45]], type: 'inputNumber' },
+        { name: 'Cruising Speed', value: [[10, 35]], type: 'inputNumber' },
+      ],
+      categoryToSpecs: [
+        {
+          category: 'Accessories',
+          specs: ['Weight', 'Colour', 'Dimensions'],
+        },
+        {
+          category: 'Electric Scooters & eBikes',
+          specs: ['Range', 'Cruising Speed'],
+        },
+        {
+          category: 'Advanced Electric Wheels',
+          specs: ['Range', 'Cruising Speed'],
+        },
+      ],
+    };
   }
 
   getUser() {
