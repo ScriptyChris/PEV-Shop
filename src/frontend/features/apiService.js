@@ -144,19 +144,20 @@ const apiService = new (class ApiService extends Ajax {
   getProductsSpecifications() {
     return {
       specs: [
-        { name: 'Weight', value: [[1, 15]], type: 'inputNumber' },
-        { name: 'Colour', value: ['Lime Green', 'Black', 'Blue', 'Red'], type: 'inputCheckbox' },
+        { name: 'Weight', values: [[1, 15]], type: 'inputNumber' },
+        { name: 'Colour', values: ['Lime Green', 'Black', 'Blue', 'Red'], type: 'inputCheckbox' },
         {
           name: 'Dimensions',
-          value: [
+          descriptions: ['Length', 'Width', 'Height'],
+          values: [
             [5, 20],
             [5, 20],
             [1, 7],
           ],
           type: 'inputNumber',
         },
-        { name: 'Range', value: [[5, 45]], type: 'inputNumber' },
-        { name: 'Cruising Speed', value: [[10, 35]], type: 'inputNumber' },
+        { name: 'Range', values: [[5, 45]], type: 'inputNumber' },
+        { name: 'Cruising Speed', values: [[10, 35]], type: 'inputNumber' },
       ],
       categoryToSpecs: [
         {
