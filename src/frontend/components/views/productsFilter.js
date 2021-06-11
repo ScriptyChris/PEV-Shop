@@ -4,7 +4,32 @@ import apiService from '../../features/apiService';
 
 const translations = {
   filterUnavailable: 'Filters are not available',
+  minExceededMax: 'Min value should not be greater than max value',
+  maxBeneathMin: 'Max value should not be lower than min value',
+  normalizeContent(text) {
+    return text.replace(/\W/g, CHARS.EMPTY).replace(/_/g, CHARS.SPACE);
+  },
 };
+
+const CHARS = Object.freeze({
+  EMPTY: '',
+  SPACE: ' ',
+  PIPE: '|',
+  MIN: 'Min',
+  MAX: 'Max',
+  LETTERS_REGEXP: '[A-Z_a-z]+',
+});
+const SPEC_NAMES_SEPARATORS = Object.freeze({
+  GAP: '_',
+  LEVEL: '__',
+  MIN_MAX: '--',
+});
+
+const matchRegExp = new RegExp(
+  // eslint-disable-next-line no-useless-escape
+  `^((?<block>${CHARS.LETTERS_REGEXP})(${SPEC_NAMES_SEPARATORS.LEVEL}))?(?<element>${CHARS.LETTERS_REGEXP})((${SPEC_NAMES_SEPARATORS.MIN_MAX})(?<modifier>${CHARS.LETTERS_REGEXP}))?$`
+);
+const parseInputName = (name) => name.match(matchRegExp).groups;
 
 const getControlsForSpecs = (() => {
   const TEMPLATE_FUNCTION_PER_CONTROL_TYPE = {
@@ -25,7 +50,7 @@ const getControlsForSpecs = (() => {
     // TODO: make each <fieldset> collapsible
     return (
       <fieldset key={`spec${name}Filter`}>
-        <legend>{name}</legend>
+        <legend>{translations.normalizeContent(name)}</legend>
         {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
       </fieldset>
     );
@@ -38,13 +63,17 @@ const getControlsForSpecs = (() => {
       const specRangeName = specRangeNames.slice(startIndex, endIndex);
       const keyAndId = `spec${specName}Control${index}`;
       const areSpecDescriptions = Array.isArray(specDescriptions);
+      const ariaLabelledBy = areSpecDescriptions ? keyAndId : CHARS.GAP;
+      const erroredInputName =
+        formikRestProps.errors && specRangeName.find((rangeName) => formikRestProps.errors[rangeName]);
+      const errorValue = formikRestProps.errors[erroredInputName];
 
       return (
         <div key={keyAndId}>
-          {areSpecDescriptions && <div id={keyAndId}>{specDescriptions[index]}</div>}
+          {areSpecDescriptions && <div id={keyAndId}>{translations.normalizeContent(specDescriptions[index])}</div>}
 
           <input
-            aria-labelledby={areSpecDescriptions ? keyAndId : ''}
+            aria-labelledby={ariaLabelledBy}
             type="number"
             min={vMin}
             name={specRangeName[0]}
@@ -55,13 +84,15 @@ const getControlsForSpecs = (() => {
           <span className="products-filter-form__range-separator">-</span>
 
           <input
-            aria-labelledby={areSpecDescriptions ? keyAndId : ''}
+            aria-labelledby={ariaLabelledBy}
             type="number"
             max={vMax}
             name={specRangeName[1]}
             value={formikRestProps.values[specRangeName[1]]}
             onChange={formikRestProps.handleChange}
           />
+
+          {errorValue && <p className="products-filter-form__range-error">{translations[errorValue]}</p>}
         </div>
       );
     });
@@ -88,6 +119,7 @@ function ProductsFilter({ selectedCategories }) {
   const productsSpecsPerCategory = useRef({});
   const [productSpecsPerSelectedCategory, setProductSpecsPerSelectedCategory] = useState([]);
   const [formInitials, setFormInitials] = useState({});
+  const lastChangedInputName = useRef('');
   const filterSpecsPerCategory = useCallback(() => {
     if (!Object.keys(productsSpecsPerCategory.current).length) {
       return;
@@ -133,8 +165,12 @@ function ProductsFilter({ selectedCategories }) {
 
         return (specName, specDescriptions) => ({
           [specName]: formInitialsKeys.filter((key) => {
-            const pipedDescriptionsRegExp = Array.isArray(specDescriptions) ? `(${specDescriptions.join('|')})` : '';
-            const regExp = new RegExp(`^${specName}${pipedDescriptionsRegExp}(Min|Max)?$`);
+            const pipedDescriptionsRegExp = Array.isArray(specDescriptions)
+              ? `(${SPEC_NAMES_SEPARATORS.LEVEL}(${specDescriptions.join(CHARS.PIPE)}))`
+              : CHARS.EMPTY;
+            const regExp = new RegExp(
+              `^${specName}${pipedDescriptionsRegExp}(${SPEC_NAMES_SEPARATORS.MIN_MAX}(${CHARS.MIN}|${CHARS.MAX}))?$`
+            );
 
             return regExp.test(key);
           }),
@@ -142,7 +178,7 @@ function ProductsFilter({ selectedCategories }) {
       })();
 
       return productSpecsPerSelectedCategory.map((spec) => {
-        spec._normalizedName = spec.name.replaceAll(' ', '_');
+        spec._normalizedName = spec.name.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP);
         spec._namesRangeMapping = getNameRangeMapping(spec._normalizedName, spec.descriptions);
 
         return getControlsForSpecs(formikRestProps, spec);
@@ -152,15 +188,18 @@ function ProductsFilter({ selectedCategories }) {
   );
 
   const prepareFormInitialValues = useCallback(() => {
-    const createEntry = (name) => [name.replaceAll(' ', '_'), ''];
-    const createMinMaxEntry = (name) => [createEntry(`${name}Min`), createEntry(`${name}Max`)];
+    const createEntry = (name) => [name.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP), CHARS.EMPTY];
+    const createMinMaxEntry = (name) => [
+      createEntry(`${name}${SPEC_NAMES_SEPARATORS.MIN_MAX}${CHARS.MIN}`),
+      createEntry(`${name}${SPEC_NAMES_SEPARATORS.MIN_MAX}${CHARS.MAX}`),
+    ];
 
     return Object.fromEntries(
       productSpecsPerSelectedCategory.flatMap(({ name, descriptions, values }) => {
         if (!Array.isArray(values[0])) {
           return [createEntry(name)];
         } else if (descriptions) {
-          return descriptions.flatMap((desc) => createMinMaxEntry(`${name}${desc}`));
+          return descriptions.flatMap((desc) => createMinMaxEntry(`${name}${SPEC_NAMES_SEPARATORS.LEVEL}${desc}`));
         } else {
           return values.flatMap(() => createMinMaxEntry(name));
         }
@@ -168,13 +207,69 @@ function ProductsFilter({ selectedCategories }) {
     );
   }, [productSpecsPerSelectedCategory]);
 
+  const changeHandler = ({ target }) => {
+    lastChangedInputName.current = target.name;
+  };
+
+  const validateHandler = (() => {
+    const getMinMaxCounterPart = (nameValuePairs, nameElement, nameModifier) => {
+      const counterPartSuffix = nameModifier === CHARS.MIN ? CHARS.MAX : CHARS.MIN;
+
+      return Object.keys(nameValuePairs).find((name) =>
+        name.endsWith(`${nameElement}${SPEC_NAMES_SEPARATORS.MIN_MAX}${counterPartSuffix}`)
+      );
+    };
+
+    return validator;
+
+    function validator(values) {
+      const parsedInputName = parseInputName(lastChangedInputName.current);
+      const hasCounterPart = parsedInputName.modifier;
+
+      if (!hasCounterPart) {
+        return;
+      }
+
+      const minMaxCounterPart = getMinMaxCounterPart(values, parsedInputName.element, parsedInputName.modifier);
+      const lastInputValue = values[lastChangedInputName.current];
+      const counterPartInputValue = values[minMaxCounterPart];
+      const errors = {
+        [lastChangedInputName.current]: '',
+      };
+
+      if (
+        parsedInputName.modifier === CHARS.MIN &&
+        counterPartInputValue !== CHARS.EMPTY &&
+        counterPartInputValue < lastInputValue
+      ) {
+        errors[lastChangedInputName.current] = 'minExceededMax';
+      } else if (
+        parsedInputName.modifier === CHARS.MAX &&
+        counterPartInputValue !== CHARS.EMPTY &&
+        counterPartInputValue > lastInputValue
+      ) {
+        errors[lastChangedInputName.current] = 'maxBeneathMin';
+      }
+
+      return errors;
+    }
+  })();
+
   return Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
-    <Formik initialValues={formInitials}>
-      {({ handleSubmit, ...formikRestProps }) => (
-        <form onSubmit={handleSubmit} className="products-filter-form">
-          {getFormControls(formikRestProps)}
-        </form>
-      )}
+    <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
+      {({ handleSubmit, ...formikRestProps }) => {
+        const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
+        formikRestProps.handleChange = function (event) {
+          changeHandler(event);
+          _handleChange(event);
+        };
+
+        return (
+          <form onSubmit={handleSubmit} className="products-filter-form">
+            {getFormControls(formikRestProps)}
+          </form>
+        );
+      }}
     </Formik>
   ) : (
     translations.filterUnavailable
