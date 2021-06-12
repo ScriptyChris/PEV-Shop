@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef, useState, Fragment } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState, Fragment, useMemo } from 'react';
 import { Formik } from 'formik';
 import apiService from '../../features/apiService';
 
@@ -76,6 +76,7 @@ const getControlsForSpecs = (() => {
             aria-labelledby={ariaLabelledBy}
             type="number"
             min={vMin}
+            max={vMax}
             name={specRangeName[0]}
             value={formikRestProps.values[specRangeName[0]]}
             onChange={formikRestProps.handleChange}
@@ -86,6 +87,7 @@ const getControlsForSpecs = (() => {
           <input
             aria-labelledby={ariaLabelledBy}
             type="number"
+            min={vMin}
             max={vMax}
             name={specRangeName[1]}
             value={formikRestProps.values[specRangeName[1]]}
@@ -211,7 +213,8 @@ function ProductsFilter({ selectedCategories }) {
     lastChangedInputName.current = target.name;
   };
 
-  const validateHandler = (() => {
+  const validateHandler = useMemo(() => {
+    const cachedErrors = {};
     const getMinMaxCounterPart = (nameValuePairs, nameElement, nameModifier) => {
       const counterPartSuffix = nameModifier === CHARS.MIN ? CHARS.MAX : CHARS.MIN;
 
@@ -234,7 +237,7 @@ function ProductsFilter({ selectedCategories }) {
       const lastInputValue = values[lastChangedInputName.current];
       const counterPartInputValue = values[minMaxCounterPart];
       const errors = {
-        [lastChangedInputName.current]: '',
+        [lastChangedInputName.current]: CHARS.EMPTY,
       };
 
       if (
@@ -251,9 +254,12 @@ function ProductsFilter({ selectedCategories }) {
         errors[lastChangedInputName.current] = 'maxBeneathMin';
       }
 
-      return errors;
+      cachedErrors[lastChangedInputName.current] = errors[lastChangedInputName.current];
+      cachedErrors[minMaxCounterPart] = CHARS.EMPTY;
+
+      return cachedErrors;
     }
-  })();
+  }, []);
 
   return Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
     <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
