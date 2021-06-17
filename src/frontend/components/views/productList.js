@@ -7,26 +7,27 @@ import CompareProducts from './compareProducts';
 import { SearchProductsByName } from './search';
 import ProductsFilter from './productsFilter';
 
+const translations = {
+  lackOfProducts: 'Brak produktów...',
+  filterProducts: 'Filtruj produkty',
+  typeProductName: 'Type product name:',
+};
+const paginationTranslations = {
+  itemsPerPageSuffix: 'produktów',
+  allItems: 'Wszystkie produkty',
+};
+
+// TODO: setup this on backend and pass via some initial config to frontend
+const productsPerPageLimits = [15, 30, 60, Infinity];
+
 export default function ProductList() {
-  const translations = {
-    lackOfProducts: 'Brak produktów...',
-    filterProducts: 'Filtruj produkty',
-    typeProductName: 'Type product name:',
-  };
-  const paginationTranslations = {
-    itemsPerPageSuffix: 'produktów',
-    allItems: 'Wszystkie produkty',
-  };
-
-  // TODO: setup this on backend and pass via some initial config to frontend
-  const productsPerPageLimits = [15, 30, 60, Infinity];
-
   const [productsList, setProductsList] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentProductPage, setCurrentProductPage] = useState(1);
   // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
   const [currentProductsPerPageLimit, setCurrentProductsPerPageLimit] = useState(productsPerPageLimits[0]);
+  const [filterBtnDisabled, setFilterBtnDisabled] = useState(false);
 
   useEffect(() => {
     updateProductsList().catch((updateProductsListError) => {
@@ -71,6 +72,12 @@ export default function ProductList() {
     setProductCategories(categories);
   };
 
+  const handleFiltersUpdate = (filters) => {
+    if (filters.isError !== filterBtnDisabled) {
+      setFilterBtnDisabled(filters.isError);
+    }
+  };
+
   const filterProducts = () => {
     updateProductsList({
       productCategories: productCategories.toString(),
@@ -96,9 +103,11 @@ export default function ProductList() {
         onItemPageChange={onProductPageChange}
       />
 
-      <ProductsFilter selectedCategories={productCategories} />
+      <ProductsFilter selectedCategories={productCategories} onFiltersUpdate={handleFiltersUpdate} />
 
-      <button onClick={filterProducts}>{translations.filterProducts}</button>
+      <button onClick={filterProducts} disabled={filterBtnDisabled}>
+        {translations.filterProducts}
+      </button>
 
       <CompareProducts.List />
 

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef, useState, Fragment, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
 import { Formik } from 'formik';
 import apiService from '../../features/apiService';
 
@@ -26,7 +26,6 @@ const SPEC_NAMES_SEPARATORS = Object.freeze({
 });
 
 const matchRegExp = new RegExp(
-  // eslint-disable-next-line no-useless-escape
   `^((?<block>${CHARS.LETTERS_REGEXP})(${SPEC_NAMES_SEPARATORS.LEVEL}))?(?<element>${CHARS.LETTERS_REGEXP})((${SPEC_NAMES_SEPARATORS.MIN_MAX})(?<modifier>${CHARS.LETTERS_REGEXP}))?$`
 );
 const parseInputName = (name) => name.match(matchRegExp).groups;
@@ -117,8 +116,9 @@ const getControlsForSpecs = (() => {
   }
 })();
 
-function ProductsFilter({ selectedCategories }) {
+function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
   const productsSpecsPerCategory = useRef({});
+  const cachedValidationErrors = useRef({});
   const [productSpecsPerSelectedCategory, setProductSpecsPerSelectedCategory] = useState([]);
   const [formInitials, setFormInitials] = useState({});
   const lastChangedInputName = useRef('');
@@ -214,7 +214,6 @@ function ProductsFilter({ selectedCategories }) {
   };
 
   const validateHandler = useMemo(() => {
-    const cachedErrors = {};
     const getMinMaxCounterPart = (nameValuePairs, nameElement, nameModifier) => {
       const counterPartSuffix = nameModifier === CHARS.MIN ? CHARS.MAX : CHARS.MIN;
 
@@ -254,12 +253,29 @@ function ProductsFilter({ selectedCategories }) {
         errors[lastChangedInputName.current] = 'maxBeneathMin';
       }
 
-      cachedErrors[lastChangedInputName.current] = errors[lastChangedInputName.current];
-      cachedErrors[minMaxCounterPart] = CHARS.EMPTY;
+      if (errors[lastChangedInputName.current]) {
+        cachedValidationErrors.current[lastChangedInputName.current] = errors[lastChangedInputName.current];
+      } else {
+        delete cachedValidationErrors.current[lastChangedInputName.current];
+      }
 
-      return cachedErrors;
+      if (cachedValidationErrors.current[minMaxCounterPart]) {
+        delete cachedValidationErrors.current[minMaxCounterPart];
+      }
+
+      prepareFiltersUpdate(Object.keys(cachedValidationErrors.current).length > 0, values);
+
+      return cachedValidationErrors.current;
     }
-  }, []);
+  }, [formInitials, onFiltersUpdate]);
+
+  const prepareFiltersUpdate = (isError, values) => {
+    const touchedValues = Object.fromEntries(
+      Object.entries(values).filter(([filterName, filterValue]) => formInitials[filterName] !== filterValue)
+    );
+
+    onFiltersUpdate({ isError, values: touchedValues });
+  };
 
   return Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
     <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
@@ -284,5 +300,7 @@ function ProductsFilter({ selectedCategories }) {
 
 export default memo(
   ProductsFilter,
-  (prevProps, nextProps) => prevProps.selectedCategories.length === nextProps.selectedCategories.length
+  (prevProps, nextProps) =>
+    prevProps.onFiltersUpdate === nextProps.onFiltersUpdate &&
+    prevProps.selectedCategories.length === nextProps.selectedCategories.length
 );
