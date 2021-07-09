@@ -1,35 +1,47 @@
+//db.getCollection('products').find({},{_id:0, __v:0, technicalSpecs: 0, 'relatedProducts.id': 0, 'reviews._id': 0}).toArray()
+
 // cross-env TS_NODE_PROJECT=../../../tsconfig.backend.json node --inspect-brk -r ts-node/register populate.ts -
 // -products=trialProducts.json categoryGroups=categoryGroups.json singleProduct cleanAll
 
 import getLogger from '../../../utils/logger';
 import { connect, model, connection } from 'mongoose';
-import productSchema from '../schemas/product';
+import productSchema, { IProduct } from '../schemas/product';
 import { TGenericModel } from '../models/models-index';
-import { promisify } from 'util';
-import * as G from 'glob';
-import { readFile, readFileSync } from 'fs';
 import * as dotenv from 'dotenv';
 
 // @ts-ignore
-const envVar = dotenv.default.config({ path: '../../../../.env' });
+const envVar = dotenv.default.config({ path: '../../../.env' }); // ../
 
-const glob = promisify(G.glob);
 const logger = getLogger(module.filename);
-const promisifiedReadFile = promisify(readFile);
 
-const PARAMS: { CLEAN_ALL: string; PRODUCTS: string; SINGLE_PRODUCT: string; CATEGORY_GROUPS: string } = {
+const PARAMS: { CLEAN_ALL: string; PRODUCTS_JSON_FILE_PATH: string } = Object.freeze({
   CLEAN_ALL: 'cleanAll',
-  PRODUCTS: 'products=',
-  SINGLE_PRODUCT: 'singleProduct',
-  CATEGORY_GROUPS: 'categoryGroups=',
-};
+  PRODUCTS_JSON_FILE_PATH: 'productsJSONFilePath=',
+});
 
-type TPopulatedData = Record<any, unknown>;
+// TODO: move to product or category schema
+// const CATEGORY_TO_SPEC_MAP: { [key: string]: Record<string, [number, number]> } = Object.freeze({
+//   'Accessories': {
+//     'Weight': [1, 10],
+//     'Colour': [0, NaN],
+//     'Dimensions': [1, 15]
+//   },
+//   'Electric Scooters & eBikes': {
+//     'Range': [3, 40],
+//     'Cruising Speed': [5, 30]
+//   },
+//   'Advanced Electric Wheels': {
+//     'Range': [10, 70],
+//     'Cruising Speed': [15, 40]
+//   },
+// })
+
+type TPopulatedData = Record<string, unknown>;
 
 logger.log('process.argv:', process.argv);
 // @ts-ignore
 logger.log(
-  '? envVar:',
+  'envVar:',
   envVar,
   ' /__dirname:',
   __dirname,
@@ -38,6 +50,10 @@ logger.log(
   ' /require.main.filename:',
   require && require.main && require.main.filename
 );
+
+if (!getScriptParamValue(PARAMS.PRODUCTS_JSON_FILE_PATH)) {
+  throw ReferenceError(`CLI argument ${PARAMS.PRODUCTS_JSON_FILE_PATH} must be provided as non empty string`);
+}
 
 (async () => {
   await connectToDB();
@@ -49,20 +65,17 @@ logger.log(
     logger.log(`Cleaning done - removed ${removedProducts.deletedCount} products.`);
   }
 
-  const sourceDataList = await getSourceData();
-
+  const sourceDataList = getSourceData() as TPopulatedData[];
   await populateProducts(Product, sourceDataList);
 
-  logger.log('products after population:', await Product.find({}).countDocuments());
+  logger.log('Products amount after population:', await Product.find({}).countDocuments());
 
   await assignIDsToRelatedProducts(Product);
 
   await connection.close();
 })();
 
-function connectToDB() /*: Promise<void>*/ {
-  logger.log('???? process.env.DATABASE_URL:', process.env.DATABASE_URL);
-
+function connectToDB(): ReturnType<typeof connect> {
   return connect(process.env.DATABASE_URL as string, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -73,106 +86,49 @@ function getProductModel(): TGenericModel {
   return model('Product', productSchema);
 }
 
-async function getSourceData(): Promise<TPopulatedData | TPopulatedData[]> {
-  const sourceDataPath: string = getScriptParamValue(PARAMS.PRODUCTS);
+function getSourceData(): TPopulatedData[] | ReferenceError {
+  const sourceDataPath: string = getScriptParamValue(PARAMS.PRODUCTS_JSON_FILE_PATH);
 
   if (!sourceDataPath) {
-    return Promise.reject(`Path to data was not provided! You must pass "${PARAMS.PRODUCTS}" parameter.`);
+    throw ReferenceError(`Path to data was not provided! You must pass "${PARAMS.PRODUCTS_JSON_FILE_PATH}" parameter.`);
   }
 
-  // if (/*!isFileInPath && */(!fileName || fileName === PARAMS.CLEAN_ALL)) {
-  //     return Promise.reject(
-  //         'If file name is not included in path as first argument, it must be provided separately - as second argument!'
-  //     );
-  // }
+  const sourceDataFiles = /* eslint-disable-line  @typescript-eslint/no-var-requires */ require(sourceDataPath);
+  // logger.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
 
-  //const sourceDataPath: string =  // isFileInPath ? path : `${path}${sep}**${sep}${fileName}.json`;
-  logger.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
-  const sourceDataFiles = (await glob(sourceDataPath)) as string[];
-
-  if (getScriptParamValue(PARAMS.SINGLE_PRODUCT)) {
-    return JSON.parse(await promisifiedReadFile(sourceDataFiles[0], { encoding: 'utf8' })) as TPopulatedData;
+  if (Array.isArray(sourceDataFiles)) {
+    return sourceDataFiles;
   }
 
-  const sourceDataList: Promise<TPopulatedData>[] = sourceDataFiles.map(async (filePath: string) =>
-    JSON.parse(await promisifiedReadFile(filePath, { encoding: 'utf8' }))
-  );
+  try {
+    return JSON.parse(sourceDataFiles);
+  } catch (parseError) {
+    logger.error('parseError:', parseError, ' for data taken from sourceDataPath:', sourceDataPath);
 
-  return Promise.all(sourceDataList);
+    throw parseError;
+  }
 }
 
-async function populateProducts(ProductModel: TGenericModel, sourceDataList: TPopulatedData | TPopulatedData[]) {
-  type TCategoryNameGrouper = (categoryName: string) => string;
-  type TNormalizersObj = { category: TCategoryNameGrouper };
-
-  const normalizersObj: TNormalizersObj = {
-    category: categoryNameGrouper(),
-  };
-
+function populateProducts(ProductModel: TGenericModel, sourceDataList: TPopulatedData[]) {
   if (!Array.isArray(sourceDataList)) {
     sourceDataList = [sourceDataList];
   }
 
   return Promise.all(
-    sourceDataList.map((data: any) => {
-      const product = new ProductModel(normalizeData(data, normalizersObj));
+    sourceDataList.map((data: any, index: number) => {
+      const product = new ProductModel(data) as IProduct;
+
       // @ts-ignore
       return product.save().catch((err) => {
-        // console.error('save err:', err, ' /data:', data);
+        logger.error('save err:', err, ' /data:', data);
 
         return err;
       });
     })
   );
-
-  function normalizeData(data: any, normalizersObj: TNormalizersObj) {
-    const normalizedData = {
-      ...data,
-      category: normalizersObj.category(data.category),
-    };
-
-    if (Array.isArray(data.reviews)) {
-      const isAnyReview = data.reviews && data.reviews[0] !== null;
-      normalizedData.reviews = {
-        summary: isAnyReview ? data.reviews[0] : { rating: '', reviewsAmount: 0 },
-        list: isAnyReview ? data.reviews.slice(1) : [],
-      };
-    } else {
-      normalizedData.reviews = data.reviews;
-    }
-
-    return normalizedData;
-  }
-
-  function categoryNameGrouper(): TCategoryNameGrouper {
-    type CustomRegExp = RegExp & { matcher: string; replacer: string };
-
-    const categoriesGroupPath: string = getScriptParamValue(PARAMS.CATEGORY_GROUPS);
-    const categoryRegExps: CustomRegExp[] = JSON.parse(readFileSync(categoriesGroupPath, { encoding: 'utf8' }));
-
-    if (categoriesGroupPath) {
-      return (categoryName: string) => {
-        const matchedRegExp: CustomRegExp | undefined = categoryRegExps.find(
-          (regExp) => typeof regExp.matcher === 'string' && new RegExp(regExp.matcher).test(categoryName)
-        );
-
-        if (matchedRegExp) {
-          return categoryName.replace(new RegExp(matchedRegExp.matcher), matchedRegExp.replacer);
-        }
-
-        return categoryName;
-      };
-    }
-
-    return (categoryName: string) => categoryName;
-  }
 }
 
 async function assignIDsToRelatedProducts(Product: TGenericModel) {
-  // temp1.forEach(product => {
-  //   product.relatedProducts.every(rp => temp1.find(p => p.url === rp.url && p.name === rp.name)) && prods.push(product)
-  // })
-
   const productsHavingRelatedProducts = Product.find({ relatedProducts: { $ne: [] } });
 
   for await (const withRelated of productsHavingRelatedProducts) {
@@ -200,7 +156,7 @@ async function assignIDsToRelatedProducts(Product: TGenericModel) {
   }).countDocuments();
 
   logger.log(
-    'All done?',
+    'All done?:',
     amountOfAllProducts === amountOfRelatedProductsWithID,
     ' /amountOfAllProducts:',
     amountOfAllProducts,
