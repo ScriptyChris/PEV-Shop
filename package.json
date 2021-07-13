@@ -24,6 +24,7 @@
     "test": "npm run eslint:test && jest --env=node",
     "test:dev": "jest --watch --env=node",
     "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
+    "populate-db": "cd src/database/populate && cross-env TS_NODE_PROJECT=../../../tsconfig.backend.json node -r ts-node/register populate.ts productsJSONFilePath=./initial-products.json cleanAll",
     "dev:frontend": "webpack-dev-server --env development",
     "dev:backend": "cross-env BACKEND_ONLY=true nodemon --exec \"npm run eslint:backend && npm run prettier:backend && ts-node --project tsconfig.backend.json src/middleware/middleware-index.ts\"",
     "build:backend": "rimraf dist/src/middleware dist/src/database dist/utils && tsc --project tsconfig.backend.json",

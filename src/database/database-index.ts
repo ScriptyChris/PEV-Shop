@@ -54,7 +54,8 @@ function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string
 async function getFromDB(
   itemQuery: any,
   modelType: TModelType,
-  options: { pagination?: TPaginationConfig; isDistinct?: boolean } = {}
+  options: { pagination?: TPaginationConfig; isDistinct?: boolean } = {},
+  projection?: Record<string, unknown>
 ): Promise<ReturnType<typeof getPaginatedItems> | any> {
   const Model = getModel(modelType);
 
@@ -71,8 +72,12 @@ async function getFromDB(
     itemQuery = { _id: itemQuery };
   }
 
-  if (queryBuilder.isEmptyQueryObject(itemQuery) || typeof itemQuery._id === 'object' || (itemQuery instanceof Object && 'name' in itemQuery)) {
-    return Model.find(itemQuery);
+  if (
+    queryBuilder.isEmptyQueryObject(itemQuery) ||
+    typeof itemQuery._id === 'object' ||
+    (itemQuery instanceof Object && 'name' in itemQuery)
+  ) {
+    return Model.find(itemQuery, projection);
   }
 
   return Model.findOne(itemQuery);
