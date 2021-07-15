@@ -179,7 +179,7 @@ type TProductTechSpec = {
 };
 
 function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TOutputMapping {
-  const UNITLESS_SPEC = 'Colour';
+  const UNITLESS_SPEC = 'colour';
   const headingToDataType: Record<string, 'primitive' | 'object' | 'array'> = {};
   const defaultUnits: Record<string, string> = {};
 
@@ -189,7 +189,7 @@ function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TOutpu
         mappedSpecs.categoryToSpecs[specData.category] = new Set();
       }
 
-      mapUniqueSpecValues(specData, mappedSpecs, defaultUnits);
+      mapUniqueSpecValues(specData, mappedSpecs);
 
       return mappedSpecs;
     },
@@ -214,7 +214,6 @@ function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TOutpu
   function mapUniqueSpecValues(
     specData: TProductTechSpec,
     mappedSpecs: TMappedSpecs,
-    defaultUnits: Record<string, string>
   ) {
     specData.technicalSpecs.forEach((spec) => {
       if (spec.heading && (spec.defaultUnit || spec.heading === UNITLESS_SPEC)) {

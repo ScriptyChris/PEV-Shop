@@ -83,6 +83,7 @@ const apiService = new (class ApiService extends Ajax {
 
     this.PRODUCTS_URL = 'products';
     this.PRODUCT_CATEGORIES_URL = 'productCategories';
+    this.PRODUCTS_SPECS_URL = 'products/specs';
     this.USERS_URL = 'users';
     this.ORDERS_URL = 'orders';
   }
@@ -102,7 +103,7 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(this.PRODUCTS_URL, product);
   }
 
-  getProducts({ pagination, productCategories, productSpecs } = {}) {
+  getProducts({ pagination, productCategories, productsFilters } = {}) {
     const searchParams = new URLSearchParams();
 
     this._preparePaginationParams(searchParams, pagination);
@@ -111,8 +112,9 @@ const apiService = new (class ApiService extends Ajax {
       searchParams.append('productCategories', productCategories);
     }
 
-    if (productSpecs && productSpecs.length) {
-      searchParams.append('productSpecs', productSpecs);
+    if (productsFilters && productsFilters.length) {
+      searchParams.append('productsFilters', productsFilters);
+      console.log('??? searchParams:', [...searchParams]);
     }
 
     return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
@@ -142,38 +144,40 @@ const apiService = new (class ApiService extends Ajax {
 
   // TODO: switch mock to real API data
   getProductsSpecifications() {
-    return {
-      specs: [
-        { name: 'Weight', values: [[1, 15]], type: 'inputNumber' },
-        { name: 'Colour', values: ['Lime Green', 'Black', 'Blue', 'Red'], type: 'inputCheckbox' },
-        {
-          name: 'Dimensions',
-          descriptions: ['Length', 'Width', 'Height'],
-          values: [
-            [5, 20],
-            [5, 20],
-            [1, 7],
-          ],
-          type: 'inputNumber',
-        },
-        { name: 'Range', values: [[5, 45]], type: 'inputNumber' },
-        { name: 'Cruising Speed', values: [[10, 35]], type: 'inputNumber' },
-      ],
-      categoryToSpecs: [
-        {
-          category: 'Accessories',
-          specs: ['Weight', 'Colour', 'Dimensions'],
-        },
-        {
-          category: 'Electric Scooters & eBikes',
-          specs: ['Range', 'Cruising Speed'],
-        },
-        {
-          category: 'Advanced Electric Wheels',
-          specs: ['Range', 'Cruising Speed'],
-        },
-      ],
-    };
+    return this.getRequest(this.PRODUCTS_SPECS_URL);
+
+    // return {
+    //   specs: [
+    //     { name: 'Weight', values: [[1, 15]], type: 'inputNumber' },
+    //     { name: 'Colour', values: ['Lime Green', 'Black', 'Blue', 'Red'], type: 'inputCheckbox' },
+    //     {
+    //       name: 'Dimensions',
+    //       descriptions: ['Length', 'Width', 'Height'],
+    //       values: [
+    //         [5, 20],
+    //         [5, 20],
+    //         [1, 7],
+    //       ],
+    //       type: 'inputNumber',
+    //     },
+    //     { name: 'Range', values: [[5, 45]], type: 'inputNumber' },
+    //     { name: 'Cruising Speed', values: [[10, 35]], type: 'inputNumber' },
+    //   ],
+    //   categoryToSpecs: [
+    //     {
+    //       category: 'Accessories',
+    //       specs: ['Weight', 'Colour', 'Dimensions'],
+    //     },
+    //     {
+    //       category: 'Electric Scooters & eBikes',
+    //       specs: ['Range', 'Cruising Speed'],
+    //     },
+    //     {
+    //       category: 'Advanced Electric Wheels',
+    //       specs: ['Range', 'Cruising Speed'],
+    //     },
+    //   ],
+    // };
   }
 
   getUser() {

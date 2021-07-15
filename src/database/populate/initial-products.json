@@ -901,7 +901,7 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" },
-      { "heading": "Suspension Module Type", "data": "Hard (Black), Soft (Green)" }
+      { "heading": "suspension module type", "data": "Hard (Black), Soft (Green)" }
     ]
   },
   {
@@ -2794,25 +2794,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 25,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 2,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 240,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 400,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -3500,25 +3500,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 18,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 1.5,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 220,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 480,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -3610,15 +3610,15 @@
     "category": "Entry & Mid-Range eWheels",
     "technicalSpecs": [
       { "heading": "model", "data": "A130 Turbo Edition" },
-      { "heading": "Battery Capacity", "data": 172, "defaultUnit": "Wh" },
-      { "heading": "Top Speed", "data": 11, "defaultUnit": "mph" },
+      { "heading": "battery capacity", "data": 172, "defaultUnit": "Wh" },
+      { "heading": "top speed", "data": 11, "defaultUnit": "mph" },
       { "heading": "weight", "data": 18.7, "defaultUnit": "lbs" },
       { "heading": "range", "data": 12.5, "defaultUnit": "miles" },
-      { "heading": "Max Gradient", "data": "20°" },
-      { "heading": "Max Load", "data": 150, "defaultUnit": "lbs" },
-      { "heading": "Motor Power", "data": 350, "defaultUnit": "W" },
+      { "heading": "max gradient", "data": "20°" },
+      { "heading": "max load", "data": 150, "defaultUnit": "lbs" },
+      { "heading": "motor power", "data": 350, "defaultUnit": "W" },
       { "heading": "materials", "data": "Shell: Scratch resistant ABS plastic\nPedals: Aluminium alloy" },
-      { "heading": "Charge Time", "data": 1, "defaultUnit": "hr" },
+      { "heading": "charge time", "data": 1, "defaultUnit": "hr" },
       { "heading": "dimensions", "data": { "height": 17.3, "length": 12.7, "width": 6.3 }, "defaultUnit": "inch" }
     ]
   },
@@ -4092,25 +4092,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 18.6,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 1.75,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 220,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 720,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -4718,25 +4718,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 30,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 3.5,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 250,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1680,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -5295,25 +5295,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 22,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 3,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 250,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 840,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -8146,25 +8146,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 40,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 3.5,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 310,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1658,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -8264,25 +8264,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 37,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 2,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 220,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1050,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -8442,25 +8442,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 50,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 4.5,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 350,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 2060,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -8768,25 +8768,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 25,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 2,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 250,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 800,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -8956,10 +8956,10 @@
     "category": "Advanced Electric Wheels",
     "technicalSpecs": [
       { "heading": "weight", "data": 64, "defaultUnit": "lbs" },
-      { "heading": "Top Speed", "data": 33, "defaultUnit": "mph" },
-      { "heading": "Motor Power", "data": 2000, "defaultUnit": "W" },
+      { "heading": "top speed", "data": 33, "defaultUnit": "mph" },
+      { "heading": "motor power", "data": 2000, "defaultUnit": "W" },
       { "heading": "range", "data": 96, "defaultUnit": "miles" },
-      { "heading": "Max Load", "data": 330, "defaultUnit": "lbs" },
+      { "heading": "max load", "data": 330, "defaultUnit": "lbs" },
       { "specFromImage": "https://www.ewheels.com/wp-content/uploads/2017/03/Monster-Whats-New-v1.2.jpg" }
     ]
   },
@@ -9162,25 +9162,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 37.5,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 4,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 325,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1410,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -9289,25 +9289,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 37.5,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 4,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 312.5,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1850,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -9564,25 +9564,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 30,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 2,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 300,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1020,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -9827,25 +9827,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 25,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 2,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 260,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 720,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -10555,25 +10555,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 18.6,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 2.5,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 200,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 380,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -10672,25 +10672,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 31,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 4,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 330,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1600,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -11141,25 +11141,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 30,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 4,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 325,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1260,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -11287,25 +11287,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2016/02/icon3.png"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 15.5,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2016/02/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 3,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2016/02/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 220,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2016/02/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 187,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2016/02/Battery-Graph-1.png"
@@ -11454,25 +11454,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 37,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 3,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 310,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1404,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -11758,25 +11758,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 20,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 4.5,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 265,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 480,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -12091,25 +12091,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 25,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 2,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 220,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 614,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -12251,25 +12251,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 28,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 3,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 300,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 921,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"
@@ -12508,25 +12508,25 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon3.jpg"
       },
       {
-        "heading": "Top Speed",
+        "heading": "top speed",
         "data": 37.5,
         "defaultUnit": "mph",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon1.png"
       },
       {
-        "heading": "Charge Time",
+        "heading": "charge time",
         "data": 3,
         "defaultUnit": "hr",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon4.png"
       },
       {
-        "heading": "Max Load",
+        "heading": "max load",
         "data": 330,
         "defaultUnit": "lbs",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/icon2.png"
       },
       {
-        "heading": "Battery Capacity",
+        "heading": "battery capacity",
         "data": 1040,
         "defaultUnit": "Wh",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Battery-Graph-1.png"

@@ -7,7 +7,10 @@ const translations = {
   minExceededMax: 'Min value should not be greater than max value',
   maxBeneathMin: 'Max value should not be lower than min value',
   normalizeContent(text) {
-    return text.replace(/\W/g, CHARS.EMPTY).replace(/_/g, CHARS.SPACE);
+    return text
+      .replace(/\W/g, CHARS.EMPTY)
+      .replace(/_/g, CHARS.SPACE)
+      .replace(/\w/, (match) => match.toUpperCase());
   },
 };
 
@@ -15,14 +18,29 @@ const CHARS = Object.freeze({
   EMPTY: '',
   SPACE: ' ',
   PIPE: '|',
-  MIN: 'Min',
-  MAX: 'Max',
+  MIN: 'min',
+  MAX: 'max',
   LETTERS_REGEXP: '[A-Z_a-z]+',
 });
 const SPEC_NAMES_SEPARATORS = Object.freeze({
   GAP: '_',
   LEVEL: '__',
   MIN_MAX: '--',
+});
+const FIELD_TYPES = {
+  INPUT_NUMBER: 'inputNumber',
+  INPUT_CHECKBOX: 'inputCheckbox',
+};
+const SPEC_TO_FIELD_TYPE = Object.freeze({
+  weight: FIELD_TYPES.INPUT_NUMBER,
+  dimensions: FIELD_TYPES.INPUT_NUMBER,
+  'top speed': FIELD_TYPES.INPUT_NUMBER,
+  'charge time': FIELD_TYPES.INPUT_NUMBER,
+  'max load': FIELD_TYPES.INPUT_NUMBER,
+  'battery capacity': FIELD_TYPES.INPUT_NUMBER,
+  range: FIELD_TYPES.INPUT_NUMBER,
+  'motor power': FIELD_TYPES.INPUT_NUMBER,
+  colour: FIELD_TYPES.INPUT_CHECKBOX,
 });
 
 const matchRegExp = new RegExp(
@@ -38,7 +56,7 @@ const getControlsForSpecs = (() => {
 
   return function GetControlsForSpecs(
     formikRestProps,
-    { _normalizedName: name, values, type, descriptions, _namesRangeMapping: namesRangeMapping }
+    { _normalizedName: name, values, type, descriptions, defaultUnit, _namesRangeMapping: namesRangeMapping }
   ) {
     const templateMethod = TEMPLATE_FUNCTION_PER_CONTROL_TYPE[type];
 
@@ -49,7 +67,9 @@ const getControlsForSpecs = (() => {
     // TODO: make each <fieldset> collapsible
     return (
       <fieldset key={`spec${name}Filter`}>
-        <legend>{translations.normalizeContent(name)}</legend>
+        <legend>
+          {translations.normalizeContent(name)} {defaultUnit && `(${defaultUnit})`}
+        </legend>
         {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
       </fieldset>
     );
@@ -57,6 +77,9 @@ const getControlsForSpecs = (() => {
 
   function getInputNumberControl(formikRestProps, specName, specRangeNames, specValue, specDescriptions) {
     return specValue.map(([vMin, vMax], index) => {
+      vMin = Math.floor(vMin);
+      vMax = Math.ceil(vMax);
+
       const startIndex = index * 2;
       const endIndex = startIndex + 2;
       const specRangeName = specRangeNames.slice(startIndex, endIndex);
@@ -145,7 +168,20 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
 
   useEffect(() => {
     (async () => {
-      productsSpecsPerCategory.current = await apiService.getProductsSpecifications();
+      productsSpecsPerCategory.current = await apiService
+        .getProductsSpecifications()
+        .then(({ categoryToSpecs, specs }) => ({
+          specs: specs.map((specObj) => ({
+            ...specObj,
+            type: SPEC_TO_FIELD_TYPE[specObj.name],
+            values: Array.isArray(specObj.values) ? [specObj.values] : Object.values(specObj.values),
+            descriptions: Array.isArray(specObj.values) ? null : Object.keys(specObj.values),
+          })),
+          categoryToSpecs: Object.entries(categoryToSpecs).map(([category, specs]) => ({
+            name: category,
+            specs,
+          })),
+        }));
       filterSpecsPerCategory();
     })();
   }, []);
