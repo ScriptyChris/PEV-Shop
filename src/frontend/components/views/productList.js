@@ -39,16 +39,17 @@ export default function ProductList() {
     pageNumber = currentProductPage,
     productsPerPage = currentProductsPerPageLimit,
     productCategories = productCategories,
+    productsFilters,
     products,
   } = {}) => {
     const isHighestProductsPerPage = productsPerPage === productsPerPageLimits[productsPerPageLimits.length - 1];
 
     if (isHighestProductsPerPage) {
-      setProductsList(products || (await apiService.getProducts({ productCategories })));
+      setProductsList(products || (await apiService.getProducts({ productCategories, productsFilters })));
       setTotalPages(1);
     } else {
       const pagination = { pageNumber, productsPerPage };
-      products = products || (await apiService.getProducts({ pagination, productCategories }));
+      products = products || (await apiService.getProducts({ pagination, productCategories, productsFilters }));
 
       setProductsList(products.productsList);
       setTotalPages(products.totalPages);
@@ -75,6 +76,12 @@ export default function ProductList() {
   const handleFiltersUpdate = (filters) => {
     if (filters.isError !== filterBtnDisabled) {
       setFilterBtnDisabled(filters.isError);
+    }
+
+    if (!filters.isError) {
+      console.log('filters.values:', filters.values);
+      const productsFilters = Object.entries(filters.values).map((filter) => filter.join(':'));
+      updateProductsList({ productsFilters }).then();
     }
   };
 
@@ -105,6 +112,7 @@ export default function ProductList() {
 
       <ProductsFilter selectedCategories={productCategories} onFiltersUpdate={handleFiltersUpdate} />
 
+      {/* TODO: move the button into ProductsFilter component, presumably with CategoriesTree */}
       <button onClick={filterProducts} disabled={filterBtnDisabled}>
         {translations.filterProducts}
       </button>

@@ -85,10 +85,12 @@ const getControlsForSpecs = (() => {
       const specRangeName = specRangeNames.slice(startIndex, endIndex);
       const keyAndId = `spec${specName}Control${index}`;
       const areSpecDescriptions = Array.isArray(specDescriptions);
-      const ariaLabelledBy = areSpecDescriptions ? keyAndId : CHARS.GAP;
+      const ariaLabelledBy = areSpecDescriptions ? keyAndId : CHARS.EMPTY;
       const erroredInputName =
         formikRestProps.errors && specRangeName.find((rangeName) => formikRestProps.errors[rangeName]);
       const errorValue = formikRestProps.errors[erroredInputName];
+      const [minValue, maxValue] =
+        specRangeName.length === 0 ? ['', ''] : specRangeName.map((item) => formikRestProps.values[item]);
 
       return (
         <div key={keyAndId}>
@@ -100,7 +102,7 @@ const getControlsForSpecs = (() => {
             min={vMin}
             max={vMax}
             name={specRangeName[0]}
-            value={formikRestProps.values[specRangeName[0]]}
+            value={minValue}
             onChange={formikRestProps.handleChange}
           />
 
@@ -112,7 +114,7 @@ const getControlsForSpecs = (() => {
             min={vMin}
             max={vMax}
             name={specRangeName[1]}
-            value={formikRestProps.values[specRangeName[1]]}
+            value={maxValue}
             onChange={formikRestProps.handleChange}
           />
 
@@ -123,16 +125,13 @@ const getControlsForSpecs = (() => {
   }
 
   function getInputCheckboxControl(formikRestProps, specName, _, specValue) {
+    const value = formikRestProps.values[specName] === undefined ? '' : formikRestProps.values[specName];
+
     return specValue.map((val, index) => (
       <Fragment key={`spec${specName}Control${index}`}>
         <label>
           {val}
-          <input
-            type="checkbox"
-            name={specName}
-            value={formikRestProps.values[specName]}
-            onChange={formikRestProps.handleChange}
-          />
+          <input type="checkbox" name={specName} value={value} onChange={formikRestProps.handleChange} />
         </label>
       </Fragment>
     ));
@@ -178,7 +177,7 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
             descriptions: Array.isArray(specObj.values) ? null : Object.keys(specObj.values),
           })),
           categoryToSpecs: Object.entries(categoryToSpecs).map(([category, specs]) => ({
-            name: category,
+            category,
             specs,
           })),
         }));
