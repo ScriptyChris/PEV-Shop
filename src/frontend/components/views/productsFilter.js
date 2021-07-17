@@ -124,14 +124,14 @@ const getControlsForSpecs = (() => {
     });
   }
 
-  function getInputCheckboxControl(formikRestProps, specName, _, specValue) {
+  function getInputCheckboxControl(formikRestProps, specName, _, [specValue]) {
     const value = formikRestProps.values[specName] === undefined ? '' : formikRestProps.values[specName];
 
     return specValue.map((val, index) => (
       <Fragment key={`spec${specName}Control${index}`}>
         <label>
           {val}
-          <input type="checkbox" name={specName} value={value} onChange={formikRestProps.handleChange} />
+          <input type="checkbox" name={`${specName}__${val}`} value={value} onChange={formikRestProps.handleChange} />
         </label>
       </Fragment>
     ));
