@@ -39,10 +39,111 @@ const getProductsWithChosenCategories = (reqQuery: TProductsCategoriesReq): { ca
   return null;
 };
 
+type TFilterQueryHeading = {
+  [key: string]: string;
+};
+type TFilterQueryData = {
+  [key: string]: number | string | string[] | boolean | { [key: string]: number | string[] };
+};
+type TFilterBlueprintQuery = {
+  heading: {
+    key: string;
+    value: string;
+  };
+  data: {
+    key: string;
+    value: number | string | string[] | boolean | { [key: string]: number | string[] };
+  };
+};
+const getFilters = (reqQuery: TProductFiltersReq) => {
+  if (typeof reqQuery.productsFilters === 'string') {
+    const specsList: Array<[TFilterQueryHeading, TFilterQueryData]> = reqQuery.productsFilters
+      .split(',')
+      .map(getFilters.mapQuery);
+
+    return {
+      $and: specsList.map(([heading, data]) => ({
+        $and: [heading, data],
+      })),
+    };
+  }
+
+  return null;
+};
+getFilters.HEADING_KEY = 'technicalSpecs.heading' as const;
+getFilters.DATA_BASE_KEY = 'technicalSpecs.data' as const;
+getFilters.MIN_MAX_SEPARATOR = '--' as const;
+getFilters.PIPE_SEPARATOR = '|' as const;
+getFilters.UNDERSCORE_AS_SPACE_SEPARATOR = /(?<!_)(_)(?!_)/g;
+getFilters.DOUBLE_UNDERSCORE_KEY_SEPARATOR = '__' as const;
+getFilters.BOOLEAN_VALUES = {
+  TRUE: 'true',
+  FALSE: 'false',
+} as const;
+getFilters.MIN_MAX_MAP = Object.freeze({
+  min: '$gte',
+  max: '$lte',
+} as { [key: string]: string });
+getFilters.getQueryDataKey = (subKey = ''): string => {
+  return subKey ? `technicalSpecs.data.${subKey}` : getFilters.DATA_BASE_KEY;
+};
+getFilters.mapQuery = (filter: string): [TFilterQueryHeading, TFilterQueryData] => {
+  const [headingName, value] = filter.split(':');
+  const filterQueryTemplateObj: TFilterBlueprintQuery = {
+    heading: {
+      key: getFilters.HEADING_KEY,
+      value: headingName,
+    },
+    data: {
+      key: getFilters.getQueryDataKey(),
+      value,
+    },
+  };
+  let parsedValue: TFilterBlueprintQuery['data']['value'] = value;
+
+  if (!Number.isNaN(Number(value))) {
+    const [wholeHeading, minOrMaxValue] = filterQueryTemplateObj.heading.value.split(getFilters.MIN_MAX_SEPARATOR);
+    const [baseHeading, optionalNestedData = ''] = wholeHeading.split(getFilters.DOUBLE_UNDERSCORE_KEY_SEPARATOR);
+
+    filterQueryTemplateObj.heading.value = baseHeading
+      .replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR, ' ')
+      .toLowerCase();
+    filterQueryTemplateObj.data.key = getFilters.getQueryDataKey(optionalNestedData.toLowerCase());
+
+    parsedValue = Number(value) as number;
+
+    filterQueryTemplateObj.data.value = minOrMaxValue
+      ? {
+          [getFilters.MIN_MAX_MAP[minOrMaxValue.toLowerCase()]]: parsedValue,
+        }
+      : parsedValue;
+  } else if (value.includes(getFilters.PIPE_SEPARATOR)) {
+    parsedValue = value
+      .split(getFilters.PIPE_SEPARATOR)
+      .map((val) => val.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR, ' '));
+    filterQueryTemplateObj.data.value = {
+      $all: parsedValue,
+    };
+  } else if (value === getFilters.BOOLEAN_VALUES.TRUE || value === getFilters.BOOLEAN_VALUES.FALSE) {
+    parsedValue = (value === getFilters.BOOLEAN_VALUES.TRUE) as boolean;
+    filterQueryTemplateObj.data.value = parsedValue;
+  }
+
+  const filterQueryHeading = {
+    [filterQueryTemplateObj.heading.key]: filterQueryTemplateObj.heading.value,
+  };
+  const filterQueryData = {
+    [filterQueryTemplateObj.data.key]: filterQueryTemplateObj.data.value,
+  };
+
+  return [filterQueryHeading, filterQueryData];
+};
+
 export type TPageLimit = { page: number; limit: number };
 export type TIdListReq = { idList: string };
 export type TProductsCategoriesReq = { productCategories: string };
 export type TProductNameReq = { name: string; caseSensitive: string | boolean };
+export type TProductFiltersReq = { productsFilters: string };
 
 export {
   isEmptyQueryObject,
@@ -50,4 +151,5 @@ export {
   getPaginationConfig,
   getIdListConfig,
   getProductsWithChosenCategories,
+  getFilters,
 };

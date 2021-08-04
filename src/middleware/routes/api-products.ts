@@ -3,7 +3,13 @@ import * as expressModule from 'express';
 import { Request, Response } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
 import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../database/database-index';
-import { TIdListReq, TPageLimit, TProductNameReq, TProductsCategoriesReq } from '../../database/utils/queryBuilder';
+import {
+  TIdListReq,
+  TPageLimit,
+  TProductFiltersReq,
+  TProductNameReq,
+  TProductsCategoriesReq,
+} from '../../database/utils/queryBuilder';
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 
 const {
@@ -60,7 +66,7 @@ router._modifyProduct = modifyProduct;
 export default router;
 
 async function getProducts(
-  req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq },
+  req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq & TProductFiltersReq },
   res: Response
 ): Promise<void> {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
@@ -71,6 +77,7 @@ async function getProducts(
     const idListConfig = queryBuilder.getIdListConfig(req.query);
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
+    const filters = queryBuilder.getFilters(req.query);
 
     let query = {};
 
@@ -80,6 +87,8 @@ async function getProducts(
       query = chosenCategories;
     } else if (searchByName) {
       query = searchByName;
+    } else if (filters) {
+      query = filters;
     }
 
     const options: { pagination?: TPaginationConfig } = {};
@@ -211,10 +220,7 @@ function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TOutpu
 
   return outputMapping;
 
-  function mapUniqueSpecValues(
-    specData: TProductTechSpec,
-    mappedSpecs: TMappedSpecs,
-  ) {
+  function mapUniqueSpecValues(specData: TProductTechSpec, mappedSpecs: TMappedSpecs) {
     specData.technicalSpecs.forEach((spec) => {
       if (spec.heading && (spec.defaultUnit || spec.heading === UNITLESS_SPEC)) {
         if (!defaultUnits[specData.category]) {

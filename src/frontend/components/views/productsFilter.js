@@ -124,10 +124,11 @@ const getControlsForSpecs = (() => {
     });
   }
 
-  function getInputCheckboxControl(formikRestProps, specName, _, [specValue]) {
+  function getInputCheckboxControl(formikRestProps, specName, _, specValue) {
     const value = formikRestProps.values[specName] === undefined ? '' : formikRestProps.values[specName];
+    const normalizedSpecValues = specValue[0].map((specV) => specV.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP));
 
-    return specValue.map((val, index) => (
+    return normalizedSpecValues.map((val, index) => (
       <Fragment key={`spec${specName}Control${index}`}>
         <label>
           {val}
@@ -305,9 +306,35 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
   }, [formInitials, onFiltersUpdate]);
 
   const prepareFiltersUpdate = (isError, values) => {
-    const touchedValues = Object.fromEntries(
-      Object.entries(values).filter(([filterName, filterValue]) => formInitials[filterName] !== filterValue)
-    );
+    // TODO: this should be rather provided by backend
+    const _singleFilterWithMultipleValues = ['colour'];
+    const normalizedSingleToMultipleFilters = Object.entries(values)
+      .filter(([filterName]) => _singleFilterWithMultipleValues.find((filter) => filterName.startsWith(filter)))
+      .reduce((singleFilters, [filterKey, filterChecked]) => {
+        if (!filterKey.includes(SPEC_NAMES_SEPARATORS.LEVEL) || !filterChecked) {
+          return singleFilters;
+        }
+
+        const [filterName, filterValue] = filterKey.split(SPEC_NAMES_SEPARATORS.LEVEL);
+
+        if (!singleFilters[filterName]) {
+          singleFilters[filterName] = [];
+        }
+
+        singleFilters[filterName].push(filterValue);
+        return singleFilters;
+      }, {});
+
+    const touchedValues = Object.fromEntries([
+      ...Object.entries(values).filter(([filterName, filterValue]) => {
+        const matchedFilterName = _singleFilterWithMultipleValues.find((filter) => filterName.startsWith(filter));
+        return formInitials[filterName] !== filterValue && !matchedFilterName;
+      }),
+      ...Object.entries(normalizedSingleToMultipleFilters).map(([filterName, filterValues]) => [
+        filterName,
+        filterValues.join(CHARS.PIPE),
+      ]),
+    ]);
 
     onFiltersUpdate({ isError, values: touchedValues });
   };

@@ -72,10 +72,11 @@ async function getFromDB(
     itemQuery = { _id: itemQuery };
   }
 
+  // TODO: refactor this!
   if (
     queryBuilder.isEmptyQueryObject(itemQuery) ||
     typeof itemQuery._id === 'object' ||
-    (itemQuery instanceof Object && 'name' in itemQuery)
+    (itemQuery instanceof Object && ('name' in itemQuery || '$and' in itemQuery))
   ) {
     return Model.find(itemQuery, projection);
   }
