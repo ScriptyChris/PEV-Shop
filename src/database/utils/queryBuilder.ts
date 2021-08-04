@@ -45,16 +45,6 @@ type TFilterQueryHeading = {
 type TFilterQueryData = {
   [key: string]: number | string | string[] | boolean | { [key: string]: number | string[] };
 };
-type TFilterBlueprintQuery = {
-  heading: {
-    key: string;
-    value: string;
-  };
-  data: {
-    key: string;
-    value: number | string | string[] | boolean | { [key: string]: number | string[] };
-  };
-};
 const getFilters = (reqQuery: TProductFiltersReq) => {
   if (typeof reqQuery.productsFilters === 'string') {
     const specsList: Array<[TFilterQueryHeading, TFilterQueryData]> = reqQuery.productsFilters
@@ -74,7 +64,8 @@ getFilters.HEADING_KEY = 'technicalSpecs.heading' as const;
 getFilters.DATA_BASE_KEY = 'technicalSpecs.data' as const;
 getFilters.MIN_MAX_SEPARATOR = '--' as const;
 getFilters.PIPE_SEPARATOR = '|' as const;
-getFilters.UNDERSCORE_AS_SPACE_SEPARATOR = /(?<!_)(_)(?!_)/g;
+getFilters.SPACE = ' ' as const;
+getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX = /(?<!_)(_)(?!_)/g;
 getFilters.DOUBLE_UNDERSCORE_KEY_SEPARATOR = '__' as const;
 getFilters.BOOLEAN_VALUES = {
   TRUE: 'true',
@@ -88,29 +79,37 @@ getFilters.getQueryDataKey = (subKey = ''): string => {
   return subKey ? `technicalSpecs.data.${subKey}` : getFilters.DATA_BASE_KEY;
 };
 getFilters.mapQuery = (filter: string): [TFilterQueryHeading, TFilterQueryData] => {
+  type TFilterBlueprintQuery = {
+    heading: {
+      key: string;
+      value: string;
+    };
+    data: {
+      key: string;
+      value: number | string | string[] | boolean | { [key: string]: number | string[] };
+    };
+  };
+
   const [headingName, value] = filter.split(':');
   const filterQueryTemplateObj: TFilterBlueprintQuery = {
     heading: {
       key: getFilters.HEADING_KEY,
-      value: headingName,
+      value: headingName.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getFilters.SPACE),
     },
     data: {
       key: getFilters.getQueryDataKey(),
-      value,
+      value: value.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getFilters.SPACE),
     },
   };
-  let parsedValue: TFilterBlueprintQuery['data']['value'] = value;
 
   if (!Number.isNaN(Number(value))) {
     const [wholeHeading, minOrMaxValue] = filterQueryTemplateObj.heading.value.split(getFilters.MIN_MAX_SEPARATOR);
     const [baseHeading, optionalNestedData = ''] = wholeHeading.split(getFilters.DOUBLE_UNDERSCORE_KEY_SEPARATOR);
 
-    filterQueryTemplateObj.heading.value = baseHeading
-      .replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR, ' ')
-      .toLowerCase();
+    filterQueryTemplateObj.heading.value = baseHeading;
     filterQueryTemplateObj.data.key = getFilters.getQueryDataKey(optionalNestedData.toLowerCase());
 
-    parsedValue = Number(value) as number;
+    const parsedValue = Number(value);
 
     filterQueryTemplateObj.data.value = minOrMaxValue
       ? {
@@ -118,15 +117,14 @@ getFilters.mapQuery = (filter: string): [TFilterQueryHeading, TFilterQueryData] 
         }
       : parsedValue;
   } else if (value.includes(getFilters.PIPE_SEPARATOR)) {
-    parsedValue = value
+    const parsedValue = value
       .split(getFilters.PIPE_SEPARATOR)
-      .map((val) => val.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR, ' '));
+      .map((val) => val.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getFilters.SPACE));
     filterQueryTemplateObj.data.value = {
       $all: parsedValue,
     };
   } else if (value === getFilters.BOOLEAN_VALUES.TRUE || value === getFilters.BOOLEAN_VALUES.FALSE) {
-    parsedValue = (value === getFilters.BOOLEAN_VALUES.TRUE) as boolean;
-    filterQueryTemplateObj.data.value = parsedValue;
+    filterQueryTemplateObj.data.value = value === getFilters.BOOLEAN_VALUES.TRUE;
   }
 
   const filterQueryHeading = {

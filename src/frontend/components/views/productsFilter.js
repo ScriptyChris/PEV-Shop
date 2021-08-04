@@ -131,7 +131,7 @@ const getControlsForSpecs = (() => {
     return normalizedSpecValues.map((val, index) => (
       <Fragment key={`spec${specName}Control${index}`}>
         <label>
-          {val}
+          {translations.normalizeContent(val)}
           <input type="checkbox" name={`${specName}__${val}`} value={value} onChange={formikRestProps.handleChange} />
         </label>
       </Fragment>
@@ -264,39 +264,37 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
       const parsedInputName = parseInputName(lastChangedInputName.current);
       const hasCounterPart = parsedInputName.modifier;
 
-      if (!hasCounterPart) {
-        return;
-      }
+      if (hasCounterPart) {
+        const minMaxCounterPart = getMinMaxCounterPart(values, parsedInputName.element, parsedInputName.modifier);
+        const lastInputValue = values[lastChangedInputName.current];
+        const counterPartInputValue = values[minMaxCounterPart];
+        const errors = {
+          [lastChangedInputName.current]: CHARS.EMPTY,
+        };
 
-      const minMaxCounterPart = getMinMaxCounterPart(values, parsedInputName.element, parsedInputName.modifier);
-      const lastInputValue = values[lastChangedInputName.current];
-      const counterPartInputValue = values[minMaxCounterPart];
-      const errors = {
-        [lastChangedInputName.current]: CHARS.EMPTY,
-      };
+        if (
+          parsedInputName.modifier === CHARS.MIN &&
+          counterPartInputValue !== CHARS.EMPTY &&
+          counterPartInputValue < lastInputValue
+        ) {
+          errors[lastChangedInputName.current] = 'minExceededMax';
+        } else if (
+          parsedInputName.modifier === CHARS.MAX &&
+          counterPartInputValue !== CHARS.EMPTY &&
+          counterPartInputValue > lastInputValue
+        ) {
+          errors[lastChangedInputName.current] = 'maxBeneathMin';
+        }
 
-      if (
-        parsedInputName.modifier === CHARS.MIN &&
-        counterPartInputValue !== CHARS.EMPTY &&
-        counterPartInputValue < lastInputValue
-      ) {
-        errors[lastChangedInputName.current] = 'minExceededMax';
-      } else if (
-        parsedInputName.modifier === CHARS.MAX &&
-        counterPartInputValue !== CHARS.EMPTY &&
-        counterPartInputValue > lastInputValue
-      ) {
-        errors[lastChangedInputName.current] = 'maxBeneathMin';
-      }
+        if (errors[lastChangedInputName.current]) {
+          cachedValidationErrors.current[lastChangedInputName.current] = errors[lastChangedInputName.current];
+        } else {
+          delete cachedValidationErrors.current[lastChangedInputName.current];
+        }
 
-      if (errors[lastChangedInputName.current]) {
-        cachedValidationErrors.current[lastChangedInputName.current] = errors[lastChangedInputName.current];
-      } else {
-        delete cachedValidationErrors.current[lastChangedInputName.current];
-      }
-
-      if (cachedValidationErrors.current[minMaxCounterPart]) {
-        delete cachedValidationErrors.current[minMaxCounterPart];
+        if (cachedValidationErrors.current[minMaxCounterPart]) {
+          delete cachedValidationErrors.current[minMaxCounterPart];
+        }
       }
 
       prepareFiltersUpdate(Object.keys(cachedValidationErrors.current).length > 0, values);
