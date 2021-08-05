@@ -4,8 +4,21 @@ import apiService from '../../features/apiService';
 
 const translations = {
   filterUnavailable: 'Filters are not available',
-  minExceededMax: 'Min value should not be greater than max value',
-  maxBeneathMin: 'Max value should not be lower than min value',
+  minExceededMax: 'Min value must be lower than or equal to max value!',
+  maxBeneathMin: 'Max value must be greater than or equal to min value!',
+  getBeyondValueRange({ boundaryName, boundaryValue }) {
+    if (!boundaryName || !boundaryValue) {
+      throw ReferenceError(`boundaryName: ${boundaryName} and boundaryValue: ${boundaryValue} must not be empty!`);
+    }
+
+    if (boundaryName === CHARS.MIN) {
+      return `Min value must be greater than or equal to ${boundaryValue}!`;
+    } else if (boundaryName === CHARS.MAX) {
+      return `Max value must be less than or equal to ${boundaryValue}!`;
+    }
+
+    throw TypeError(`boundaryName: ${boundaryName} was not recognized!`);
+  },
   normalizeContent(text) {
     return text
       .replace(/\W/g, CHARS.EMPTY)
@@ -86,9 +99,9 @@ const getControlsForSpecs = (() => {
       const keyAndId = `spec${specName}Control${index}`;
       const areSpecDescriptions = Array.isArray(specDescriptions);
       const ariaLabelledBy = areSpecDescriptions ? keyAndId : CHARS.EMPTY;
-      const erroredInputName =
-        formikRestProps.errors && specRangeName.find((rangeName) => formikRestProps.errors[rangeName]);
-      const errorValue = formikRestProps.errors[erroredInputName];
+      const erroredInputNames =
+        (formikRestProps.errors && specRangeName.filter((rangeName) => formikRestProps.errors[rangeName])) || [];
+      const errorList = erroredInputNames.map((inputName) => formikRestProps.errors[inputName]);
       const [minValue, maxValue] =
         specRangeName.length === 0 ? ['', ''] : specRangeName.map((item) => formikRestProps.values[item]);
 
@@ -118,7 +131,22 @@ const getControlsForSpecs = (() => {
             onChange={formikRestProps.handleChange}
           />
 
-          {errorValue && <p className="products-filter-form__range-error">{translations[errorValue]}</p>}
+          {errorList.length > 0 &&
+            errorList.map((errorObj, index) => {
+              let errorMessage = '';
+
+              if (errorObj.conflictWithCounterPart) {
+                errorMessage = translations[errorObj.conflictWithCounterPart];
+              } else if (errorObj.beyondValueRange) {
+                errorMessage = translations.getBeyondValueRange(errorObj.beyondValueRange);
+              }
+
+              return (
+                <p className="products-filter-form__range-error" key={`${ariaLabelledBy}-error${index}`}>
+                  {errorMessage}
+                </p>
+              );
+            })}
         </div>
       );
     });
@@ -144,7 +172,11 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
   const cachedValidationErrors = useRef({});
   const [productSpecsPerSelectedCategory, setProductSpecsPerSelectedCategory] = useState([]);
   const [formInitials, setFormInitials] = useState({});
-  const lastChangedInputName = useRef('');
+  const lastChangedInputMeta = useRef({
+    name: CHARS.EMPTY,
+    min: Number.NEGATIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
+  });
   const filterSpecsPerCategory = useCallback(() => {
     if (!Object.keys(productsSpecsPerCategory.current).length) {
       return;
@@ -246,7 +278,9 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
   }, [productSpecsPerSelectedCategory]);
 
   const changeHandler = ({ target }) => {
-    lastChangedInputName.current = target.name;
+    lastChangedInputMeta.current.name = target.name;
+    lastChangedInputMeta.current.min = Number(target.min);
+    lastChangedInputMeta.current.max = Number(target.max);
   };
 
   const validateHandler = useMemo(() => {
@@ -261,43 +295,60 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
     return validator;
 
     function validator(values) {
-      const parsedInputName = parseInputName(lastChangedInputName.current);
+      const {
+        name: lastChangedInputName,
+        min: lastChangedInputMinValue,
+        max: lastChangedInputMaxValue,
+      } = lastChangedInputMeta.current;
+      const parsedInputName = parseInputName(lastChangedInputName);
       const hasCounterPart = parsedInputName.modifier;
 
       if (hasCounterPart) {
-        const minMaxCounterPart = getMinMaxCounterPart(values, parsedInputName.element, parsedInputName.modifier);
-        const lastInputValue = values[lastChangedInputName.current];
-        const counterPartInputValue = values[minMaxCounterPart];
+        const minMaxCounterPartName = getMinMaxCounterPart(values, parsedInputName.element, parsedInputName.modifier);
+        const lastInputValue = values[lastChangedInputName];
+        const counterPartInputValue = values[minMaxCounterPartName];
         const errors = {
-          [lastChangedInputName.current]: CHARS.EMPTY,
+          [lastChangedInputName]: {
+            conflictWithCounterPart: CHARS.EMPTY,
+            beyondValueRange: null,
+          },
         };
 
-        if (
-          parsedInputName.modifier === CHARS.MIN &&
-          counterPartInputValue !== CHARS.EMPTY &&
-          counterPartInputValue < lastInputValue
-        ) {
-          errors[lastChangedInputName.current] = 'minExceededMax';
-        } else if (
-          parsedInputName.modifier === CHARS.MAX &&
-          counterPartInputValue !== CHARS.EMPTY &&
-          counterPartInputValue > lastInputValue
-        ) {
-          errors[lastChangedInputName.current] = 'maxBeneathMin';
+        if (counterPartInputValue !== CHARS.EMPTY) {
+          if (parsedInputName.modifier === CHARS.MIN && counterPartInputValue < lastInputValue) {
+            errors[lastChangedInputName].conflictWithCounterPart = 'minExceededMax';
+          } else if (parsedInputName.modifier === CHARS.MAX && counterPartInputValue > lastInputValue) {
+            errors[lastChangedInputName].conflictWithCounterPart = 'maxBeneathMin';
+          }
         }
 
-        if (errors[lastChangedInputName.current]) {
-          cachedValidationErrors.current[lastChangedInputName.current] = errors[lastChangedInputName.current];
+        if (lastInputValue !== CHARS.EMPTY) {
+          if (lastInputValue < lastChangedInputMinValue) {
+            errors[lastChangedInputName].beyondValueRange = {
+              boundaryName: CHARS.MIN,
+              boundaryValue: lastChangedInputMinValue,
+            };
+          } else if (lastInputValue > lastChangedInputMaxValue) {
+            errors[lastChangedInputName].beyondValueRange = {
+              boundaryName: CHARS.MAX,
+              boundaryValue: lastChangedInputMaxValue,
+            };
+          }
+        }
+
+        const isAnyError = Object.values(errors[lastChangedInputName]).some(Boolean);
+        if (isAnyError) {
+          cachedValidationErrors.current[lastChangedInputName] = errors[lastChangedInputName];
         } else {
-          delete cachedValidationErrors.current[lastChangedInputName.current];
+          delete cachedValidationErrors.current[lastChangedInputName];
         }
 
-        if (cachedValidationErrors.current[minMaxCounterPart]) {
-          delete cachedValidationErrors.current[minMaxCounterPart];
+        if (cachedValidationErrors.current[minMaxCounterPartName]) {
+          cachedValidationErrors.current[minMaxCounterPartName].conflictWithCounterPart = CHARS.EMPTY;
         }
       }
 
-      prepareFiltersUpdate(Object.keys(cachedValidationErrors.current).length > 0, values);
+      prepareFiltersUpdate(Object.values(cachedValidationErrors.current).some(Boolean), values);
 
       return cachedValidationErrors.current;
     }
