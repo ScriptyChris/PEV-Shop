@@ -67,6 +67,7 @@ describe('#api-products', () => {
         queryBuilderMock.getSearchByNameConfig.mockImplementationOnce(
           queryBuilderMock.getSearchByNameConfig._succeededCall
         );
+        queryBuilderMock.getFilters.mockImplementationOnce(queryBuilderMock.getFilters._succeededCall);
         getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
       });
 
@@ -74,6 +75,7 @@ describe('#api-products', () => {
         queryBuilderMock.getIdListConfig.mockClear();
         queryBuilderMock.getProductsWithChosenCategories.mockClear();
         queryBuilderMock.getPaginationConfig.mockClear();
+        queryBuilderMock.getFilters.mockClear();
         getFromDBMock.mockClear();
       });
 

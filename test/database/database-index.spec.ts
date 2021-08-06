@@ -117,21 +117,20 @@ describe('#database-index', () => {
     });
 
     it('should call Model.find(..) or Model.findOne(..) depending on itemQuery param value and return promise resolved to the result of that call', async () => {
-      const itemQueryEmpty = {};
-      const getFromDBResult1 = getFromDB(itemQueryEmpty, MODEL_TYPE, {});
+      const projectionParam = undefined;
 
+      const itemQueryEmpty = {};
+      const getFromDBResult1 = getFromDB(itemQueryEmpty, MODEL_TYPE, {}, projectionParam);
       expect(getFromDBResult1).resolves.toBe('find result');
-      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryEmpty);
+      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryEmpty, projectionParam);
 
       const itemQueryIdObject = { _id: {} };
-      const getFromDBResult2 = getFromDB(itemQueryIdObject, MODEL_TYPE, {});
-
+      const getFromDBResult2 = getFromDB(itemQueryIdObject, MODEL_TYPE, {}, projectionParam);
       expect(getFromDBResult2).resolves.toBe('find result');
-      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryIdObject);
+      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryIdObject, projectionParam);
 
       const itemQueryNumber = 123;
       const getFromDBResult3 = getFromDB(itemQueryNumber, MODEL_TYPE, {});
-
       expect(getFromDBResult3).resolves.toBe('findOne result');
       expect(getModelMock._ModelClassMock.findOne).toHaveBeenCalledWith(itemQueryNumber);
     });
