@@ -1,5 +1,5 @@
 import * as mongooseModule from 'mongoose';
-import { Document } from 'mongoose';
+import { Document, SchemaType } from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
 
 const {
@@ -25,6 +25,28 @@ const reviewsSchema = new Schema({
     type: Array,
     required: true,
   },
+});
+
+const technicalSpecs = new Schema({
+  // TODO: restrict that to predefined (and extendable) values
+  heading: String,
+  data: {
+    type: Schema.Types.Mixed,
+    set(value: any) {
+      // TODO: make it dependable on heading value
+      const stringValueAsNumber = typeof value === 'string' ? Number(value) : value;
+
+      if (!Number.isNaN(stringValueAsNumber)) {
+        value = stringValueAsNumber;
+      }
+
+      return value;
+    },
+  },
+  // TODO: restrict that to predefined (and extendable) values
+  defaultUnit: String,
+  iconSrc: String,
+  specFromImage: String,
 });
 
 const productSchema = new Schema({
@@ -54,7 +76,7 @@ const productSchema = new Schema({
     required: true,
   },
   technicalSpecs: {
-    type: [Object],
+    type: [technicalSpecs],
     required: true,
   },
   images: {

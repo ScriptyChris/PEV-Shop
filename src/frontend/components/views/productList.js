@@ -5,27 +5,29 @@ import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
 import CompareProducts from './compareProducts';
 import { SearchProductsByName } from './search';
+import ProductsFilter from './productsFilter';
+
+const translations = {
+  lackOfProducts: 'Brak produktów...',
+  filterProducts: 'Filtruj produkty',
+  typeProductName: 'Type product name:',
+};
+const paginationTranslations = {
+  itemsPerPageSuffix: 'produktów',
+  allItems: 'Wszystkie produkty',
+};
+
+// TODO: setup this on backend and pass via some initial config to frontend
+const productsPerPageLimits = [15, 30, 60, Infinity];
 
 export default function ProductList() {
-  const translations = {
-    lackOfProducts: 'Brak produktów...',
-    filterProducts: 'Filtruj produkty',
-    typeProductName: 'Type product name:',
-  };
-  const paginationTranslations = {
-    itemsPerPageSuffix: 'produktów',
-    allItems: 'Wszystkie produkty',
-  };
-
-  // TODO: setup this on backend and pass via some initial config to frontend
-  const productsPerPageLimits = [15, 30, 60, Infinity];
-
   const [productsList, setProductsList] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentProductPage, setCurrentProductPage] = useState(1);
   // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
   const [currentProductsPerPageLimit, setCurrentProductsPerPageLimit] = useState(productsPerPageLimits[0]);
+  const [filterBtnDisabled, setFilterBtnDisabled] = useState(false);
 
   useEffect(() => {
     updateProductsList().catch((updateProductsListError) => {
@@ -37,16 +39,17 @@ export default function ProductList() {
     pageNumber = currentProductPage,
     productsPerPage = currentProductsPerPageLimit,
     productCategories = productCategories,
+    productsFilters,
     products,
   } = {}) => {
     const isHighestProductsPerPage = productsPerPage === productsPerPageLimits[productsPerPageLimits.length - 1];
 
     if (isHighestProductsPerPage) {
-      setProductsList(products || (await apiService.getProducts({ productCategories })));
+      setProductsList(products || (await apiService.getProducts({ productCategories, productsFilters })));
       setTotalPages(1);
     } else {
       const pagination = { pageNumber, productsPerPage };
-      products = products || (await apiService.getProducts({ pagination, productCategories }));
+      products = products || (await apiService.getProducts({ pagination, productCategories, productsFilters }));
 
       setProductsList(products.productsList);
       setTotalPages(products.totalPages);
@@ -68,6 +71,18 @@ export default function ProductList() {
 
   const onCategorySelect = (categories) => {
     setProductCategories(categories);
+  };
+
+  const handleFiltersUpdate = (filters) => {
+    if (filters.isError !== filterBtnDisabled) {
+      setFilterBtnDisabled(filters.isError);
+    }
+
+    if (!filters.isError) {
+      console.log('filters.values:', filters.values);
+      const productsFilters = Object.entries(filters.values).map((filter) => filter.join(':'));
+      updateProductsList({ productsFilters }).then();
+    }
   };
 
   const filterProducts = () => {
@@ -95,7 +110,12 @@ export default function ProductList() {
         onItemPageChange={onProductPageChange}
       />
 
-      <button onClick={filterProducts}>{translations.filterProducts}</button>
+      <ProductsFilter selectedCategories={productCategories} onFiltersUpdate={handleFiltersUpdate} />
+
+      {/* TODO: move the button into ProductsFilter component, presumably with CategoriesTree */}
+      <button onClick={filterProducts} disabled={filterBtnDisabled}>
+        {translations.filterProducts}
+      </button>
 
       <CompareProducts.List />
 

@@ -7,6 +7,7 @@ import glob from 'glob';
 // @ts-ignore
 import bodyParser from 'body-parser';
 import { resolve, sep } from 'path';
+import { existsSync } from 'fs';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
@@ -40,6 +41,10 @@ const middleware = (app: Application): void => {
 };
 
 if (process.env.BACKEND_ONLY === 'true') {
+  if (!existsSync(getFrontendPath())) {
+    console.error(`App's frontend is not available! Build it first.`);
+  }
+
   wrappedMiddleware();
 }
 
@@ -47,8 +52,7 @@ export default middleware;
 
 function wrappedMiddleware(): void {
   const app: Application = Express();
-
-  handleStaticFileRequests(app);
+  app.use(Express.static(getFrontendPath()));
 
   middleware(app);
   app.listen(process.env.PORT, () => {
@@ -56,13 +60,9 @@ function wrappedMiddleware(): void {
   });
 }
 
-function handleStaticFileRequests(app: Application): void {
+function getFrontendPath(): string {
   const relativeDist = __dirname.includes(`${sep}dist${sep}`) ? '' : 'dist/';
-  const path = `../../${relativeDist}src/frontend`;
-
-  const root = resolve(__dirname, path);
-
-  app.use(Express.static(root));
+  return resolve(__dirname, `../../${relativeDist}src/frontend`);
 }
 
 // TODO: change string type to probably ArrayBuffer
