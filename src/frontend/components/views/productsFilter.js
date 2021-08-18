@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
 import { Formik } from 'formik';
-import apiService from '../../features/apiService';
+import productSpecsService from '../../features/productSpecsService';
 
 const translations = {
   filterUnavailable: 'Filters are not available',
@@ -40,21 +40,6 @@ const SPEC_NAMES_SEPARATORS = Object.freeze({
   LEVEL: '__',
   MIN_MAX: '--',
 });
-const FIELD_TYPES = {
-  INPUT_NUMBER: 'inputNumber',
-  INPUT_CHECKBOX: 'inputCheckbox',
-};
-const SPEC_TO_FIELD_TYPE = Object.freeze({
-  weight: FIELD_TYPES.INPUT_NUMBER,
-  dimensions: FIELD_TYPES.INPUT_NUMBER,
-  'top speed': FIELD_TYPES.INPUT_NUMBER,
-  'charge time': FIELD_TYPES.INPUT_NUMBER,
-  'max load': FIELD_TYPES.INPUT_NUMBER,
-  'battery capacity': FIELD_TYPES.INPUT_NUMBER,
-  range: FIELD_TYPES.INPUT_NUMBER,
-  'motor power': FIELD_TYPES.INPUT_NUMBER,
-  colour: FIELD_TYPES.INPUT_CHECKBOX,
-});
 
 const matchRegExp = new RegExp(
   `^((?<block>${CHARS.LETTERS_REGEXP})(${SPEC_NAMES_SEPARATORS.LEVEL}))?(?<element>${CHARS.LETTERS_REGEXP})((${SPEC_NAMES_SEPARATORS.MIN_MAX})(?<modifier>${CHARS.LETTERS_REGEXP}))?$`
@@ -63,8 +48,8 @@ const parseInputName = (name) => name.match(matchRegExp).groups;
 
 const getControlsForSpecs = (() => {
   const TEMPLATE_FUNCTION_PER_CONTROL_TYPE = {
-    inputNumber: getInputNumberControl,
-    inputCheckbox: getInputCheckboxControl,
+    NUMBER: getInputNumberControl,
+    CHOICE: getInputCheckboxControl,
   };
 
   return function GetControlsForSpecs(
@@ -200,20 +185,9 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
 
   useEffect(() => {
     (async () => {
-      productsSpecsPerCategory.current = await apiService
+      productsSpecsPerCategory.current = await productSpecsService
         .getProductsSpecifications()
-        .then(({ categoryToSpecs, specs }) => ({
-          specs: specs.map((specObj) => ({
-            ...specObj,
-            type: SPEC_TO_FIELD_TYPE[specObj.name],
-            values: Array.isArray(specObj.values) ? [specObj.values] : Object.values(specObj.values),
-            descriptions: Array.isArray(specObj.values) ? null : Object.keys(specObj.values),
-          })),
-          categoryToSpecs: Object.entries(categoryToSpecs).map(([category, specs]) => ({
-            category,
-            specs,
-          })),
-        }));
+        .then(productSpecsService.structureProductsSpecifications);
       filterSpecsPerCategory();
     })();
   }, []);
