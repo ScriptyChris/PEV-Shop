@@ -2,7 +2,7 @@ import React, { useState, useEffect, createRef, useRef } from 'react';
 import apiService from '../../features/apiService';
 import TreeMenu from 'react-simple-tree-menu';
 
-export default function CategoriesTree(props) {
+export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
   const [categoriesMap, setCategoriesMap] = useState(null);
   const categoriesTreeRef = createRef();
   const treeMenuRef = createRef();
@@ -69,31 +69,38 @@ export default function CategoriesTree(props) {
 
   const toggleActiveTreeNode = (nodeLevel, nodeIndex, matchedParentKey, nodeLabel) => {
     const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
-    const isActiveTreeNode = activeTreeNodes.current.has(currentNodeKey);
+    const currentNodeValue = `${matchedParentKey}${nodeLabel}`;
 
-    if (isActiveTreeNode) {
-      activeTreeNodes.current.delete(currentNodeKey);
+    if (isMultiselect) {
+      const isActiveTreeNode = activeTreeNodes.current.has(currentNodeKey);
+
+      if (isActiveTreeNode) {
+        activeTreeNodes.current.delete(currentNodeKey);
+      } else {
+        activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
+      }
+
+      // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
+      [[currentNodeKey], ...activeTreeNodes.current].forEach(([key], iteration) => {
+        const isCurrentNodeKey = iteration === 0;
+        const [level, index] = key.split('-');
+        const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
+
+        const treeNodeDOM = categoriesTreeRef.current.querySelectorAll(treeNodeLevelSelector)[index];
+
+        // "Force" DOM actions execution on elements controlled by React.
+        requestAnimationFrame(() => {
+          treeNodeDOM.classList.toggle('rstm-tree-item--active', !isCurrentNodeKey);
+          treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
+        });
+      });
     } else {
-      activeTreeNodes.current.set(currentNodeKey, `${matchedParentKey}${nodeLabel}`);
+      activeTreeNodes.current.clear();
+      activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
     }
 
-    // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
-    [[currentNodeKey], ...activeTreeNodes.current].forEach(([key], iteration) => {
-      const isCurrentNodeKey = iteration === 0;
-      const [level, index] = key.split('-');
-      const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
-
-      const treeNodeDOM = categoriesTreeRef.current.querySelectorAll(treeNodeLevelSelector)[index];
-
-      // "Force" DOM actions execution on elements controlled by React.
-      requestAnimationFrame(() => {
-        treeNodeDOM.classList.toggle('rstm-tree-item--active', !isCurrentNodeKey);
-        treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
-      });
-    });
-
     const activeCategoryNames = [...activeTreeNodes.current.values()];
-    props.onCategorySelect(activeCategoryNames);
+    onCategorySelect(activeCategoryNames);
   };
   toggleActiveTreeNode.matchParentKey = (treeData, clickedItem) => {
     const matchedParent = treeData.find((node) => clickedItem.parent && clickedItem.parent === node.key);

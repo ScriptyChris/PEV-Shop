@@ -2,6 +2,7 @@ import React, { useEffect, useState /*useRef,*/ /*Fragment*/ } from 'react';
 // import { Formik } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
+import CategoriesTree from '../views/categoriesTree';
 
 const translations = {
   baseInformation: 'Basic information',
@@ -79,6 +80,8 @@ export default function NewProduct() {
             value={productPriceValue}
             onChange={handleChange}
           />
+
+          <CategoriesTree onCategorySelect={(...args) => console.log('onCategorySelect args:', args)} />
         </fieldset>
 
         <fieldset>
