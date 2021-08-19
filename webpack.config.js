@@ -1,7 +1,6 @@
 const { resolve } = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const Dotenv = require('html-webpack-plugin');
 
 require('dotenv').config();
 
@@ -24,7 +23,6 @@ module.exports = (env) => {
         {
           test: /\.js$/,
           loader: ['babel-loader', 'eslint-loader', 'prettier-loader'],
-          exclude: /node_modules/,
         },
         {
           test: /\.scss$/,
@@ -42,7 +40,6 @@ module.exports = (env) => {
       ]
     },
     plugins: [
-      new Dotenv(),
       new MiniCssExtractPlugin({
         filename: 'styles.css',
         chunkFilename: '[id].css'
@@ -60,6 +57,12 @@ module.exports = (env) => {
       port: process.env.PORT,
       hotOnly: true,
       liveReload: false,
-    }
+      watchOptions: {
+        ignored: [
+          'node_modules', 'dist', '.*', 'src/middleware',
+          'src/database', 'test/middleware', 'test/database'
+        ].map(path => resolve(__dirname, path)),
+      },
+    },
   };
 };
