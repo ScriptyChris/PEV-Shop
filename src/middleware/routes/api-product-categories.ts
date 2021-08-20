@@ -15,21 +15,29 @@ function createCategoriesHierarchy(productCategories: string[]): string[] {
 
   productCategories.forEach((category) => {
     if (category.includes('|')) {
-      const [parentCategory, childCategory] = category.split('|');
+      const [categoryName, childCategory] = category.split('|');
       const parentCategorySlotIndex = categoriesHierarchy.findIndex(
-        (categoryItem) => categoryItem.parentCategory === parentCategory
+        (categoryItem) => categoryItem.categoryName === categoryName
       );
 
       if (parentCategorySlotIndex === -1) {
         categoriesHierarchy.push({
-          parentCategory,
-          childCategories: [childCategory],
+          categoryName,
+          childCategories: [
+            {
+              categoryName: childCategory,
+            },
+          ],
         });
       } else {
-        categoriesHierarchy[parentCategorySlotIndex].childCategories.push(childCategory);
+        categoriesHierarchy[parentCategorySlotIndex].childCategories.push({
+          categoryName: childCategory,
+        });
       }
     } else {
-      categoriesHierarchy.push(category);
+      categoriesHierarchy.push({
+        categoryName: category,
+      });
     }
   });
 

@@ -5,7 +5,6 @@ import TreeMenu from 'react-simple-tree-menu';
 export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
   const [categoriesMap, setCategoriesMap] = useState(null);
   const categoriesTreeRef = createRef();
-  const treeMenuRef = createRef();
   const activeTreeNodes = useRef(new Map());
 
   useEffect(() => {
@@ -31,7 +30,6 @@ export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
               clickedItem.label
             )
           }
-          ref={treeMenuRef}
         />
       );
     }
@@ -45,15 +43,14 @@ export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
       throw new RangeError('Product categories hierarchy has more levels than prepared list!');
     }
 
-    const isNestedCategory = typeof categoryItem === 'object';
     const mappedLevel = getCategoriesTree.levels[level];
     const key = `${mappedLevel}-level-node-${index + 1}`;
 
-    if (isNestedCategory) {
+    if (categoryItem.childCategories) {
       return {
         key,
         index,
-        label: categoryItem.parentCategory,
+        label: categoryItem.categoryName,
         nodes: categoryItem.childCategories.map((item, idx, __) =>
           getCategoriesTree.recursiveMapper(item, idx, __, level + 1)
         ),
@@ -63,7 +60,7 @@ export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
     return {
       key,
       index,
-      label: categoryItem,
+      label: categoryItem.categoryName,
     };
   };
 
