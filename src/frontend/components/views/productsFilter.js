@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
-import { Formik } from 'formik';
+import { Formik, ErrorMessage } from 'formik';
 import productSpecsService from '../../features/productSpecsService';
+import FormFieldError from '../utils/formFieldError';
 
 const translations = {
   filterUnavailable: 'Filters are not available',
@@ -86,7 +87,10 @@ const getControlsForSpecs = (() => {
       const ariaLabelledBy = areSpecDescriptions ? keyAndId : CHARS.EMPTY;
       const erroredInputNames =
         (formikRestProps.errors && specRangeName.filter((rangeName) => formikRestProps.errors[rangeName])) || [];
-      const errorList = erroredInputNames.map((inputName) => formikRestProps.errors[inputName]);
+      const errorList = erroredInputNames.map((inputName) => ({
+        ...formikRestProps.errors[inputName],
+        _name: inputName,
+      }));
       const [minValue, maxValue] =
         specRangeName.length === 0 ? ['', ''] : specRangeName.map((item) => formikRestProps.values[item]);
 
@@ -127,9 +131,12 @@ const getControlsForSpecs = (() => {
               }
 
               return (
-                <p className="products-filter-form__range-error" key={`${ariaLabelledBy}-error${index}`}>
-                  {errorMessage}
-                </p>
+                <ErrorMessage
+                  name={errorObj._name}
+                  key={`${ariaLabelledBy}-error${index}`}
+                  component={FormFieldError}
+                  customMessage={errorMessage}
+                />
               );
             })}
         </div>
@@ -284,7 +291,7 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
         const errors = {
           [lastChangedInputName]: {
             conflictWithCounterPart: CHARS.EMPTY,
-            beyondValueRange: null,
+            beyondValueRange: undefined,
           },
         };
 
@@ -367,6 +374,9 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
       {({ handleSubmit, ...formikRestProps }) => {
         const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
         formikRestProps.handleChange = function (event) {
+          // TODO: remove this when form will be submitted via button, not dynamically
+          formikRestProps.setFieldTouched(event.target.name, true, false);
+
           changeHandler(event);
           _handleChange(event);
         };

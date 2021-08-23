@@ -97,7 +97,7 @@ export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
     }
 
     const activeCategoryNames = [...activeTreeNodes.current.values()];
-    onCategorySelect(activeCategoryNames);
+    onCategorySelect(isMultiselect ? activeCategoryNames : activeCategoryNames[0]);
   };
   toggleActiveTreeNode.matchParentKey = (treeData, clickedItem) => {
     const matchedParent = treeData.find((node) => clickedItem.parent && clickedItem.parent === node.key);
