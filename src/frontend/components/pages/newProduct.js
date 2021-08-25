@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
-import CategoriesTree from '../views/categoriesTree';
+import { CategoriesTreeFormField } from '../views/categoriesTree';
 import FormFieldError from '../utils/formFieldError';
 
 const translations = {
@@ -115,9 +115,7 @@ export default function NewProduct() {
     setProductCurrentSpecs(currentSpecs);
   };
 
-  const validateCategoryName = (value) => {
-    return value ? undefined : translations.emptyCategoryError;
-  };
+  const validateCategoryName = (value) => (value ? undefined : translations.emptyCategoryError);
 
   const getSpecsFields = (formikRestProps) => {
     return productCurrentSpecs.map((spec) => {
@@ -179,10 +177,15 @@ export default function NewProduct() {
 
             <fieldset>
               <legend>{translations.baseInformation}</legend>
-
               <label htmlFor="newProductName">{translations.name}</label>
-              <input id="newProductName" name="name" type="text" onChange={formikRestProps.handleChange} required />
-
+              <input
+                id="newProductName"
+                name="name"
+                type="text"
+                onChange={formikRestProps.handleChange}
+                onBlur={formikRestProps.handleBlur}
+                required
+              />
               <label htmlFor="newProductPrice">{translations.price}</label>
               <input
                 id="newProductPrice"
@@ -191,6 +194,7 @@ export default function NewProduct() {
                 step="0.01"
                 min="0.01"
                 onChange={formikRestProps.handleChange}
+                onBlur={formikRestProps.handleBlur}
                 required
               />
 
@@ -198,11 +202,8 @@ export default function NewProduct() {
                 name="category"
                 required
                 validate={validateCategoryName}
-                as={CategoriesTree}
-                onCategorySelect={(selectedCategory) => {
-                  formikRestProps.validateField('category');
-                  handleCategorySelect(selectedCategory);
-                }}
+                component={CategoriesTreeFormField}
+                onCategorySelect={(selectedCategory) => handleCategorySelect(selectedCategory)}
               />
               <ErrorMessage name="category" component={FormFieldError} />
             </fieldset>
@@ -215,7 +216,12 @@ export default function NewProduct() {
               {productCurrentSpecs.length > 0 && getSpecsFields(formikRestProps)}
             </fieldset>
 
-            <button type="submit">{translations.save}</button>
+            <button
+              type="submit"
+              onClick={() => !formikRestProps.touched.category && formikRestProps.setFieldTouched('category')}
+            >
+              {translations.save}
+            </button>
           </form>
         )}
       </Formik>

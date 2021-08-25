@@ -2,7 +2,7 @@ import React, { useState, useEffect, createRef, useRef } from 'react';
 import apiService from '../../features/apiService';
 import TreeMenu from 'react-simple-tree-menu';
 
-export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
+function CategoriesTree({ onCategorySelect, isMultiselect, formField }) {
   const [categoriesMap, setCategoriesMap] = useState(null);
   const categoriesTreeRef = createRef();
   const activeTreeNodes = useRef(new Map());
@@ -110,6 +110,30 @@ export default function CategoriesTree({ onCategorySelect, isMultiselect }) {
       both useRef() hook and React.createRef() method don't seem to
       give reference to nested functional component's DOM elements, such as used TreeMenu.
     */
-    <div ref={categoriesTreeRef}>{getCategoriesTree()}</div>
+    <div ref={categoriesTreeRef}>
+      {formField}
+      {getCategoriesTree()}
+    </div>
   );
 }
+
+function CategoriesTreeFormField({ onCategorySelect, ...props }) {
+  const handleCategorySelect = (categoryNames) => {
+    props.form.setValues({
+      [props.field.name]: categoryNames.toString(),
+    });
+    onCategorySelect(categoryNames.toString());
+  };
+
+  return (
+    <CategoriesTree
+      {...props}
+      onCategorySelect={handleCategorySelect}
+      formField={
+        <input type="text" {...props.field} className="categories-tree-form-field__proxy-input--hidden" required />
+      }
+    />
+  );
+}
+
+export { CategoriesTree as default, CategoriesTreeFormField };
