@@ -119,9 +119,7 @@ function CategoriesTree({ onCategorySelect, isMultiselect, formField }) {
 
 function CategoriesTreeFormField({ onCategorySelect, ...props }) {
   const handleCategorySelect = (categoryNames) => {
-    props.form.setValues({
-      [props.field.name]: categoryNames.toString(),
-    });
+    props.form.setFieldValue(props.field.name, categoryNames.toString());
     onCategorySelect(categoryNames.toString());
   };
 

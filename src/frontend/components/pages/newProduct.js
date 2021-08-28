@@ -25,9 +25,11 @@ const SPEC_NAMES_SEPARATORS = Object.freeze({
   GAP: '_',
   LEVEL: '__',
 });
+const FIELD_NAME_PREFIXES = Object.freeze({
+  TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
+});
 
 export default function NewProduct() {
-  const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
@@ -72,39 +74,57 @@ export default function NewProduct() {
     })();
   }, []);
 
+  const normalizeSubmittedValues = (values) => {
+    const entries = Object.entries(values);
+    const entriesWithNaturalKeys = entries.filter(([key]) => !key.includes(SPEC_NAMES_SEPARATORS.LEVEL));
+    const nestedEntries = entries
+      .filter(([key]) => key.includes(SPEC_NAMES_SEPARATORS.LEVEL))
+      .reduce((obj, [key, value]) => {
+        const nestLevelKeys = key.split(SPEC_NAMES_SEPARATORS.LEVEL);
+
+        createNestedProperty(obj, nestLevelKeys, value);
+
+        return obj;
+      }, {});
+
+    return {
+      ...Object.fromEntries(entriesWithNaturalKeys),
+      ...nestedEntries,
+    };
+
+    function createNestedProperty(obj, nestLevelKeys, value, currentLevel = 0) {
+      const currentLevelKey = nestLevelKeys[currentLevel];
+      const nextLevel = currentLevel + 1;
+
+      // eslint-disable-next-line no-prototype-builtins
+      if (!obj.hasOwnProperty(currentLevelKey)) {
+        obj[currentLevelKey] = {};
+      }
+
+      if (nestLevelKeys[nextLevel]) {
+        createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
+      } else {
+        obj[currentLevelKey] = value;
+      }
+    }
+  };
+
   const onSubmitHandler = (values, { setSubmitting }) => {
     console.log('new product submit values:', values);
 
-    apiService
-      .addProduct({
-        ...values,
-        selectedCategoryName,
-      })
-      .then(
-        () => {
-          console.log('Product successfully saved');
-          setSubmitting(false);
-        },
-        (err) => {
-          console.error('Product save error:', err);
-          setSubmitting(false);
-        }
-      );
+    apiService.addProduct(normalizeSubmittedValues(values)).then(
+      () => {
+        console.log('Product successfully saved');
+        setSubmitting(false);
+      },
+      (err) => {
+        console.error('Product save error:', err);
+        setSubmitting(false);
+      }
+    );
   };
 
-  // const handleChange = ({ target }) => {
-  //   if (target.name === 'name') {
-  //     setProductNameValue(target.value);
-  //   } else if (target.name === 'price') {
-  //     setProductPriceValue(target.value);
-  //   }
-  // };
-
   const handleCategorySelect = (selectedCategoryName) => {
-    console.log('---- selectedCategoryName', selectedCategoryName);
-
-    setSelectedCategoryName(selectedCategoryName);
-
     const specsFromChosenCategory = (
       productSpecsMap.current.categoryToSpecs.find(
         (categoryToSpec) => categoryToSpec.category === selectedCategoryName
@@ -134,7 +154,7 @@ export default function NewProduct() {
           {Array.isArray(spec.descriptions) ? (
             spec.descriptions.map((specDescription, index) => {
               const groupFieldIdentifier = `${fieldIdentifier}${index}`;
-              const mergedName = `${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+              const mergedName = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
 
               return (
                 <div key={groupFieldIdentifier}>
@@ -155,7 +175,7 @@ export default function NewProduct() {
             })
           ) : (
             <input
-              name={spec.fieldName}
+              name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
               type={spec.fieldType}
               min={minValue}
               id={fieldIdentifier}
@@ -170,13 +190,14 @@ export default function NewProduct() {
 
   return (
     <section>
-      <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={(v) => console.log('validate:', v)}>
+      <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
         {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
             <h2>{translations.intro}</h2>
 
             <fieldset>
               <legend>{translations.baseInformation}</legend>
+
               <label htmlFor="newProductName">{translations.name}</label>
               <input
                 id="newProductName"
@@ -186,6 +207,7 @@ export default function NewProduct() {
                 onBlur={formikRestProps.handleBlur}
                 required
               />
+
               <label htmlFor="newProductPrice">{translations.price}</label>
               <input
                 id="newProductPrice"
