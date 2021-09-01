@@ -15,6 +15,7 @@ const translations = {
   addNewSpec: 'Add new spec',
   save: 'Save',
   emptyCategoryError: 'Category must be selected!',
+  colourIsNotTextError: 'Colour value must be a text!',
 };
 
 const FIELD_TYPE_MAP = Object.freeze({
@@ -85,7 +86,7 @@ export default function NewProduct() {
         createNestedProperty(obj, nestLevelKeys, value);
 
         return obj;
-      }, {});
+      }, Object.create(null));
 
     return {
       ...Object.fromEntries(entriesWithNaturalKeys),
@@ -96,15 +97,37 @@ export default function NewProduct() {
       const currentLevelKey = nestLevelKeys[currentLevel];
       const nextLevel = currentLevel + 1;
 
-      // eslint-disable-next-line no-prototype-builtins
-      if (!obj.hasOwnProperty(currentLevelKey)) {
-        obj[currentLevelKey] = {};
+      if (!(currentLevelKey in obj)) {
+        if (currentLevel === 0) {
+          obj[currentLevelKey] = {};
+        } else if (currentLevel === 1) {
+          obj[currentLevelKey] = {
+            value: {},
+            defaultUnit: undefined,
+          };
+
+          const specWithDefaultUnit = productSpecsMap.current.specs.find(
+            (specObj) => specObj.fieldName === currentLevelKey && specObj.defaultUnit
+          );
+
+          if (specWithDefaultUnit) {
+            obj[currentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
+          }
+        }
       }
 
       if (nestLevelKeys[nextLevel]) {
         createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
       } else {
-        obj[currentLevelKey] = value;
+        if (currentLevel > 1) {
+          obj.value[currentLevelKey] = value;
+        } else {
+          const isSpecWithChoiceType = productSpecsMap.current.specs.some(
+            (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
+          );
+
+          obj[currentLevelKey].value = isSpecWithChoiceType ? [value] : value;
+        }
       }
     }
   };
@@ -135,7 +158,26 @@ export default function NewProduct() {
     setProductCurrentSpecs(currentSpecs);
   };
 
-  const validateCategoryName = (value) => (value ? undefined : translations.emptyCategoryError);
+  const validateHandler = (values) => {
+    const errors = {};
+
+    if (!values.category) {
+      errors.category = translations.emptyCategoryError;
+    }
+
+    const { isColourFieldError, colourFieldKey } = validateHandler.colorFieldTextValidator(values);
+    if (isColourFieldError) {
+      errors[colourFieldKey] = translations.colourIsNotTextError;
+    }
+
+    return errors;
+  };
+  validateHandler.colorFieldTextValidator = (values) => {
+    const colourFieldKey = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}colour`;
+    const isColorFieldText = /^\D+$/.test(values[colourFieldKey]);
+
+    return { isColourFieldError: !isColorFieldText, colourFieldKey };
+  };
 
   const getSpecsFields = (formikRestProps) => {
     return productCurrentSpecs.map((spec) => {
@@ -183,6 +225,8 @@ export default function NewProduct() {
               required
             />
           )}
+
+          <ErrorMessage name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`} component={FormFieldError} />
         </div>
       );
     });
@@ -190,7 +234,7 @@ export default function NewProduct() {
 
   return (
     <section>
-      <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
+      <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
         {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
             <h2>{translations.intro}</h2>
@@ -223,7 +267,6 @@ export default function NewProduct() {
               <Field
                 name="category"
                 required
-                validate={validateCategoryName}
                 component={CategoriesTreeFormField}
                 onCategorySelect={(selectedCategory) => handleCategorySelect(selectedCategory)}
               />
