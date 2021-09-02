@@ -20,6 +20,9 @@ const translations = {
 
 const FIELD_TYPE_MAP = Object.freeze({
   NUMBER: 'number',
+  /* TODO: make colour field as input[type="color"] to let convenient color picking
+   * a kind of HEX to approx. human readable color name converter should also be provided
+   */
   CHOICE: 'text',
 });
 const SPEC_NAMES_SEPARATORS = Object.freeze({
@@ -95,13 +98,14 @@ export default function NewProduct() {
 
     function createNestedProperty(obj, nestLevelKeys, value, currentLevel = 0) {
       const currentLevelKey = nestLevelKeys[currentLevel];
+      const normalizedCurrentLevelKey = currentLevelKey.replaceAll(SPEC_NAMES_SEPARATORS.GAP, ' ');
       const nextLevel = currentLevel + 1;
 
       if (!(currentLevelKey in obj)) {
         if (currentLevel === 0) {
           obj[currentLevelKey] = {};
         } else if (currentLevel === 1) {
-          obj[currentLevelKey] = {
+          obj[normalizedCurrentLevelKey] = {
             value: {},
             defaultUnit: undefined,
           };
@@ -111,7 +115,7 @@ export default function NewProduct() {
           );
 
           if (specWithDefaultUnit) {
-            obj[currentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
+            obj[normalizedCurrentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
           }
         }
       }
@@ -120,13 +124,13 @@ export default function NewProduct() {
         createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
       } else {
         if (currentLevel > 1) {
-          obj.value[currentLevelKey] = value;
+          obj.value[normalizedCurrentLevelKey] = value;
         } else {
           const isSpecWithChoiceType = productSpecsMap.current.specs.some(
             (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
           );
 
-          obj[currentLevelKey].value = isSpecWithChoiceType ? [value] : value;
+          obj[normalizedCurrentLevelKey].value = isSpecWithChoiceType ? [value] : value;
         }
       }
     }

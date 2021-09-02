@@ -108,6 +108,15 @@ const productSchema = new Schema({
   reviews: {
     type: reviewsSchema,
     required: false,
+    default() {
+      return {
+        list: [],
+        summary: {
+          summary: '',
+          reviewsAmount: 0,
+        },
+      };
+    },
   },
 });
 productSchema.pre('validate', function (next: () => void) {
