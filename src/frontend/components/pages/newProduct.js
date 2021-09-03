@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
@@ -44,13 +44,22 @@ export default function NewProduct() {
     price: '',
     category: '',
   });
+  const ORIGINAL_FORM_INITIALS_KEYS = useMemo(() => Object.keys(formInitials), []);
+  const getSpecsForSelectedCategory = useCallback((selectedCategoryName) => {
+    const specsFromChosenCategory = (
+      productSpecsMap.current.categoryToSpecs.find(
+        (categoryToSpec) => categoryToSpec.category === selectedCategoryName
+      ) || { specs: [] }
+    ) /* TODO: remove fallback when CategoriesTree will handle ignoring toggle'able nodes */.specs;
+
+    return productSpecsMap.current.specs.filter((spec) => specsFromChosenCategory.includes(spec.name));
+  }, []);
 
   useEffect(() => {
     (async () => {
       const productSpecifications = await productSpecsService
         .getProductsSpecifications()
         .then(productSpecsService.structureProductsSpecifications);
-      console.log('newProduct productSpecifications:', productSpecifications);
 
       productSpecsMap.current.categoryToSpecs = productSpecifications.categoryToSpecs;
       productSpecsMap.current.specs = productSpecifications.specs.map((specObj) => ({
@@ -77,6 +86,32 @@ export default function NewProduct() {
       }));
     })();
   }, []);
+
+  const filterOutUnrelatedFields = (values) => {
+    const specFieldNamesForSelectedCategory = getSpecsForSelectedCategory(values.category).reduce(
+      (specEntries, spec) => {
+        const names = spec.descriptions
+          ? spec.descriptions.map(
+              (description) =>
+                `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${description}`
+            )
+          : [`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`];
+
+        names.forEach((name) => {
+          specEntries.push(name);
+        });
+
+        return specEntries;
+      },
+      []
+    );
+    const filteredValues = Object.entries(values).filter(([key]) =>
+      specFieldNamesForSelectedCategory.some((fieldName) => fieldName === key)
+    );
+    const filteredFormInitials = Object.entries(values).filter(([key]) => ORIGINAL_FORM_INITIALS_KEYS.includes(key));
+
+    return Object.fromEntries([...filteredFormInitials, ...filteredValues]);
+  };
 
   const normalizeSubmittedValues = (values) => {
     const entries = Object.entries(values);
@@ -137,9 +172,9 @@ export default function NewProduct() {
   };
 
   const onSubmitHandler = (values, { setSubmitting }) => {
-    console.log('new product submit values:', values);
+    const newProductData = normalizeSubmittedValues(filterOutUnrelatedFields(values));
 
-    apiService.addProduct(normalizeSubmittedValues(values)).then(
+    apiService.addProduct(newProductData).then(
       () => {
         console.log('Product successfully saved');
         setSubmitting(false);
@@ -152,14 +187,7 @@ export default function NewProduct() {
   };
 
   const handleCategorySelect = (selectedCategoryName) => {
-    const specsFromChosenCategory = (
-      productSpecsMap.current.categoryToSpecs.find(
-        (categoryToSpec) => categoryToSpec.category === selectedCategoryName
-      ) || { specs: [] }
-    ) /* TODO: remove fallback when CategoriesTree will handle ignoring toggle'able nodes */.specs;
-    const currentSpecs = productSpecsMap.current.specs.filter((spec) => specsFromChosenCategory.includes(spec.name));
-
-    setProductCurrentSpecs(currentSpecs);
+    setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
   };
 
   const validateHandler = (values) => {
