@@ -9,6 +9,7 @@ const translations = {
   intro: 'Fill new product details',
   baseInformation: 'Basic information',
   technicalSpecs: 'Technical specification',
+  categoryChooser: 'Category',
   chooseCategoryFirst: 'please, choose category first',
   name: 'Name',
   price: 'Price',
@@ -32,6 +33,115 @@ const SPEC_NAMES_SEPARATORS = Object.freeze({
 const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
 });
+
+function NewProductBaseInfo({ methods: { handleChange, handleBlur } }) {
+  return (
+    <fieldset>
+      <legend>{translations.baseInformation}</legend>
+
+      <label htmlFor="newProductName">{translations.name}</label>
+      <input id="newProductName" name="name" type="text" onChange={handleChange} onBlur={handleBlur} required />
+
+      <label htmlFor="newProductPrice">{translations.price}</label>
+      <input
+        id="newProductPrice"
+        name="price"
+        type="number"
+        step="0.01"
+        min="0.01"
+        onChange={handleChange}
+        onBlur={handleBlur}
+        required
+      />
+    </fieldset>
+  );
+}
+
+function NewProductCategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
+  const handleCategorySelect = (selectedCategoryName) => {
+    setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
+  };
+
+  return (
+    <fieldset>
+      <legend>{translations.categoryChooser}</legend>
+
+      <Field
+        name="category"
+        required
+        component={CategoriesTreeFormField}
+        onCategorySelect={(selectedCategory) => handleCategorySelect(selectedCategory)}
+      />
+      <ErrorMessage name="category" component={FormFieldError} />
+    </fieldset>
+  );
+}
+
+function NewProductTechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange } }) {
+  const getSpecsFields = () => {
+    return productCurrentSpecs.map((spec) => {
+      const fieldIdentifier = `${spec.name
+        .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
+        .replace(/\s/g, '')}Field`;
+      const minValue = spec.fieldType === 'number' ? 0 : null;
+
+      return (
+        <div key={fieldIdentifier}>
+          <label htmlFor={fieldIdentifier}>
+            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}{' '}
+            {spec.defaultUnit && `(${spec.defaultUnit})`}
+          </label>
+
+          {Array.isArray(spec.descriptions) ? (
+            spec.descriptions.map((specDescription, index) => {
+              const groupFieldIdentifier = `${fieldIdentifier}${index}`;
+              const mergedName = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+
+              return (
+                <div key={groupFieldIdentifier}>
+                  <label htmlFor={groupFieldIdentifier}>
+                    {specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+                  </label>
+
+                  <input
+                    name={mergedName}
+                    type={spec.fieldType}
+                    min={minValue}
+                    id={groupFieldIdentifier}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <input
+              name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
+              type={spec.fieldType}
+              min={minValue}
+              id={fieldIdentifier}
+              onChange={handleChange}
+              required
+            />
+          )}
+
+          <ErrorMessage name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`} component={FormFieldError} />
+        </div>
+      );
+    });
+  };
+
+  return (
+    <fieldset>
+      <legend>
+        {translations.technicalSpecs}{' '}
+        {productCurrentSpecs.length === 0 && <span>({translations.chooseCategoryFirst})</span>}
+      </legend>
+
+      {productCurrentSpecs.length > 0 && getSpecsFields()}
+    </fieldset>
+  );
+}
 
 export default function NewProduct() {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
@@ -121,7 +231,7 @@ export default function NewProduct() {
       .reduce((obj, [key, value]) => {
         const nestLevelKeys = key.split(SPEC_NAMES_SEPARATORS.LEVEL);
 
-        createNestedProperty(obj, nestLevelKeys, value);
+        normalizeSubmittedValues.createNestedProperty(obj, nestLevelKeys, value);
 
         return obj;
       }, Object.create(null));
@@ -130,43 +240,42 @@ export default function NewProduct() {
       ...Object.fromEntries(entriesWithNaturalKeys),
       ...nestedEntries,
     };
+  };
+  normalizeSubmittedValues.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
+    const currentLevelKey = nestLevelKeys[currentLevel];
+    const normalizedCurrentLevelKey = currentLevelKey.replaceAll(SPEC_NAMES_SEPARATORS.GAP, ' ');
+    const nextLevel = currentLevel + 1;
 
-    function createNestedProperty(obj, nestLevelKeys, value, currentLevel = 0) {
-      const currentLevelKey = nestLevelKeys[currentLevel];
-      const normalizedCurrentLevelKey = currentLevelKey.replaceAll(SPEC_NAMES_SEPARATORS.GAP, ' ');
-      const nextLevel = currentLevel + 1;
+    if (!(currentLevelKey in obj)) {
+      if (currentLevel === 0) {
+        obj[currentLevelKey] = {};
+      } else if (currentLevel === 1) {
+        obj[normalizedCurrentLevelKey] = {
+          value: {},
+          defaultUnit: undefined,
+        };
 
-      if (!(currentLevelKey in obj)) {
-        if (currentLevel === 0) {
-          obj[currentLevelKey] = {};
-        } else if (currentLevel === 1) {
-          obj[normalizedCurrentLevelKey] = {
-            value: {},
-            defaultUnit: undefined,
-          };
+        const specWithDefaultUnit = productSpecsMap.current.specs.find(
+          (specObj) => specObj.fieldName === currentLevelKey && specObj.defaultUnit
+        );
 
-          const specWithDefaultUnit = productSpecsMap.current.specs.find(
-            (specObj) => specObj.fieldName === currentLevelKey && specObj.defaultUnit
-          );
-
-          if (specWithDefaultUnit) {
-            obj[normalizedCurrentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
-          }
+        if (specWithDefaultUnit) {
+          obj[normalizedCurrentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
         }
       }
+    }
 
-      if (nestLevelKeys[nextLevel]) {
-        createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
+    if (nestLevelKeys[nextLevel]) {
+      normalizeSubmittedValues.createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
+    } else {
+      if (currentLevel > 1) {
+        obj.value[normalizedCurrentLevelKey] = value;
       } else {
-        if (currentLevel > 1) {
-          obj.value[normalizedCurrentLevelKey] = value;
-        } else {
-          const isSpecWithChoiceType = productSpecsMap.current.specs.some(
-            (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
-          );
+        const isSpecWithChoiceType = productSpecsMap.current.specs.some(
+          (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
+        );
 
-          obj[normalizedCurrentLevelKey].value = isSpecWithChoiceType ? [value] : value;
-        }
+        obj[normalizedCurrentLevelKey].value = isSpecWithChoiceType ? [value] : value;
       }
     }
   };
@@ -184,10 +293,6 @@ export default function NewProduct() {
         setSubmitting(false);
       }
     );
-  };
-
-  const handleCategorySelect = (selectedCategoryName) => {
-    setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
   };
 
   const validateHandler = (values) => {
@@ -211,59 +316,6 @@ export default function NewProduct() {
     return { isColourFieldError: !isColorFieldText, colourFieldKey };
   };
 
-  const getSpecsFields = (formikRestProps) => {
-    return productCurrentSpecs.map((spec) => {
-      const fieldIdentifier = `${spec.name
-        .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
-        .replace(/\s/g, '')}Field`;
-      const minValue = spec.fieldType === 'number' ? 0 : null;
-
-      return (
-        <div key={fieldIdentifier}>
-          <label htmlFor={fieldIdentifier}>
-            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}{' '}
-            {spec.defaultUnit && `(${spec.defaultUnit})`}
-          </label>
-
-          {Array.isArray(spec.descriptions) ? (
-            spec.descriptions.map((specDescription, index) => {
-              const groupFieldIdentifier = `${fieldIdentifier}${index}`;
-              const mergedName = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
-
-              return (
-                <div key={groupFieldIdentifier}>
-                  <label htmlFor={groupFieldIdentifier}>
-                    {specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-                  </label>
-
-                  <input
-                    name={mergedName}
-                    type={spec.fieldType}
-                    min={minValue}
-                    id={groupFieldIdentifier}
-                    onChange={formikRestProps.handleChange}
-                    required
-                  />
-                </div>
-              );
-            })
-          ) : (
-            <input
-              name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
-              type={spec.fieldType}
-              min={minValue}
-              id={fieldIdentifier}
-              onChange={formikRestProps.handleChange}
-              required
-            />
-          )}
-
-          <ErrorMessage name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`} component={FormFieldError} />
-        </div>
-      );
-    });
-  };
-
   return (
     <section>
       <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
@@ -271,47 +323,14 @@ export default function NewProduct() {
           <form onSubmit={handleSubmit}>
             <h2>{translations.intro}</h2>
 
-            <fieldset>
-              <legend>{translations.baseInformation}</legend>
-
-              <label htmlFor="newProductName">{translations.name}</label>
-              <input
-                id="newProductName"
-                name="name"
-                type="text"
-                onChange={formikRestProps.handleChange}
-                onBlur={formikRestProps.handleBlur}
-                required
-              />
-
-              <label htmlFor="newProductPrice">{translations.price}</label>
-              <input
-                id="newProductPrice"
-                name="price"
-                type="number"
-                step="0.01"
-                min="0.01"
-                onChange={formikRestProps.handleChange}
-                onBlur={formikRestProps.handleBlur}
-                required
-              />
-
-              <Field
-                name="category"
-                required
-                component={CategoriesTreeFormField}
-                onCategorySelect={(selectedCategory) => handleCategorySelect(selectedCategory)}
-              />
-              <ErrorMessage name="category" component={FormFieldError} />
-            </fieldset>
-            <fieldset>
-              <legend>
-                {translations.technicalSpecs}{' '}
-                {productCurrentSpecs.length === 0 && <span>({translations.chooseCategoryFirst})</span>}
-              </legend>
-
-              {productCurrentSpecs.length > 0 && getSpecsFields(formikRestProps)}
-            </fieldset>
+            <NewProductBaseInfo
+              methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
+            />
+            <NewProductCategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
+            <NewProductTechnicalSpecs
+              data={{ productCurrentSpecs }}
+              methods={{ handleChange: formikRestProps.handleChange }}
+            />
 
             <button
               type="submit"

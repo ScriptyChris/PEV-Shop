@@ -25,8 +25,6 @@ const router: any = Router();
 
 // just for tests
 router.get('/api/products/specs', async (req: Request, res: Response) => {
-  console.log('(/products/specs) ...');
-
   try {
     const specQuery = {
       name: {
@@ -40,8 +38,6 @@ router.get('/api/products/specs', async (req: Request, res: Response) => {
       'technicalSpecs.defaultUnit': 1,
     };
     const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
-
-    console.log('productsSpec:', productsSpec);
 
     res.status(200).json(productsSpec);
   } catch (exception) {
@@ -78,6 +74,7 @@ async function getProducts(
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const filters = queryBuilder.getFilters(req.query);
+    console.log('filters:', JSON.stringify(filters));
 
     let query = {};
 
@@ -99,8 +96,6 @@ async function getProducts(
     }
 
     const paginatedProducts = await getFromDB(query, 'Product', options);
-
-    // logger.log('query:', query, ' /paginatedProducts:', paginatedProducts.length);
 
     res.status(200).json(paginatedProducts);
   } catch (exception) {
@@ -128,9 +123,7 @@ async function addProduct(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[products POST] req.body', req.body);
 
-    const savedProduct = await saveToDB(req.body, 'Product');
-
-    logger.log('Product saved', savedProduct);
+    await saveToDB(req.body, 'Product');
 
     res.status(201).json({ msg: 'Success!' });
   } catch (exception) {
