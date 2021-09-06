@@ -60,22 +60,40 @@ describe('#api-product-categories', () => {
     });
 
     it('should call res.status(..).json(..) with correct params in case of succeeded and failed result from getFromDB(..)', async () => {
-      const resMock = getResMock();
-
       // succeeded case
-      const nonEmptyProductCategories = ['test category'];
-      getFromDB.mockImplementationOnce(() => nonEmptyProductCategories);
+      const categoriesInputAndOutput = [
+        {
+          input: ['test category'],
+          output: [
+            {
+              categoryName: 'test category',
+            },
+          ],
+        },
+        {
+          input: ['parent category|test category'],
+          output: [{ categoryName: 'parent category', childCategories: [{ categoryName: 'test category' }] }],
+        },
+      ];
 
-      await routerGetCallback(reqMock, resMock);
+      await Promise.all(
+        categoriesInputAndOutput.map(async (value) => {
+          const resMock = getResMock();
+          getFromDB.mockImplementationOnce(() => value.input);
 
-      expect(resMock.status).toHaveBeenCalledWith(200);
-      expect(resMock._jsonMethod).toHaveBeenCalledWith(nonEmptyProductCategories);
+          await routerGetCallback(reqMock, resMock).catch(console.error);
 
-      // inline mocks cleanup
-      resMock.status.mockClear();
-      resMock._jsonMethod.mockClear();
+          expect(resMock.status).toHaveBeenCalledWith(200);
+          expect(resMock._jsonMethod).toHaveBeenCalledWith(value.output);
 
-      //failed case
+          // inline mocks cleanup
+          resMock.status.mockClear();
+          resMock._jsonMethod.mockClear();
+        })
+      );
+
+      // failed case
+      const resMock = getResMock();
       const emptyProductCategories = null;
       getFromDB.mockImplementationOnce(() => emptyProductCategories);
 
