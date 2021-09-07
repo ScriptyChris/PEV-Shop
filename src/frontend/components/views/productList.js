@@ -97,7 +97,7 @@ export default function ProductList() {
 
   return (
     <>
-      <CategoriesTree onCategorySelect={onCategorySelect} />
+      <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
 
       {/*TODO: disable pagination list options, which are unnecessary, because of too little products*/}
       <Pagination

@@ -52,6 +52,7 @@ const technicalSpecs = new Schema({
 const productSchema = new Schema({
   name: {
     type: String,
+    unique: true,
     required: true,
   },
   url: {
@@ -78,6 +79,23 @@ const productSchema = new Schema({
   technicalSpecs: {
     type: [technicalSpecs],
     required: true,
+    set(technicalSpecsValue: any) {
+      const entries: Array<[string, { value: any; defaultUnit?: string }]> = Object.entries(technicalSpecsValue);
+      const output = entries.map(([key, data]) => {
+        const obj: { heading: string; data: typeof data; defaultUnit?: string } = {
+          heading: key,
+          data: data.value,
+        };
+
+        if (data.defaultUnit) {
+          obj.defaultUnit = data.defaultUnit;
+        }
+
+        return obj;
+      });
+
+      return output;
+    },
   },
   images: {
     // TODO: include different kinds, like Main and Others
@@ -91,18 +109,37 @@ const productSchema = new Schema({
   reviews: {
     type: reviewsSchema,
     required: false,
+    default() {
+      return {
+        list: [],
+        summary: {
+          summary: '',
+          reviewsAmount: 0,
+        },
+      };
+    },
   },
+});
+productSchema.pre('validate', function (next: () => void) {
+  // @ts-ignore: implicit this
+  const document = (this as unknown) as Document & Schema.methods;
+  document.prepareUrlFieldBasedOnNameField();
+
+  next();
 });
 
 // @ts-ignore
 productSchema.plugin(mongoosePaginate.default);
 
 productSchema.methods.toJSON = function () {
-  const user = this.toObject();
+  const product = this.toObject();
 
-  delete user.__v;
+  delete product.__v;
 
-  return user;
+  return product;
+};
+productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
+  this.url = this.name.toLowerCase().replace(/\s/g, '-');
 };
 
 export interface IReviews extends Document {

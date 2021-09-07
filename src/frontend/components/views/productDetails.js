@@ -89,7 +89,10 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
             return (
               <div key={`spec-${index}`}>
                 <dt>{productDetail.heading}</dt>
-                <dd>{productDetail.data}</dd>
+                <dd>
+                  {/* TODO: use table for object data */}
+                  {typeof productDetail.data === 'object' ? JSON.stringify(productDetail.data) : productDetail.data}
+                </dd>
               </div>
             );
           })}

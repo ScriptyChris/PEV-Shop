@@ -2,10 +2,9 @@ import React, { useState, useEffect, createRef, useRef } from 'react';
 import apiService from '../../features/apiService';
 import TreeMenu from 'react-simple-tree-menu';
 
-export default function CategoriesTree(props) {
+function CategoriesTree({ onCategorySelect, isMultiselect, formField }) {
   const [categoriesMap, setCategoriesMap] = useState(null);
   const categoriesTreeRef = createRef();
-  const treeMenuRef = createRef();
   const activeTreeNodes = useRef(new Map());
 
   useEffect(() => {
@@ -31,7 +30,6 @@ export default function CategoriesTree(props) {
               clickedItem.label
             )
           }
-          ref={treeMenuRef}
         />
       );
     }
@@ -45,15 +43,14 @@ export default function CategoriesTree(props) {
       throw new RangeError('Product categories hierarchy has more levels than prepared list!');
     }
 
-    const isNestedCategory = typeof categoryItem === 'object';
     const mappedLevel = getCategoriesTree.levels[level];
     const key = `${mappedLevel}-level-node-${index + 1}`;
 
-    if (isNestedCategory) {
+    if (categoryItem.childCategories) {
       return {
         key,
         index,
-        label: categoryItem.parentCategory,
+        label: categoryItem.categoryName,
         nodes: categoryItem.childCategories.map((item, idx, __) =>
           getCategoriesTree.recursiveMapper(item, idx, __, level + 1)
         ),
@@ -63,37 +60,44 @@ export default function CategoriesTree(props) {
     return {
       key,
       index,
-      label: categoryItem,
+      label: categoryItem.categoryName,
     };
   };
 
   const toggleActiveTreeNode = (nodeLevel, nodeIndex, matchedParentKey, nodeLabel) => {
     const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
-    const isActiveTreeNode = activeTreeNodes.current.has(currentNodeKey);
+    const currentNodeValue = `${matchedParentKey}${nodeLabel}`;
 
-    if (isActiveTreeNode) {
-      activeTreeNodes.current.delete(currentNodeKey);
+    if (isMultiselect) {
+      const isActiveTreeNode = activeTreeNodes.current.has(currentNodeKey);
+
+      if (isActiveTreeNode) {
+        activeTreeNodes.current.delete(currentNodeKey);
+      } else {
+        activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
+      }
+
+      // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
+      [[currentNodeKey], ...activeTreeNodes.current].forEach(([key], iteration) => {
+        const isCurrentNodeKey = iteration === 0;
+        const [level, index] = key.split('-');
+        const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
+
+        const treeNodeDOM = categoriesTreeRef.current.querySelectorAll(treeNodeLevelSelector)[index];
+
+        // "Force" DOM actions execution on elements controlled by React.
+        requestAnimationFrame(() => {
+          treeNodeDOM.classList.toggle('rstm-tree-item--active', !isCurrentNodeKey);
+          treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
+        });
+      });
     } else {
-      activeTreeNodes.current.set(currentNodeKey, `${matchedParentKey}${nodeLabel}`);
+      activeTreeNodes.current.clear();
+      activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
     }
 
-    // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
-    [[currentNodeKey], ...activeTreeNodes.current].forEach(([key], iteration) => {
-      const isCurrentNodeKey = iteration === 0;
-      const [level, index] = key.split('-');
-      const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
-
-      const treeNodeDOM = categoriesTreeRef.current.querySelectorAll(treeNodeLevelSelector)[index];
-
-      // "Force" DOM actions execution on elements controlled by React.
-      requestAnimationFrame(() => {
-        treeNodeDOM.classList.toggle('rstm-tree-item--active', !isCurrentNodeKey);
-        treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
-      });
-    });
-
     const activeCategoryNames = [...activeTreeNodes.current.values()];
-    props.onCategorySelect(activeCategoryNames);
+    onCategorySelect(isMultiselect ? activeCategoryNames : activeCategoryNames[0]);
   };
   toggleActiveTreeNode.matchParentKey = (treeData, clickedItem) => {
     const matchedParent = treeData.find((node) => clickedItem.parent && clickedItem.parent === node.key);
@@ -106,6 +110,28 @@ export default function CategoriesTree(props) {
       both useRef() hook and React.createRef() method don't seem to
       give reference to nested functional component's DOM elements, such as used TreeMenu.
     */
-    <div ref={categoriesTreeRef}>{getCategoriesTree()}</div>
+    <div ref={categoriesTreeRef}>
+      {formField}
+      {getCategoriesTree()}
+    </div>
   );
 }
+
+function CategoriesTreeFormField({ onCategorySelect, ...props }) {
+  const handleCategorySelect = (categoryNames) => {
+    props.form.setFieldValue(props.field.name, categoryNames.toString());
+    onCategorySelect(categoryNames.toString());
+  };
+
+  return (
+    <CategoriesTree
+      {...props}
+      onCategorySelect={handleCategorySelect}
+      formField={
+        <input type="text" {...props.field} className="categories-tree-form-field__proxy-input--hidden" required />
+      }
+    />
+  );
+}
+
+export { CategoriesTree as default, CategoriesTreeFormField };

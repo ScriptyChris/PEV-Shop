@@ -11,6 +11,7 @@ import {
   TProductsCategoriesReq,
 } from '../../database/utils/queryBuilder';
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
+import mapProductsTechnicalSpecs from '../helpers/api-products-specs-mapper';
 
 const {
   // @ts-ignore
@@ -23,34 +24,7 @@ const router: any = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 // const productList =  getProductList();
 
-// just for tests
-router.get('/api/products/specs', async (req: Request, res: Response) => {
-  console.log('(/products/specs) ...');
-
-  try {
-    const specQuery = {
-      name: {
-        $ne: '',
-      },
-    };
-    const projection = {
-      category: 1,
-      'technicalSpecs.heading': 1,
-      'technicalSpecs.data': 1,
-      'technicalSpecs.defaultUnit': 1,
-    };
-    const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
-
-    console.log('productsSpec:', productsSpec);
-
-    res.status(200).json(productsSpec);
-  } catch (exception) {
-    logger.error('Retrieving product specs exception:', exception);
-
-    res.status(500).json({ exception });
-  }
-});
-
+router.get('/api/products/specs', getProductsSpecs);
 router.get('/api/products', getProducts);
 router.get('/api/products/:id', getProductById);
 // TODO: add auth and user-role middlewares
@@ -65,6 +39,29 @@ router._modifyProduct = modifyProduct;
 
 export default router;
 
+async function getProductsSpecs(req: Request, res: Response) {
+  try {
+    const specQuery = {
+      name: {
+        $ne: '',
+      },
+    };
+    const projection = {
+      category: 1,
+      'technicalSpecs.heading': 1,
+      'technicalSpecs.data': 1,
+      'technicalSpecs.defaultUnit': 1,
+    };
+    const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
+
+    res.status(200).json(productsSpec);
+  } catch (exception) {
+    logger.error('Retrieving product specs exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+}
+
 async function getProducts(
   req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq & TProductFiltersReq },
   res: Response
@@ -78,6 +75,7 @@ async function getProducts(
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const filters = queryBuilder.getFilters(req.query);
+    console.log('filters:', JSON.stringify(filters));
 
     let query = {};
 
@@ -99,8 +97,6 @@ async function getProducts(
     }
 
     const paginatedProducts = await getFromDB(query, 'Product', options);
-
-    // logger.log('query:', query, ' /paginatedProducts:', paginatedProducts.length);
 
     res.status(200).json(paginatedProducts);
   } catch (exception) {
@@ -128,9 +124,7 @@ async function addProduct(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[products POST] req.body', req.body);
 
-    const savedProduct = await saveToDB(req.body, 'Product');
-
-    logger.log('Product saved', savedProduct);
+    await saveToDB(req.body, 'Product');
 
     res.status(201).json({ msg: 'Success!' });
   } catch (exception) {
@@ -157,130 +151,6 @@ function modifyProduct(req: Request & { userPermissions: any }, res: Response): 
     logger.error('Modifying product exception:', exception);
 
     res.status(403).json({ exception });
-  }
-}
-
-type TSpecs<Collection, Circular> = Record<string, Collection | Circular>;
-type TIntermediateSpecsValues = Array<string | number> | Record<string, number[]>;
-type TIntermediateSpecs = [string, TIntermediateSpecsValues];
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface IUniqueSpecs extends TSpecs<Set<number | string>, IUniqueSpecs> {}
-type TOutputSpecs = {
-  name: string;
-  values: TIntermediateSpecsValues;
-  defaultUnit: string;
-};
-type TOutputMapping = {
-  specs: TOutputSpecs[];
-  categoryToSpecs: Record<string, string[]>;
-};
-type TMappedSpecs = {
-  specs: IUniqueSpecs;
-  categoryToSpecs: Record<string, Set<string>>;
-};
-type TProductTechSpec = {
-  category: string;
-  technicalSpecs: Array<{
-    heading: string;
-    defaultUnit: string;
-    data: unknown;
-  }>;
-};
-
-function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TOutputMapping {
-  const UNITLESS_SPEC = 'colour';
-  const headingToDataType: Record<string, 'primitive' | 'object' | 'array'> = {};
-  const defaultUnits: Record<string, string> = {};
-
-  const mapping = productTechSpecs.reduce(
-    (mappedSpecs: TMappedSpecs, specData) => {
-      if (!mappedSpecs.categoryToSpecs[specData.category]) {
-        mappedSpecs.categoryToSpecs[specData.category] = new Set();
-      }
-
-      mapUniqueSpecValues(specData, mappedSpecs);
-
-      return mappedSpecs;
-    },
-    { specs: {}, categoryToSpecs: {} }
-  );
-
-  const outputMapping: TOutputMapping = {
-    specs: mapMinMax(mapping.specs).map(([key, value]) => ({
-      name: key,
-      values: value,
-      defaultUnit: defaultUnits[key],
-    })),
-
-    // @ts-ignore
-    categoryToSpecs: Object.fromEntries(
-      Object.entries(mapping.categoryToSpecs).map(([key, value]) => [key, Array.from(value)])
-    ),
-  };
-
-  return outputMapping;
-
-  function mapUniqueSpecValues(specData: TProductTechSpec, mappedSpecs: TMappedSpecs) {
-    specData.technicalSpecs.forEach((spec) => {
-      if (spec.heading && (spec.defaultUnit || spec.heading === UNITLESS_SPEC)) {
-        if (!defaultUnits[specData.category]) {
-          defaultUnits[spec.heading] = spec.defaultUnit;
-        }
-
-        if (!mappedSpecs.specs[spec.heading]) {
-          if (typeof spec.data === 'object' && !Array.isArray(spec.data)) {
-            mappedSpecs.specs[spec.heading] = {};
-            headingToDataType[spec.heading] = 'object';
-          } else {
-            if (Array.isArray(spec.data)) {
-              headingToDataType[spec.heading] = 'array';
-            } else {
-              headingToDataType[spec.heading] = 'primitive';
-            }
-
-            mappedSpecs.specs[spec.heading] = new Set();
-          }
-        }
-
-        if (headingToDataType[spec.heading] === 'object') {
-          Object.entries(spec.data as Record<string, number>).forEach(([key, value]) => {
-            const specProp = mappedSpecs.specs[spec.heading] as Record<string, Set<unknown>>;
-
-            if (!specProp[key]) {
-              specProp[key] = new Set();
-            }
-
-            specProp[key].add(value);
-          });
-        } else if (headingToDataType[spec.heading] === 'array') {
-          (spec.data as string[]).forEach((data) => (mappedSpecs.specs[spec.heading] as Set<string>).add(data));
-        } else {
-          (mappedSpecs.specs[spec.heading] as Set<number>).add(spec.data as number);
-        }
-
-        mappedSpecs.categoryToSpecs[specData.category].add(spec.heading);
-      }
-    });
-  }
-
-  function mapMinMax(mappingSpecs: IUniqueSpecs): TIntermediateSpecs[] {
-    return Object.entries(mappingSpecs).map(function doMapMinMax([key, value]): TIntermediateSpecs {
-      const valueAsArray = Array.from(value as Set<number>);
-
-      if (value instanceof Set || Array.isArray(value)) {
-        if (valueAsArray.every(Number)) {
-          return [key, [Math.min(...valueAsArray), Math.max(...valueAsArray)]];
-        }
-
-        return [key, valueAsArray];
-      }
-
-      return [
-        key,
-        // @ts-ignore
-        Object.fromEntries(mapMinMax(value)),
-      ];
-    });
   }
 }
 
