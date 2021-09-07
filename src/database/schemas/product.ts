@@ -52,6 +52,7 @@ const technicalSpecs = new Schema({
 const productSchema = new Schema({
   name: {
     type: String,
+    unique: true,
     required: true,
   },
   url: {
