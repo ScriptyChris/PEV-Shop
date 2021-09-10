@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo, useReducer } from 'react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
@@ -16,6 +16,9 @@ const translations = {
   price: 'Price',
   addNewSpec: 'Add new spec',
   save: 'Save',
+  addRelatedProduct: 'Add',
+  editRelatedProduct: 'Edit',
+  deleteRelatedProduct: 'Delete',
   emptyCategoryError: 'Category must be selected!',
   colourIsNotTextError: 'Colour value must be a text!',
 };
@@ -144,27 +147,139 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
   );
 }
 
-function RelatedProducts(/*{ methods: { handleChange } }*/) {
-  const [relatedProductsList, setRelatedProductsList] = useState([]);
+const EMPTY_PRODUCT_NAME = '';
+const relatedProductsBtnsReducer = (state, action) => {
+  return {
+    ...state,
+    [relatedProductsBtnsReducer.ACTION_TYPES[action.type]]: action.value,
+  };
 
-  const handleSelectedProductName = useCallback((product) => {
-    console.log('!!! found product:', product);
-    setRelatedProductsList((prev) => [...prev, product]);
-  }, []);
+  // switch (action.type) {
+  //   case relatedProductsBtnsReducer.ACTION_TYPES.SHOW_ADD_BTN: {
+  //     return {
+  //       ...state,
+  //       [relatedProductsBtnsReducer.ACTION_TYPES.SHOW_ADD_BTN]: action.value
+  //     }
+  //   }
+  //
+  //   case relatedProductsBtnsReducer.ACTION_TYPES.HIDE_ADD_BTN: {
+  //     break;
+  //   }
+  //
+  //   case relatedProductsBtnsReducer.ACTION_TYPES.START_EDITING_INDEX: {
+  //     break;
+  //   }
+  //
+  //   case relatedProductsBtnsReducer.ACTION_TYPES.STOP_EDITING_INDEX: {
+  //     break;
+  //   }
+  // }
+};
+relatedProductsBtnsReducer.ACTION_TYPES = {
+  ADD_BTN_VISIBILITY: 'ADD_BTN_VISIBILITY',
+  EDITING_INDEX: 'EDITING_INDEX',
+};
+
+function RelatedProducts() {
+  const [relatedProductsList, setRelatedProductsList] = useState([EMPTY_PRODUCT_NAME]);
+  const [btnsState, btnsDispatch] = useReducer(relatedProductsBtnsReducer, {
+    [relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY]: true,
+    [relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX]: -1,
+  });
+
+  const showRelatedProductList = () => {
+    return relatedProductsList.map((relatedProductName, index) => {
+      if (relatedProductName === EMPTY_PRODUCT_NAME) {
+        return (
+          <li key={relatedProductName}>
+            {btnsState[relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY] ? (
+              <>
+                <button type="button" onClick={addProductName}>
+                  {translations.addRelatedProduct}
+                </button>
+              </>
+            ) : (
+              <BoundSearchSingleProductByName />
+            )}
+          </li>
+        );
+      } else {
+        return (
+          <li key={relatedProductName}>
+            {btnsState[relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX] === index ? (
+              <BoundSearchSingleProductByName productName={relatedProductName} />
+            ) : (
+              <>
+                <output>{relatedProductName}</output>
+                <div>
+                  <button type="button" onClick={() => editProductName(index)}>
+                    {translations.editRelatedProduct}
+                  </button>
+                  <button type="button" onClick={() => deleteProductName(index)}>
+                    {translations.deleteRelatedProduct}
+                  </button>
+                </div>
+              </>
+            )}
+          </li>
+        );
+      }
+    });
+  };
+
+  const handleSelectedProductName = useCallback(
+    (product) => {
+      const wasInEditMode = btnsState[relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX] > -1;
+
+      console.log('!!! found product:', product, ' /btnsState:', btnsState, ' /wasInEditMode:', wasInEditMode);
+
+      setRelatedProductsList((prev) => {
+        const prevWithoutEmptyItem = prev.filter((name) => name !== EMPTY_PRODUCT_NAME);
+
+        if (wasInEditMode) {
+          return [...prevWithoutEmptyItem, EMPTY_PRODUCT_NAME];
+        }
+
+        return [...prevWithoutEmptyItem, product, EMPTY_PRODUCT_NAME];
+      });
+
+      if (wasInEditMode) {
+        btnsDispatch({ type: relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX, value: -1 });
+      }
+
+      btnsDispatch({ type: relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: true });
+    },
+    [btnsState]
+  );
+
+  const BoundSearchSingleProductByName = ({ productName }) => (
+    <SearchSingleProductByName
+      list="foundRelatedProducts"
+      debounceTimeMs={250}
+      onSelectedProductName={handleSelectedProductName}
+      presetValue={productName}
+    />
+  );
+
+  const addProductName = () => {
+    console.log('addProductName');
+
+    btnsDispatch({ type: relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: false });
+  };
+
+  const editProductName = (index) => {
+    console.log('(editProductName) index:', index);
+
+    btnsDispatch({ type: relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX, value: index });
+  };
+
+  const deleteProductName = (index) => {
+    setRelatedProductsList((prev) => prev.filter((_, productNameIndex) => productNameIndex !== index));
+  };
 
   return (
     <fieldset>
-      <ul>
-        {relatedProductsList.map((relatedProductName) => (
-          <li key={relatedProductName}>{relatedProductName}</li>
-        ))}
-      </ul>
-
-      <SearchSingleProductByName
-        list={'foundRelatedProducts'}
-        debounceTimeMs={250}
-        onSelectedProductName={handleSelectedProductName}
-      />
+      <ul>{showRelatedProductList()}</ul>
     </fieldset>
   );
 }

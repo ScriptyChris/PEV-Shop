@@ -10,8 +10,9 @@ const Search = memo(function Search({
   label = translations.defaultLabel,
   searchingTarget = Math.random() /* TODO: make default value more spec conforming */,
   debounceTimeMs = 0,
-  list = '',
   onInputChange,
+  list = '',
+  presetValue = '',
 }) {
   if (Number.isNaN(debounceTimeMs) || typeof debounceTimeMs !== 'number') {
     throw TypeError(`debounceTimeMs prop must be number! Received: ${debounceTimeMs}`);
@@ -19,7 +20,7 @@ const Search = memo(function Search({
     throw TypeError(`onInputChange props must be a function! ReceivedL ${onInputChange}`);
   }
 
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(presetValue);
   const debounce = useRef(-1);
   const inputId = `${searchingTarget}Search`;
 
@@ -82,6 +83,8 @@ function SearchProductsByName(props) {
 }
 
 const SearchSingleProductByName = memo(function SearchSingleProductByName(props) {
+  console.log('??? [SearchSingleProductByName] props:', props);
+
   const [searchResults, setSearchResults] = useState([]);
   const [searchRecentValues, setSearchRecentValues] = useState(['', '']);
   const dataListRef = createRef();
