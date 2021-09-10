@@ -4,6 +4,7 @@ import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
 import { CategoriesTreeFormField } from '../views/categoriesTree';
 import FormFieldError from '../utils/formFieldError';
+import { SearchSingleProductByName } from '../views/search';
 
 const translations = {
   intro: 'Fill new product details',
@@ -34,7 +35,7 @@ const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
 });
 
-function NewProductBaseInfo({ methods: { handleChange, handleBlur } }) {
+function BaseInfo({ methods: { handleChange, handleBlur } }) {
   return (
     <fieldset>
       <legend>{translations.baseInformation}</legend>
@@ -57,7 +58,7 @@ function NewProductBaseInfo({ methods: { handleChange, handleBlur } }) {
   );
 }
 
-function NewProductCategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
+function CategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
   const handleCategorySelect = (selectedCategoryName) => {
     setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
   };
@@ -77,7 +78,7 @@ function NewProductCategorySelector({ methods: { setProductCurrentSpecs, getSpec
   );
 }
 
-function NewProductTechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange } }) {
+function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange } }) {
   const getSpecsFields = () => {
     return productCurrentSpecs.map((spec) => {
       const fieldIdentifier = `${spec.name
@@ -139,6 +140,31 @@ function NewProductTechnicalSpecs({ data: { productCurrentSpecs }, methods: { ha
       </legend>
 
       {productCurrentSpecs.length > 0 && getSpecsFields()}
+    </fieldset>
+  );
+}
+
+function RelatedProducts(/*{ methods: { handleChange } }*/) {
+  const [relatedProductsList, setRelatedProductsList] = useState([]);
+
+  const handleSelectedProductName = useCallback((product) => {
+    console.log('!!! found product:', product);
+    setRelatedProductsList((prev) => [...prev, product]);
+  }, []);
+
+  return (
+    <fieldset>
+      <ul>
+        {relatedProductsList.map((relatedProductName) => (
+          <li key={relatedProductName}>{relatedProductName}</li>
+        ))}
+      </ul>
+
+      <SearchSingleProductByName
+        list={'foundRelatedProducts'}
+        debounceTimeMs={250}
+        onSelectedProductName={handleSelectedProductName}
+      />
     </fieldset>
   );
 }
@@ -323,14 +349,12 @@ export default function NewProduct() {
           <form onSubmit={handleSubmit}>
             <h2>{translations.intro}</h2>
 
-            <NewProductBaseInfo
+            <BaseInfo
               methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
             />
-            <NewProductCategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
-            <NewProductTechnicalSpecs
-              data={{ productCurrentSpecs }}
-              methods={{ handleChange: formikRestProps.handleChange }}
-            />
+            <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
+            <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
+            <RelatedProducts methods={{ handleChange: formikRestProps.handleChange }} />
 
             <button
               type="submit"
