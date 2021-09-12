@@ -11,7 +11,6 @@ const Search = memo(function Search({
   searchingTarget = Math.random() /* TODO: make default value more spec conforming */,
   debounceTimeMs = 0,
   onInputChange,
-  onInputBlur = () => {},
   list = '',
   presetValue = '',
   autoFocus = false,
@@ -47,15 +46,7 @@ const Search = memo(function Search({
   return (
     <div>
       <label htmlFor={inputId}>{label}</label>
-      <input
-        onChange={handleChange}
-        onBlur={onInputBlur}
-        value={inputValue}
-        id={inputId}
-        list={list}
-        autoFocus={autoFocus}
-        type="search"
-      />
+      <input onChange={handleChange} value={inputValue} id={inputId} list={list} autoFocus={autoFocus} type="search" />
     </div>
   );
 });
@@ -93,16 +84,12 @@ function SearchProductsByName(props) {
 }
 
 const SearchSingleProductByName = memo(function SearchSingleProductByName(props) {
-  // console.log('??? [SearchSingleProductByName] props:', props);
-
   const [searchResults, setSearchResults] = useState([]);
   const [searchRecentValues, setSearchRecentValues] = useState(['', '']);
   const dataListRef = createRef();
 
   useEffect(() => {
     (async () => {
-      console.log('[0] (useEffect) ignoredProductNames:', props.ignoredProductNames);
-
       if (
         searchRecentValues[1] &&
         dataListRef.current.children.length === 1 &&
@@ -116,21 +103,10 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
 
         setSearchRecentValues((prev) => [prev[1], prev[1]]);
 
-        const products = newSearchValueContainsOld
-          ? searchResults.filter((result) => result.name.toLowerCase().includes(newSearchValue.toLowerCase()))
-          : (console.log('[===fetch products by name]'),
-            await apiService.getProductsByName(searchRecentValues[1], false, null));
-
-        console.log(
-          //   '[2](handleInputSearchChange) foundProducts:',
-          //   products,
-          //   ' /searchRecentValues:',
-          //   searchRecentValues,
-          //   ' /newSearchValueContainsOld:',
-          //   newSearchValueContainsOld
-          '[1] ignoredProductNames:',
-          props.ignoredProductNames
-        );
+        const products = (newSearchValueContainsOld
+          ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
+          : (await apiService.getProductsByName(searchRecentValues[1], false, null)).map(({ name }) => name)
+        ).filter((productName) => !props.ignoredProductNames.includes(productName));
 
         setSearchResults(products);
       }
@@ -138,25 +114,18 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
   }, [dataListRef]);
 
   const handleInputSearchChange = async (searchValue) => {
-    // console.log(
-    //   '[0](handleInputSearchChange) single related product:',
-    //   searchValue,
-    //   ' /searchRecentValues:',
-    //   searchRecentValues
-    // );
-
     setSearchRecentValues((prev) => [prev[1], searchValue]);
   };
 
   return (
     <>
-      <Search {...props} onInputChange={handleInputSearchChange} onInputBlur={props.handleInputSearchBlur} />
+      <Search {...props} onInputChange={handleInputSearchChange} />
 
       {props.cancelBtn && <button onClick={props.cancelBtn.onClick}>{props.cancelBtn.label}</button>}
 
       <datalist ref={dataListRef} id={props.list}>
-        {searchResults.map((relatedProduct) => (
-          <option key={relatedProduct.name} value={relatedProduct.name}></option>
+        {searchResults.map((relatedProductName) => (
+          <option key={relatedProductName} value={relatedProductName}></option>
         ))}
       </datalist>
     </>

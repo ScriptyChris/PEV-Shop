@@ -151,43 +151,22 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
 }
 
 const EMPTY_PRODUCT_NAME = '';
-const relatedProductsBtnsReducer = (state, action) => {
+const relatedProductsStatesReducer = (state, action) => {
   return {
     ...state,
-    [relatedProductsBtnsReducer.ACTION_TYPES[action.type]]: action.value,
+    [relatedProductsStatesReducer.ACTION_TYPES[action.type]]: action.value,
   };
-
-  // switch (action.type) {
-  //   case relatedProductsBtnsReducer.ACTION_TYPES.SHOW_ADD_BTN: {
-  //     return {
-  //       ...state,
-  //       [relatedProductsBtnsReducer.ACTION_TYPES.SHOW_ADD_BTN]: action.value
-  //     }
-  //   }
-  //
-  //   case relatedProductsBtnsReducer.ACTION_TYPES.HIDE_ADD_BTN: {
-  //     break;
-  //   }
-  //
-  //   case relatedProductsBtnsReducer.ACTION_TYPES.START_EDITING_INDEX: {
-  //     break;
-  //   }
-  //
-  //   case relatedProductsBtnsReducer.ACTION_TYPES.STOP_EDITING_INDEX: {
-  //     break;
-  //   }
-  // }
 };
-relatedProductsBtnsReducer.ACTION_TYPES = {
+relatedProductsStatesReducer.ACTION_TYPES = {
   ADD_BTN_VISIBILITY: 'ADD_BTN_VISIBILITY',
   EDITING_INDEX: 'EDITING_INDEX',
 };
 
 function RelatedProducts() {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([EMPTY_PRODUCT_NAME]);
-  const [btnsState, btnsDispatch] = useReducer(relatedProductsBtnsReducer, {
-    [relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY]: true,
-    [relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX]: -1,
+  const [btnsState, btnsDispatch] = useReducer(relatedProductsStatesReducer, {
+    [relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY]: true,
+    [relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX]: -1,
   });
 
   const showRelatedProductList = () => {
@@ -195,25 +174,22 @@ function RelatedProducts() {
       if (relatedProductName === EMPTY_PRODUCT_NAME) {
         return (
           <li key={relatedProductName}>
-            {btnsState[relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY] ? (
+            {btnsState[relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY] ? (
               <>
                 <button type="button" onClick={addProductName}>
                   {translations.addRelatedProduct}
                 </button>
               </>
             ) : (
-              <BoundSearchSingleProductByName handleInputSearchBlur={dispatchers.showAddBtn} />
+              <BoundSearchSingleProductByName />
             )}
           </li>
         );
       } else {
         return (
           <li key={relatedProductName}>
-            {btnsState[relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX] === index ? (
-              <BoundSearchSingleProductByName
-                presetValue={relatedProductName}
-                handleInputSearchBlur={dispatchers.cancelEditing}
-              />
+            {btnsState[relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX] === index ? (
+              <BoundSearchSingleProductByName presetValue={relatedProductName} />
             ) : (
               <>
                 <output>{relatedProductName}</output>
@@ -235,18 +211,9 @@ function RelatedProducts() {
 
   const handleSelectedProductName = useCallback(
     (product) => {
-      const wasInEditMode = btnsState[relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX] > -1;
+      const wasInEditMode = btnsState[relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX] > -1;
 
-      console.log(
-        '!!! found product:',
-        product,
-        ' /btnsState:',
-        btnsState,
-        ' /wasInEditMode:',
-        wasInEditMode,
-        ' /relatedProductNamesList:',
-        relatedProductNamesList
-      );
+      console.log('!!! found product:', product, ' /relatedProductNamesList:', relatedProductNamesList);
 
       setRelatedProductNamesList((prev) => {
         const prevWithoutEmptyItem = prev.filter((name) => name !== EMPTY_PRODUCT_NAME);
@@ -280,16 +247,20 @@ function RelatedProducts() {
       onSelectedProductName={handleSelectedProductName}
       cancelBtn={{
         label: translations.cancelEditing,
-        onClick: cancelEditing,
+        onClick: () => {
+          dispatchers.showAddBtn();
+          dispatchers.cancelEditing();
+        },
       }}
       autoFocus={true}
     />
   );
 
   const dispatchers = {
-    showAddBtn: () => btnsDispatch({ type: relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: true }),
-    hideAddBtn: () => btnsDispatch({ type: relatedProductsBtnsReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: false }),
-    editIndex: (index) => btnsDispatch({ type: relatedProductsBtnsReducer.ACTION_TYPES.EDITING_INDEX, value: index }),
+    showAddBtn: () => btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: true }),
+    hideAddBtn: () =>
+      btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: false }),
+    editIndex: (index) => btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX, value: index }),
     cancelEditing: () => dispatchers.editIndex(-1),
   };
   const addProductName = () => {
@@ -300,10 +271,6 @@ function RelatedProducts() {
   const editProductName = (index) => {
     dispatchers.showAddBtn();
     dispatchers.editIndex(index);
-  };
-
-  const cancelEditing = () => {
-    dispatchers.cancelEditing();
   };
 
   const deleteProductName = (index) => {
