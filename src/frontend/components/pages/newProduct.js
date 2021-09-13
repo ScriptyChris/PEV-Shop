@@ -162,12 +162,30 @@ relatedProductsStatesReducer.ACTION_TYPES = {
   EDITING_INDEX: 'EDITING_INDEX',
 };
 
-function RelatedProducts() {
+function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([EMPTY_PRODUCT_NAME]);
   const [btnsState, btnsDispatch] = useReducer(relatedProductsStatesReducer, {
     [relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY]: true,
     [relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX]: -1,
   });
+  const dispatchers = useMemo(
+    () => ({
+      showAddBtn: () =>
+        btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: true }),
+      hideAddBtn: () =>
+        btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: false }),
+      editIndex: (index) =>
+        btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX, value: index }),
+      cancelEditing: () => dispatchers.editIndex(-1),
+    }),
+    []
+  );
+
+  useEffect(() => {
+    console.log('===(useEffect) relatedProductNamesList:', relatedProductNamesList);
+
+    setFieldValue(formikField.name, relatedProductNamesList.filter(Boolean));
+  }, [relatedProductNamesList]);
 
   const showRelatedProductList = () => {
     return relatedProductNamesList.map((relatedProductName, index) => {
@@ -189,7 +207,7 @@ function RelatedProducts() {
         return (
           <li key={relatedProductName}>
             {btnsState[relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX] === index ? (
-              <BoundSearchSingleProductByName presetValue={relatedProductName} />
+              <BoundSearchSingleProductByName presetValue={relatedProductName} editedProductIndex={index} />
             ) : (
               <>
                 <output>{relatedProductName}</output>
@@ -210,19 +228,28 @@ function RelatedProducts() {
   };
 
   const handleSelectedProductName = useCallback(
-    (product) => {
+    (productName, editedProductIndex) => {
       const wasInEditMode = btnsState[relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX] > -1;
 
-      console.log('!!! found product:', product, ' /relatedProductNamesList:', relatedProductNamesList);
+      console.log(
+        '!!! found productName:',
+        productName,
+        ' /relatedProductNamesList:',
+        relatedProductNamesList,
+        ' /productIndex:',
+        editedProductIndex
+      );
 
       setRelatedProductNamesList((prev) => {
         const prevWithoutEmptyItem = prev.filter((name) => name !== EMPTY_PRODUCT_NAME);
 
         if (wasInEditMode) {
+          prevWithoutEmptyItem.splice(editedProductIndex, 1, productName);
+
           return [...prevWithoutEmptyItem, EMPTY_PRODUCT_NAME];
         }
 
-        return [...prevWithoutEmptyItem, product, EMPTY_PRODUCT_NAME];
+        return [...prevWithoutEmptyItem, productName, EMPTY_PRODUCT_NAME];
       });
 
       if (wasInEditMode) {
@@ -244,7 +271,7 @@ function RelatedProducts() {
       ignoredProductNames={relatedProductNamesList.filter(
         (productName) => productName && props.presetValue !== productName
       )}
-      onSelectedProductName={handleSelectedProductName}
+      onSelectedProductName={(productName) => handleSelectedProductName(productName, props.editedProductIndex)}
       cancelBtn={{
         label: translations.cancelEditing,
         onClick: () => {
@@ -256,13 +283,6 @@ function RelatedProducts() {
     />
   );
 
-  const dispatchers = {
-    showAddBtn: () => btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: true }),
-    hideAddBtn: () =>
-      btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: false }),
-    editIndex: (index) => btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX, value: index }),
-    cancelEditing: () => dispatchers.editIndex(-1),
-  };
   const addProductName = () => {
     dispatchers.cancelEditing();
     dispatchers.hideAddBtn();
@@ -281,6 +301,8 @@ function RelatedProducts() {
     <fieldset className="new-product">
       <legend>{translations.relatedProducts}</legend>
       <ul>{showRelatedProductList()}</ul>
+
+      <input {...formikField} type="hidden" />
     </fieldset>
   );
 }
@@ -295,6 +317,7 @@ export default function NewProduct() {
     name: '',
     price: '',
     category: '',
+    relatedProducts: '',
   });
   const ORIGINAL_FORM_INITIALS_KEYS = useMemo(() => Object.keys(formInitials), []);
   const getSpecsForSelectedCategory = useCallback((selectedCategoryName) => {
@@ -470,7 +493,7 @@ export default function NewProduct() {
             />
             <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
             <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
-            <RelatedProducts methods={{ handleChange: formikRestProps.handleChange }} />
+            <Field name="relatedProducts" component={RelatedProducts} />
 
             <button
               type="submit"

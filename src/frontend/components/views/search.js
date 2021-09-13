@@ -46,7 +46,15 @@ const Search = memo(function Search({
   return (
     <div>
       <label htmlFor={inputId}>{label}</label>
-      <input onChange={handleChange} value={inputValue} id={inputId} list={list} autoFocus={autoFocus} type="search" />
+      <input
+        onChange={handleChange}
+        value={inputValue}
+        id={inputId}
+        list={list}
+        autoFocus={autoFocus}
+        type="search"
+        autoComplete="off"
+      />
     </div>
   );
 });
