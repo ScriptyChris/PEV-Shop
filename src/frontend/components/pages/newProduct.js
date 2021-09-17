@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo, useReducer } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
 import { CategoriesTreeFormField } from '../views/categoriesTree';
 import FormFieldError from '../utils/formFieldError';
 import { SearchSingleProductByName } from '../views/search';
+import FlexibleList from '../utils/flexibleList';
 
 const translations = {
   intro: 'Fill new product details',
@@ -164,22 +165,6 @@ relatedProductsStatesReducer.ACTION_TYPES = {
 
 function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([EMPTY_PRODUCT_NAME]);
-  const [btnsState, btnsDispatch] = useReducer(relatedProductsStatesReducer, {
-    [relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY]: true,
-    [relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX]: -1,
-  });
-  const dispatchers = useMemo(
-    () => ({
-      showAddBtn: () =>
-        btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: true }),
-      hideAddBtn: () =>
-        btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY, value: false }),
-      editIndex: (index) =>
-        btnsDispatch({ type: relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX, value: index }),
-      cancelEditing: () => dispatchers.editIndex(-1),
-    }),
-    []
-  );
 
   useEffect(() => {
     console.log('===(useEffect) relatedProductNamesList:', relatedProductNamesList);
@@ -187,120 +172,51 @@ function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
     setFieldValue(formikField.name, relatedProductNamesList.filter(Boolean));
   }, [relatedProductNamesList]);
 
-  const showRelatedProductList = () => {
-    return relatedProductNamesList.map((relatedProductName, index) => {
-      if (relatedProductName === EMPTY_PRODUCT_NAME) {
-        return (
-          <li key={relatedProductName}>
-            {btnsState[relatedProductsStatesReducer.ACTION_TYPES.ADD_BTN_VISIBILITY] ? (
-              <>
-                <button type="button" onClick={addProductName}>
-                  {translations.addRelatedProduct}
-                </button>
-              </>
-            ) : (
-              <BoundSearchSingleProductByName />
-            )}
-          </li>
-        );
-      } else {
-        return (
-          <li key={relatedProductName}>
-            {btnsState[relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX] === index ? (
-              <BoundSearchSingleProductByName presetValue={relatedProductName} editedProductIndex={index} />
-            ) : (
-              <>
-                <output>{relatedProductName}</output>
-                <div>
-                  <button type="button" onClick={() => editProductName(index)}>
-                    {translations.editRelatedProduct}
-                  </button>
-                  <button type="button" onClick={() => deleteProductName(index)}>
-                    {translations.deleteRelatedProduct}
-                  </button>
-                </div>
-              </>
-            )}
-          </li>
-        );
-      }
-    });
-  };
+  const BoundSearchSingleProductByName = useCallback(
+    (props) => (
+      <SearchSingleProductByName
+        {...props}
+        list="foundRelatedProducts"
+        debounceTimeMs={200}
+        label={translations.relatedProductName}
+        searchingTarget="relatedProducts"
+        ignoredProductNames={relatedProductNamesList.filter(
+          (productName) => productName && props.presetValue !== productName
+        )}
+        onSelectedProductName={(productName) => {
+          console.log('(onSelectedProductName) productName:', productName, ' /idx:', props.editedProductIndex);
 
-  const handleSelectedProductName = useCallback(
-    (productName, editedProductIndex) => {
-      const wasInEditMode = btnsState[relatedProductsStatesReducer.ACTION_TYPES.EDITING_INDEX] > -1;
-
-      console.log(
-        '!!! found productName:',
-        productName,
-        ' /relatedProductNamesList:',
-        relatedProductNamesList,
-        ' /productIndex:',
-        editedProductIndex
-      );
-
-      setRelatedProductNamesList((prev) => {
-        const prevWithoutEmptyItem = prev.filter((name) => name !== EMPTY_PRODUCT_NAME);
-
-        if (wasInEditMode) {
-          prevWithoutEmptyItem.splice(editedProductIndex, 1, productName);
-
-          return [...prevWithoutEmptyItem, EMPTY_PRODUCT_NAME];
-        }
-
-        return [...prevWithoutEmptyItem, productName, EMPTY_PRODUCT_NAME];
-      });
-
-      if (wasInEditMode) {
-        dispatchers.cancelEditing();
-      }
-
-      dispatchers.showAddBtn();
-    },
-    [btnsState]
+          if (props.editedProductIndex > -1) {
+            props.listFeatures.editItem(productName, props.editedProductIndex);
+          } else {
+            props.listFeatures.addItem(productName);
+          }
+        }}
+        cancelBtn={{
+          label: translations.cancelEditing,
+          onClick: props.listFeatures.resetState,
+        }}
+        autoFocus={true}
+      />
+    ),
+    [relatedProductNamesList]
   );
-
-  const BoundSearchSingleProductByName = (props) => (
-    <SearchSingleProductByName
-      {...props}
-      list="foundRelatedProducts"
-      debounceTimeMs={200}
-      label={translations.relatedProductName}
-      searchingTarget="relatedProducts"
-      ignoredProductNames={relatedProductNamesList.filter(
-        (productName) => productName && props.presetValue !== productName
-      )}
-      onSelectedProductName={(productName) => handleSelectedProductName(productName, props.editedProductIndex)}
-      cancelBtn={{
-        label: translations.cancelEditing,
-        onClick: () => {
-          dispatchers.showAddBtn();
-          dispatchers.cancelEditing();
-        },
-      }}
-      autoFocus={true}
-    />
-  );
-
-  const addProductName = () => {
-    dispatchers.cancelEditing();
-    dispatchers.hideAddBtn();
-  };
-
-  const editProductName = (index) => {
-    dispatchers.showAddBtn();
-    dispatchers.editIndex(index);
-  };
-
-  const deleteProductName = (index) => {
-    setRelatedProductNamesList((prev) => prev.filter((_, productNameIndex) => productNameIndex !== index));
-  };
 
   return (
     <fieldset className="new-product">
       <legend>{translations.relatedProducts}</legend>
-      <ul>{showRelatedProductList()}</ul>
+
+      <FlexibleList
+        newItemComponent={(listFeatures) => <BoundSearchSingleProductByName listFeatures={listFeatures} />}
+        editItemComponent={(relatedProductName, index, listFeatures) => (
+          <BoundSearchSingleProductByName
+            presetValue={relatedProductName}
+            editedProductIndex={index}
+            listFeatures={listFeatures}
+          />
+        )}
+        emitUpdatedItemsList={setRelatedProductNamesList}
+      />
 
       <input {...formikField} type="hidden" />
     </fieldset>
