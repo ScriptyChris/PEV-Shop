@@ -84,6 +84,12 @@ function FlexibleList({ newItemComponent, editItemComponent, emitUpdatedItemsLis
     emitUpdatedItemsList(listItems);
   }, [listItems]);
 
+  const CancelBtn = (
+    <button type="button" onClick={features.resetState}>
+      {translations.cancel}
+    </button>
+  );
+
   const showList = () => {
     return listItems.map((item, index) => {
       if (item === EMPTY_LIST_ITEM) {
@@ -96,7 +102,10 @@ function FlexibleList({ newItemComponent, editItemComponent, emitUpdatedItemsLis
                 {translations.add}
               </button>
             ) : (
-              newItemComponent(features)
+              <>
+                {newItemComponent(features)}
+                {CancelBtn}
+              </>
             )}
           </li>
         );
@@ -106,7 +115,10 @@ function FlexibleList({ newItemComponent, editItemComponent, emitUpdatedItemsLis
         return (
           <li key={item}>
             {currentlyEdited ? (
-              editItemComponent(item, index, features)
+              <>
+                {editItemComponent(item, index, features)}
+                {CancelBtn}
+              </>
             ) : (
               <>
                 <output>{item}</output>

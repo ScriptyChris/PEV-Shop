@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
@@ -16,13 +16,11 @@ const translations = {
   name: 'Name',
   price: 'Price',
   addNewSpec: 'Add new spec',
+  confirm: 'Confirm',
   save: 'Save',
   relatedProducts: 'Related products',
   relatedProductName: 'Product name',
-  addRelatedProduct: 'Add',
-  editRelatedProduct: 'Edit',
-  cancelEditing: 'Cancel',
-  deleteRelatedProduct: 'Delete',
+  shortDescription: 'Short description',
   emptyCategoryError: 'Category must be selected!',
   colourIsNotTextError: 'Colour value must be a text!',
 };
@@ -60,6 +58,80 @@ function BaseInfo({ methods: { handleChange, handleBlur } }) {
         onChange={handleChange}
         onBlur={handleBlur}
         required
+      />
+    </fieldset>
+  );
+}
+
+function ShortDescription() {
+  const [shortDescriptionList, setShortDescriptionList] = useState([]);
+
+  useEffect(() => {
+    console.log('(useEffect) shortDescriptionList:', shortDescriptionList);
+  }, [shortDescriptionList]);
+
+  const BoundShortDescriptionInputComponent = useCallback(
+    (props) => {
+      console.log('(BoundShortDescriptionInputComponent) props:', props);
+
+      const inputRef = createRef();
+      const updateItem = (updateValue, isEditMode) => {
+        if (isEditMode) {
+          props.listFeatures.editItem(updateValue, props.editedDescIndex);
+        } else {
+          props.listFeatures.addItem(updateValue);
+        }
+      };
+      const isEditMode = props.editedDescIndex > -1;
+
+      return (
+        <>
+          <input
+            ref={inputRef}
+            type="text"
+            defaultValue={props.presetValue || ''}
+            onKeyPress={(event) => {
+              console.log('input value:', event.target.value, ' /key:', event.key);
+
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                updateItem(event.target.value, isEditMode);
+              }
+            }}
+          />
+          {
+            <button
+              type="button"
+              onClick={() => {
+                updateItem(inputRef.current.value, isEditMode);
+              }}
+            >
+              {translations.confirm}
+            </button>
+          }
+        </>
+      );
+    },
+    [shortDescriptionList]
+  );
+
+  return (
+    <fieldset>
+      <legend>{translations.shortDescription}</legend>
+      <FlexibleList
+        newItemComponent={(listFeatures) => <BoundShortDescriptionInputComponent listFeatures={listFeatures} />}
+        editItemComponent={(shortDescItem, index, listFeatures) => {
+          console.log('(editItemComponent) shortDescItem:', shortDescItem, ' /index:', index);
+
+          return (
+            <BoundShortDescriptionInputComponent
+              editedDescIndex={index}
+              presetValue={shortDescItem}
+              listFeatures={listFeatures}
+            />
+          );
+        }}
+        emitUpdatedItemsList={setShortDescriptionList}
       />
     </fieldset>
   );
@@ -151,20 +223,8 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
   );
 }
 
-const EMPTY_PRODUCT_NAME = '';
-const relatedProductsStatesReducer = (state, action) => {
-  return {
-    ...state,
-    [relatedProductsStatesReducer.ACTION_TYPES[action.type]]: action.value,
-  };
-};
-relatedProductsStatesReducer.ACTION_TYPES = {
-  ADD_BTN_VISIBILITY: 'ADD_BTN_VISIBILITY',
-  EDITING_INDEX: 'EDITING_INDEX',
-};
-
 function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
-  const [relatedProductNamesList, setRelatedProductNamesList] = useState([EMPTY_PRODUCT_NAME]);
+  const [relatedProductNamesList, setRelatedProductNamesList] = useState([]);
 
   useEffect(() => {
     console.log('===(useEffect) relatedProductNamesList:', relatedProductNamesList);
@@ -191,10 +251,6 @@ function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
           } else {
             props.listFeatures.addItem(productName);
           }
-        }}
-        cancelBtn={{
-          label: translations.cancelEditing,
-          onClick: props.listFeatures.resetState,
         }}
         autoFocus={true}
       />
@@ -407,6 +463,7 @@ export default function NewProduct() {
             <BaseInfo
               methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
             />
+            <ShortDescription />
             <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
             <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
             <Field name="relatedProducts" component={RelatedProducts} />
