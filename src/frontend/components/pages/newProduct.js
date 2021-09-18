@@ -21,6 +21,7 @@ const translations = {
   relatedProducts: 'Related products',
   relatedProductName: 'Product name',
   shortDescription: 'Short description',
+  duplicatedDescription: 'Description item must be unique!',
   emptyCategoryError: 'Category must be selected!',
   colourIsNotTextError: 'Colour value must be a text!',
 };
@@ -63,79 +64,98 @@ function BaseInfo({ methods: { handleChange, handleBlur } }) {
   );
 }
 
-function ShortDescription() {
+function ShortDescription({ field: formikField, form: { setFieldValue } }) {
   const [shortDescriptionList, setShortDescriptionList] = useState([]);
 
   useEffect(() => {
-    console.log('(useEffect) shortDescriptionList:', shortDescriptionList);
+    setFieldValue(formikField.name, shortDescriptionList.filter(Boolean));
   }, [shortDescriptionList]);
-
-  const BoundShortDescriptionInputComponent = useCallback(
-    (props) => {
-      console.log('(BoundShortDescriptionInputComponent) props:', props);
-
-      const inputRef = createRef();
-      const updateItem = (updateValue, isEditMode) => {
-        if (isEditMode) {
-          props.listFeatures.editItem(updateValue, props.editedDescIndex);
-        } else {
-          props.listFeatures.addItem(updateValue);
-        }
-      };
-      const isEditMode = props.editedDescIndex > -1;
-
-      return (
-        <>
-          <input
-            ref={inputRef}
-            type="text"
-            defaultValue={props.presetValue || ''}
-            onKeyPress={(event) => {
-              console.log('input value:', event.target.value, ' /key:', event.key);
-
-              if (event.key === 'Enter') {
-                event.preventDefault();
-                updateItem(event.target.value, isEditMode);
-              }
-            }}
-          />
-          {
-            <button
-              type="button"
-              onClick={() => {
-                updateItem(inputRef.current.value, isEditMode);
-              }}
-            >
-              {translations.confirm}
-            </button>
-          }
-        </>
-      );
-    },
-    [shortDescriptionList]
-  );
 
   return (
     <fieldset>
       <legend>{translations.shortDescription}</legend>
-      <FlexibleList
-        newItemComponent={(listFeatures) => <BoundShortDescriptionInputComponent listFeatures={listFeatures} />}
-        editItemComponent={(shortDescItem, index, listFeatures) => {
-          console.log('(editItemComponent) shortDescItem:', shortDescItem, ' /index:', index);
 
-          return (
-            <BoundShortDescriptionInputComponent
-              editedDescIndex={index}
-              presetValue={shortDescItem}
-              listFeatures={listFeatures}
-            />
-          );
-        }}
+      <FlexibleList
+        newItemComponent={(listFeatures) => (
+          <ShortDescription.InputComponent shortDescriptionList={shortDescriptionList} listFeatures={listFeatures} />
+        )}
+        editItemComponent={(shortDescItem, index, listFeatures) => (
+          <ShortDescription.InputComponent
+            shortDescriptionList={shortDescriptionList}
+            editedDescIndex={index}
+            presetValue={shortDescItem}
+            listFeatures={listFeatures}
+          />
+        )}
         emitUpdatedItemsList={setShortDescriptionList}
       />
+
+      <input {...formikField} type="hidden" />
     </fieldset>
   );
 }
+ShortDescription.InputComponent = function InputComponent(props) {
+  const inputRef = createRef();
+  const [isDisabled, setIsDisabled] = useState(false);
+  const updateItem = (updateValue, isEditMode) => {
+    if (isEditMode) {
+      props.listFeatures.editItem(updateValue, props.editedDescIndex);
+    } else {
+      props.listFeatures.addItem(updateValue);
+    }
+  };
+  const isEditMode = props.editedDescIndex > -1;
+  const validateInput = (value) => {
+    const isValid = !props.shortDescriptionList.some((descriptionItem) => value === descriptionItem);
+    setIsDisabled(!isValid);
+
+    return isValid;
+  };
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="text"
+        defaultValue={props.presetValue || ''}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+
+            const inputValue = event.target.value;
+
+            if (validateInput(inputValue)) {
+              updateItem(inputValue, isEditMode);
+            }
+          }
+        }}
+        onChange={({ target: { value } }) => {
+          if (isDisabled) {
+            validateInput(value);
+          }
+        }}
+        autoFocus
+        required
+      />
+
+      <button
+        type="button"
+        onClick={() => {
+          const inputValue = inputRef.current.value;
+
+          if (validateInput(inputValue)) {
+            updateItem(inputValue, isEditMode);
+          }
+        }}
+        disabled={isDisabled}
+      >
+        {translations.confirm}
+      </button>
+
+      {isDisabled && <FormFieldError>{translations.duplicatedDescription}</FormFieldError>}
+    </>
+  );
+};
 
 function CategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
   const handleCategorySelect = (selectedCategoryName) => {
@@ -227,8 +247,6 @@ function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([]);
 
   useEffect(() => {
-    console.log('===(useEffect) relatedProductNamesList:', relatedProductNamesList);
-
     setFieldValue(formikField.name, relatedProductNamesList.filter(Boolean));
   }, [relatedProductNamesList]);
 
@@ -244,8 +262,6 @@ function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
           (productName) => productName && props.presetValue !== productName
         )}
         onSelectedProductName={(productName) => {
-          console.log('(onSelectedProductName) productName:', productName, ' /idx:', props.editedProductIndex);
-
           if (props.editedProductIndex > -1) {
             props.listFeatures.editItem(productName, props.editedProductIndex);
           } else {
@@ -288,6 +304,7 @@ export default function NewProduct() {
   const [formInitials, setFormInitials] = useState({
     name: '',
     price: '',
+    shortDescription: '',
     category: '',
     relatedProducts: '',
   });
@@ -463,7 +480,7 @@ export default function NewProduct() {
             <BaseInfo
               methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
             />
-            <ShortDescription />
+            <Field name="shortDescription" component={ShortDescription} />
             <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
             <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
             <Field name="relatedProducts" component={RelatedProducts} />
