@@ -1,6 +1,10 @@
 import * as mongooseModule from 'mongoose';
-import { Document, SchemaType } from 'mongoose';
+import { Document } from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
+import getModel from '../models/models-index';
+import getLogger from '../../../utils/logger';
+
+const logger = getLogger(module.filename);
 
 const {
   // @ts-ignore
@@ -52,7 +56,7 @@ const technicalSpecs = new Schema({
 const productSchema = new Schema({
   name: {
     type: String,
-    unique: true,
+    unique: true /* TODO: handle case when some product tries to be set with duplicated name */,
     required: true,
   },
   url: {
@@ -103,8 +107,20 @@ const productSchema = new Schema({
     required: true,
   },
   relatedProducts: {
-    type: [Object],
+    type: [String],
     required: false,
+    async validate(relatedProducts: Array<string>) {
+      if (!Array.isArray(relatedProducts) || !relatedProducts.every((value) => typeof value === 'string')) {
+        return false;
+      }
+
+      const ProductModel = getModel('Product');
+      const matchedRelatedProducts = (await ProductModel.find({ name: { $in: relatedProducts } }).lean()).map(
+        (product) => (product as IProduct).name
+      );
+
+      return relatedProducts.length === matchedRelatedProducts.length;
+    },
   },
   reviews: {
     type: reviewsSchema,
