@@ -45,12 +45,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron Ultra- Tube Off-Road Tire", "url": "dualtron-ultra-tube-off-road-tire", "price": 42 },
-      { "name": "Electric Scooter: Inner-tube 10”x 2”", "url": "electric-scooter-inner-tube-10x-2", "price": 16 },
-      { "name": "Electric Scooter: Tire 8”x 2”", "url": "l6-8-front-tire", "price": 31 },
-      { "name": "Electric Scooter: Inner-tube 8”x 2”", "url": "l6-8-innertube", "price": 12 }
-    ],
     "price": 15,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "12-x-9-piece-of-jessup-skate-grip-tape",
@@ -59,6 +53,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 12, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Ultra- Tube Off-Road Tire",
+      "Electric Scooter: Inner-tube 10”x 2”",
+      "Electric Scooter: Tire 8”x 2”",
+      "Electric Scooter: Inner-tube 8”x 2”"
     ]
   },
   {
@@ -99,16 +99,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Electric Scooter: Tire 8”x 2”", "url": "l6-8-front-tire", "price": 31 },
-      {
-        "name": "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
-        "url": "new-inmotion-xl-pedals-for-v10-f-v8-glide-3-v5f-glide-2",
-        "price": 110
-      },
-      { "name": "Inner-tube: 18” x 2.5”, Kenda", "url": "18-innertube-for-msuper-ks18", "price": 27 },
-      { "name": "New: Speedway Mini4 5A/54.6v Charger", "url": "new-speedway-mini4-5a-54-6v-charger", "price": 125 }
-    ],
     "price": 19,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "16-x-1-95-innertube",
@@ -117,6 +107,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 6, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Electric Scooter: Tire 8”x 2”",
+      "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
+      "Inner-tube: 18” x 2.5”, Kenda",
+      "New: Speedway Mini4 5A/54.6v Charger"
     ]
   },
   {
@@ -165,12 +161,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Inner-tube: 16” x 2.125”, Kenda", "url": "16-x-1-95-innertube", "price": 22 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "Protective Padding/Bumper Strip", "url": "soft-padding-protective", "price": 10 },
-      { "name": "Electric Scooter: Inner-tube 10”x 2”", "url": "electric-scooter-inner-tube-10x-2", "price": 16 }
-    ],
     "price": 25,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "18-innertube-for-msuper-ks18",
@@ -179,6 +169,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Inner-tube: 16” x 2.125”, Kenda",
+      "Tire: 18” x 2.5”, Kenda",
+      "Protective Padding/Bumper Strip",
+      "Electric Scooter: Inner-tube 10”x 2”"
     ]
   },
   {
@@ -219,16 +215,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "eWheels Branded Wrist-guards", "url": "ewheels-branded-wrist-guard", "price": 19 },
-      { "name": "Inner-Tube: 14” x 2.125”, Kenda", "url": "king-song-14-inner-tube", "price": 22.5 },
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      {
-        "name": "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
-        "url": "new-gotway-tesla-16-1020wh-1900w-motor",
-        "price": 1512.5
-      }
-    ],
     "price": 49,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "18-kenda-tire",
@@ -237,6 +223,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 15, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "eWheels Branded Wrist-guards",
+      "Inner-Tube: 14” x 2.125”, Kenda",
+      "Tire: 14” x 2.125”, Kenda",
+      "NEW: Gotway Tesla 16” 1020Wh/2000W Motor"
     ]
   },
   {
@@ -293,12 +285,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 },
-      { "name": "KS 16B: Replacement Control-Board", "url": "king-song-16-control-board", "price": 165 },
-      { "name": "KS 14C & 16B: 840Wh Battery Pack Pair", "url": "king-song-840wh-battery-pack", "price": 599 },
-      { "name": "KS 14B/C: Pair of Replacement LED Covers, Black", "url": "king-song-14-led-panels-black", "price": 40 }
-    ],
     "price": 98,
     "reviews": {
       "list": [
@@ -348,6 +334,12 @@
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" },
       { "heading": "colour", "data": ["lime green", "black", "blue", "red"] }
+    ],
+    "relatedProductsNames": [
+      "KS 14C: Replacement Control-Board",
+      "KS 16B: Replacement Control-Board",
+      "KS 14C & 16B: 840Wh Battery Pack Pair",
+      "KS 14B/C: Pair of Replacement LED Covers, Black"
     ]
   },
   {
@@ -396,12 +388,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Set of Side Panels, Black", "url": "monster-set-of-side-panels-black", "price": 68.5 },
-      { "name": "GW Telsa: Replacement Control-Board", "url": "gw-telsa-replacement-control-board", "price": 174 },
-      { "name": "GW MSuper: Set of Pedals", "url": "msuper-set-of-pedals", "price": 99 },
-      { "name": "GW Monster: Pair of Shells", "url": "gw-monster-pair-shells", "price": 196 }
-    ],
     "price": 650,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "800wh-84-2v-battery-pack-for-the-acmsmsuper-v3smonster",
@@ -410,6 +396,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 15, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 10, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Set of Side Panels, Black",
+      "GW Telsa: Replacement Control-Board",
+      "GW MSuper: Set of Pedals",
+      "GW Monster: Pair of Shells"
     ]
   },
   {
@@ -456,12 +448,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Replacement Control-Board", "url": "monster-control-board", "price": 196 },
-      { "name": "GW MTen3: Replacement Control-Board", "url": "gw-mten3-replacement-control-board", "price": 174 },
-      { "name": "GW MSuper: Set of Pedals", "url": "msuper-set-of-pedals", "price": 99 },
-      { "name": "GW Monster: Seat/Cushion", "url": "monster-seatcushion", "price": 87 }
-    ],
     "price": 98,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "acmacms-set-of-pedals",
@@ -470,6 +456,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 6, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Replacement Control-Board",
+      "GW MTen3: Replacement Control-Board",
+      "GW MSuper: Set of Pedals",
+      "GW Monster: Seat/Cushion"
     ]
   },
   {
@@ -520,16 +512,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW ACM/ACMS+: Set of Pedals", "url": "acmacms-set-of-pedals", "price": 98 },
-      { "name": "GW MSuper V3s+: Replacement Control-Board", "url": "msuper-v3s-control-board", "price": 165 },
-      { "name": "GW MTen3: Replacement Control-Board", "url": "gw-mten3-replacement-control-board", "price": 174 },
-      {
-        "name": "GW MSuper V3s+: Set of Side Panels, Black",
-        "url": "msuper-3s-set-of-side-panels-black",
-        "price": 65.5
-      }
-    ],
     "price": 165,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "acms-control-board",
@@ -538,6 +520,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW ACM/ACMS+: Set of Pedals",
+      "GW MSuper V3s+: Replacement Control-Board",
+      "GW MTen3: Replacement Control-Board",
+      "GW MSuper V3s+: Set of Side Panels, Black"
     ]
   },
   {
@@ -592,16 +580,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron Ultra- Tube Road Tire", "url": "dualtron-ultra-tube-road-tire", "price": 42 },
-      { "name": "Inner-tube: 14” x 1.50″", "url": "v3pro-innertube", "price": 22 },
-      {
-        "name": "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
-        "url": "new-speedway-pro-iii-iv-not-mini4-5a-58-8v-charger",
-        "price": 125
-      },
-      { "name": "Speedway Mini4 Seat Kit", "url": "speedway-mini4-seat-kit", "price": 125 }
-    ],
     "price": 55,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "chargedoctor-duo-for-v5f-king-song-gotway-inmotion-v8",
@@ -614,6 +592,12 @@
         "heading": "connector",
         "data": "GX12 4-pin, GX12 3-pin, V5F USB, GX12 & USB, GX16 3-pin (KS/GW 67.2v), GX16 4-pin"
       }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Ultra- Tube Road Tire",
+      "Inner-tube: 14” x 1.50″",
+      "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
+      "Speedway Mini4 Seat Kit"
     ]
   },
   {
@@ -664,16 +648,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron- Side Panels", "url": "dualtron-side-panels", "price": 72 },
-      { "name": "Dualtron 2- Rear Fender/Mud-guard", "url": "dualtron-2-rear-fender-mud-guard", "price": 29 },
-      { "name": "Dualtron Spider- Controller", "url": "dualtron-spider-controller", "price": 148 },
-      {
-        "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-        "url": "dualtron-thunder-ultra-handlebar-locking-latch",
-        "price": 15
-      }
-    ],
     "price": 14,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-2-3-handlebar-locking-latch",
@@ -682,6 +656,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron- Side Panels",
+      "Dualtron 2- Rear Fender/Mud-guard",
+      "Dualtron Spider- Controller",
+      "Dualtron Thunder-Ultra- Handlebar Locking Latch"
     ]
   },
   {
@@ -734,16 +714,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron 2-3- Handlebar Locking Latch", "url": "dualtron-2-3-handlebar-locking-latch", "price": 14 },
-      {
-        "name": "Dualtron- Side-panel to Controller Splitter Cable",
-        "url": "dualtron-side-panel-to-controller-splitter-cable",
-        "price": 25
-      },
-      { "name": "Dualtron- Seat Kit", "url": "dualtron-seat-kit", "price": 120 },
-      { "name": "Dualtron- Front Fender/Mud-guard", "url": "dualtron-front-fender-mud-guard", "price": 31 }
-    ],
     "price": 86,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-2-handlebar-support-strut-suspension",
@@ -752,6 +722,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron 2-3- Handlebar Locking Latch",
+      "Dualtron- Side-panel to Controller Splitter Cable",
+      "Dualtron- Seat Kit",
+      "Dualtron- Front Fender/Mud-guard"
     ]
   },
   {
@@ -803,20 +779,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "Dualtron 3-Thunder- Suspension Cartridge Modules",
-        "url": "dualtron-3-thunder-suspension-cartridge-modules",
-        "price": 55
-      },
-      {
-        "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-        "url": "dualtron-thunder-ultra-handlebar-locking-latch",
-        "price": 15
-      },
-      { "name": "Dualtron 2-3- Handlebar Locking Latch", "url": "dualtron-2-3-handlebar-locking-latch", "price": 14 },
-      { "name": "Dualtron- Side Panels", "url": "dualtron-side-panels", "price": 72 }
-    ],
     "price": 29,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-2-rear-fender-mud-guard",
@@ -825,6 +787,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron 3-Thunder- Suspension Cartridge Modules",
+      "Dualtron Thunder-Ultra- Handlebar Locking Latch",
+      "Dualtron 2-3- Handlebar Locking Latch",
+      "Dualtron- Side Panels"
     ]
   },
   {
@@ -879,20 +847,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
-        "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
-        "price": 52
-      },
-      {
-        "name": "Dualtron 2- Handlebar Support Strut & Suspension",
-        "url": "dualtron-2-handlebar-support-strut-suspension",
-        "price": 86
-      },
-      { "name": "Dualtron- Charging Flap", "url": "dualtron-charging-flap", "price": 9 },
-      { "name": "Dualtron 2- Rear Fender/Mud-guard", "url": "dualtron-2-rear-fender-mud-guard", "price": 29 }
-    ],
     "price": 55,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-3-thunder-suspension-cartridge-modules",
@@ -902,6 +856,12 @@
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" },
       { "heading": "suspension module type", "data": "Hard (Black), Soft (Green)" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
+      "Dualtron 2- Handlebar Support Strut & Suspension",
+      "Dualtron- Charging Flap",
+      "Dualtron 2- Rear Fender/Mud-guard"
     ]
   },
   {
@@ -952,20 +912,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron- Fingerprint Security Scanner", "url": "dualtron-fingerprint-security-scanner", "price": 99 },
-      {
-        "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-        "url": "dualtron-thunder-ultra-handlebar-locking-latch",
-        "price": 15
-      },
-      { "name": "Dualtron- Front Fender/Mud-guard", "url": "dualtron-front-fender-mud-guard", "price": 31 },
-      {
-        "name": "Dualtron 2- Handlebar Support Strut & Suspension",
-        "url": "dualtron-2-handlebar-support-strut-suspension",
-        "price": 86
-      }
-    ],
     "price": 9,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-charging-flap",
@@ -974,6 +920,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron- Fingerprint Security Scanner",
+      "Dualtron Thunder-Ultra- Handlebar Locking Latch",
+      "Dualtron- Front Fender/Mud-guard",
+      "Dualtron 2- Handlebar Support Strut & Suspension"
     ]
   },
   {
@@ -1027,20 +979,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
-        "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
-        "price": 52
-      },
-      { "name": "Dualtron- Side Panels", "url": "dualtron-side-panels", "price": 72 },
-      { "name": "Dualtron 2- Rear Fender/Mud-guard", "url": "dualtron-2-rear-fender-mud-guard", "price": 29 },
-      {
-        "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-        "url": "dualtron-thunder-ultra-handlebar-locking-latch",
-        "price": 15
-      }
-    ],
     "price": 89,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-eye-dashboard-throttle-control",
@@ -1049,6 +987,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
+      "Dualtron- Side Panels",
+      "Dualtron 2- Rear Fender/Mud-guard",
+      "Dualtron Thunder-Ultra- Handlebar Locking Latch"
     ]
   },
   {
@@ -1100,20 +1044,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron Spider- Controller", "url": "dualtron-spider-controller", "price": 148 },
-      {
-        "name": "Dualtron 2- Handlebar Support Strut & Suspension",
-        "url": "dualtron-2-handlebar-support-strut-suspension",
-        "price": 86
-      },
-      {
-        "name": "Dualtron- EYE Dashboard/Throttle Control",
-        "url": "dualtron-eye-dashboard-throttle-control",
-        "price": 89
-      },
-      { "name": "Dualtron- Side Panels", "url": "dualtron-side-panels", "price": 72 }
-    ],
     "price": 99,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-fingerprint-security-scanner",
@@ -1122,6 +1052,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Spider- Controller",
+      "Dualtron 2- Handlebar Support Strut & Suspension",
+      "Dualtron- EYE Dashboard/Throttle Control",
+      "Dualtron- Side Panels"
     ]
   },
   {
@@ -1176,20 +1112,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron- Fingerprint Security Scanner", "url": "dualtron-fingerprint-security-scanner", "price": 99 },
-      { "name": "Dualtron- Charging Flap", "url": "dualtron-charging-flap", "price": 9 },
-      {
-        "name": "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
-        "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
-        "price": 52
-      },
-      {
-        "name": "Dualtron 2- Handlebar Support Strut & Suspension",
-        "url": "dualtron-2-handlebar-support-strut-suspension",
-        "price": 86
-      }
-    ],
     "price": 75,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-folding-handlebar",
@@ -1198,6 +1120,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron- Fingerprint Security Scanner",
+      "Dualtron- Charging Flap",
+      "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
+      "Dualtron 2- Handlebar Support Strut & Suspension"
     ]
   },
   {
@@ -1251,20 +1179,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron- Seat Kit", "url": "dualtron-seat-kit", "price": 120 },
-      {
-        "name": "Dualtron- Single-Dual Motor Activation Switch",
-        "url": "dualtron-single-dual-motor-activation-switch",
-        "price": 28
-      },
-      {
-        "name": "Dualtron- EYE Dashboard/Throttle Control",
-        "url": "dualtron-eye-dashboard-throttle-control",
-        "price": 89
-      },
-      { "name": "Dualtron- Fingerprint Security Scanner", "url": "dualtron-fingerprint-security-scanner", "price": 99 }
-    ],
     "price": 31,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-front-fender-mud-guard",
@@ -1273,6 +1187,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron- Seat Kit",
+      "Dualtron- Single-Dual Motor Activation Switch",
+      "Dualtron- EYE Dashboard/Throttle Control",
+      "Dualtron- Fingerprint Security Scanner"
     ]
   },
   {
@@ -1323,20 +1243,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron- Folding Handlebar", "url": "dualtron-folding-handlebar", "price": 75 },
-      {
-        "name": "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
-        "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
-        "price": 52
-      },
-      {
-        "name": "Dualtron- Side-panel to Controller Splitter Cable",
-        "url": "dualtron-side-panel-to-controller-splitter-cable",
-        "price": 25
-      },
-      { "name": "Dualtron Spider- Controller", "url": "dualtron-spider-controller", "price": 148 }
-    ],
     "price": 120,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-seat-kit",
@@ -1345,6 +1251,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 6, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 12, "width": 8, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron- Folding Handlebar",
+      "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
+      "Dualtron- Side-panel to Controller Splitter Cable",
+      "Dualtron Spider- Controller"
     ]
   },
   {
@@ -1397,24 +1309,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron- Seat Kit", "url": "dualtron-seat-kit", "price": 120 },
-      {
-        "name": "Dualtron 2- Handlebar Support Strut & Suspension",
-        "url": "dualtron-2-handlebar-support-strut-suspension",
-        "price": 86
-      },
-      {
-        "name": "Dualtron- EYE Dashboard/Throttle Control",
-        "url": "dualtron-eye-dashboard-throttle-control",
-        "price": 89
-      },
-      {
-        "name": "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
-        "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
-        "price": 52
-      }
-    ],
     "price": 25,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-side-panel-to-controller-splitter-cable",
@@ -1423,6 +1317,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron- Seat Kit",
+      "Dualtron 2- Handlebar Support Strut & Suspension",
+      "Dualtron- EYE Dashboard/Throttle Control",
+      "Dualtron Ultra-Thunder- Rear Fender/Mud-guard"
     ]
   },
   {
@@ -1476,16 +1376,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron 2-3- Handlebar Locking Latch", "url": "dualtron-2-3-handlebar-locking-latch", "price": 14 },
-      { "name": "Dualtron 2- Rear Fender/Mud-guard", "url": "dualtron-2-rear-fender-mud-guard", "price": 29 },
-      { "name": "Dualtron- Charging Flap", "url": "dualtron-charging-flap", "price": 9 },
-      {
-        "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-        "url": "dualtron-thunder-ultra-handlebar-locking-latch",
-        "price": 15
-      }
-    ],
     "price": 72,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-side-panels",
@@ -1495,6 +1385,12 @@
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 5, "height": 3 }, "defaultUnit": "in" },
       { "heading": "side", "data": "Left (charge ports), Right (light switch)" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron 2-3- Handlebar Locking Latch",
+      "Dualtron 2- Rear Fender/Mud-guard",
+      "Dualtron- Charging Flap",
+      "Dualtron Thunder-Ultra- Handlebar Locking Latch"
     ]
   },
   {
@@ -1545,16 +1441,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron 2-3- Handlebar Locking Latch", "url": "dualtron-2-3-handlebar-locking-latch", "price": 14 },
-      { "name": "Dualtron 2- Rear Fender/Mud-guard", "url": "dualtron-2-rear-fender-mud-guard", "price": 29 },
-      { "name": "Dualtron- Fingerprint Security Scanner", "url": "dualtron-fingerprint-security-scanner", "price": 99 },
-      {
-        "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-        "url": "dualtron-thunder-ultra-handlebar-locking-latch",
-        "price": 15
-      }
-    ],
     "price": 28,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-single-dual-motor-activation-switch",
@@ -1563,6 +1449,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron 2-3- Handlebar Locking Latch",
+      "Dualtron 2- Rear Fender/Mud-guard",
+      "Dualtron- Fingerprint Security Scanner",
+      "Dualtron Thunder-Ultra- Handlebar Locking Latch"
     ]
   },
   {
@@ -1617,20 +1509,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron 2-3- Handlebar Locking Latch", "url": "dualtron-2-3-handlebar-locking-latch", "price": 14 },
-      {
-        "name": "Dualtron- Single-Dual Motor Activation Switch",
-        "url": "dualtron-single-dual-motor-activation-switch",
-        "price": 28
-      },
-      {
-        "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-        "url": "dualtron-thunder-ultra-handlebar-locking-latch",
-        "price": 15
-      },
-      { "name": "Dualtron- Seat Kit", "url": "dualtron-seat-kit", "price": 120 }
-    ],
     "price": 148,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-spider-controller",
@@ -1639,6 +1517,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron 2-3- Handlebar Locking Latch",
+      "Dualtron- Single-Dual Motor Activation Switch",
+      "Dualtron Thunder-Ultra- Handlebar Locking Latch",
+      "Dualtron- Seat Kit"
     ]
   },
   {
@@ -1692,16 +1576,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron Ultra- Tube Road Tire", "url": "dualtron-ultra-tube-road-tire", "price": 42 },
-      { "name": "Speedway Mini4 Seat Kit", "url": "speedway-mini4-seat-kit", "price": 125 },
-      { "name": "Inner-tube: 18” x 2.5”, Kenda", "url": "18-innertube-for-msuper-ks18", "price": 27 },
-      {
-        "name": "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8",
-        "url": "ewheels-84-2v-rapid-chargers",
-        "price": 137.5
-      }
-    ],
     "price": 46,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-thunder-tubeless-road-tire",
@@ -1710,6 +1584,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 13, "width": 12, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Ultra- Tube Road Tire",
+      "Speedway Mini4 Seat Kit",
+      "Inner-tube: 18” x 2.5”, Kenda",
+      "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8"
     ]
   },
   {
@@ -1762,20 +1642,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron- Seat Kit", "url": "dualtron-seat-kit", "price": 120 },
-      {
-        "name": "Dualtron- Single-Dual Motor Activation Switch",
-        "url": "dualtron-single-dual-motor-activation-switch",
-        "price": 28
-      },
-      { "name": "Dualtron- Front Fender/Mud-guard", "url": "dualtron-front-fender-mud-guard", "price": 31 },
-      {
-        "name": "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
-        "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
-        "price": 52
-      }
-    ],
     "price": 15,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-thunder-ultra-handlebar-locking-latch",
@@ -1784,6 +1650,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron- Seat Kit",
+      "Dualtron- Single-Dual Motor Activation Switch",
+      "Dualtron- Front Fender/Mud-guard",
+      "Dualtron Ultra-Thunder- Rear Fender/Mud-guard"
     ]
   },
   {
@@ -1835,16 +1707,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron 2-3- Handlebar Locking Latch", "url": "dualtron-2-3-handlebar-locking-latch", "price": 14 },
-      { "name": "Dualtron 2- Rear Fender/Mud-guard", "url": "dualtron-2-rear-fender-mud-guard", "price": 29 },
-      { "name": "Dualtron- Side Panels", "url": "dualtron-side-panels", "price": 72 },
-      {
-        "name": "Dualtron 2- Handlebar Support Strut & Suspension",
-        "url": "dualtron-2-handlebar-support-strut-suspension",
-        "price": 86
-      }
-    ],
     "price": 52,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
@@ -1853,6 +1715,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron 2-3- Handlebar Locking Latch",
+      "Dualtron 2- Rear Fender/Mud-guard",
+      "Dualtron- Side Panels",
+      "Dualtron 2- Handlebar Support Strut & Suspension"
     ]
   },
   {
@@ -1904,16 +1772,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      { "name": "Inner-tube: 14” x 1.50″", "url": "v3pro-innertube", "price": 22 },
-      {
-        "name": "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
-        "url": "new-speedway-pro-iii-iv-not-mini4-5a-58-8v-charger",
-        "price": 125
-      },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 }
-    ],
     "price": 42,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-ultra-tube-off-road-tire",
@@ -1922,6 +1780,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 13, "width": 12, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Tire: 14” x 2.125”, Kenda",
+      "Inner-tube: 14” x 1.50″",
+      "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
+      "Tire: 18” x 2.5”, Kenda"
     ]
   },
   {
@@ -1973,20 +1837,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "New: Gen V 5A/67.2v Charger for King Song Electric Wheels",
-        "url": "new-gen-v-5a67-2v-charger-king-song-electric-wheels",
-        "price": 150
-      },
-      { "name": "Electric Scooter: Tire 8”x 2”", "url": "l6-8-front-tire", "price": 31 },
-      {
-        "name": "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
-        "url": "new-speedway-pro-iii-iv-not-mini4-5a-58-8v-charger",
-        "price": 125
-      },
-      { "name": "Inner-tube: 18” x 2.5”, Kenda", "url": "18-innertube-for-msuper-ks18", "price": 27 }
-    ],
     "price": 42,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "dualtron-ultra-tube-road-tire",
@@ -1995,6 +1845,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 13, "width": 12, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "New: Gen V 5A/67.2v Charger for King Song Electric Wheels",
+      "Electric Scooter: Tire 8”x 2”",
+      "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
+      "Inner-tube: 18” x 2.5”, Kenda"
     ]
   },
   {
@@ -2038,12 +1894,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6: Front Spring Set", "url": "l6-scooter-front-spring-set", "price": 34 },
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "Electric Scooter: Inner-tube 8”x 2”", "url": "l6-8-innertube", "price": 12 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 }
-    ],
     "price": 16,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "electric-scooter-inner-tube-10x-2",
@@ -2052,6 +1902,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6: Front Spring Set",
+      "V5F: Set of Outer Shells, Black",
+      "Electric Scooter: Inner-tube 8”x 2”",
+      "L6/Lively: Replacement Control-Board"
     ]
   },
   {
@@ -2095,12 +1951,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3Pro: Resting Bumpers", "url": "v3prov3s-resting-bumpers", "price": 24 },
-      { "name": "Electric Scooter: Inner-tube 8”x 2”", "url": "l6-8-innertube", "price": 12 },
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "V3Pro: Set of Pads", "url": "v3prov3s-set-pads", "price": 39 }
-    ],
     "price": 12,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "electric-scooter-inner-tube-8-5x-2",
@@ -2109,6 +1959,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3Pro: Resting Bumpers",
+      "Electric Scooter: Inner-tube 8”x 2”",
+      "V5F: Set of Outer Shells, Black",
+      "V3Pro: Set of Pads"
     ]
   },
   {
@@ -2164,20 +2020,6 @@
           { "src": "Charger-JR-T450-Gen-V-Serial-Number.jpg", "srcset": null },
           { "src": "Charger-JR-T450-Gen-V-Serial-Number-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "12” x 9” Piece of Jessup Skate Grip Tape",
-        "url": "12-x-9-piece-of-jessup-skate-grip-tape",
-        "price": 15
-      },
-      { "name": "Dualtron Ultra- Tube Road Tire", "url": "dualtron-ultra-tube-road-tire", "price": 42 },
-      { "name": "Protective Padding/Bumper Strip", "url": "soft-padding-protective", "price": 10 },
-      {
-        "name": "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
-        "url": "new-inmotion-xl-pedals-for-v10-f-v8-glide-3-v5f-glide-2",
-        "price": 110
       }
     ],
     "price": 137.5,
@@ -2369,6 +2211,12 @@
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 11, "width": 8, "height": 6 }, "defaultUnit": "in" },
       { "heading": "type", "data": "Gotway 84v, King Song 18L/XL, Inmotion Glide 3/V8, Inmotion V10/V10F" }
+    ],
+    "relatedProductsNames": [
+      "12” x 9” Piece of Jessup Skate Grip Tape",
+      "Dualtron Ultra- Tube Road Tire",
+      "Protective Padding/Bumper Strip",
+      "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2"
     ]
   },
   {
@@ -2418,12 +2266,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "King Song 16X Seat", "url": "king-song-16x-seat", "price": 75 },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 },
-      { "name": "Tire: 16” x 1.95″ Kenda for V8/Glide 3", "url": "tire-16-x-1-95-kenda-for-v8", "price": 35 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 }
-    ],
     "price": 19,
     "reviews": {
       "list": [
@@ -2460,6 +2302,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "King Song 16X Seat",
+      "KS 14C: Replacement Control-Board",
+      "Tire: 16” x 1.95″ Kenda for V8/Glide 3",
+      "Tire: 18” x 2.5”, Kenda"
     ]
   },
   {
@@ -2514,16 +2362,6 @@
           { "src": "Mten3-Side-768x767.jpg", "srcset": null }
         ]
       }
-    ],
-    "relatedProducts": [
-      { "name": "King Song 16X Seat", "url": "king-song-16x-seat", "price": 75 },
-      {
-        "name": "18L/XL Bodyguard Protective Neoprene Covers Roll.nz",
-        "url": "18l-xl-bodyguard-protective-neoprene-covers-roll-nz",
-        "price": 98
-      },
-      { "name": "eWheels Branded Wrist-guards", "url": "ewheels-branded-wrist-guard", "price": 19 },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 }
     ],
     "price": 999,
     "reviews": {
@@ -2823,6 +2661,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "King Song 16X Seat",
+      "18L/XL Bodyguard Protective Neoprene Covers Roll.nz",
+      "eWheels Branded Wrist-guards",
+      "KS 14C: Replacement Control-Board"
     ]
   },
   {
@@ -2876,16 +2720,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Set of Side Panels, Black", "url": "monster-set-of-side-panels-black", "price": 68.5 },
-      { "name": "GW Monster: Seat/Cushion", "url": "monster-seatcushion", "price": 87 },
-      { "name": "GW Telsa: Replacement Control-Board", "url": "gw-telsa-replacement-control-board", "price": 174 },
-      {
-        "name": "GW MSuper V3s+: Set of Side Panels, Black",
-        "url": "msuper-3s-set-of-side-panels-black",
-        "price": 65.5
-      }
-    ],
     "price": 196,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "gw-monster-pair-shells",
@@ -2895,6 +2729,12 @@
       { "heading": "weight", "data": 12, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 20, "height": 6 }, "defaultUnit": "in" },
       { "heading": "colour", "data": ["blue", "purple", "red"] }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Set of Side Panels, Black",
+      "GW Monster: Seat/Cushion",
+      "GW Telsa: Replacement Control-Board",
+      "GW MSuper V3s+: Set of Side Panels, Black"
     ]
   },
   {
@@ -2944,12 +2784,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Pair of Shells", "url": "gw-monster-pair-shells", "price": 196 },
-      { "name": "GW Telsa: Replacement Control-Board", "url": "gw-telsa-replacement-control-board", "price": 174 },
-      { "name": "GW Monster: Replacement Control-Board", "url": "monster-control-board", "price": 196 },
-      { "name": "GW Monster: Seat/Cushion", "url": "monster-seatcushion", "price": 87 }
-    ],
     "price": 174,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "gw-mten3-replacement-control-board",
@@ -2958,6 +2792,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Pair of Shells",
+      "GW Telsa: Replacement Control-Board",
+      "GW Monster: Replacement Control-Board",
+      "GW Monster: Seat/Cushion"
     ]
   },
   {
@@ -3007,12 +2847,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW ACM/ACMS+: Set of Pedals", "url": "acmacms-set-of-pedals", "price": 98 },
-      { "name": "GW Monster: Pair of Shells", "url": "gw-monster-pair-shells", "price": 196 },
-      { "name": "GW Monster: Set of Side Panels, Black", "url": "monster-set-of-side-panels-black", "price": 68.5 },
-      { "name": "GW ACM/ACMS+: Replacement Control-Board", "url": "acms-control-board", "price": 165 }
-    ],
     "price": 174,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "gw-telsa-replacement-control-board",
@@ -3021,6 +2855,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW ACM/ACMS+: Set of Pedals",
+      "GW Monster: Pair of Shells",
+      "GW Monster: Set of Side Panels, Black",
+      "GW ACM/ACMS+: Replacement Control-Board"
     ]
   },
   {
@@ -3066,12 +2906,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5F: Charger Port Flap", "url": "v5f-charger-port-flap", "price": 19 },
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 },
-      { "name": "V8: Pair of Outer Shells", "url": "v8-pair-of-outer-shells", "price": 95 },
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 }
-    ],
     "price": 70,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "inmotion-v5f-set-outer-shells-black",
@@ -3080,6 +2914,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 3, "height": 20 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5F: Charger Port Flap",
+      "V8: Pair of Structural Inner/shells",
+      "V8: Pair of Outer Shells",
+      "V5F: Set of Outer Shells, White"
     ]
   },
   {
@@ -3138,24 +2978,6 @@
           { "src": "V8-Dimensions_burned.jpg", "srcset": null },
           { "src": "V8-Dimensions_burned-768x548.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
-        "url": "new-gotway-msuper-x-msx-1600wh-battery-2000w-motor",
-        "price": 1595
-      },
-      { "name": "Tire: 16” x 1.95″ Kenda for V8/Glide 3", "url": "tire-16-x-1-95-kenda-for-v8", "price": 35 },
-      {
-        "name": "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
-        "url": "new-king-song-18xl-1554wh-battery-2000w-motor",
-        "price": 1969.5
-      },
-      {
-        "name": "NEW: King Song 18S, 840Wh & 1500W Motor",
-        "url": "king-song-18s-840wh-1680wh-1500w-motor",
-        "price": 1745
       }
     ],
     "price": 899,
@@ -3529,6 +3351,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
+      "Tire: 16” x 1.95″ Kenda for V8/Glide 3",
+      "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
+      "NEW: King Song 18S, 840Wh & 1500W Motor"
     ]
   },
   {
@@ -3586,13 +3414,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "King Song 14D, 340/420Wh Battery, 800W Motor",
-        "url": "new-king-song-14d-420wh-battery800w-motor",
-        "price": 800
-      }
-    ],
     "price": 375,
     "reviews": {
       "list": [
@@ -3620,7 +3441,8 @@
       { "heading": "materials", "data": "Shell: Scratch resistant ABS plastic\nPedals: Aluminium alloy" },
       { "heading": "charge time", "data": 1, "defaultUnit": "hr" },
       { "heading": "dimensions", "data": { "height": 17.3, "length": 12.7, "width": 6.3 }, "defaultUnit": "inch" }
-    ]
+    ],
+    "relatedProductsNames": ["King Song 14D, 340/420Wh Battery, 800W Motor"]
   },
   {
     "shortDescription": [
@@ -3654,16 +3476,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14D: Replacement Control-Board", "url": "ks-14d-replacement-control-board", "price": 154 },
-      { "name": "KS 14B: 174Wh Battery Pack", "url": "ks-14b-battery-pack", "price": 175 },
-      {
-        "name": "KS 14B/C: Pair of Replacement LED Covers, Black",
-        "url": "king-song-14-led-panels-black",
-        "price": 40
-      },
-      { "name": "KS 16: Set of 2x LED Strips", "url": "king-song-16-led-strip", "price": 35 }
-    ],
     "price": 125,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "king-song-14-control-board",
@@ -3672,6 +3484,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 14D: Replacement Control-Board",
+      "KS 14B: 174Wh Battery Pack",
+      "KS 14B/C: Pair of Replacement LED Covers, Black",
+      "KS 16: Set of 2x LED Strips"
     ]
   },
   {
@@ -3706,20 +3524,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "18L/XL Bodyguard Protective Neoprene Covers Roll.nz",
-        "url": "18l-xl-bodyguard-protective-neoprene-covers-roll-nz",
-        "price": 98
-      },
-      {
-        "name": "NEW: MTen3 10”, ‘The Pocket Rocket’, 512Wh/800W Motor",
-        "url": "gotway-mten3-512-800w-motor",
-        "price": 1049.5
-      },
-      { "name": "KS 14C & 16B: 840Wh Battery Pack Pair", "url": "king-song-840wh-battery-pack", "price": 599 },
-      { "name": "King Song 16X Seat", "url": "king-song-16x-seat", "price": 75 }
-    ],
     "price": 20,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "king-song-14-inner-tube",
@@ -3728,6 +3532,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 15, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "18L/XL Bodyguard Protective Neoprene Covers Roll.nz",
+      "NEW: MTen3 10”, ‘The Pocket Rocket’, 512Wh/800W Motor",
+      "KS 14C & 16B: 840Wh Battery Pack Pair",
+      "King Song 16X Seat"
     ]
   },
   {
@@ -3764,16 +3574,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 16: Set of 2x LED Strips", "url": "king-song-16-led-strip", "price": 35 },
-      { "name": "KS 14B: 174Wh Battery Pack", "url": "ks-14b-battery-pack", "price": 175 },
-      { "name": "KS 16: Set of Unbranded Upper Pads", "url": "ks-16-set-of-unbranded-upper-pads", "price": 39 },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Gloss",
-        "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
-        "price": 42
-      }
-    ],
     "price": 40,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "king-song-14-led-panels-black",
@@ -3782,6 +3582,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.7, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 16: Set of 2x LED Strips",
+      "KS 14B: 174Wh Battery Pack",
+      "KS 16: Set of Unbranded Upper Pads",
+      "KS16: Top Cover with Switch & Charging Port, Black Gloss"
     ]
   },
   {
@@ -3829,16 +3635,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Solowheel Glide 3, 480Wh Battery/800W Motor", "url": "inmotion-v8", "price": 899 },
-      { "name": "KS 16S: Replacement Control-Board", "url": "ks-16s-replacement-control-board", "price": 168 },
-      {
-        "name": "NEW: King Song 18S, 840Wh & 1500W Motor",
-        "url": "king-song-18s-840wh-1680wh-1500w-motor",
-        "price": 1745
-      },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 }
-    ],
     "price": 32,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "king-song-14-tire-inner-tube",
@@ -3847,6 +3643,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 15, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Solowheel Glide 3, 480Wh Battery/800W Motor",
+      "KS 16S: Replacement Control-Board",
+      "NEW: King Song 18S, 840Wh & 1500W Motor",
+      "KS 14C: Replacement Control-Board"
     ]
   },
   {
@@ -3906,24 +3708,6 @@
           { "src": "KS14S-B-Side-700x699.jpg", "srcset": null }
         ]
       }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: MTen3 10”, ‘The Pocket Rocket’, 512Wh/800W Motor",
-        "url": "gotway-mten3-512-800w-motor",
-        "price": 1049.5
-      },
-      {
-        "name": "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
-        "url": "new-king-song-18xl-1554wh-battery-2000w-motor",
-        "price": 1969.5
-      },
-      {
-        "name": "NEW: King Song 16X 1554Wh Battery/2000W Motor, 3″ Wide Tire",
-        "url": "new-king-song-16x-1554wh-battery-2000w-motor-3-wide-tire",
-        "price": 500
-      },
-      { "name": "King Song 16S, 1200W Motor/840Wh Battery", "url": "kingsong-16-electric-unicycle", "price": 1412.5 }
     ],
     "price": 1175,
     "reviews": {
@@ -4121,6 +3905,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: MTen3 10”, ‘The Pocket Rocket’, 512Wh/800W Motor",
+      "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
+      "NEW: King Song 16X 1554Wh Battery/2000W Motor, 3″ Wide Tire",
+      "King Song 16S, 1200W Motor/840Wh Battery"
     ]
   },
   {
@@ -4171,12 +3961,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14D: Replacement Control-Board", "url": "ks-14d-replacement-control-board", "price": 154 },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 },
-      { "name": "King Song 16X Seat", "url": "king-song-16x-seat", "price": 75 },
-      { "name": "Inner-Tube: 14” x 2.125”, Kenda", "url": "king-song-14-inner-tube", "price": 22.5 }
-    ],
     "price": 165,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "king-song-16-control-board",
@@ -4185,6 +3969,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 14D: Replacement Control-Board",
+      "KS 14C: Replacement Control-Board",
+      "King Song 16X Seat",
+      "Inner-Tube: 14” x 2.125”, Kenda"
     ]
   },
   {
@@ -4233,20 +4023,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Gloss",
-        "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
-        "price": 42
-      },
-      { "name": "KS 14D: Replacement Control-Board", "url": "ks-14d-replacement-control-board", "price": 154 },
-      { "name": "KS 16S: Replacement Control-Board", "url": "ks-16s-replacement-control-board", "price": 168 },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Matte",
-        "url": "ks16-top-cover-switch-charging-port-black-matte",
-        "price": 42
-      }
-    ],
     "price": 59,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "king-song-16-handle-kit",
@@ -4255,6 +4031,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 20, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS16: Top Cover with Switch & Charging Port, Black Gloss",
+      "KS 14D: Replacement Control-Board",
+      "KS 16S: Replacement Control-Board",
+      "KS16: Top Cover with Switch & Charging Port, Black Matte"
     ]
   },
   {
@@ -4304,12 +4086,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14B/C: Telescopic Handle Add-on", "url": "king-song-telescopic-handle-accessory", "price": 58 },
-      { "name": "KS 16: LED Panel Cover", "url": "king-song-16-led-panel-cover", "price": 22 },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 },
-      { "name": "KS 14B: 174Wh Battery Pack", "url": "ks-14b-battery-pack", "price": 175 }
-    ],
     "price": 35,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "king-song-16-kenda-tire",
@@ -4318,6 +4094,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 15, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 14B/C: Telescopic Handle Add-on",
+      "KS 16: LED Panel Cover",
+      "KS 14C: Replacement Control-Board",
+      "KS 14B: 174Wh Battery Pack"
     ]
   },
   {
@@ -4366,20 +4148,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS16: Replacement Set of Outer Shells, Black Gloss",
-        "url": "ks16-replacement-outer-shells-black-gloss",
-        "price": 75
-      },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Matte",
-        "url": "ks16-top-cover-switch-charging-port-black-matte",
-        "price": 42
-      },
-      { "name": "KS 14S: Set of Unbranded Pads", "url": "ks-14s-set-of-unbranded-upper-pads", "price": 48 },
-      { "name": "Inner-Tube: 14” x 2.125”, Kenda", "url": "king-song-14-inner-tube", "price": 22.5 }
-    ],
     "price": 22,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "king-song-16-led-panel-cover",
@@ -4388,6 +4156,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 16, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS16: Replacement Set of Outer Shells, Black Gloss",
+      "KS16: Top Cover with Switch & Charging Port, Black Matte",
+      "KS 14S: Set of Unbranded Pads",
+      "Inner-Tube: 14” x 2.125”, Kenda"
     ]
   },
   {
@@ -4436,20 +4210,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS16: Replacement Set of Outer Shells, Rubber Finish Black Matte",
-        "url": "ks16-replacement-outer-shells-black-matte",
-        "price": 82
-      },
-      { "name": "KS 16B: Replacement Control-Board", "url": "king-song-16-control-board", "price": 165 },
-      { "name": "King Song 16X Seat", "url": "king-song-16x-seat", "price": 75 },
-      {
-        "name": "NEW: King Song 18S, 840Wh & 1500W Motor",
-        "url": "king-song-18s-840wh-1680wh-1500w-motor",
-        "price": 1745
-      }
-    ],
     "price": 35,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "king-song-16-led-strip",
@@ -4458,6 +4218,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS16: Replacement Set of Outer Shells, Rubber Finish Black Matte",
+      "KS 16B: Replacement Control-Board",
+      "King Song 16X Seat",
+      "NEW: King Song 18S, 840Wh & 1500W Motor"
     ]
   },
   {
@@ -4513,16 +4279,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS 18AY+(1200W): Replacement Control-board",
-        "url": "ks18ay-1200w-replacement-control-board",
-        "price": 190
-      },
-      { "name": "Inner-Tube: 14” x 2.125”, Kenda", "url": "king-song-14-inner-tube", "price": 22.5 },
-      { "name": "KS 16S: Replacement Control-Board", "url": "ks-16s-replacement-control-board", "price": 168 },
-      { "name": "KS 14S: Set of Unbranded Pads", "url": "ks-14s-set-of-unbranded-upper-pads", "price": 48 }
-    ],
     "price": 75,
     "reviews": {
       "list": [
@@ -4559,6 +4315,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 18AY+(1200W): Replacement Control-board",
+      "Inner-Tube: 14” x 2.125”, Kenda",
+      "KS 16S: Replacement Control-Board",
+      "KS 14S: Set of Unbranded Pads"
     ]
   },
   {
@@ -4616,12 +4378,6 @@
           { "src": "KS18S-W-Side-700x700.jpg", "srcset": null }
         ]
       }
-    ],
-    "relatedProducts": [
-      { "name": "Tire: 16” x 1.95″ Kenda for V8/Glide 3", "url": "tire-16-x-1-95-kenda-for-v8", "price": 35 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "KS 16: Set of 2x LED Strips", "url": "king-song-16-led-strip", "price": 35 },
-      { "name": "Solowheel Glide 3, 480Wh Battery/800W Motor", "url": "inmotion-v8", "price": 899 }
     ],
     "price": 1995,
     "reviews": {
@@ -4747,6 +4503,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "Tire: 16” x 1.95″ Kenda for V8/Glide 3",
+      "Tire: 18” x 2.5”, Kenda",
+      "KS 16: Set of 2x LED Strips",
+      "Solowheel Glide 3, 480Wh Battery/800W Motor"
     ]
   },
   {
@@ -4789,12 +4551,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      { "name": "KS 16S: Replacement Control-Board", "url": "ks-16s-replacement-control-board", "price": 168 },
-      { "name": "KS 18: Set of Unbranded Upper Pads", "url": "ks-18-unbranded-set-of-upper-pads", "price": 38 },
-      { "name": "Inner-Tube: 14” x 2.125”, Kenda", "url": "king-song-14-inner-tube", "price": 22.5 }
-    ],
     "price": 599,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "king-song-840wh-battery-pack",
@@ -4803,6 +4559,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 8, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Tire: 14” x 2.125”, Kenda",
+      "KS 16S: Replacement Control-Board",
+      "KS 18: Set of Unbranded Upper Pads",
+      "Inner-Tube: 14” x 2.125”, Kenda"
     ]
   },
   {
@@ -4845,20 +4607,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS14C: Replacement Set of Shells, Black Gloss", "url": "ks14c-replacement-shell-black", "price": 75 },
-      {
-        "name": "NEW: King Song 18S, 840Wh & 1500W Motor",
-        "url": "king-song-18s-840wh-1680wh-1500w-motor",
-        "price": 1745
-      },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Gloss",
-        "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
-        "price": 42
-      },
-      { "name": "KS 16B: Replacement Control-Board", "url": "king-song-16-control-board", "price": 165 }
-    ],
     "price": 58,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "king-song-telescopic-handle-accessory",
@@ -4867,6 +4615,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 12, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS14C: Replacement Set of Shells, Black Gloss",
+      "NEW: King Song 18S, 840Wh & 1500W Motor",
+      "KS16: Top Cover with Switch & Charging Port, Black Gloss",
+      "KS 16B: Replacement Control-Board"
     ]
   },
   {
@@ -4909,16 +4663,6 @@
           { "src": "KS16-Top-Oblique.jpg", "srcset": null },
           { "src": "KS16-Top-Oblique.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      { "name": "KS 16S: Replacement Control-Board", "url": "ks-16s-replacement-control-board", "price": 168 },
-      { "name": "Tire: 16” x 2.125”, Kenda", "url": "king-song-16-kenda-tire", "price": 35 },
-      { "name": "KS 16: Set of 2x LED Strips", "url": "king-song-16-led-strip", "price": 35 },
-      {
-        "name": "NEW: King Song 18S, 840Wh & 1500W Motor",
-        "url": "king-song-18s-840wh-1680wh-1500w-motor",
-        "price": 1745
       }
     ],
     "price": 1350,
@@ -5324,6 +5068,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "KS 16S: Replacement Control-Board",
+      "Tire: 16” x 2.125”, Kenda",
+      "KS 16: Set of 2x LED Strips",
+      "NEW: King Song 18S, 840Wh & 1500W Motor"
     ]
   },
   {
@@ -5376,22 +5126,18 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14S: Set of Unbranded Pads", "url": "ks-14s-set-of-unbranded-upper-pads", "price": 48 },
-      { "name": "KS 14C & 16B: 840Wh Battery Pack Pair", "url": "king-song-840wh-battery-pack", "price": 599 },
-      { "name": "KS 14B/C: Telescopic Handle Add-on", "url": "king-song-telescopic-handle-accessory", "price": 58 },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Matte",
-        "url": "ks16-top-cover-switch-charging-port-black-matte",
-        "price": 42
-      }
-    ],
     "price": 175,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks-14b-battery-pack",
     "name": "KS 14B: 174Wh Battery Pack",
     "category": "Parts|King Song",
-    "technicalSpecs": [{ "heading": "colour", "data": ["black", "red"] }]
+    "technicalSpecs": [{ "heading": "colour", "data": ["black", "red"] }],
+    "relatedProductsNames": [
+      "KS 14S: Set of Unbranded Pads",
+      "KS 14C & 16B: 840Wh Battery Pack Pair",
+      "KS 14B/C: Telescopic Handle Add-on",
+      "KS16: Top Cover with Switch & Charging Port, Black Matte"
+    ]
   },
   {
     "shortDescription": [
@@ -5440,12 +5186,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 16: Set of 2x LED Strips", "url": "king-song-16-led-strip", "price": 35 },
-      { "name": "KS 16: Retractable Handle Kit", "url": "king-song-16-handle-kit", "price": 59 },
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      { "name": "KS 14B/C: Telescopic Handle Add-on", "url": "king-song-telescopic-handle-accessory", "price": 58 }
-    ],
     "price": 154,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "ks-14d-replacement-control-board",
@@ -5454,6 +5194,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 16: Set of 2x LED Strips",
+      "KS 16: Retractable Handle Kit",
+      "Tire: 14” x 2.125”, Kenda",
+      "KS 14B/C: Telescopic Handle Add-on"
     ]
   },
   {
@@ -5502,12 +5248,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS14C: Replacement Set of Shells, Black Gloss", "url": "ks14c-replacement-shell-black", "price": 75 },
-      { "name": "KS 16S: Replacement Control-Board", "url": "ks-16s-replacement-control-board", "price": 168 },
-      { "name": "KS 16: Set of 2x LED Strips", "url": "king-song-16-led-strip", "price": 35 },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 }
-    ],
     "price": 48,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks-14s-set-of-unbranded-upper-pads",
@@ -5516,6 +5256,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS14C: Replacement Set of Shells, Black Gloss",
+      "KS 16S: Replacement Control-Board",
+      "KS 16: Set of 2x LED Strips",
+      "KS 14C: Replacement Control-Board"
     ]
   },
   {
@@ -5564,20 +5310,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Gloss",
-        "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
-        "price": 42
-      },
-      { "name": "KS14C: Replacement Set of Shells, Black Gloss", "url": "ks14c-replacement-shell-black", "price": 75 },
-      { "name": "KS 16: LED Panel Cover", "url": "king-song-16-led-panel-cover", "price": 22 },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Matte",
-        "url": "ks16-top-cover-switch-charging-port-black-matte",
-        "price": 42
-      }
-    ],
     "price": 39,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks-16-set-of-unbranded-upper-pads",
@@ -5586,6 +5318,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS16: Top Cover with Switch & Charging Port, Black Gloss",
+      "KS14C: Replacement Set of Shells, Black Gloss",
+      "KS 16: LED Panel Cover",
+      "KS16: Top Cover with Switch & Charging Port, Black Matte"
     ]
   },
   {
@@ -5635,16 +5373,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS 14B/C: Pair of Replacement LED Covers, Black",
-        "url": "king-song-14-led-panels-black",
-        "price": 40
-      },
-      { "name": "KS 14D: Replacement Control-Board", "url": "ks-14d-replacement-control-board", "price": 154 },
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 }
-    ],
     "price": 168,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "ks-16s-replacement-control-board",
@@ -5653,6 +5381,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 14B/C: Pair of Replacement LED Covers, Black",
+      "KS 14D: Replacement Control-Board",
+      "Tire: 14” x 2.125”, Kenda",
+      "KS 14C: Replacement Control-Board"
     ]
   },
   {
@@ -5701,16 +5435,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14B/C: Telescopic Handle Add-on", "url": "king-song-telescopic-handle-accessory", "price": 58 },
-      { "name": "KS 16: Set of Unbranded Upper Pads", "url": "ks-16-set-of-unbranded-upper-pads", "price": 39 },
-      {
-        "name": "KS16: Replacement Set of Outer Shells, Black Gloss",
-        "url": "ks16-replacement-outer-shells-black-gloss",
-        "price": 75
-      },
-      { "name": "KS 14D: Replacement Control-Board", "url": "ks-14d-replacement-control-board", "price": 154 }
-    ],
     "price": 38,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks-18-unbranded-set-of-upper-pads",
@@ -5719,6 +5443,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 14B/C: Telescopic Handle Add-on",
+      "KS 16: Set of Unbranded Upper Pads",
+      "KS16: Replacement Set of Outer Shells, Black Gloss",
+      "KS 14D: Replacement Control-Board"
     ]
   },
   {
@@ -5765,20 +5495,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Matte",
-        "url": "ks16-top-cover-switch-charging-port-black-matte",
-        "price": 42
-      },
-      { "name": "KS 16: Set of 2x LED Strips", "url": "king-song-16-led-strip", "price": 35 },
-      {
-        "name": "KS16: Replacement Set of Outer Shells, Black Gloss",
-        "url": "ks16-replacement-outer-shells-black-gloss",
-        "price": 75
-      },
-      { "name": "KS 16: Retractable Handle Kit", "url": "king-song-16-handle-kit", "price": 59 }
-    ],
     "price": 75,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks14c-replacement-shell-black",
@@ -5787,6 +5503,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS16: Top Cover with Switch & Charging Port, Black Matte",
+      "KS 16: Set of 2x LED Strips",
+      "KS16: Replacement Set of Outer Shells, Black Gloss",
+      "KS 16: Retractable Handle Kit"
     ]
   },
   {
@@ -5837,16 +5559,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 18: Set of Unbranded Upper Pads", "url": "ks-18-unbranded-set-of-upper-pads", "price": 38 },
-      {
-        "name": "KS 14B/C: Pair of Replacement LED Covers, Black",
-        "url": "king-song-14-led-panels-black",
-        "price": 40
-      },
-      { "name": "KS 14C & 16B: 840Wh Battery Pack Pair", "url": "king-song-840wh-battery-pack", "price": 599 },
-      { "name": "KS14C: Replacement Set of Shells, Black Gloss", "url": "ks14c-replacement-shell-black", "price": 75 }
-    ],
     "price": 75,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks16-replacement-outer-shells-black-gloss",
@@ -5855,6 +5567,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 18: Set of Unbranded Upper Pads",
+      "KS 14B/C: Pair of Replacement LED Covers, Black",
+      "KS 14C & 16B: 840Wh Battery Pack Pair",
+      "KS14C: Replacement Set of Shells, Black Gloss"
     ]
   },
   {
@@ -5900,24 +5618,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14B: 174Wh Battery Pack", "url": "ks-14b-battery-pack", "price": 175 },
-      {
-        "name": "KS 18AY+(1200W): Replacement Control-board",
-        "url": "ks18ay-1200w-replacement-control-board",
-        "price": 190
-      },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Gloss",
-        "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
-        "price": 42
-      },
-      {
-        "name": "KS16: Replacement Set of Outer Shells, Black Gloss",
-        "url": "ks16-replacement-outer-shells-black-gloss",
-        "price": 75
-      }
-    ],
     "price": 82,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks16-replacement-outer-shells-black-matte",
@@ -5926,6 +5626,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 14B: 174Wh Battery Pack",
+      "KS 18AY+(1200W): Replacement Control-board",
+      "KS16: Top Cover with Switch & Charging Port, Black Gloss",
+      "KS16: Replacement Set of Outer Shells, Black Gloss"
     ]
   },
   {
@@ -5970,20 +5676,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Matte",
-        "url": "ks16-top-cover-switch-charging-port-black-matte",
-        "price": 42
-      },
-      { "name": "KS 14B: 174Wh Battery Pack", "url": "ks-14b-battery-pack", "price": 175 },
-      { "name": "KS 18: Set of Unbranded Upper Pads", "url": "ks-18-unbranded-set-of-upper-pads", "price": 38 },
-      {
-        "name": "KS16: Replacement Set of Outer Shells, Black Gloss",
-        "url": "ks16-replacement-outer-shells-black-gloss",
-        "price": 75
-      }
-    ],
     "price": 82,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks16-replacement-outer-shells-white-gloss",
@@ -5992,6 +5684,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS16: Top Cover with Switch & Charging Port, Black Matte",
+      "KS 14B: 174Wh Battery Pack",
+      "KS 18: Set of Unbranded Upper Pads",
+      "KS16: Replacement Set of Outer Shells, Black Gloss"
     ]
   },
   {
@@ -6038,16 +5736,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "KS 18AY+(1200W): Replacement Control-board",
-        "url": "ks18ay-1200w-replacement-control-board",
-        "price": 190
-      },
-      { "name": "KS 16: LED Panel Cover", "url": "king-song-16-led-panel-cover", "price": 22 },
-      { "name": "KS 14D: Replacement Control-Board", "url": "ks-14d-replacement-control-board", "price": 154 },
-      { "name": "KS 16B: Replacement Control-Board", "url": "king-song-16-control-board", "price": 165 }
-    ],
     "price": 42,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
@@ -6056,6 +5744,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 18AY+(1200W): Replacement Control-board",
+      "KS 16: LED Panel Cover",
+      "KS 14D: Replacement Control-Board",
+      "KS 16B: Replacement Control-Board"
     ]
   },
   {
@@ -6102,12 +5796,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 18: Set of Unbranded Upper Pads", "url": "ks-18-unbranded-set-of-upper-pads", "price": 38 },
-      { "name": "KS 14S: Set of Unbranded Pads", "url": "ks-14s-set-of-unbranded-upper-pads", "price": 48 },
-      { "name": "KS 16: Set of Unbranded Upper Pads", "url": "ks-16-set-of-unbranded-upper-pads", "price": 39 },
-      { "name": "KS 14D: Replacement Control-Board", "url": "ks-14d-replacement-control-board", "price": 154 }
-    ],
     "price": 42,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks16-top-cover-switch-charging-port-black-matte",
@@ -6116,6 +5804,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 18: Set of Unbranded Upper Pads",
+      "KS 14S: Set of Unbranded Pads",
+      "KS 16: Set of Unbranded Upper Pads",
+      "KS 14D: Replacement Control-Board"
     ]
   },
   {
@@ -6163,16 +5857,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "KS 14C & 16B: 840Wh Battery Pack Pair", "url": "king-song-840wh-battery-pack", "price": 599 },
-      { "name": "KS 18: Set of Unbranded Upper Pads", "url": "ks-18-unbranded-set-of-upper-pads", "price": 38 },
-      {
-        "name": "KS16: Top Cover with Switch & Charging Port, Black Gloss",
-        "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
-        "price": 42
-      },
-      { "name": "KS 14B/C: Telescopic Handle Add-on", "url": "king-song-telescopic-handle-accessory", "price": 58 }
-    ],
     "price": 190,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "ks18ay-1200w-replacement-control-board",
@@ -6181,6 +5865,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 5, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "KS 14C & 16B: 840Wh Battery Pack Pair",
+      "KS 18: Set of Unbranded Upper Pads",
+      "KS16: Top Cover with Switch & Charging Port, Black Gloss",
+      "KS 14B/C: Telescopic Handle Add-on"
     ]
   },
   {
@@ -6223,16 +5913,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron Ultra- Tube Road Tire", "url": "dualtron-ultra-tube-road-tire", "price": 42 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "Dualtron Thunder- Tubeless Road Tire", "url": "dualtron-thunder-tubeless-road-tire", "price": 46 },
-      {
-        "name": "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
-        "url": "new-inmotion-xl-pedals-for-v10-f-v8-glide-3-v5f-glide-2",
-        "price": 110
-      }
-    ],
     "price": 25,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "l6-8-front-tire",
@@ -6241,6 +5921,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Ultra- Tube Road Tire",
+      "Tire: 18” x 2.5”, Kenda",
+      "Dualtron Thunder- Tubeless Road Tire",
+      "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2"
     ]
   },
   {
@@ -6284,12 +5970,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 },
-      { "name": "V3Pro: 144Wh Replacement Battery Pack", "url": "v3pro-battery-pack-144wh", "price": 265 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 },
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 }
-    ],
     "price": 12,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "l6-8-innertube",
@@ -6298,6 +5978,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Standing Mat",
+      "V3Pro: 144Wh Replacement Battery Pack",
+      "L6/Lively: Replacement Control-Board",
+      "L6/Lively: Kickstand"
     ]
   },
   {
@@ -6342,12 +6028,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3Pro: Set of Pads", "url": "v3prov3s-set-pads", "price": 39 },
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 }
-    ],
     "price": 26,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "l6-kickstand",
@@ -6356,6 +6036,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 6, "width": 6, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3Pro: Set of Pads",
+      "V8: Extendable Handle",
+      "L6/Lively: Replacement Control-Board",
+      "V5F/+ Handle Kit"
     ]
   },
   {
@@ -6396,12 +6082,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "V5F: Charger Port Flap", "url": "v5f-charger-port-flap", "price": 19 },
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 },
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 }
-    ],
     "price": 34,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "l6-scooter-front-spring-set",
@@ -6410,6 +6090,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8/Glide 3: Protective Cover",
+      "V5F: Charger Port Flap",
+      "L6/Lively: Standing Mat",
+      "V8: Extendable Handle"
     ]
   },
   {
@@ -6450,18 +6136,17 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 },
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 },
-      { "name": "V3Pro: Set of Pads", "url": "v3prov3s-set-pads", "price": 39 },
-      { "name": "V5/V8: Front LED Headlight", "url": "v5-v8-front-led-headlight", "price": 16 }
-    ],
     "price": 34,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "l6-scooter-rear-spring-set",
     "name": "L6: Rear Spring Set",
     "category": "Parts|Inmotion",
-    "technicalSpecs": [null]
+    "relatedProductsNames": [
+      "V3S: Replacement Control-Board",
+      "V8: Pair of Structural Inner/shells",
+      "V3Pro: Set of Pads",
+      "V5/V8: Front LED Headlight"
+    ]
   },
   {
     "shortDescription": [
@@ -6503,12 +6188,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 },
-      { "name": "V8: Charger Port Flap", "url": "v8-charger-port-flap", "price": 19 },
-      { "name": "V8: Rear LED Light", "url": "v8-rear-led-light", "price": 17 },
-      { "name": "V5F/V5F+: Replacement Control-board", "url": "v5fv5f-control-board", "price": 150 }
-    ],
     "price": 43,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "l6-standing-mat",
@@ -6517,6 +6196,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Replacement Control-Board",
+      "V8: Charger Port Flap",
+      "V8: Rear LED Light",
+      "V5F/V5F+: Replacement Control-board"
     ]
   },
   {
@@ -6559,12 +6244,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 },
-      { "name": "V5F: Charger Port Flap", "url": "v5f-charger-port-flap", "price": 19 },
-      { "name": "V3Pro: 144Wh Replacement Battery Pack", "url": "v3pro-battery-pack-144wh", "price": 265 }
-    ],
     "price": 99,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "l8-control-board",
@@ -6573,6 +6252,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5F: Set of Outer Shells, Black",
+      "L6/Lively: Kickstand",
+      "V5F: Charger Port Flap",
+      "V3Pro: 144Wh Replacement Battery Pack"
     ]
   },
   {
@@ -6621,12 +6306,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: Charger Port Flap", "url": "v8-charger-port-flap", "price": 19 },
-      { "name": "L6: Rear Spring Set", "url": "l6-scooter-rear-spring-set", "price": 34 },
-      { "name": "Electric Scooter: Inner-tube 8”x 2”", "url": "l6-8-innertube", "price": 12 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 }
-    ],
     "price": 375,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "livelyl6-411wh-replacement-battery-pack",
@@ -6635,6 +6314,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 15, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 8, "height": 8 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: Charger Port Flap",
+      "L6: Rear Spring Set",
+      "Electric Scooter: Inner-tube 8”x 2”",
+      "L6/Lively: Replacement Control-Board"
     ]
   },
   {
@@ -6687,12 +6372,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Speedway III/IV- 600W Motor", "url": "speedway-iii-iv-600w-motor", "price": 141 },
-      { "name": "Scooter Brake Disc Rotor", "url": "scooter-brake-disc-rotor", "price": 23 },
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 },
-      { "name": "Mini4- Dashboard Data Cable", "url": "mini-4-dashboard-data-cable", "price": 28 }
-    ],
     "price": 43,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-bare-handle-bar-folding-parts",
@@ -6701,6 +6380,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 6, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Speedway III/IV- 600W Motor",
+      "Scooter Brake Disc Rotor",
+      "Mini4- Rear Brake Lever",
+      "Mini4- Dashboard Data Cable"
     ]
   },
   {
@@ -6752,16 +6437,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 },
-      { "name": "Mini4- Front Fork", "url": "mini4-front-fork", "price": 41 },
-      { "name": "Speedway III/IV- 600W Motor", "url": "speedway-iii-iv-600w-motor", "price": 141 },
-      {
-        "name": "Mini4- Bare Handlebar with Folding Extensions",
-        "url": "mini-4-bare-handle-bar-folding-parts",
-        "price": 43
-      }
-    ],
     "price": 28,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-dashboard-data-cable",
@@ -6770,6 +6445,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Rear Brake Lever",
+      "Mini4- Front Fork",
+      "Speedway III/IV- 600W Motor",
+      "Mini4- Bare Handlebar with Folding Extensions"
     ]
   },
   {
@@ -6822,16 +6503,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 },
-      {
-        "name": "Mini4- Bare Handlebar with Folding Extensions",
-        "url": "mini-4-bare-handle-bar-folding-parts",
-        "price": 43
-      },
-      { "name": "Mini4- Solid Rubber Front Tire", "url": "mini4-solid-rubber-front-tire", "price": 44 },
-      { "name": "Mini4- Handle Grip Set", "url": "mini-4-handle-grip-set", "price": 24 }
-    ],
     "price": 27,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-front-mud-guard",
@@ -6840,6 +6511,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Rear Brake Lever",
+      "Mini4- Bare Handlebar with Folding Extensions",
+      "Mini4- Solid Rubber Front Tire",
+      "Mini4- Handle Grip Set"
     ]
   },
   {
@@ -6892,12 +6569,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Side Panels", "url": "mini-4-set-side-led-panels", "price": 30 },
-      { "name": "Mini4- Rear Mud-guard", "url": "mini-4-rear-mud-guard", "price": 33 },
-      { "name": "Mini4- Front Fork", "url": "mini4-front-fork", "price": 41 },
-      { "name": "Mini4- Front Fender/Mud-guard", "url": "mini-4-front-mud-guard", "price": 27 }
-    ],
     "price": 24,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-handle-grip-set",
@@ -6906,6 +6577,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 3, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Side Panels",
+      "Mini4- Rear Mud-guard",
+      "Mini4- Front Fork",
+      "Mini4- Front Fender/Mud-guard"
     ]
   },
   {
@@ -6957,12 +6634,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Dashboard/Throttle Unit", "url": "mini4-dashboard-throttle-unit", "price": 49 },
-      { "name": "Mini4- Handle Grip Set", "url": "mini-4-handle-grip-set", "price": 24 },
-      { "name": "Mini4- Trolley-wheel Kit", "url": "mini4-trolley-wheel-kit", "price": 23 },
-      { "name": "4x Scooter Brake Pads", "url": "scooter-brake-pads", "price": 16 }
-    ],
     "price": 19,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-rear-brake-line-cable",
@@ -6971,6 +6642,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Dashboard/Throttle Unit",
+      "Mini4- Handle Grip Set",
+      "Mini4- Trolley-wheel Kit",
+      "4x Scooter Brake Pads"
     ]
   },
   {
@@ -7027,12 +6704,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 },
-      { "name": "Mini4- Front Fork", "url": "mini4-front-fork", "price": 41 },
-      { "name": "Mini4- Dashboard Data Cable", "url": "mini-4-dashboard-data-cable", "price": 28 },
-      { "name": "Mini 4- Rear Drum Brake Shoe", "url": "mini-4-rear-wheel-drum-brake-system", "price": 29 }
-    ],
     "price": 33,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-rear-mud-guard",
@@ -7041,6 +6712,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Rear Brake Lever",
+      "Mini4- Front Fork",
+      "Mini4- Dashboard Data Cable",
+      "Mini 4- Rear Drum Brake Shoe"
     ]
   },
   {
@@ -7096,12 +6773,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Side Panels", "url": "mini-4-set-side-led-panels", "price": 30 },
-      { "name": "Mini4- Dashboard/Throttle Unit", "url": "mini4-dashboard-throttle-unit", "price": 49 },
-      { "name": "Mini4- Handle Grip Set", "url": "mini-4-handle-grip-set", "price": 24 },
-      { "name": "Speedway III- Rear Fender/Mud-guard", "url": "speedway-iii-rear-fender-mud-guard", "price": 44 }
-    ],
     "price": 29,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-rear-wheel-drum-brake-system",
@@ -7110,6 +6781,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 6, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Side Panels",
+      "Mini4- Dashboard/Throttle Unit",
+      "Mini4- Handle Grip Set",
+      "Speedway III- Rear Fender/Mud-guard"
     ]
   },
   {
@@ -7168,12 +6845,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Rear Mud-guard", "url": "mini-4-rear-mud-guard", "price": 33 },
-      { "name": "Scooter Rear Brake Line Cable", "url": "mini-4-rear-brake-line-cable", "price": 19 },
-      { "name": "Mini 4- Rear Drum Brake Shoe", "url": "mini-4-rear-wheel-drum-brake-system", "price": 29 },
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 }
-    ],
     "price": 30,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini-4-set-side-led-panels",
@@ -7183,6 +6854,12 @@
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 5, "height": 3 }, "defaultUnit": "in" },
       { "heading": "side", "data": "Left (charge port), Right (with switch)" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Rear Mud-guard",
+      "Scooter Rear Brake Line Cable",
+      "Mini 4- Rear Drum Brake Shoe",
+      "Mini4- Rear Brake Lever"
     ]
   },
   {
@@ -7237,12 +6914,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 },
-      { "name": "Mini4- Deck Anti-slip Mat", "url": "mini4-foot-plate-anti-slip-mat", "price": 25 },
-      { "name": "Mini 4- Rear Drum Brake Shoe", "url": "mini-4-rear-wheel-drum-brake-system", "price": 29 },
-      { "name": "Mini4- Handle Grip Set", "url": "mini-4-handle-grip-set", "price": 24 }
-    ],
     "price": 49,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini4-dashboard-throttle-unit",
@@ -7251,6 +6922,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Rear Brake Lever",
+      "Mini4- Deck Anti-slip Mat",
+      "Mini 4- Rear Drum Brake Shoe",
+      "Mini4- Handle Grip Set"
     ]
   },
   {
@@ -7303,12 +6980,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Side Panels", "url": "mini-4-set-side-led-panels", "price": 30 },
-      { "name": "Mini4- Front Fender/Mud-guard", "url": "mini-4-front-mud-guard", "price": 27 },
-      { "name": "Mini4- Dashboard Data Cable", "url": "mini-4-dashboard-data-cable", "price": 28 },
-      { "name": "Mini4- Solid Rubber Front Tire", "url": "mini4-solid-rubber-front-tire", "price": 44 }
-    ],
     "price": 25,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini4-foot-plate-anti-slip-mat",
@@ -7317,6 +6988,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Side Panels",
+      "Mini4- Front Fender/Mud-guard",
+      "Mini4- Dashboard Data Cable",
+      "Mini4- Solid Rubber Front Tire"
     ]
   },
   {
@@ -7372,12 +7049,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 },
-      { "name": "Mini4- Rear Mud-guard", "url": "mini-4-rear-mud-guard", "price": 33 },
-      { "name": "Mini4- Handlebar Base", "url": "mini4-handle-bar-base", "price": 36 },
-      { "name": "Mini4- Solid Rubber Front Tire", "url": "mini4-solid-rubber-front-tire", "price": 44 }
-    ],
     "price": 41,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini4-front-fork",
@@ -7386,6 +7057,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 6, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Rear Brake Lever",
+      "Mini4- Rear Mud-guard",
+      "Mini4- Handlebar Base",
+      "Mini4- Solid Rubber Front Tire"
     ]
   },
   {
@@ -7438,16 +7115,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Speedway III/IV- 600W Motor", "url": "speedway-iii-iv-600w-motor", "price": 141 },
-      { "name": "Mini4- Dashboard Data Cable", "url": "mini-4-dashboard-data-cable", "price": 28 },
-      {
-        "name": "Mini4- Bare Handlebar with Folding Extensions",
-        "url": "mini-4-bare-handle-bar-folding-parts",
-        "price": 43
-      },
-      { "name": "Mini4- Handle Grip Set", "url": "mini-4-handle-grip-set", "price": 24 }
-    ],
     "price": 36,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini4-handle-bar-base",
@@ -7456,6 +7123,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Speedway III/IV- 600W Motor",
+      "Mini4- Dashboard Data Cable",
+      "Mini4- Bare Handlebar with Folding Extensions",
+      "Mini4- Handle Grip Set"
     ]
   },
   {
@@ -7508,12 +7181,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini 4- Rear Drum Brake Shoe", "url": "mini-4-rear-wheel-drum-brake-system", "price": 29 },
-      { "name": "Mini4- Handlebar Base", "url": "mini4-handle-bar-base", "price": 36 },
-      { "name": "Mini4- Side Panels", "url": "mini-4-set-side-led-panels", "price": 30 },
-      { "name": "Mini4- Solid Rubber Front Tire", "url": "mini4-solid-rubber-front-tire", "price": 44 }
-    ],
     "price": 25,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini4-rear-brake-lever",
@@ -7522,6 +7189,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini 4- Rear Drum Brake Shoe",
+      "Mini4- Handlebar Base",
+      "Mini4- Side Panels",
+      "Mini4- Solid Rubber Front Tire"
     ]
   },
   {
@@ -7574,12 +7247,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Front Fork", "url": "mini4-front-fork", "price": 41 },
-      { "name": "Mini4- Deck Anti-slip Mat", "url": "mini4-foot-plate-anti-slip-mat", "price": 25 },
-      { "name": "Mini4- Dashboard/Throttle Unit", "url": "mini4-dashboard-throttle-unit", "price": 49 },
-      { "name": "Mini4- Dashboard Data Cable", "url": "mini-4-dashboard-data-cable", "price": 28 }
-    ],
     "price": 44,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "mini4-solid-rubber-front-tire",
@@ -7588,6 +7255,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Front Fork",
+      "Mini4- Deck Anti-slip Mat",
+      "Mini4- Dashboard/Throttle Unit",
+      "Mini4- Dashboard Data Cable"
     ]
   },
   {
@@ -7642,12 +7315,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Rear Mud-guard", "url": "mini-4-rear-mud-guard", "price": 33 },
-      { "name": "Mini4- Front Fork", "url": "mini4-front-fork", "price": 41 },
-      { "name": "Mini4- Solid Rubber Front Tire", "url": "mini4-solid-rubber-front-tire", "price": 44 },
-      { "name": "Mini4- Front Fender/Mud-guard", "url": "mini-4-front-mud-guard", "price": 27 }
-    ],
     "price": 23,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "mini4-trolley-wheel-kit",
@@ -7656,6 +7323,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Rear Mud-guard",
+      "Mini4- Front Fork",
+      "Mini4- Solid Rubber Front Tire",
+      "Mini4- Front Fender/Mud-guard"
     ]
   },
   {
@@ -7705,12 +7378,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Set of Side Panels, Black", "url": "monster-set-of-side-panels-black", "price": 68.5 },
-      { "name": "GW ACM/ACMS+: Set of Pedals", "url": "acmacms-set-of-pedals", "price": 98 },
-      { "name": "GW Telsa: Replacement Control-Board", "url": "gw-telsa-replacement-control-board", "price": 174 },
-      { "name": "GW ACM/ACMS+: Replacement Control-Board", "url": "acms-control-board", "price": 165 }
-    ],
     "price": 196,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "monster-control-board",
@@ -7719,6 +7386,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Set of Side Panels, Black",
+      "GW ACM/ACMS+: Set of Pedals",
+      "GW Telsa: Replacement Control-Board",
+      "GW ACM/ACMS+: Replacement Control-Board"
     ]
   },
   {
@@ -7769,12 +7442,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW MSuper V3s+: Replacement Control-Board", "url": "msuper-v3s-control-board", "price": 165 },
-      { "name": "GW Monster: Replacement Control-Board", "url": "monster-control-board", "price": 196 },
-      { "name": "GW Telsa: Replacement Control-Board", "url": "gw-telsa-replacement-control-board", "price": 174 },
-      { "name": "GW Monster: Set of Side Panels, Black", "url": "monster-set-of-side-panels-black", "price": 68.5 }
-    ],
     "price": 87,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "monster-seatcushion",
@@ -7783,6 +7450,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 12, "height": 8 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW MSuper V3s+: Replacement Control-Board",
+      "GW Monster: Replacement Control-Board",
+      "GW Telsa: Replacement Control-Board",
+      "GW Monster: Set of Side Panels, Black"
     ]
   },
   {
@@ -7831,20 +7504,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Telsa: Replacement Control-Board", "url": "gw-telsa-replacement-control-board", "price": 174 },
-      {
-        "name": "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack",
-        "url": "800wh-84-2v-battery-pack-for-the-acmsmsuper-v3smonster",
-        "price": 650
-      },
-      {
-        "name": "GW MSuper V3s+: Set of Side Panels, Black",
-        "url": "msuper-3s-set-of-side-panels-black",
-        "price": 65.5
-      },
-      { "name": "GW MSuper V3s+: Replacement Control-Board", "url": "msuper-v3s-control-board", "price": 165 }
-    ],
     "price": 59,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "monster-set-of-side-panels-black",
@@ -7853,6 +7512,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 16, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Telsa: Replacement Control-Board",
+      "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack",
+      "GW MSuper V3s+: Set of Side Panels, Black",
+      "GW MSuper V3s+: Replacement Control-Board"
     ]
   },
   {
@@ -7901,12 +7566,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Seat/Cushion", "url": "monster-seatcushion", "price": 87 },
-      { "name": "GW ACM/ACMS+: Replacement Control-Board", "url": "acms-control-board", "price": 165 },
-      { "name": "GW Monster: Pair of Shells", "url": "gw-monster-pair-shells", "price": 196 },
-      { "name": "GW MTen3: Replacement Control-Board", "url": "gw-mten3-replacement-control-board", "price": 174 }
-    ],
     "price": 55,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "msuper-3s-set-of-side-panels-black",
@@ -7915,6 +7574,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 18, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Seat/Cushion",
+      "GW ACM/ACMS+: Replacement Control-Board",
+      "GW Monster: Pair of Shells",
+      "GW MTen3: Replacement Control-Board"
     ]
   },
   {
@@ -7961,12 +7626,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Pair of Shells", "url": "gw-monster-pair-shells", "price": 196 },
-      { "name": "GW ACM/ACMS+: Set of Pedals", "url": "acmacms-set-of-pedals", "price": 98 },
-      { "name": "GW Monster: Set of Side Panels, Black", "url": "monster-set-of-side-panels-black", "price": 68.5 },
-      { "name": "GW MSuper V3s+: Replacement Control-Board", "url": "msuper-v3s-control-board", "price": 165 }
-    ],
     "price": 99,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "msuper-set-of-pedals",
@@ -7975,6 +7634,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 6, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Pair of Shells",
+      "GW ACM/ACMS+: Set of Pedals",
+      "GW Monster: Set of Side Panels, Black",
+      "GW MSuper V3s+: Replacement Control-Board"
     ]
   },
   {
@@ -8025,20 +7690,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "GW Monster: Set of Side Panels, Black", "url": "monster-set-of-side-panels-black", "price": 68.5 },
-      {
-        "name": "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack",
-        "url": "800wh-84-2v-battery-pack-for-the-acmsmsuper-v3smonster",
-        "price": 650
-      },
-      {
-        "name": "GW MSuper V3s+: Set of Side Panels, Black",
-        "url": "msuper-3s-set-of-side-panels-black",
-        "price": 65.5
-      },
-      { "name": "GW Telsa: Replacement Control-Board", "url": "gw-telsa-replacement-control-board", "price": 174 }
-    ],
     "price": 165,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "msuper-v3s-control-board",
@@ -8047,6 +7698,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "GW Monster: Set of Side Panels, Black",
+      "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack",
+      "GW MSuper V3s+: Set of Side Panels, Black",
+      "GW Telsa: Replacement Control-Board"
     ]
   },
   {
@@ -8105,24 +7762,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
-        "url": "new-stigo-b1-480wh-battery-350w-electric-folding-bike",
-        "price": 1050
-      },
-      {
-        "name": "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
-        "url": "new-dualtron-thunder-2060wh-2x-1200w-2400w-motors",
-        "price": 3925
-      },
-      {
-        "name": "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
-        "url": "new-speedway-5-1404wh-battery-3600w-peak-power",
-        "price": 2100
-      },
-      { "name": "NEW: Turbowheel Dart, T9 600W/614Wh", "url": "new-turbowheel-dart-t9-500w-614wh", "price": 998 }
-    ],
     "price": 2992,
     "reviews": {
       "list": [
@@ -8175,6 +7814,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
+      "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
+      "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
+      "NEW: Turbowheel Dart, T9 600W/614Wh"
     ]
   },
   {
@@ -8233,24 +7878,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
-        "url": "new-dualtron-thunder-2060wh-2x-1200w-2400w-motors",
-        "price": 3925
-      },
-      {
-        "name": "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
-        "url": "new-stigo-b1-480wh-battery-350w-electric-folding-bike",
-        "price": 1050
-      },
-      {
-        "name": "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors",
-        "url": "new-dualtron-3-1658wh-2x-800w-1600w-motors",
-        "price": 2992
-      },
-      { "name": "NEW: Turbowheel Dart, T9 600W/614Wh", "url": "new-turbowheel-dart-t9-500w-614wh", "price": 998 }
-    ],
     "price": 2450,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "new-dualtron-spider-3000w-peak-1050wh-battery",
@@ -8293,6 +7920,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
+      "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
+      "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors",
+      "NEW: Turbowheel Dart, T9 600W/614Wh"
     ]
   },
   {
@@ -8353,28 +7986,6 @@
           { "src": "DT-Thunder-Oblique-Left.jpg", "srcset": null },
           { "src": "DT-Thunder-Oblique-Left-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Dualtron Spider 1,050Wh Battery/3000W Peak Power",
-        "url": "new-dualtron-spider-3000w-peak-1050wh-battery",
-        "price": 2450
-      },
-      {
-        "name": "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
-        "url": "new-turbowheel-lightning-957wh-battery-2x-1000w-3600w-motors",
-        "price": 2050
-      },
-      {
-        "name": "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
-        "url": "new-speedway-5-1404wh-battery-3600w-peak-power",
-        "price": 2100
-      },
-      {
-        "name": "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
-        "url": "new-ninebot-es2-es4-187wh-battery-300w-motor",
-        "price": 607
       }
     ],
     "price": 3850,
@@ -8471,6 +8082,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Dualtron Spider 1,050Wh Battery/3000W Peak Power",
+      "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
+      "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
+      "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor"
     ]
   },
   {
@@ -8528,12 +8145,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Dualtron Ultra- Tube Off-Road Tire", "url": "dualtron-ultra-tube-off-road-tire", "price": 42 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "New: Speedway Mini4 5A/54.6v Charger", "url": "new-speedway-mini4-5a-54-6v-charger", "price": 125 },
-      { "name": "Dualtron Thunder- Tubeless Road Tire", "url": "dualtron-thunder-tubeless-road-tire", "price": 46 }
-    ],
     "price": 150,
     "reviews": {
       "list": [
@@ -8565,6 +8176,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 11, "width": 8, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Dualtron Ultra- Tube Off-Road Tire",
+      "Tire: 18” x 2.5”, Kenda",
+      "New: Speedway Mini4 5A/54.6v Charger",
+      "Dualtron Thunder- Tubeless Road Tire"
     ]
   },
   {
@@ -8623,24 +8240,6 @@
           { "src": "MCM5-Top.jpg", "srcset": null },
           { "src": "MCM5-Top-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      { "name": "King Song 16S, 1200W Motor/840Wh Battery", "url": "kingsong-16-electric-unicycle", "price": 1412.5 },
-      {
-        "name": "NEW: King Song 16X 1554Wh Battery/2000W Motor, 3″ Wide Tire",
-        "url": "new-king-song-16x-1554wh-battery-2000w-motor-3-wide-tire",
-        "price": 500
-      },
-      {
-        "name": "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
-        "url": "new-king-song-18xl-1554wh-battery-2000w-motor",
-        "price": 1969.5
-      },
-      {
-        "name": "King Song 14S, 840Wh Battery/800W Motor",
-        "url": "king-song-14s-electric-unicycle-840wh",
-        "price": 1175
       }
     ],
     "price": 1350,
@@ -8797,6 +8396,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "King Song 16S, 1200W Motor/840Wh Battery",
+      "NEW: King Song 16X 1554Wh Battery/2000W Motor, 3″ Wide Tire",
+      "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
+      "King Song 14S, 840Wh Battery/800W Motor"
     ]
   },
   {
@@ -8854,24 +8459,6 @@
           { "src": "Monster-Purple-Oblique-700x700.jpg", "srcset": null }
         ]
       }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
-        "url": "new-king-song-18xl-1554wh-battery-2000w-motor",
-        "price": 1969.5
-      },
-      {
-        "name": "King Song 14S, 840Wh Battery/800W Motor",
-        "url": "king-song-14s-electric-unicycle-840wh",
-        "price": 1175
-      },
-      {
-        "name": "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
-        "url": "new-gotway-msuper-x-msx-1600wh-battery-2000w-motor",
-        "price": 1595
-      },
-      { "name": "Inmotion V10/V10F, 960Wh Battery/2000W Motor", "url": "new-inmotion-v10-v10f", "price": 1449 }
     ],
     "price": 2850,
     "reviews": {
@@ -8961,6 +8548,12 @@
       { "heading": "range", "data": 96, "defaultUnit": "miles" },
       { "heading": "max load", "data": 330, "defaultUnit": "lbs" },
       { "specFromImage": "https://www.ewheels.com/wp-content/uploads/2017/03/Monster-Whats-New-v1.2.jpg" }
+    ],
+    "relatedProductsNames": [
+      "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
+      "King Song 14S, 840Wh Battery/800W Motor",
+      "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
+      "Inmotion V10/V10F, 960Wh Battery/2000W Motor"
     ]
   },
   {
@@ -9018,24 +8611,6 @@
           { "src": "MSX-Side-700x700.jpg", "srcset": null }
         ]
       }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
-        "url": "new-gotway-mcm5-14-the-mountain-climber-800wh-battery-1500w-motor",
-        "price": 1400
-      },
-      {
-        "name": "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
-        "url": "new-king-song-18xl-1554wh-battery-2000w-motor",
-        "price": 1969.5
-      },
-      {
-        "name": "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
-        "url": "new-gotway-tesla-16-1020wh-1900w-motor",
-        "price": 1512.5
-      },
-      { "name": "King Song 16S, 1200W Motor/840Wh Battery", "url": "kingsong-16-electric-unicycle", "price": 1412.5 }
     ],
     "price": 1997,
     "reviews": {
@@ -9191,6 +8766,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
+      "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
+      "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
+      "King Song 16S, 1200W Motor/840Wh Battery"
     ]
   },
   {
@@ -9254,28 +8835,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
-        "url": "new-gotway-tesla-16-1020wh-1900w-motor",
-        "price": 1512.5
-      },
-      {
-        "name": "King Song 14S, 840Wh Battery/800W Motor",
-        "url": "king-song-14s-electric-unicycle-840wh",
-        "price": 1175
-      },
-      {
-        "name": "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
-        "url": "new-gotway-mcm5-14-the-mountain-climber-800wh-battery-1500w-motor",
-        "price": 1400
-      },
-      {
-        "name": "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
-        "url": "new-king-song-18xl-1554wh-battery-2000w-motor",
-        "price": 1969.5
-      }
-    ],
     "price": 2273.5,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "new-gotway-nikola-1600wh-battery-2000w-motor-3-wide-tire",
@@ -9318,6 +8877,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
+      "King Song 14S, 840Wh Battery/800W Motor",
+      "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
+      "NEW: King Song 18XL 1554Wh Battery/2000W Motor"
     ]
   },
   {
@@ -9372,12 +8937,6 @@
           { "src": "Tesla-Front.jpg", "srcset": null }
         ]
       }
-    ],
-    "relatedProducts": [
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      { "name": "KS 14B/C: Telescopic Handle Add-on", "url": "king-song-telescopic-handle-accessory", "price": 58 },
-      { "name": "KS 16: LED Panel Cover", "url": "king-song-16-led-panel-cover", "price": 22 },
-      { "name": "Inner-Tube: 14” x 2.125”, Kenda", "url": "king-song-14-inner-tube", "price": 22.5 }
     ],
     "price": 1450,
     "reviews": {
@@ -9593,6 +9152,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "Tire: 14” x 2.125”, Kenda",
+      "KS 14B/C: Telescopic Handle Add-on",
+      "KS 16: LED Panel Cover",
+      "Inner-Tube: 14” x 2.125”, Kenda"
     ]
   },
   {
@@ -9651,24 +9216,6 @@
           { "src": "Inmotion-V10F-Front.jpg", "srcset": null },
           { "src": "Inmotion-V10F-Front-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: King Song 18S, 840Wh & 1500W Motor",
-        "url": "king-song-18s-840wh-1680wh-1500w-motor",
-        "price": 1745
-      },
-      {
-        "name": "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
-        "url": "new-gotway-mcm5-14-the-mountain-climber-800wh-battery-1500w-motor",
-        "price": 1400
-      },
-      { "name": "Solowheel Glide 3, 480Wh Battery/800W Motor", "url": "inmotion-v8", "price": 899 },
-      {
-        "name": "NEW: Gotway Monster, 22”, 100V/1845Wh, 84V/2400Wh",
-        "url": "new-gotway-monster-22-1600wh2400wh",
-        "price": 2850
       }
     ],
     "price": 1449,
@@ -9856,6 +9403,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: King Song 18S, 840Wh & 1500W Motor",
+      "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
+      "Solowheel Glide 3, 480Wh Battery/800W Motor",
+      "NEW: Gotway Monster, 22”, 100V/1845Wh, 84V/2400Wh"
     ]
   },
   {
@@ -9914,16 +9467,6 @@
           { "src": "V10F-PEDALS-2-700x700.jpg", "srcset": null }
         ]
       }
-    ],
-    "relatedProducts": [
-      { "name": "Speedway Mini4 Seat Kit", "url": "speedway-mini4-seat-kit", "price": 125 },
-      {
-        "name": "12” x 9” Piece of Jessup Skate Grip Tape",
-        "url": "12-x-9-piece-of-jessup-skate-grip-tape",
-        "price": 15
-      },
-      { "name": "New: Speedway Mini4 5A/54.6v Charger", "url": "new-speedway-mini4-5a-54-6v-charger", "price": 125 },
-      { "name": "Inner-tube: 16” x 2.125”, Kenda", "url": "16-x-1-95-innertube", "price": 22 }
     ],
     "price": 110,
     "reviews": {
@@ -10033,6 +9576,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 12, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Speedway Mini4 Seat Kit",
+      "12” x 9” Piece of Jessup Skate Grip Tape",
+      "New: Speedway Mini4 5A/54.6v Charger",
+      "Inner-tube: 16” x 2.125”, Kenda"
     ]
   },
   {
@@ -10083,16 +9632,6 @@
           }
         ]
       }
-    ],
-    "relatedProducts": [
-      { "name": "Protective Padding/Bumper Strip", "url": "soft-padding-protective", "price": 10 },
-      {
-        "name": "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
-        "url": "new-inmotion-xl-pedals-for-v10-f-v8-glide-3-v5f-glide-2",
-        "price": 110
-      },
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      { "name": "Tire: 16” x 2.125”, Kenda", "url": "king-song-16-kenda-tire", "price": 35 }
     ],
     "price": 99,
     "reviews": {
@@ -10245,6 +9784,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 12, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Protective Padding/Bumper Strip",
+      "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
+      "Tire: 14” x 2.125”, Kenda",
+      "Tire: 16” x 2.125”, Kenda"
     ]
   },
   {
@@ -10305,7 +9850,6 @@
         ]
       }
     ],
-    "relatedProducts": [{ "name": "IPS a130 Turbo Edition", "url": "ips-a130-turbo-edition", "price": 375 }],
     "price": 800,
     "reviews": {
       "list": [
@@ -10584,7 +10128,8 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
-    ]
+    ],
+    "relatedProductsNames": ["IPS a130 Turbo Edition"]
   },
   {
     "shortDescription": [
@@ -10641,24 +10186,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
-        "url": "new-gotway-mcm5-14-the-mountain-climber-800wh-battery-1500w-motor",
-        "price": 1400
-      },
-      {
-        "name": "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
-        "url": "new-gotway-msuper-x-msx-1600wh-battery-2000w-motor",
-        "price": 1595
-      },
-      {
-        "name": "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
-        "url": "new-king-song-18xl-1554wh-battery-2000w-motor",
-        "price": 1969.5
-      },
-      { "name": "Inmotion V10/V10F, 960Wh Battery/2000W Motor", "url": "new-inmotion-v10-v10f", "price": 1449 }
-    ],
     "price": 500,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "new-king-song-16x-1554wh-battery-2000w-motor-3-wide-tire",
@@ -10701,6 +10228,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
+      "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
+      "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
+      "Inmotion V10/V10F, 960Wh Battery/2000W Motor"
     ]
   },
   {
@@ -10755,24 +10288,6 @@
           { "src": "KS18XL-PED-Front.jpg", "srcset": null },
           { "src": "KS18XL-PED-Front-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: MTen3 10”, ‘The Pocket Rocket’, 512Wh/800W Motor",
-        "url": "gotway-mten3-512-800w-motor",
-        "price": 1049.5
-      },
-      {
-        "name": "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
-        "url": "new-gotway-tesla-16-1020wh-1900w-motor",
-        "price": 1512.5
-      },
-      { "name": "King Song 16S, 1200W Motor/840Wh Battery", "url": "kingsong-16-electric-unicycle", "price": 1412.5 },
-      {
-        "name": "King Song 14S, 840Wh Battery/800W Motor",
-        "url": "king-song-14s-electric-unicycle-840wh",
-        "price": 1175
       }
     ],
     "price": 2150,
@@ -11170,6 +10685,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: MTen3 10”, ‘The Pocket Rocket’, 512Wh/800W Motor",
+      "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
+      "King Song 16S, 1200W Motor/840Wh Battery",
+      "King Song 14S, 840Wh Battery/800W Motor"
     ]
   },
   {
@@ -11228,28 +10749,6 @@
           { "src": "Ninebot-ES2-Side.jpg", "srcset": null },
           { "src": "Ninebot-ES2-Side-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors",
-        "url": "new-dualtron-3-1658wh-2x-800w-1600w-motors",
-        "price": 2992
-      },
-      {
-        "name": "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
-        "url": "new-turbowheel-lightning-957wh-battery-2x-1000w-3600w-motors",
-        "price": 2050
-      },
-      {
-        "name": "NEW: Turbowheel Hornet, 921Wh Battery/2x 500W (2400W) Motors",
-        "url": "new-turbowheel-hornet-2x-500w-921wh",
-        "price": 1449
-      },
-      {
-        "name": "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
-        "url": "new-dualtron-thunder-2060wh-2x-1200w-2400w-motors",
-        "price": 3925
       }
     ],
     "price": 589,
@@ -11316,6 +10815,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2016/02/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors",
+      "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
+      "NEW: Turbowheel Hornet, 921Wh Battery/2x 500W (2400W) Motors",
+      "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors"
     ]
   },
   {
@@ -11371,28 +10876,6 @@
           { "src": "SW5-W-Oblique-Front-Left.jpg", "srcset": null },
           { "src": "SW5-W-Oblique-Front-Left-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
-        "url": "new-ninebot-es2-es4-187wh-battery-300w-motor",
-        "price": 607
-      },
-      {
-        "name": "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
-        "url": "new-dualtron-thunder-2060wh-2x-1200w-2400w-motors",
-        "price": 3925
-      },
-      {
-        "name": "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
-        "url": "new-turbowheel-lightning-957wh-battery-2x-1000w-3600w-motors",
-        "price": 2050
-      },
-      {
-        "name": "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors",
-        "url": "new-dualtron-3-1658wh-2x-800w-1600w-motors",
-        "price": 2992
       }
     ],
     "price": 2100,
@@ -11483,6 +10966,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
+      "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
+      "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
+      "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors"
     ]
   },
   {
@@ -11540,12 +11029,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Speedway Mini4 Seat Kit", "url": "speedway-mini4-seat-kit", "price": 125 },
-      { "name": "Electric Scooter Tire- 10″ x 2.5″", "url": "scooter-10-x-2-5-tire", "price": 28 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "Electric Scooter: Inner-tube 10”x 2”", "url": "electric-scooter-inner-tube-10x-2", "price": 16 }
-    ],
     "price": 125,
     "reviews": { "list": [], "summary": { "rating": 0, "reviewsAmount": "0 Reviews" } },
     "url": "new-speedway-mini4-5a-54-6v-charger",
@@ -11554,6 +11037,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 11, "width": 8, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Speedway Mini4 Seat Kit",
+      "Electric Scooter Tire- 10″ x 2.5″",
+      "Tire: 18” x 2.5”, Kenda",
+      "Electric Scooter: Inner-tube 10”x 2”"
     ]
   },
   {
@@ -11612,12 +11101,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Tire: 14” x 1.5 Tire, for V3Pro", "url": "v3pro-14-tire", "price": 41.5 },
-      { "name": "Electric Scooter: Inner-tube 8”x 2”", "url": "l6-8-innertube", "price": 12 },
-      { "name": "Inner-tube: 18” x 2.5”, Kenda", "url": "18-innertube-for-msuper-ks18", "price": 27 },
-      { "name": "Inner-Tube: 14” x 2.125”, Kenda", "url": "king-song-14-inner-tube", "price": 22.5 }
-    ],
     "price": 125,
     "reviews": {
       "list": [
@@ -11643,6 +11126,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 11, "width": 8, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Tire: 14” x 1.5 Tire, for V3Pro",
+      "Electric Scooter: Inner-tube 8”x 2”",
+      "Inner-tube: 18” x 2.5”, Kenda",
+      "Inner-Tube: 14” x 2.125”, Kenda"
     ]
   },
   {
@@ -11697,24 +11186,6 @@
           { "src": "Sitgo-B1-Oblique-Rear.jpg", "srcset": null },
           { "src": "Sitgo-B1-Oblique-Rear-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
-        "url": "new-speedway-5-1404wh-battery-3600w-peak-power",
-        "price": 2100
-      },
-      { "name": "NEW: Turbowheel Dart, T9 600W/614Wh", "url": "new-turbowheel-dart-t9-500w-614wh", "price": 998 },
-      {
-        "name": "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
-        "url": "new-ninebot-es2-es4-187wh-battery-300w-motor",
-        "price": 607
-      },
-      {
-        "name": "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
-        "url": "new-dualtron-thunder-2060wh-2x-1200w-2400w-motors",
-        "price": 3925
       }
     ],
     "price": 1050,
@@ -11787,6 +11258,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
+      "NEW: Turbowheel Dart, T9 600W/614Wh",
+      "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
+      "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors"
     ]
   },
   {
@@ -11849,28 +11326,6 @@
           { "src": "Dart-Headlight-Illuminated-Stem.jpg", "srcset": null },
           { "src": "Dart-Headlight-Illuminated-Stem-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
-        "url": "new-stigo-b1-480wh-battery-350w-electric-folding-bike",
-        "price": 1050
-      },
-      {
-        "name": "NEW: Dualtron Spider 1,050Wh Battery/3000W Peak Power",
-        "url": "new-dualtron-spider-3000w-peak-1050wh-battery",
-        "price": 2450
-      },
-      {
-        "name": "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
-        "url": "new-turbowheel-lightning-957wh-battery-2x-1000w-3600w-motors",
-        "price": 2050
-      },
-      {
-        "name": "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
-        "url": "new-speedway-5-1404wh-battery-3600w-peak-power",
-        "price": 2100
       }
     ],
     "price": 998,
@@ -12120,6 +11575,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
+      "NEW: Dualtron Spider 1,050Wh Battery/3000W Peak Power",
+      "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
+      "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power"
     ]
   },
   {
@@ -12180,28 +11641,6 @@
           { "src": "Hornet-Folded.jpg", "srcset": null },
           { "src": "Hornet-Folded-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Dualtron Spider 1,050Wh Battery/3000W Peak Power",
-        "url": "new-dualtron-spider-3000w-peak-1050wh-battery",
-        "price": 2450
-      },
-      {
-        "name": "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
-        "url": "new-turbowheel-lightning-957wh-battery-2x-1000w-3600w-motors",
-        "price": 2050
-      },
-      {
-        "name": "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
-        "url": "new-speedway-5-1404wh-battery-3600w-peak-power",
-        "price": 2100
-      },
-      {
-        "name": "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
-        "url": "new-dualtron-thunder-2060wh-2x-1200w-2400w-motors",
-        "price": 3925
       }
     ],
     "price": 1349,
@@ -12280,6 +11719,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Dualtron Spider 1,050Wh Battery/3000W Peak Power",
+      "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
+      "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
+      "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors"
     ]
   },
   {
@@ -12335,28 +11780,6 @@
           { "src": "Lightning-Down-Oblique.jpg", "srcset": null },
           { "src": "Lightning-Down-Oblique-700x700.jpg", "srcset": null }
         ]
-      }
-    ],
-    "relatedProducts": [
-      {
-        "name": "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
-        "url": "new-dualtron-thunder-2060wh-2x-1200w-2400w-motors",
-        "price": 3925
-      },
-      {
-        "name": "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
-        "url": "new-ninebot-es2-es4-187wh-battery-300w-motor",
-        "price": 607
-      },
-      {
-        "name": "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
-        "url": "new-speedway-5-1404wh-battery-3600w-peak-power",
-        "price": 2100
-      },
-      {
-        "name": "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
-        "url": "new-stigo-b1-480wh-battery-350w-electric-folding-bike",
-        "price": 1050
       }
     ],
     "price": 2050,
@@ -12537,6 +11960,12 @@
         "defaultUnit": "miles",
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
+    ],
+    "relatedProductsNames": [
+      "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
+      "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
+      "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
+      "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike"
     ]
   },
   {
@@ -12589,16 +12018,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8",
-        "url": "ewheels-84-2v-rapid-chargers",
-        "price": 137.5
-      },
-      { "name": "Electric Scooter: Tire 8”x 2”", "url": "l6-8-front-tire", "price": 31 },
-      { "name": "Speedway Mini4 Seat Kit", "url": "speedway-mini4-seat-kit", "price": 125 },
-      { "name": "Tire: 14” x 1.5 Tire, for V3Pro", "url": "v3pro-14-tire", "price": 41.5 }
-    ],
     "price": 28,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "scooter-10-x-2-5-tire",
@@ -12607,6 +12026,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 13, "width": 12, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8",
+      "Electric Scooter: Tire 8”x 2”",
+      "Speedway Mini4 Seat Kit",
+      "Tire: 14” x 1.5 Tire, for V3Pro"
     ]
   },
   {
@@ -12658,12 +12083,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Dashboard Data Cable", "url": "mini-4-dashboard-data-cable", "price": 28 },
-      { "name": "Mini4- Deck Anti-slip Mat", "url": "mini4-foot-plate-anti-slip-mat", "price": 25 },
-      { "name": "Mini4- Rear Mud-guard", "url": "mini-4-rear-mud-guard", "price": 33 },
-      { "name": "Mini4- Rear Brake Lever", "url": "mini4-rear-brake-lever", "price": 25 }
-    ],
     "price": 23,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "scooter-brake-disc-rotor",
@@ -12672,6 +12091,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Dashboard Data Cable",
+      "Mini4- Deck Anti-slip Mat",
+      "Mini4- Rear Mud-guard",
+      "Mini4- Rear Brake Lever"
     ]
   },
   {
@@ -12723,16 +12148,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "Turbowheel Hornet- Front Fender/Mud-guard",
-        "url": "turbowheel-hornet-front-fender-mud-guard",
-        "price": 27
-      },
-      { "name": "Turbowheel Dart- Brake Lever Set", "url": "turbowheel-dart-brake-lever-set", "price": 36 },
-      { "name": "Turbowheel Dart- LED Strips", "url": "turbowheel-dart-led-strips", "price": 26 },
-      { "name": "Turbowheel- Dashboard/Throttle Unit", "url": "turbowheel-dashboard-throttle-unit", "price": 65 }
-    ],
     "price": 16,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "scooter-brake-pads",
@@ -12741,6 +12156,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Hornet- Front Fender/Mud-guard",
+      "Turbowheel Dart- Brake Lever Set",
+      "Turbowheel Dart- LED Strips",
+      "Turbowheel- Dashboard/Throttle Unit"
     ]
   },
   {
@@ -12785,20 +12206,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "New: King Song 10″/25cm Extended Length Pedal",
-        "url": "new-king-song-10-25cm-larger-pedal",
-        "price": 99
-      },
-      { "name": "Dualtron Thunder- Tubeless Road Tire", "url": "dualtron-thunder-tubeless-road-tire", "price": 46 },
-      {
-        "name": "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8",
-        "url": "ewheels-84-2v-rapid-chargers",
-        "price": 137.5
-      },
-      { "name": "Tire: 14” x 1.5 Tire, for V3Pro", "url": "v3pro-14-tire", "price": 41.5 }
-    ],
     "price": 10,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "soft-padding-protective",
@@ -12808,6 +12215,12 @@
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 6, "width": 6, "height": 3 }, "defaultUnit": "in" },
       { "heading": "colour", "data": ["black", "red", "white"] }
+    ],
+    "relatedProductsNames": [
+      "New: King Song 10″/25cm Extended Length Pedal",
+      "Dualtron Thunder- Tubeless Road Tire",
+      "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8",
+      "Tire: 14” x 1.5 Tire, for V3Pro"
     ]
   },
   {
@@ -12864,12 +12277,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Mini4- Front Fork", "url": "mini4-front-fork", "price": 41 },
-      { "name": "Mini4- Trolley-wheel Kit", "url": "mini4-trolley-wheel-kit", "price": 23 },
-      { "name": "Mini4- Handle Grip Set", "url": "mini-4-handle-grip-set", "price": 24 },
-      { "name": "Mini4- Deck Anti-slip Mat", "url": "mini4-foot-plate-anti-slip-mat", "price": 25 }
-    ],
     "price": 141,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "speedway-iii-iv-600w-motor",
@@ -12878,6 +12285,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 15, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 12, "width": 12, "height": 15 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Mini4- Front Fork",
+      "Mini4- Trolley-wheel Kit",
+      "Mini4- Handle Grip Set",
+      "Mini4- Deck Anti-slip Mat"
     ]
   },
   {
@@ -12929,12 +12342,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Speedway III/IV- 600W Motor", "url": "speedway-iii-iv-600w-motor", "price": 141 },
-      { "name": "Mini4- Deck Anti-slip Mat", "url": "mini4-foot-plate-anti-slip-mat", "price": 25 },
-      { "name": "Mini 4- Rear Drum Brake Shoe", "url": "mini-4-rear-wheel-drum-brake-system", "price": 29 },
-      { "name": "Mini4- Dashboard/Throttle Unit", "url": "mini4-dashboard-throttle-unit", "price": 49 }
-    ],
     "price": 44,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "speedway-iii-rear-fender-mud-guard",
@@ -12943,6 +12350,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Speedway III/IV- 600W Motor",
+      "Mini4- Deck Anti-slip Mat",
+      "Mini 4- Rear Drum Brake Shoe",
+      "Mini4- Dashboard/Throttle Unit"
     ]
   },
   {
@@ -12998,20 +12411,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Tire: 16” x 2.125”, Kenda", "url": "king-song-16-kenda-tire", "price": 35 },
-      {
-        "name": "New: King Song 10″/25cm Extended Length Pedal",
-        "url": "new-king-song-10-25cm-larger-pedal",
-        "price": 99
-      },
-      { "name": "Dualtron Ultra- Tube Road Tire", "url": "dualtron-ultra-tube-road-tire", "price": 42 },
-      {
-        "name": "12” x 9” Piece of Jessup Skate Grip Tape",
-        "url": "12-x-9-piece-of-jessup-skate-grip-tape",
-        "price": 15
-      }
-    ],
     "price": 125,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "speedway-mini4-seat-kit",
@@ -13020,6 +12419,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 6, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 12, "width": 8, "height": 8 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Tire: 16” x 2.125”, Kenda",
+      "New: King Song 10″/25cm Extended Length Pedal",
+      "Dualtron Ultra- Tube Road Tire",
+      "12” x 9” Piece of Jessup Skate Grip Tape"
     ]
   },
   {
@@ -13069,16 +12474,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "King Song 16X Seat", "url": "king-song-16x-seat", "price": 75 },
-      { "name": "V5F/V5F+: Replacement Control-board", "url": "v5fv5f-control-board", "price": 150 },
-      { "name": "KS 14C: Replacement Control-Board", "url": "king-song-14-control-board", "price": 125 },
-      {
-        "name": "18L/XL Bodyguard Protective Neoprene Covers Roll.nz",
-        "url": "18l-xl-bodyguard-protective-neoprene-covers-roll-nz",
-        "price": 98
-      }
-    ],
     "price": 35,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "tire-16-x-1-95-kenda-for-v8",
@@ -13087,6 +12482,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 15, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "King Song 16X Seat",
+      "V5F/V5F+: Replacement Control-board",
+      "KS 14C: Replacement Control-Board",
+      "18L/XL Bodyguard Protective Neoprene Covers Roll.nz"
     ]
   },
   {
@@ -13139,24 +12540,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "Turbowheel Dart- Front Fender/Mud-guard",
-        "url": "turbowheel-dart-front-fender-mud-guard",
-        "price": 23
-      },
-      { "name": "4x Scooter Brake Pads", "url": "scooter-brake-pads", "price": 16 },
-      {
-        "name": "Turbowheel Hornet- Rear Fender/Mud-guard",
-        "url": "turbowheel-hornet-rear-fender-mud-guard",
-        "price": 32
-      },
-      {
-        "name": "Turbowheel Hornet- Front Fender/Mud-guard",
-        "url": "turbowheel-hornet-front-fender-mud-guard",
-        "price": 27
-      }
-    ],
     "price": 36,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-dart-brake-lever-set",
@@ -13165,6 +12548,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Dart- Front Fender/Mud-guard",
+      "4x Scooter Brake Pads",
+      "Turbowheel Hornet- Rear Fender/Mud-guard",
+      "Turbowheel Hornet- Front Fender/Mud-guard"
     ]
   },
   {
@@ -13216,16 +12605,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Turbowheel Dart- Brake Lever Set", "url": "turbowheel-dart-brake-lever-set", "price": 36 },
-      { "name": "4x Scooter Brake Pads", "url": "scooter-brake-pads", "price": 16 },
-      { "name": "Turbowheel Dart- LED Strips", "url": "turbowheel-dart-led-strips", "price": 26 },
-      {
-        "name": "Turbowheel Hornet- Rear Fender/Mud-guard",
-        "url": "turbowheel-hornet-rear-fender-mud-guard",
-        "price": 32
-      }
-    ],
     "price": 26,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-dart-front-cover-panel",
@@ -13234,6 +12613,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Dart- Brake Lever Set",
+      "4x Scooter Brake Pads",
+      "Turbowheel Dart- LED Strips",
+      "Turbowheel Hornet- Rear Fender/Mud-guard"
     ]
   },
   {
@@ -13290,16 +12675,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "Turbowheel Hornet- Key Ignition & Voltmeter",
-        "url": "turbowheel-hornet-key-ignition-voltmeter",
-        "price": 45
-      },
-      { "name": "Turbowheel- Dashboard/Throttle Unit", "url": "turbowheel-dashboard-throttle-unit", "price": 65 },
-      { "name": "Scooter Rear Brake Line Cable", "url": "mini-4-rear-brake-line-cable", "price": 19 },
-      { "name": "Turbowheel Dart- Front Cover Panel", "url": "turbowheel-dart-front-cover-panel", "price": 26 }
-    ],
     "price": 23,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-dart-front-fender-mud-guard",
@@ -13308,6 +12683,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Hornet- Key Ignition & Voltmeter",
+      "Turbowheel- Dashboard/Throttle Unit",
+      "Scooter Rear Brake Line Cable",
+      "Turbowheel Dart- Front Cover Panel"
     ]
   },
   {
@@ -13360,16 +12741,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Turbowheel Hornet- Brake Lever", "url": "turbowheel-hornet-brake-lever", "price": 39 },
-      { "name": "Scooter Rear Brake Line Cable", "url": "mini-4-rear-brake-line-cable", "price": 19 },
-      {
-        "name": "Turbowheel Hornet- Front Fender/Mud-guard",
-        "url": "turbowheel-hornet-front-fender-mud-guard",
-        "price": 27
-      },
-      { "name": "Turbowheel Dart- Front Cover Panel", "url": "turbowheel-dart-front-cover-panel", "price": 26 }
-    ],
     "price": 26,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-dart-led-strips",
@@ -13378,6 +12749,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Hornet- Brake Lever",
+      "Scooter Rear Brake Line Cable",
+      "Turbowheel Hornet- Front Fender/Mud-guard",
+      "Turbowheel Dart- Front Cover Panel"
     ]
   },
   {
@@ -13432,16 +12809,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Turbowheel Dart- Brake Lever Set", "url": "turbowheel-dart-brake-lever-set", "price": 36 },
-      { "name": "Turbowheel Dart- Front Cover Panel", "url": "turbowheel-dart-front-cover-panel", "price": 26 },
-      { "name": "Turbowheel Dart- LED Strips", "url": "turbowheel-dart-led-strips", "price": 26 },
-      {
-        "name": "Turbowheel Hornet- Key Ignition & Voltmeter",
-        "url": "turbowheel-hornet-key-ignition-voltmeter",
-        "price": 45
-      }
-    ],
     "price": 65,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-dashboard-throttle-unit",
@@ -13450,6 +12817,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Dart- Brake Lever Set",
+      "Turbowheel Dart- Front Cover Panel",
+      "Turbowheel Dart- LED Strips",
+      "Turbowheel Hornet- Key Ignition & Voltmeter"
     ]
   },
   {
@@ -13501,20 +12874,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      {
-        "name": "Turbowheel Hornet- Rear Fender/Mud-guard",
-        "url": "turbowheel-hornet-rear-fender-mud-guard",
-        "price": 32
-      },
-      {
-        "name": "Turbowheel Hornet- Key Ignition & Voltmeter",
-        "url": "turbowheel-hornet-key-ignition-voltmeter",
-        "price": 45
-      },
-      { "name": "4x Scooter Brake Pads", "url": "scooter-brake-pads", "price": 16 },
-      { "name": "Scooter Rear Brake Line Cable", "url": "mini-4-rear-brake-line-cable", "price": 19 }
-    ],
     "price": 39,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-hornet-brake-lever",
@@ -13523,6 +12882,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Hornet- Rear Fender/Mud-guard",
+      "Turbowheel Hornet- Key Ignition & Voltmeter",
+      "4x Scooter Brake Pads",
+      "Scooter Rear Brake Line Cable"
     ]
   },
   {
@@ -13573,20 +12938,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Turbowheel- Dashboard/Throttle Unit", "url": "turbowheel-dashboard-throttle-unit", "price": 65 },
-      {
-        "name": "Turbowheel Hornet- Rear Fender/Mud-guard",
-        "url": "turbowheel-hornet-rear-fender-mud-guard",
-        "price": 32
-      },
-      { "name": "Turbowheel Dart- LED Strips", "url": "turbowheel-dart-led-strips", "price": 26 },
-      {
-        "name": "Turbowheel Dart- Front Fender/Mud-guard",
-        "url": "turbowheel-dart-front-fender-mud-guard",
-        "price": 23
-      }
-    ],
     "price": 27,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-hornet-front-fender-mud-guard",
@@ -13595,6 +12946,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel- Dashboard/Throttle Unit",
+      "Turbowheel Hornet- Rear Fender/Mud-guard",
+      "Turbowheel Dart- LED Strips",
+      "Turbowheel Dart- Front Fender/Mud-guard"
     ]
   },
   {
@@ -13649,16 +13006,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Turbowheel Dart- Front Cover Panel", "url": "turbowheel-dart-front-cover-panel", "price": 26 },
-      {
-        "name": "Turbowheel Dart- Front Fender/Mud-guard",
-        "url": "turbowheel-dart-front-fender-mud-guard",
-        "price": 23
-      },
-      { "name": "Turbowheel- Dashboard/Throttle Unit", "url": "turbowheel-dashboard-throttle-unit", "price": 65 },
-      { "name": "Scooter Rear Brake Line Cable", "url": "mini-4-rear-brake-line-cable", "price": 19 }
-    ],
     "price": 45,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-hornet-key-ignition-voltmeter",
@@ -13667,6 +13014,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Dart- Front Cover Panel",
+      "Turbowheel Dart- Front Fender/Mud-guard",
+      "Turbowheel- Dashboard/Throttle Unit",
+      "Scooter Rear Brake Line Cable"
     ]
   },
   {
@@ -13720,12 +13073,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Turbowheel Hornet- Brake Lever", "url": "turbowheel-hornet-brake-lever", "price": 39 },
-      { "name": "Turbowheel Dart- Brake Lever Set", "url": "turbowheel-dart-brake-lever-set", "price": 36 },
-      { "name": "Scooter Rear Brake Line Cable", "url": "mini-4-rear-brake-line-cable", "price": 19 },
-      { "name": "4x Scooter Brake Pads", "url": "scooter-brake-pads", "price": 16 }
-    ],
     "price": 32,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "turbowheel-hornet-rear-fender-mud-guard",
@@ -13734,6 +13081,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Turbowheel Hornet- Brake Lever",
+      "Turbowheel Dart- Brake Lever Set",
+      "Scooter Rear Brake Line Cable",
+      "4x Scooter Brake Pads"
     ]
   },
   {
@@ -13778,16 +13131,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: 480Wh Removeable Battery Pack", "url": "v8-480wh-removeable-battery-pack", "price": 385 },
-      { "name": "Solowheel Glide 3, 480Wh Battery/800W Motor", "url": "inmotion-v8", "price": 899 },
-      { "name": "Electric Scooter: Tire 8”x 2”", "url": "l6-8-front-tire", "price": 31 },
-      {
-        "name": "12” x 9” Piece of Jessup Skate Grip Tape",
-        "url": "12-x-9-piece-of-jessup-skate-grip-tape",
-        "price": 15
-      }
-    ],
     "price": 36,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3pro-14-tire",
@@ -13796,6 +13139,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 15, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: 480Wh Removeable Battery Pack",
+      "Solowheel Glide 3, 480Wh Battery/800W Motor",
+      "Electric Scooter: Tire 8”x 2”",
+      "12” x 9” Piece of Jessup Skate Grip Tape"
     ]
   },
   {
@@ -13838,12 +13187,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 },
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 },
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 },
-      { "name": "V8: 800W Motor", "url": "v8-replacement-motor", "price": 165 }
-    ],
     "price": 265,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3pro-battery-pack-144wh",
@@ -13852,6 +13195,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5F: Set of Outer Shells, White",
+      "L6/Lively: Standing Mat",
+      "V3S: Replacement Control-Board",
+      "V8: 800W Motor"
     ]
   },
   {
@@ -13894,12 +13243,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 },
-      { "name": "V5F: Charger Port Flap", "url": "v5f-charger-port-flap", "price": 19 },
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 }
-    ],
     "price": 110,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3pro-control-board",
@@ -13908,6 +13251,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: Extendable Handle",
+      "V5F: Charger Port Flap",
+      "V8: Pair of Structural Inner/shells",
+      "V8/Glide 3: Protective Cover"
     ]
   },
   {
@@ -13948,16 +13297,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Speedway Mini4 Seat Kit", "url": "speedway-mini4-seat-kit", "price": 125 },
-      { "name": "Tire: 14” x 2.125”, Kenda", "url": "king-song-14-tire-inner-tube", "price": 36 },
-      { "name": "Inner-tube: 18” x 2.5”, Kenda", "url": "18-innertube-for-msuper-ks18", "price": 27 },
-      {
-        "name": "12” x 9” Piece of Jessup Skate Grip Tape",
-        "url": "12-x-9-piece-of-jessup-skate-grip-tape",
-        "price": 15
-      }
-    ],
     "price": 22,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3pro-innertube",
@@ -13966,6 +13305,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 6, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Speedway Mini4 Seat Kit",
+      "Tire: 14” x 2.125”, Kenda",
+      "Inner-tube: 18” x 2.5”, Kenda",
+      "12” x 9” Piece of Jessup Skate Grip Tape"
     ]
   },
   {
@@ -14011,12 +13356,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3Pro: Replacement Control-Board", "url": "v3pro-control-board", "price": 110 },
-      { "name": "V8: Rear LED Light", "url": "v8-rear-led-light", "price": 17 },
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 },
-      { "name": "V5F/V5F+: Replacement Control-board", "url": "v5fv5f-control-board", "price": 150 }
-    ],
     "price": 26,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3pro-v3s-charging-slot-panel",
@@ -14025,6 +13364,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3Pro: Replacement Control-Board",
+      "V8: Rear LED Light",
+      "V3S: Replacement Control-Board",
+      "V5F/V5F+: Replacement Control-board"
     ]
   },
   {
@@ -14071,12 +13416,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 },
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 },
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 }
-    ],
     "price": 56,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3prov3s-replacement-set-of-pedals",
@@ -14085,6 +13424,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3S: Replacement Control-Board",
+      "V5F: Set of Outer Shells, White",
+      "L6/Lively: Standing Mat",
+      "V8/Glide 3: Protective Cover"
     ]
   },
   {
@@ -14131,12 +13476,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 },
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "V3Pro: Replacement Control-Board", "url": "v3pro-control-board", "price": 110 },
-      { "name": "L6: Front Spring Set", "url": "l6-scooter-front-spring-set", "price": 34 }
-    ],
     "price": 35,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3prov3s-replacement-touch-panel",
@@ -14145,6 +13484,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 6, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Kickstand",
+      "V5F: Set of Outer Shells, Black",
+      "V3Pro: Replacement Control-Board",
+      "L6: Front Spring Set"
     ]
   },
   {
@@ -14187,12 +13532,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3Pro: Set of Pads", "url": "v3prov3s-set-pads", "price": 39 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 },
-      { "name": "V3Pro: Charging Slot & Panel", "url": "v3pro-v3s-charging-slot-panel", "price": 26 },
-      { "name": "V5/V8: Front LED Headlight", "url": "v5-v8-front-led-headlight", "price": 16 }
-    ],
     "price": 24,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3prov3s-resting-bumpers",
@@ -14201,6 +13540,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3Pro: Set of Pads",
+      "L6/Lively: Replacement Control-Board",
+      "V3Pro: Charging Slot & Panel",
+      "V5/V8: Front LED Headlight"
     ]
   },
   {
@@ -14243,12 +13588,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3Pro: 144Wh Replacement Battery Pack", "url": "v3pro-battery-pack-144wh", "price": 265 },
-      { "name": "V8: Rear LED Light", "url": "v8-rear-led-light", "price": 17 },
-      { "name": "Electric Scooter: Inner-tube 8”x 2”", "url": "l6-8-innertube", "price": 12 },
-      { "name": "V3Pro: Replacement Control-Board", "url": "v3pro-control-board", "price": 110 }
-    ],
     "price": 39,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3prov3s-set-pads",
@@ -14257,6 +13596,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3Pro: 144Wh Replacement Battery Pack",
+      "V8: Rear LED Light",
+      "Electric Scooter: Inner-tube 8”x 2”",
+      "V3Pro: Replacement Control-Board"
     ]
   },
   {
@@ -14299,12 +13644,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5/V8: Front LED Headlight", "url": "v5-v8-front-led-headlight", "price": 16 },
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 },
-      { "name": "V8: Rear LED Light", "url": "v8-rear-led-light", "price": 17 },
-      { "name": "V3Pro: Replacement Control-Board", "url": "v3pro-control-board", "price": 110 }
-    ],
     "price": 125,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v3s-control-board",
@@ -14313,6 +13652,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5/V8: Front LED Headlight",
+      "V8: Extendable Handle",
+      "V8: Rear LED Light",
+      "V3Pro: Replacement Control-Board"
     ]
   },
   {
@@ -14353,12 +13698,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6: Front Spring Set", "url": "l6-scooter-front-spring-set", "price": 34 },
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 },
-      { "name": "V3Pro: 144Wh Replacement Battery Pack", "url": "v3pro-battery-pack-144wh", "price": 265 },
-      { "name": "V3Pro: Resting Bumpers", "url": "v3prov3s-resting-bumpers", "price": 24 }
-    ],
     "price": 16,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5-v8-front-led-headlight",
@@ -14367,6 +13706,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6: Front Spring Set",
+      "L6/Lively: Kickstand",
+      "V3Pro: 144Wh Replacement Battery Pack",
+      "V3Pro: Resting Bumpers"
     ]
   },
   {
@@ -14407,12 +13752,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 },
-      { "name": "V8: Rear LED Light", "url": "v8-rear-led-light", "price": 17 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "V8: Charger Port Flap", "url": "v8-charger-port-flap", "price": 19 }
-    ],
     "price": 19,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-charger-port-flap",
@@ -14421,6 +13760,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3S: Replacement Control-Board",
+      "V8: Rear LED Light",
+      "V8/Glide 3: Protective Cover",
+      "V8: Charger Port Flap"
     ]
   },
   {
@@ -14468,12 +13813,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 },
-      { "name": "V3Pro: Replacement Control-Board", "url": "v3pro-control-board", "price": 110 },
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 }
-    ],
     "price": 36,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-frontrear-color-strips",
@@ -14482,6 +13821,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 6, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8/Glide 3: Protective Cover",
+      "V5F: Set of Outer Shells, White",
+      "V3Pro: Replacement Control-Board",
+      "L6/Lively: Standing Mat"
     ]
   },
   {
@@ -14528,12 +13873,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Tire: 16” x 1.95″ Kenda for V8/Glide 3", "url": "tire-16-x-1-95-kenda-for-v8", "price": 35 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "Tire: 14” x 1.5 Tire, for V3Pro", "url": "v3pro-14-tire", "price": 41.5 }
-    ],
     "price": 58,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-handle-kit",
@@ -14542,6 +13881,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Tire: 16” x 1.95″ Kenda for V8/Glide 3",
+      "V8/Glide 3: Protective Cover",
+      "Tire: 18” x 2.5”, Kenda",
+      "Tire: 14” x 1.5 Tire, for V3Pro"
     ]
   },
   {
@@ -14593,12 +13938,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 },
-      { "name": "L6: Rear Spring Set", "url": "l6-scooter-rear-spring-set", "price": 34 },
-      { "name": "V8: Pair of Outer Shells", "url": "v8-pair-of-outer-shells", "price": 95 },
-      { "name": "V5F/V5F+: Replacement Control-board", "url": "v5fv5f-control-board", "price": 150 }
-    ],
     "price": 42,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-set-of-center-plastic-panel-bits",
@@ -14607,6 +13946,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 6, "width": 6, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Standing Mat",
+      "L6: Rear Spring Set",
+      "V8: Pair of Outer Shells",
+      "V5F/V5F+: Replacement Control-board"
     ]
   },
   {
@@ -14653,12 +13998,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6: Front Spring Set", "url": "l6-scooter-front-spring-set", "price": 34 },
-      { "name": "V3Pro: Resting Bumpers", "url": "v3prov3s-resting-bumpers", "price": 24 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 }
-    ],
     "price": 70,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-set-of-outer-shells",
@@ -14667,6 +14006,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 3, "height": 20 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6: Front Spring Set",
+      "V3Pro: Resting Bumpers",
+      "V5F/+ Handle Kit",
+      "V8/Glide 3: Protective Cover"
     ]
   },
   {
@@ -14715,12 +14060,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6: Rear Spring Set", "url": "l6-scooter-rear-spring-set", "price": 34 },
-      { "name": "V5F: Charger Port Flap", "url": "v5f-charger-port-flap", "price": 19 },
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 },
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 }
-    ],
     "price": 49,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-set-of-pedals-white",
@@ -14729,6 +14068,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6: Rear Spring Set",
+      "V5F: Charger Port Flap",
+      "L6/Lively: Kickstand",
+      "L6/Lively: Standing Mat"
     ]
   },
   {
@@ -14775,12 +14120,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "V8: Rear LED Light", "url": "v8-rear-led-light", "price": 17 },
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 }
-    ],
     "price": 20,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-upper-side-padding",
@@ -14789,6 +14128,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 5, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Standing Mat",
+      "V8/Glide 3: Protective Cover",
+      "V8: Rear LED Light",
+      "L6/Lively: Kickstand"
     ]
   },
   {
@@ -14838,12 +14183,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5F/V5F+: Replacement Control-board", "url": "v5fv5f-control-board", "price": 150 },
-      { "name": "V3Pro: Replacement Control-Board", "url": "v3pro-control-board", "price": 110 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 }
-    ],
     "price": 57,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-v3pro-v3s-84-2v-1-5a-standard-charger",
@@ -14852,6 +14191,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 2, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5F/V5F+: Replacement Control-board",
+      "V3Pro: Replacement Control-Board",
+      "V5F/+ Handle Kit",
+      "L6/Lively: Replacement Control-Board"
     ]
   },
   {
@@ -14897,12 +14242,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 },
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 },
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 }
-    ],
     "price": 18,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-v8-control-board-cover",
@@ -14911,6 +14250,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 5 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5F: Set of Outer Shells, White",
+      "V3S: Replacement Control-Board",
+      "V8: Extendable Handle",
+      "V5F/+ Handle Kit"
     ]
   },
   {
@@ -14959,12 +14304,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 },
-      { "name": "L6: Front Spring Set", "url": "l6-scooter-front-spring-set", "price": 34 },
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 }
-    ],
     "price": 49,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5f-v8set-of-pedals-black",
@@ -14973,6 +14312,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: Extendable Handle",
+      "L6/Lively: Replacement Control-Board",
+      "L6: Front Spring Set",
+      "V8: Pair of Structural Inner/shells"
     ]
   },
   {
@@ -15019,12 +14364,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Tire: 16” x 2.125”, Kenda", "url": "king-song-16-kenda-tire", "price": 35 },
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "Solowheel Glide 3, 480Wh Battery/800W Motor", "url": "inmotion-v8", "price": 899 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 }
-    ],
     "price": 150,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5fv5f-control-board",
@@ -15033,6 +14372,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Tire: 16” x 2.125”, Kenda",
+      "Tire: 18” x 2.5”, Kenda",
+      "Solowheel Glide 3, 480Wh Battery/800W Motor",
+      "V5F/+ Handle Kit"
     ]
   },
   {
@@ -15081,12 +14426,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 },
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "V5/V8: Front LED Headlight", "url": "v5-v8-front-led-headlight", "price": 16 }
-    ],
     "price": 20,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v5fv8-pedal-grip-replacements",
@@ -15095,6 +14434,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 6, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: Pair of Structural Inner/shells",
+      "V5F: Set of Outer Shells, Black",
+      "V8/Glide 3: Protective Cover",
+      "V5/V8: Front LED Headlight"
     ]
   },
   {
@@ -15147,12 +14492,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "Tire: 18” x 2.5”, Kenda", "url": "18-kenda-tire", "price": 59 },
-      { "name": "L6: Rear Spring Set", "url": "l6-scooter-rear-spring-set", "price": 34 },
-      { "name": "King Song 16X Seat", "url": "king-song-16x-seat", "price": 75 },
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 }
-    ],
     "price": 385,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-480wh-removeable-battery-pack",
@@ -15161,6 +14500,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 6, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 10, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "Tire: 18” x 2.5”, Kenda",
+      "L6: Rear Spring Set",
+      "King Song 16X Seat",
+      "V8: Pair of Structural Inner/shells"
     ]
   },
   {
@@ -15201,12 +14546,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: 800W Motor", "url": "v8-replacement-motor", "price": 165 },
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 },
-      { "name": "V5F/V5F+: Replacement Control-board", "url": "v5fv5f-control-board", "price": 150 },
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 }
-    ],
     "price": 19,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-charger-port-flap",
@@ -15215,6 +14554,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: 800W Motor",
+      "V5F: Set of Outer Shells, White",
+      "V5F/V5F+: Replacement Control-board",
+      "V8: Extendable Handle"
     ]
   },
   {
@@ -15259,12 +14604,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Standing Mat", "url": "l6-standing-mat", "price": 43 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 },
-      { "name": "V8: Pair of Outer Shells", "url": "v8-pair-of-outer-shells", "price": 95 },
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 }
-    ],
     "price": 165,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-control-board",
@@ -15273,6 +14612,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Standing Mat",
+      "V5F/+ Handle Kit",
+      "V8: Pair of Outer Shells",
+      "V3S: Replacement Control-Board"
     ]
   },
   {
@@ -15313,12 +14658,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "V8: Charger Port Flap", "url": "v8-charger-port-flap", "price": 19 },
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 },
-      { "name": "V3Pro: 144Wh Replacement Battery Pack", "url": "v3pro-battery-pack-144wh", "price": 265 }
-    ],
     "price": 52,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-extendable-handle",
@@ -15327,6 +14666,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 6, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5F: Set of Outer Shells, Black",
+      "V8: Charger Port Flap",
+      "V5F: Set of Outer Shells, White",
+      "V3Pro: 144Wh Replacement Battery Pack"
     ]
   },
   {
@@ -15371,12 +14716,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3Pro: Resting Bumpers", "url": "v3prov3s-resting-bumpers", "price": 24 },
-      { "name": "V8: Pair of Outer Shells", "url": "v8-pair-of-outer-shells", "price": 95 },
-      { "name": "V3Pro: Set of Pads", "url": "v3prov3s-set-pads", "price": 39 },
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 }
-    ],
     "price": 89,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-pair-innershells",
@@ -15385,6 +14724,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 18, "height": 6 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3Pro: Resting Bumpers",
+      "V8: Pair of Outer Shells",
+      "V3Pro: Set of Pads",
+      "L6/Lively: Kickstand"
     ]
   },
   {
@@ -15431,12 +14776,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 },
-      { "name": "L6: Front Spring Set", "url": "l6-scooter-front-spring-set", "price": 34 },
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "V8: Charger Port Flap", "url": "v8-charger-port-flap", "price": 19 }
-    ],
     "price": 95,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-pair-of-outer-shells",
@@ -15445,6 +14784,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 18, "height": 4 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3S: Replacement Control-Board",
+      "L6: Front Spring Set",
+      "V5F: Set of Outer Shells, Black",
+      "V8: Charger Port Flap"
     ]
   },
   {
@@ -15490,12 +14835,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Kickstand", "url": "l6-kickstand", "price": 26 },
-      { "name": "V5F: Set of Outer Shells, White", "url": "v5f-set-of-outer-shells", "price": 70 },
-      { "name": "V5F: Charger Port Flap", "url": "v5f-charger-port-flap", "price": 19 },
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 }
-    ],
     "price": 67,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-protective-cover",
@@ -15504,6 +14843,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Kickstand",
+      "V5F: Set of Outer Shells, White",
+      "V5F: Charger Port Flap",
+      "V8: Extendable Handle"
     ]
   },
   {
@@ -15544,12 +14889,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: Pair of Outer Shells", "url": "v8-pair-of-outer-shells", "price": 95 },
-      { "name": "V5F: Charger Port Flap", "url": "v5f-charger-port-flap", "price": 19 },
-      { "name": "V3Pro: Resting Bumpers", "url": "v3prov3s-resting-bumpers", "price": 24 },
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 }
-    ],
     "price": 17,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-rear-led-light",
@@ -15558,6 +14897,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: Pair of Outer Shells",
+      "V5F: Charger Port Flap",
+      "V3Pro: Resting Bumpers",
+      "V8: Pair of Structural Inner/shells"
     ]
   },
   {
@@ -15603,12 +14948,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 },
-      { "name": "L6: Rear Spring Set", "url": "l6-scooter-rear-spring-set", "price": 34 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 },
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 }
-    ],
     "price": 19,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-replacement-charging-port-wire",
@@ -15617,6 +14956,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 2 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "L6/Lively: Replacement Control-Board",
+      "L6: Rear Spring Set",
+      "V5F/+ Handle Kit",
+      "V8: Pair of Structural Inner/shells"
     ]
   },
   {
@@ -15659,12 +15004,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V8: Pair of Structural Inner/shells", "url": "v8-pair-innershells", "price": 89 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "V5F/+ Handle Kit", "url": "v5f-handle-kit", "price": 58 },
-      { "name": "L6/Lively: Replacement Control-Board", "url": "l8-control-board", "price": 99 }
-    ],
     "price": 165,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-replacement-motor",
@@ -15673,6 +15012,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 18, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 20, "height": 8 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V8: Pair of Structural Inner/shells",
+      "V8/Glide 3: Protective Cover",
+      "V5F/+ Handle Kit",
+      "L6/Lively: Replacement Control-Board"
     ]
   },
   {
@@ -15724,12 +15069,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V5F: Set of Outer Shells, Black", "url": "inmotion-v5f-set-outer-shells-black", "price": 70 },
-      { "name": "Electric Scooter: Inner-tube 8”x 2”", "url": "l6-8-innertube", "price": 12 },
-      { "name": "L6: Front Spring Set", "url": "l6-scooter-front-spring-set", "price": 34 },
-      { "name": "V3S: Replacement Control-Board", "url": "v3s-control-board", "price": 125 }
-    ],
     "price": 59,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-set-of-center-plastic-panel-bits",
@@ -15738,6 +15077,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 6, "height": 3 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V5F: Set of Outer Shells, Black",
+      "Electric Scooter: Inner-tube 8”x 2”",
+      "L6: Front Spring Set",
+      "V3S: Replacement Control-Board"
     ]
   },
   {
@@ -15786,12 +15131,6 @@
         ]
       }
     ],
-    "relatedProducts": [
-      { "name": "V3Pro: Set of Pads", "url": "v3prov3s-set-pads", "price": 39 },
-      { "name": "V8: Extendable Handle", "url": "v8-extendable-handle", "price": 52 },
-      { "name": "V8/Glide 3: Protective Cover", "url": "v8-protective-cover", "price": 67 },
-      { "name": "V8: Rear LED Light", "url": "v8-rear-led-light", "price": 17 }
-    ],
     "price": 17,
     "reviews": { "list": [], "summary": { "summary": "", "reviewsAmount": 0 } },
     "url": "v8-v5f-speaker",
@@ -15800,6 +15139,12 @@
     "technicalSpecs": [
       { "heading": "weight", "data": 0.3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
+    ],
+    "relatedProductsNames": [
+      "V3Pro: Set of Pads",
+      "V8: Extendable Handle",
+      "V8/Glide 3: Protective Cover",
+      "V8: Rear LED Light"
     ]
   }
 ]

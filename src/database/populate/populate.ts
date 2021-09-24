@@ -4,20 +4,20 @@
 // -products=trialProducts.json categoryGroups=categoryGroups.json singleProduct cleanAll
 
 import getLogger from '../../../utils/logger';
-import { connect, model, connection } from 'mongoose';
-import productSchema, { IProduct } from '../schemas/product';
-import { TGenericModel } from '../models/models-index';
+import { connect, connection } from 'mongoose';
+import { IProduct } from '../models/_product';
+import getModel, { TGenericModel } from '../models/models-index';
 import * as dotenv from 'dotenv';
 
 // @ts-ignore
 const envVar = dotenv.default.config({ path: '../../../.env' }); // ../
-
 const logger = getLogger(module.filename);
-
 const PARAMS: { CLEAN_ALL: string; PRODUCTS_JSON_FILE_PATH: string } = Object.freeze({
   CLEAN_ALL: 'cleanAll',
   PRODUCTS_JSON_FILE_PATH: 'productsJSONFilePath=',
 });
+
+let relatedProductsErrors = 0;
 
 // TODO: move to product or category schema
 // const CATEGORY_TO_SPEC_MAP: { [key: string]: Record<string, [number, number]> } = Object.freeze({
@@ -58,7 +58,7 @@ if (!getScriptParamValue(PARAMS.PRODUCTS_JSON_FILE_PATH)) {
 (async () => {
   await connectToDB();
 
-  const Product: TGenericModel = getProductModel();
+  const Product: TGenericModel = getModel('Product');
 
   if (getScriptParamValue(PARAMS.CLEAN_ALL)) {
     const removedProducts = await Product.deleteMany({});
@@ -67,10 +67,14 @@ if (!getScriptParamValue(PARAMS.PRODUCTS_JSON_FILE_PATH)) {
 
   const sourceDataList = getSourceData() as TPopulatedData[];
   await populateProducts(Product, sourceDataList);
+  await updateRelatedProductsNames(Product, sourceDataList);
 
-  logger.log('Products amount after population:', await Product.find({}).countDocuments());
-
-  await assignIDsToRelatedProducts(Product);
+  logger.log(
+    'Products amount after population:',
+    await Product.find({}).countDocuments(),
+    ' /relatedProductsErrors:',
+    relatedProductsErrors
+  );
 
   await connection.close();
 })();
@@ -82,10 +86,6 @@ function connectToDB(): ReturnType<typeof connect> {
   });
 }
 
-function getProductModel(): TGenericModel {
-  return model('Product', productSchema);
-}
-
 function getSourceData(): TPopulatedData[] | ReferenceError {
   const sourceDataPath: string = getScriptParamValue(PARAMS.PRODUCTS_JSON_FILE_PATH);
 
@@ -93,15 +93,17 @@ function getSourceData(): TPopulatedData[] | ReferenceError {
     throw ReferenceError(`Path to data was not provided! You must pass "${PARAMS.PRODUCTS_JSON_FILE_PATH}" parameter.`);
   }
 
-  const sourceDataFiles = /* eslint-disable-line  @typescript-eslint/no-var-requires */ require(sourceDataPath);
-  // logger.log('Got sourceDataList from sourceDataPath:', sourceDataPath);
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const sourceDataFiles = require(sourceDataPath);
 
   if (Array.isArray(sourceDataFiles)) {
     return sourceDataFiles;
   }
 
   try {
-    return JSON.parse(sourceDataFiles);
+    const parsedSourceDataFiles = JSON.parse(sourceDataFiles);
+
+    return Array.isArray(parsedSourceDataFiles) ? parsedSourceDataFiles : [parsedSourceDataFiles];
   } catch (parseError) {
     logger.error('parseError:', parseError, ' for data taken from sourceDataPath:', sourceDataPath);
 
@@ -109,16 +111,12 @@ function getSourceData(): TPopulatedData[] | ReferenceError {
   }
 }
 
-function populateProducts(ProductModel: TGenericModel, sourceDataList: TPopulatedData[]) {
-  if (!Array.isArray(sourceDataList)) {
-    sourceDataList = [sourceDataList];
-  }
-
+function populateProducts(ProductModel: TGenericModel, sourceDataList: TPopulatedData[]): Promise<IProduct[]> {
   return Promise.all(
-    sourceDataList.map((data: any, index: number) => {
+    sourceDataList.map((data: TPopulatedData) => {
       const product = new ProductModel(data) as IProduct;
+      product.set('relatedProductsNames', undefined);
 
-      // @ts-ignore
       return product.save().catch((err) => {
         logger.error('save err:', err, ' /data:', data);
 
@@ -128,40 +126,21 @@ function populateProducts(ProductModel: TGenericModel, sourceDataList: TPopulate
   );
 }
 
-async function assignIDsToRelatedProducts(Product: TGenericModel) {
-  const productsHavingRelatedProducts = Product.find({ relatedProducts: { $ne: [] } });
-
-  for await (const withRelated of productsHavingRelatedProducts) {
-    // @ts-ignore
-    for (const relatedProductToUpdate of withRelated.relatedProducts) {
-      const relatedProduct = await Product.findOne(
-        { url: relatedProductToUpdate.url, name: relatedProductToUpdate.name },
-        ['url', '_id']
-      );
-
-      if (relatedProduct) {
-        await Product.updateMany(
-          // @ts-ignore
-          { 'relatedProducts.url': relatedProduct.url },
-          // @ts-ignore
-          { $set: { 'relatedProducts.$.id': relatedProduct._id } }
-        );
-      }
-    }
-  }
-
-  const amountOfAllProducts = await Product.find({}).countDocuments();
-  const amountOfRelatedProductsWithID = await Product.find({
-    'relatedProducts.id': { $exists: true },
-  }).countDocuments();
-
-  logger.log(
-    'All done?:',
-    amountOfAllProducts === amountOfRelatedProductsWithID,
-    ' /amountOfAllProducts:',
-    amountOfAllProducts,
-    ' /amountOfRelatedProductsWithID:',
-    amountOfRelatedProductsWithID
+function updateRelatedProductsNames(
+  ProductModel: TGenericModel,
+  sourceDataList: TPopulatedData[]
+): Promise<Array<IProduct | void>> {
+  return Promise.all(
+    sourceDataList.map((data: TPopulatedData) => {
+      return ProductModel.updateOne(
+        { name: data.name },
+        { relatedProductsNames: data.relatedProductsNames },
+        { runValidators: true }
+      ).catch((error) => {
+        logger.error(error);
+        relatedProductsErrors++;
+      });
+    })
   );
 }
 
