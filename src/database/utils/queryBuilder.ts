@@ -1,3 +1,7 @@
+import getLogger from '../../../utils/logger';
+
+const logger = getLogger(module.filename);
+
 const isEmptyQueryObject = (query: Record<string, unknown>): boolean => {
   return typeof query === 'object' && !Object.keys(query).length;
 };
@@ -25,6 +29,21 @@ const getIdListConfig = (reqQuery: TIdListReq): { _id: { $in: string[] } } | nul
   if (typeof reqQuery.idList === 'string') {
     const commaSplitIdList = reqQuery.idList.split(',');
     return { _id: { $in: commaSplitIdList } };
+  }
+
+  return null;
+};
+
+const getNameListConfig = (reqQuery: TNameListReq): { name: { $in: string[] } } | null => {
+  if (typeof reqQuery.nameList === 'string') {
+    try {
+      const commaSplitIdList = JSON.parse(reqQuery.nameList);
+      return { name: { $in: commaSplitIdList } };
+    } catch (parseException) {
+      logger.error('(getNameListConfig) parseException:', parseException);
+
+      return null;
+    }
   }
 
   return null;
@@ -139,6 +158,7 @@ getFilters.mapQuery = (filter: string): [TFilterQueryHeading, TFilterQueryData] 
 
 export type TPageLimit = { page: number; limit: number };
 export type TIdListReq = { idList: string };
+export type TNameListReq = { nameList: string };
 export type TProductsCategoriesReq = { productCategories: string };
 export type TProductNameReq = { name: string; caseSensitive: string | boolean };
 export type TProductFiltersReq = { productsFilters: string };
@@ -148,6 +168,7 @@ export {
   getSearchByNameConfig,
   getPaginationConfig,
   getIdListConfig,
+  getNameListConfig,
   getProductsWithChosenCategories,
   getFilters,
 };

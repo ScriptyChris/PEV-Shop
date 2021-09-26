@@ -124,6 +124,15 @@ const apiService = new (class ApiService extends Ajax {
     return this.getRequest(`${this.PRODUCTS_URL}?idList=${idList}`);
   }
 
+  getProductsByNames(nameList) {
+    const searchParams = new URLSearchParams({ nameList: JSON.stringify(nameList) });
+
+    return this.getRequest({
+      url: this.PRODUCTS_URL,
+      searchParams,
+    });
+  }
+
   getProductsByName(name, caseSensitive = 'false', pagination) {
     const searchParams = new URLSearchParams();
     searchParams.append('name', name);

@@ -1,5 +1,3 @@
-//db.getCollection('products').find({},{_id:0, __v:0, technicalSpecs: 0, 'relatedProducts.id': 0, 'reviews._id': 0}).toArray()
-
 // cross-env TS_NODE_PROJECT=../../../tsconfig.backend.json node --inspect-brk -r ts-node/register populate.ts -
 // -products=trialProducts.json categoryGroups=categoryGroups.json singleProduct cleanAll
 

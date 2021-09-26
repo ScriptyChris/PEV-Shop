@@ -18,7 +18,7 @@ const translations = {
   addNewSpec: 'Add new spec',
   confirm: 'Confirm',
   save: 'Save',
-  relatedProducts: 'Related products',
+  relatedProductsNames: 'Related products names',
   relatedProductName: 'Product name',
   shortDescription: 'Short description',
   duplicatedDescription: 'Description item must be unique!',
@@ -243,7 +243,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
   );
 }
 
-function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
+function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([]);
 
   useEffect(() => {
@@ -254,10 +254,10 @@ function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
     (props) => (
       <SearchSingleProductByName
         {...props}
-        list="foundRelatedProducts"
+        list="foundRelatedProductsNames"
         debounceTimeMs={200}
         label={translations.relatedProductName}
-        searchingTarget="relatedProducts"
+        searchingTarget="relatedProductsNames"
         ignoredProductNames={relatedProductNamesList.filter(
           (productName) => productName && props.presetValue !== productName
         )}
@@ -276,7 +276,7 @@ function RelatedProducts({ field: formikField, form: { setFieldValue } }) {
 
   return (
     <fieldset className="new-product">
-      <legend>{translations.relatedProducts}</legend>
+      <legend>{translations.relatedProductsNames}</legend>
 
       <FlexibleList
         newItemComponent={(listFeatures) => <BoundSearchSingleProductByName listFeatures={listFeatures} />}
@@ -306,7 +306,7 @@ export default function NewProduct() {
     price: '',
     shortDescription: '',
     category: '',
-    relatedProducts: '',
+    relatedProductsNames: '',
   });
   const ORIGINAL_FORM_INITIALS_KEYS = useMemo(() => Object.keys(formInitials), []);
   const getSpecsForSelectedCategory = useCallback((selectedCategoryName) => {
@@ -390,10 +390,19 @@ export default function NewProduct() {
         return obj;
       }, Object.create(null));
 
-    return {
+    const normalizedValues = {
       ...Object.fromEntries(entriesWithNaturalKeys),
       ...nestedEntries,
     };
+    normalizedValues.technicalSpecs = Object.entries(normalizedValues.technicalSpecs).map(
+      ([key, { value, defaultUnit }]) => ({
+        heading: key,
+        data: value,
+        defaultUnit,
+      })
+    );
+
+    return normalizedValues;
   };
   normalizeSubmittedValues.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
     const currentLevelKey = nestLevelKeys[currentLevel];
@@ -483,7 +492,7 @@ export default function NewProduct() {
             <Field name="shortDescription" component={ShortDescription} />
             <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
             <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
-            <Field name="relatedProducts" component={RelatedProducts} />
+            <Field name="relatedProductsNames" component={RelatedProductsNames} />
 
             <button
               type="submit"

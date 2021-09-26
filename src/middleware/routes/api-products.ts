@@ -5,6 +5,7 @@ import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../fea
 import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../database/database-index';
 import {
   TIdListReq,
+  TNameListReq,
   TPageLimit,
   TProductFiltersReq,
   TProductNameReq,
@@ -63,7 +64,9 @@ async function getProductsSpecs(req: Request, res: Response) {
 }
 
 async function getProducts(
-  req: Request & { query: TIdListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq & TProductFiltersReq },
+  req: Request & {
+    query: TIdListReq & TNameListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq & TProductFiltersReq;
+  },
   res: Response
 ): Promise<void> {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
@@ -72,6 +75,7 @@ async function getProducts(
 
     // TODO: ... and really refactor this!
     const idListConfig = queryBuilder.getIdListConfig(req.query);
+    const nameListConfig = queryBuilder.getNameListConfig(req.query);
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const filters = queryBuilder.getFilters(req.query);
@@ -81,6 +85,8 @@ async function getProducts(
 
     if (idListConfig) {
       query = idListConfig;
+    } else if (nameListConfig) {
+      query = nameListConfig;
     } else if (chosenCategories) {
       query = chosenCategories;
     } else if (searchByName) {

@@ -83,23 +83,6 @@ const productSchema: mongooseModule.Schema = new Schema({
   technicalSpecs: {
     type: [technicalSpecs],
     required: true,
-    set(technicalSpecsValue: any) {
-      const entries: Array<[string, { value: any; defaultUnit?: string }]> = Object.entries(technicalSpecsValue);
-      const output = entries.map(([key, data]) => {
-        const obj: { heading: string; data: typeof data; defaultUnit?: string } = {
-          heading: key,
-          data: data.value,
-        };
-
-        if (data.defaultUnit) {
-          obj.defaultUnit = data.defaultUnit;
-        }
-
-        return obj;
-      });
-
-      return output;
-    },
   },
   images: {
     // TODO: include different kinds, like Main and Others
