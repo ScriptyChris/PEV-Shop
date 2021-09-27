@@ -22,6 +22,7 @@ const translations = {
   relatedProductName: 'Product name',
   shortDescription: 'Short description',
   duplicatedDescription: 'Description item must be unique!',
+  lackOfData: 'No data!',
   emptyCategoryError: 'Category must be selected!',
   colourIsNotTextError: 'Colour value must be a text!',
 };
@@ -41,13 +42,21 @@ const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
 });
 
-function BaseInfo({ methods: { handleChange, handleBlur } }) {
+function BaseInfo({ data: { initialData }, methods: { handleChange, handleBlur } }) {
   return (
     <fieldset>
       <legend>{translations.baseInformation}</legend>
 
       <label htmlFor="newProductName">{translations.name}</label>
-      <input id="newProductName" name="name" type="text" onChange={handleChange} onBlur={handleBlur} required />
+      <input
+        id="newProductName"
+        name="name"
+        type="text"
+        onChange={handleChange}
+        onBlur={handleBlur}
+        defaultValue={initialData.name}
+        required
+      />
 
       <label htmlFor="newProductPrice">{translations.price}</label>
       <input
@@ -58,13 +67,14 @@ function BaseInfo({ methods: { handleChange, handleBlur } }) {
         min="0.01"
         onChange={handleChange}
         onBlur={handleBlur}
+        defaultValue={initialData.price}
         required
       />
     </fieldset>
   );
 }
 
-function ShortDescription({ field: formikField, form: { setFieldValue } }) {
+function ShortDescription({ data: { initialData = {} }, field: formikField, form: { setFieldValue } }) {
   const [shortDescriptionList, setShortDescriptionList] = useState([]);
 
   useEffect(() => {
@@ -76,6 +86,7 @@ function ShortDescription({ field: formikField, form: { setFieldValue } }) {
       <legend>{translations.shortDescription}</legend>
 
       <FlexibleList
+        initialListItems={initialData[formikField.name]}
         newItemComponent={(listFeatures) => (
           <ShortDescription.InputComponent shortDescriptionList={shortDescriptionList} listFeatures={listFeatures} />
         )}
@@ -243,7 +254,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
   );
 }
 
-function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
+function RelatedProductsNames({ data: { initialData = {} }, field: formikField, form: { setFieldValue } }) {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([]);
 
   useEffect(() => {
@@ -279,6 +290,7 @@ function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
       <legend>{translations.relatedProductsNames}</legend>
 
       <FlexibleList
+        initialListItems={initialData[formikField.name]}
         newItemComponent={(listFeatures) => <BoundSearchSingleProductByName listFeatures={listFeatures} />}
         editItemComponent={(relatedProductName, index, listFeatures) => (
           <BoundSearchSingleProductByName
@@ -295,19 +307,15 @@ function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
   );
 }
 
-export default function NewProduct() {
+const ProductForm = ({ initialData }) => {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
     categoryToSpecs: null,
   });
-  const [formInitials, setFormInitials] = useState({
-    name: '',
-    price: '',
-    shortDescription: '',
-    category: '',
-    relatedProductsNames: '',
-  });
+  const [formInitials, setFormInitials] = useState(() =>
+    Object.fromEntries(ProductForm.initialFormKeys.map((key) => [key, initialData[key] || '']))
+  );
   const ORIGINAL_FORM_INITIALS_KEYS = useMemo(() => Object.keys(formInitials), []);
   const getSpecsForSelectedCategory = useCallback((selectedCategoryName) => {
     const specsFromChosenCategory = (
@@ -332,22 +340,27 @@ export default function NewProduct() {
         fieldType: FIELD_TYPE_MAP[specObj.type],
       }));
 
-      setFormInitials((prevFormInitials) => ({
-        ...prevFormInitials,
-        ...Object.fromEntries(
-          productSpecsMap.current.specs.reduce((specEntries, spec) => {
-            const names = spec.descriptions
-              ? spec.descriptions.map((description) => `${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${description}`)
-              : [spec.fieldName];
+      setFormInitials((prevFormInitials) => {
+        console.log('??? prevFormInitials:', prevFormInitials);
+        return {
+          ...prevFormInitials,
+          ...Object.fromEntries(
+            productSpecsMap.current.specs.reduce((specEntries, spec) => {
+              const names = spec.descriptions
+                ? spec.descriptions.map(
+                    (description) => `${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${description}`
+                  )
+                : [spec.fieldName];
 
-            names.forEach((name) => {
-              specEntries.push([name, '']);
-            });
+              names.forEach((name) => {
+                specEntries.push([name, '']);
+              });
 
-            return specEntries;
-          }, [])
-        ),
-      }));
+              return specEntries;
+            }, [])
+          ),
+        };
+      });
     })();
   }, []);
 
@@ -486,13 +499,24 @@ export default function NewProduct() {
           <form onSubmit={handleSubmit}>
             <h2>{translations.intro}</h2>
 
+            {JSON.stringify(formikRestProps.values)}
+
             <BaseInfo
+              data={{ initialData: formikRestProps.values }}
               methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
             />
-            <Field name="shortDescription" component={ShortDescription} />
+            <Field
+              name="shortDescription"
+              data={{ initialData: formikRestProps.values }}
+              component={ShortDescription}
+            />
             <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
             <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
-            <Field name="relatedProductsNames" component={RelatedProductsNames} />
+            <Field
+              name="relatedProductsNames"
+              data={{ initialData: formikRestProps.values }}
+              component={RelatedProductsNames}
+            />
 
             <button
               type="submit"
@@ -505,4 +529,23 @@ export default function NewProduct() {
       </Formik>
     </section>
   );
-}
+};
+ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 'relatedProductsNames'];
+
+const NewProduct = () => <ProductForm />;
+const ModifyProduct = ({ productName }) => {
+  const [productData, setProductData] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      // TODO: implement `getProductByName` method instead of (or along with) `getProduct[ById]`
+      const _productData = await apiService.getProductsByNames([productName]);
+      console.log('_productData:', _productData);
+      setProductData(_productData[0]);
+    })();
+  }, []);
+
+  return productData ? <ProductForm initialData={productData} /> : translations.lackOfData;
+};
+
+export { NewProduct, ModifyProduct };
