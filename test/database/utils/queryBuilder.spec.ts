@@ -10,11 +10,13 @@ describe('#queryBuilder', () => {
 
   beforeAll(async () => {
     ({
-      isEmptyQueryObject,
-      getPaginationConfig,
-      getIdListConfig,
-      getProductsWithChosenCategories,
-      getSearchByNameConfig,
+      queryBuilder: {
+        isEmptyQueryObject,
+        getPaginationConfig,
+        getIdListConfig,
+        getProductsWithChosenCategories,
+        getSearchByNameConfig,
+      },
     } = await import(findAssociatedSrcModulePath()));
   });
 

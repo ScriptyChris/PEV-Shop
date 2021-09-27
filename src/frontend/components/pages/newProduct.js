@@ -1,9 +1,11 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
 import { CategoriesTreeFormField } from '../views/categoriesTree';
 import FormFieldError from '../utils/formFieldError';
+import { SearchSingleProductByName } from '../views/search';
+import FlexibleList from '../utils/flexibleList';
 
 const translations = {
   intro: 'Fill new product details',
@@ -14,7 +16,12 @@ const translations = {
   name: 'Name',
   price: 'Price',
   addNewSpec: 'Add new spec',
+  confirm: 'Confirm',
   save: 'Save',
+  relatedProductsNames: 'Related products names',
+  relatedProductName: 'Product name',
+  shortDescription: 'Short description',
+  duplicatedDescription: 'Description item must be unique!',
   emptyCategoryError: 'Category must be selected!',
   colourIsNotTextError: 'Colour value must be a text!',
 };
@@ -34,7 +41,7 @@ const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
 });
 
-function NewProductBaseInfo({ methods: { handleChange, handleBlur } }) {
+function BaseInfo({ methods: { handleChange, handleBlur } }) {
   return (
     <fieldset>
       <legend>{translations.baseInformation}</legend>
@@ -57,7 +64,100 @@ function NewProductBaseInfo({ methods: { handleChange, handleBlur } }) {
   );
 }
 
-function NewProductCategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
+function ShortDescription({ field: formikField, form: { setFieldValue } }) {
+  const [shortDescriptionList, setShortDescriptionList] = useState([]);
+
+  useEffect(() => {
+    setFieldValue(formikField.name, shortDescriptionList.filter(Boolean));
+  }, [shortDescriptionList]);
+
+  return (
+    <fieldset>
+      <legend>{translations.shortDescription}</legend>
+
+      <FlexibleList
+        newItemComponent={(listFeatures) => (
+          <ShortDescription.InputComponent shortDescriptionList={shortDescriptionList} listFeatures={listFeatures} />
+        )}
+        editItemComponent={(shortDescItem, index, listFeatures) => (
+          <ShortDescription.InputComponent
+            shortDescriptionList={shortDescriptionList}
+            editedDescIndex={index}
+            presetValue={shortDescItem}
+            listFeatures={listFeatures}
+          />
+        )}
+        emitUpdatedItemsList={setShortDescriptionList}
+      />
+
+      <input {...formikField} type="hidden" />
+    </fieldset>
+  );
+}
+ShortDescription.InputComponent = function InputComponent(props) {
+  const inputRef = createRef();
+  const [isDisabled, setIsDisabled] = useState(false);
+  const updateItem = (updateValue, isEditMode) => {
+    if (isEditMode) {
+      props.listFeatures.editItem(updateValue, props.editedDescIndex);
+    } else {
+      props.listFeatures.addItem(updateValue);
+    }
+  };
+  const isEditMode = props.editedDescIndex > -1;
+  const validateInput = (value) => {
+    const isValid = !props.shortDescriptionList.some((descriptionItem) => value === descriptionItem);
+    setIsDisabled(!isValid);
+
+    return isValid;
+  };
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="text"
+        defaultValue={props.presetValue || ''}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+
+            const inputValue = event.target.value;
+
+            if (validateInput(inputValue)) {
+              updateItem(inputValue, isEditMode);
+            }
+          }
+        }}
+        onChange={({ target: { value } }) => {
+          if (isDisabled) {
+            validateInput(value);
+          }
+        }}
+        autoFocus
+        required
+      />
+
+      <button
+        type="button"
+        onClick={() => {
+          const inputValue = inputRef.current.value;
+
+          if (validateInput(inputValue)) {
+            updateItem(inputValue, isEditMode);
+          }
+        }}
+        disabled={isDisabled}
+      >
+        {translations.confirm}
+      </button>
+
+      {isDisabled && <FormFieldError>{translations.duplicatedDescription}</FormFieldError>}
+    </>
+  );
+};
+
+function CategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
   const handleCategorySelect = (selectedCategoryName) => {
     setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
   };
@@ -77,7 +177,7 @@ function NewProductCategorySelector({ methods: { setProductCurrentSpecs, getSpec
   );
 }
 
-function NewProductTechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange } }) {
+function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange } }) {
   const getSpecsFields = () => {
     return productCurrentSpecs.map((spec) => {
       const fieldIdentifier = `${spec.name
@@ -143,6 +243,58 @@ function NewProductTechnicalSpecs({ data: { productCurrentSpecs }, methods: { ha
   );
 }
 
+function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
+  const [relatedProductNamesList, setRelatedProductNamesList] = useState([]);
+
+  useEffect(() => {
+    setFieldValue(formikField.name, relatedProductNamesList.filter(Boolean));
+  }, [relatedProductNamesList]);
+
+  const BoundSearchSingleProductByName = useCallback(
+    (props) => (
+      <SearchSingleProductByName
+        {...props}
+        list="foundRelatedProductsNames"
+        debounceTimeMs={200}
+        label={translations.relatedProductName}
+        searchingTarget="relatedProductsNames"
+        ignoredProductNames={relatedProductNamesList.filter(
+          (productName) => productName && props.presetValue !== productName
+        )}
+        onSelectedProductName={(productName) => {
+          if (props.editedProductIndex > -1) {
+            props.listFeatures.editItem(productName, props.editedProductIndex);
+          } else {
+            props.listFeatures.addItem(productName);
+          }
+        }}
+        autoFocus={true}
+      />
+    ),
+    [relatedProductNamesList]
+  );
+
+  return (
+    <fieldset className="new-product">
+      <legend>{translations.relatedProductsNames}</legend>
+
+      <FlexibleList
+        newItemComponent={(listFeatures) => <BoundSearchSingleProductByName listFeatures={listFeatures} />}
+        editItemComponent={(relatedProductName, index, listFeatures) => (
+          <BoundSearchSingleProductByName
+            presetValue={relatedProductName}
+            editedProductIndex={index}
+            listFeatures={listFeatures}
+          />
+        )}
+        emitUpdatedItemsList={setRelatedProductNamesList}
+      />
+
+      <input {...formikField} type="hidden" />
+    </fieldset>
+  );
+}
+
 export default function NewProduct() {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
@@ -152,7 +304,9 @@ export default function NewProduct() {
   const [formInitials, setFormInitials] = useState({
     name: '',
     price: '',
+    shortDescription: '',
     category: '',
+    relatedProductsNames: '',
   });
   const ORIGINAL_FORM_INITIALS_KEYS = useMemo(() => Object.keys(formInitials), []);
   const getSpecsForSelectedCategory = useCallback((selectedCategoryName) => {
@@ -236,10 +390,19 @@ export default function NewProduct() {
         return obj;
       }, Object.create(null));
 
-    return {
+    const normalizedValues = {
       ...Object.fromEntries(entriesWithNaturalKeys),
       ...nestedEntries,
     };
+    normalizedValues.technicalSpecs = Object.entries(normalizedValues.technicalSpecs).map(
+      ([key, { value, defaultUnit }]) => ({
+        heading: key,
+        data: value,
+        defaultUnit,
+      })
+    );
+
+    return normalizedValues;
   };
   normalizeSubmittedValues.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
     const currentLevelKey = nestLevelKeys[currentLevel];
@@ -323,14 +486,13 @@ export default function NewProduct() {
           <form onSubmit={handleSubmit}>
             <h2>{translations.intro}</h2>
 
-            <NewProductBaseInfo
+            <BaseInfo
               methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
             />
-            <NewProductCategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
-            <NewProductTechnicalSpecs
-              data={{ productCurrentSpecs }}
-              methods={{ handleChange: formikRestProps.handleChange }}
-            />
+            <Field name="shortDescription" component={ShortDescription} />
+            <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
+            <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
+            <Field name="relatedProductsNames" component={RelatedProductsNames} />
 
             <button
               type="submit"

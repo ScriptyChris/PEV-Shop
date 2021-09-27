@@ -3,7 +3,7 @@ import { Router as IRouter, Request, Response } from 'express-serve-static-core'
 import getLogger from '../../../utils/logger';
 import { authMiddlewareFn as authMiddleware } from '../features/auth';
 import { saveToDB, getFromDB, updateOneModelInDB } from '../../database/database-index';
-import { IUserRole } from '../../database/schemas/userRole';
+import { IUserRole } from '../../database/models/_userRole';
 
 // @ts-ignore
 const { Router } = express.default;

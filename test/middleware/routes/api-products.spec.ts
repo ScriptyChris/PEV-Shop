@@ -5,12 +5,12 @@ const { Router, _router } = jest.mock('express').requireMock('express').default;
 const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMiddlewareMock } = jest
   .mock('../../../src/middleware/features/auth')
   .requireMock('../../../src/middleware/features/auth');
-const {
-  getFromDB: getFromDBMock,
-  saveToDB: saveToDBMock,
-  updateOneModelInDB: updateOneModelInDBMock,
-  queryBuilder: queryBuilderMock,
-} = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
+const { queryBuilder: queryBuilderMock } = jest
+  .mock('../../../src/database/utils/queryBuilder')
+  .requireMock('../../../src/database/utils/queryBuilder');
+const { getFromDB: getFromDBMock, saveToDB: saveToDBMock, updateOneModelInDB: updateOneModelInDBMock } = jest
+  .mock('../../../src/database/database-index')
+  .requireMock('../../../src/database/database-index');
 
 describe('#api-products', () => {
   let apiProductsRouter: any = null;
@@ -58,6 +58,7 @@ describe('#api-products', () => {
     describe('when succeeded', () => {
       beforeEach(() => {
         queryBuilderMock.getIdListConfig.mockImplementationOnce(queryBuilderMock.getIdListConfig._succeededCall);
+        queryBuilderMock.getNameListConfig.mockImplementationOnce(queryBuilderMock.getNameListConfig._succeededCall);
         queryBuilderMock.getProductsWithChosenCategories.mockImplementationOnce(
           queryBuilderMock.getProductsWithChosenCategories._succeededCall
         );

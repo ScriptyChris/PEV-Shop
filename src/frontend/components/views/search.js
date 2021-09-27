@@ -1,4 +1,4 @@
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef, createRef, useState, useEffect } from 'react';
 import apiService from '../../features/apiService';
 
 const translations = {
@@ -6,39 +6,14 @@ const translations = {
   caseSensitiveSearch: 'Is case sensitive?',
 };
 
-const SearchProductsByName = (props) => {
-  const [isCaseSensitive, setCaseSensitive] = useState(false);
-
-  // TODO: fix issue with stale isCaseSensitive value when checkbox is ticked between user types query and debounce delays reaction
-  const handleInputSearchChange = (searchValue) => {
-    const pagination = {
-      pageNumber: props.pagination.currentProductPage,
-      productsPerPage: props.pagination.currentProductsPerPageLimit,
-    };
-
-    props.onReceivedProductsByName(apiService.getProductsByName(searchValue, isCaseSensitive, pagination));
-  };
-
-  const handleCaseSensitiveChange = ({ target: { checked } }) => {
-    setCaseSensitive(checked);
-  };
-
-  return (
-    <div className="search">
-      <Search {...props} onInputChange={handleInputSearchChange} />
-      <label>
-        {translations.caseSensitiveSearch}
-        <input type="checkbox" onChange={handleCaseSensitiveChange} checked={isCaseSensitive} />
-      </label>
-    </div>
-  );
-};
-
 const Search = memo(function Search({
   label = translations.defaultLabel,
-  searchingTarget = Math.random(),
+  searchingTarget = Math.random() /* TODO: make default value more spec conforming */,
   debounceTimeMs = 0,
   onInputChange,
+  list = '',
+  presetValue = '',
+  autoFocus = false,
 }) {
   if (Number.isNaN(debounceTimeMs) || typeof debounceTimeMs !== 'number') {
     throw TypeError(`debounceTimeMs prop must be number! Received: ${debounceTimeMs}`);
@@ -46,7 +21,7 @@ const Search = memo(function Search({
     throw TypeError(`onInputChange props must be a function! ReceivedL ${onInputChange}`);
   }
 
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(presetValue);
   const debounce = useRef(-1);
   const inputId = `${searchingTarget}Search`;
 
@@ -71,9 +46,96 @@ const Search = memo(function Search({
   return (
     <div>
       <label htmlFor={inputId}>{label}</label>
-      <input onChange={handleChange} value={inputValue} id={inputId} type="search" />
+      <input
+        onChange={handleChange}
+        value={inputValue}
+        id={inputId}
+        list={list}
+        autoFocus={autoFocus}
+        type="search"
+        autoComplete="off"
+      />
     </div>
   );
 });
 
-export { Search as default, SearchProductsByName };
+function SearchProductsByName(props) {
+  const [isCaseSensitive, setCaseSensitive] = useState(false);
+
+  // TODO: fix issue with stale isCaseSensitive value when checkbox is ticked between user types query and debounce delays reaction
+  const handleInputSearchChange = async (searchValue) => {
+    const pagination = props.pagination
+      ? {
+          pageNumber: props.pagination.currentProductPage,
+          productsPerPage: props.pagination.currentProductsPerPageLimit,
+        }
+      : null;
+
+    const foundProducts = await apiService.getProductsByName(searchValue, isCaseSensitive, pagination);
+
+    props.onReceivedProductsByName(foundProducts);
+  };
+
+  const handleCaseSensitiveChange = ({ target: { checked } }) => {
+    setCaseSensitive(checked);
+  };
+
+  return (
+    <div className="search">
+      <Search {...props} onInputChange={handleInputSearchChange} />
+      <label>
+        {translations.caseSensitiveSearch}
+        <input type="checkbox" onChange={handleCaseSensitiveChange} checked={isCaseSensitive} />
+      </label>
+    </div>
+  );
+}
+
+const SearchSingleProductByName = memo(function SearchSingleProductByName(props) {
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchRecentValues, setSearchRecentValues] = useState({ oldValue: '', newValue: '' });
+  const dataListRef = createRef();
+
+  useEffect(() => {
+    (async () => {
+      if (
+        searchRecentValues.newValue &&
+        dataListRef.current.children.length === 1 &&
+        dataListRef.current.children[0].value === searchRecentValues.newValue
+      ) {
+        props.onSelectedProductName(searchRecentValues.newValue);
+      } else if (searchRecentValues.oldValue !== searchRecentValues.newValue) {
+        const { oldValue: oldSearchValue, newValue: newSearchValue } = searchRecentValues;
+        const newSearchValueContainsOld =
+          !!oldSearchValue && newSearchValue.toLowerCase().includes(oldSearchValue.toLowerCase());
+
+        setSearchRecentValues((prev) => ({ oldValue: prev.newValue, newValue: prev.newValue }));
+
+        const products = (newSearchValueContainsOld
+          ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
+          : (await apiService.getProductsByName(searchRecentValues.newValue, false, null)).map(({ name }) => name)
+        ).filter((productName) => !(props.ignoredProductNames || []).includes(productName));
+
+        setSearchResults(products);
+      }
+    })();
+  }, [dataListRef]);
+
+  const handleInputSearchChange = async (searchValue) => {
+    setSearchRecentValues((prev) => ({ oldValue: prev.newValue, newValue: searchValue }));
+  };
+
+  return (
+    <>
+      <Search {...props} onInputChange={handleInputSearchChange} />
+
+      <datalist ref={dataListRef} id={props.list}>
+        {searchResults.map((relatedProductName) => (
+          <option key={relatedProductName} value={relatedProductName}></option>
+        ))}
+      </datalist>
+    </>
+  );
+});
+
+export { SearchProductsByName, SearchSingleProductByName };

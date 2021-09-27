@@ -25,8 +25,8 @@ export function getProductDetailsHeaders() {
   }, {});
 }
 
-export function getProductDetailsData(product) {
-  const relatedProducts = apiService.getProductsById(product.relatedProducts.map((item) => item.id).toString());
+export async function getProductDetailsData(product) {
+  const relatedProducts = await apiService.getProductsByNames(product.relatedProductsNames);
 
   return {
     category: product.category,
@@ -168,7 +168,10 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
             {detailValue.map((relatedProduct, index) => {
               return (
                 <li key={`related-product-${index}`}>
-                  {/*TODO: ProductItem component in this case will not have full product info, so it has to somehow fetch it on it's own*/}
+                  {/*
+                      TODO: ProductItem component in this case will not have full product info, 
+                      so it has to somehow fetch it on it's own
+                    */}
                   <ProductItem product={relatedProduct} />
                 </li>
               );
@@ -190,14 +193,16 @@ export default function ProductDetails({ product }) {
 
   console.log('[ProductDetails] product received from navigation: ', product);
 
-  const productDetails = getProductDetailsData(product);
+  const [productDetails, setProductDetails] = useState([]);
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {
-    productDetails.relatedProducts
-      .then((relatedProducts) => {
-        if (relatedProducts.length) {
+    getProductDetailsData(product)
+      .then((productDetails) => {
+        setProductDetails(productDetails);
+
+        if (productDetails.relatedProducts?.length) {
           setRenderRelatedProducts(true);
         }
       })

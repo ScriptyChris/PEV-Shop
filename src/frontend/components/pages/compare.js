@@ -1,5 +1,5 @@
 import { toJS } from 'mobx';
-import React, { useRef, createRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, createRef, useEffect, useCallback } from 'react';
 import appStore from '../../features/appStore';
 import { getProductDetailsData, prepareSpecificProductDetail, getProductDetailsHeaders } from '../views/productDetails';
 import Scroller from '../utils/scroller';
@@ -7,29 +7,28 @@ import { ProductItemLink } from '../views/productItem';
 
 const translations = {
   productsAmount: 'produktów',
+  lackOfData: 'No data!',
 };
 
 export default function Compare() {
   const tableRef = useRef(createRef());
-  const {
-    nameHeaderIndex,
-    productDetailsHeaders,
-    productDetailsHeadersKeys,
-    comparableProductsData,
-  } = prepareComparisonData(getProductDetailsHeaders());
+  const [comparisonData, setComparisonData] = useState(null);
 
   const setTableStylingCSSVariables = () => {
-    tableRef.current.style.setProperty('--compare-rows-number', productDetailsHeadersKeys.length);
-    tableRef.current.style.setProperty('--compare-columns-number', comparableProductsData.length);
+    tableRef.current.style.setProperty('--compare-rows-number', comparisonData.productDetailsHeadersKeys.length);
+    tableRef.current.style.setProperty('--compare-columns-number', comparisonData.comparableProductsData.length);
   };
 
-  const getClassForNameHeader = useCallback((index) => {
-    return nameHeaderIndex === index ? 'compare-products--slider-control-row' : '';
-  }, []);
+  const getClassForNameHeader = useCallback(
+    (index) => {
+      return comparisonData.nameHeaderIndex === index ? 'compare-products--slider-control-row' : '';
+    },
+    [comparisonData]
+  );
 
   const getProductsAmountText = useCallback(
-    () => `${comparableProductsData.length} ${translations.productsAmount}`,
-    []
+    () => `${comparisonData.comparableProductsData.length} ${translations.productsAmount}`,
+    [comparisonData]
   );
 
   const getTableHeadContent = (headRowRefGetter) =>
@@ -42,7 +41,7 @@ export default function Compare() {
           key={`header-row-${headerIndex}`}
         >
           <span className="compare-products__cell" role="cell">
-            {headerIndex === 0 ? getProductsAmountText() : productDetailsHeaders[detailHeader]}
+            {headerIndex === 0 ? getProductsAmountText() : comparisonData.productDetailsHeaders[detailHeader]}
           </span>
         </div>
       );
@@ -57,7 +56,7 @@ export default function Compare() {
           role="row"
           key={`body-row-${headerIndex}`}
         >
-          {comparableProductsData.map((productData, dataIndex) => (
+          {comparisonData.comparableProductsData.map((productData, dataIndex) => (
             <div className="compare-products__cell" role="cell" key={`cell-${dataIndex}`}>
               {prepareSpecificProductDetail(detailHeader, productData[detailHeader])}
 
@@ -72,46 +71,64 @@ export default function Compare() {
       );
     };
 
-  useEffect(setTableStylingCSSVariables, []);
+  useEffect(() => {
+    (async () => {
+      setComparisonData(await prepareComparisonData(getProductDetailsHeaders()));
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (comparisonData) {
+      setTableStylingCSSVariables();
+    }
+  }, [comparisonData]);
 
   return (
     <section className="compare-products">
-      <div ref={tableRef} className="compare-products__table" role="table">
-        <Scroller
-          scrollerBaseValueMeta={{
-            selector: '.compare-products-candidates, .compare-products',
-            varName: '--product-list-item-width',
-          }}
-          render={({ elementRef, multipleRefsGetter }) => {
-            const { createRefGetter, REF_TYPE } = multipleRefsGetter;
-            const [headRowRefGetter, bodyRowRefGetter] = [
-              createRefGetter(REF_TYPE.HEAD),
-              createRefGetter(REF_TYPE.BODY),
-            ];
+      {comparisonData ? (
+        <div ref={tableRef} className="compare-products__table" role="table">
+          <Scroller
+            scrollerBaseValueMeta={{
+              selector: '.compare-products-candidates, .compare-products',
+              varName: '--product-list-item-width',
+            }}
+            render={({ elementRef, multipleRefsGetter }) => {
+              const { createRefGetter, REF_TYPE } = multipleRefsGetter;
+              const [headRowRefGetter, bodyRowRefGetter] = [
+                createRefGetter(REF_TYPE.HEAD),
+                createRefGetter(REF_TYPE.BODY),
+              ];
 
-            return (
-              <>
-                <div className="compare-products__head" role="rowgroup">
-                  {productDetailsHeadersKeys.map(getTableHeadContent(headRowRefGetter))}
-                </div>
-
-                <div>
-                  <div className="compare-products__body" ref={elementRef} role="rowgroup">
-                    {productDetailsHeadersKeys.map(getTableBodyContent(bodyRowRefGetter))}
+              return (
+                <>
+                  <div className="compare-products__head" role="rowgroup">
+                    {comparisonData.productDetailsHeadersKeys.map(getTableHeadContent(headRowRefGetter))}
                   </div>
-                </div>
-              </>
-            );
-          }}
-        />
-      </div>
+
+                  <div>
+                    <div className="compare-products__body" ref={elementRef} role="rowgroup">
+                      {comparisonData.productDetailsHeadersKeys.map(getTableBodyContent(bodyRowRefGetter))}
+                    </div>
+                  </div>
+                </>
+              );
+            }}
+          />
+        </div>
+      ) : (
+        translations.lackOfData
+      )}
     </section>
   );
 
-  function prepareComparisonData(productDetailsHeaders) {
-    let productDetailsHeadersKeys = Object.keys(productDetailsHeaders).filter((header) => header !== 'relatedProducts');
+  async function prepareComparisonData(productDetailsHeaders) {
+    let productDetailsHeadersKeys = Object.keys(productDetailsHeaders).filter(
+      (header) => header !== 'relatedProductsNames'
+    );
     let nameHeaderIndex = productDetailsHeadersKeys.findIndex((headerName) => headerName.toLowerCase() === 'name');
-    const comparableProductsData = appStore.productComparisonState.map((product) => getProductDetailsData(product));
+    const comparableProductsData = await Promise.all(
+      appStore.productComparisonState.map((product) => getProductDetailsData(product))
+    );
 
     const [nameHeader] = productDetailsHeadersKeys.splice(nameHeaderIndex, 1);
     productDetailsHeadersKeys.unshift(nameHeader);

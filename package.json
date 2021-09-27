@@ -27,7 +27,7 @@
     "populate-db": "cd src/database/populate && cross-env TS_NODE_PROJECT=../../../tsconfig.backend.json node -r ts-node/register populate.ts productsJSONFilePath=./initial-products.json cleanAll",
     "dev:frontend": "webpack-dev-server --env development",
     "dev:backend": "cross-env BACKEND_ONLY=true nodemon --exec \"npm run eslint:backend && npm run prettier:backend && ts-node --project tsconfig.backend.json src/middleware/middleware-index.ts\" --watch src/middlware --watch src/database",
-    "build:backend": "rimraf dist/src/middleware dist/src/database dist/utils && tsc --project tsconfig.backend.json",
+    "build:backend": "npm run eslint:backend && npm run prettier:backend && rimraf dist/src/middleware dist/src/database dist/utils && tsc --project tsconfig.backend.json",
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend",
     "serve": "cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"

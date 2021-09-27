@@ -12,38 +12,51 @@ Model.prototype.save._succeededCall = () => {
 };
 Model.prototype.save._failedCall = () => Promise.reject(null);
 
-const ModelClassMock: TJestMock &
-  Partial<{
-    find: TJestMock;
-    findOne: TJestMock;
-    findOneAndUpdate: TJestMock<Error> &
-      Partial<{ _succeededCall: () => typeof Model; _clazz: typeof Model; _failedCall: () => null }>;
-    distinct: TJestMock;
-  }> = jest
-  .fn(() => {
-    // @ts-ignore
-    return new Model();
-  })
-  .mockName('Model');
-ModelClassMock.find = jest.fn(() => 'find result');
-ModelClassMock.findOne = jest.fn(() => 'findOne result');
-ModelClassMock.findOneAndUpdate = jest.fn(() => {
-  throw getMockImplementationError('findOneAndUpdate');
-});
-ModelClassMock.findOneAndUpdate._succeededCall = () => {
-  // @ts-ignore
-  return new Model();
-};
-ModelClassMock.findOneAndUpdate._clazz = Model;
-ModelClassMock.findOneAndUpdate._failedCall = () => null;
-ModelClassMock.distinct = jest.fn(() => 'distinct result');
+const ModelClassMock: TJestMock & {
+  find: TJestMock;
+  findOne: TJestMock;
+  findOneAndUpdate: TJestMock<Error> & {
+    _succeededCall: () => typeof Model;
+    _clazz: typeof Model;
+    _failedCall: () => null;
+  };
+  distinct: TJestMock;
+} = Object.assign(
+  jest
+    .fn(() => {
+      // @ts-ignore
+      return new Model();
+    })
+    .mockName('Model'),
+  {
+    find: jest.fn(() => 'find result'),
+    findOne: jest.fn(() => 'findOne result'),
+    findOneAndUpdate: Object.assign(
+      jest.fn(() => {
+        throw getMockImplementationError('findOneAndUpdate');
+      }),
+      {
+        _succeededCall: () => {
+          // @ts-ignore
+          return new Model();
+        },
+        _clazz: Model,
+        _failedCall: () => null,
+      }
+    ),
+    distinct: jest.fn(() => 'distinct result'),
+  }
+);
 
-const ModelModuleMock: TJestMock &
-  Partial<{
-    _ModelClassMock: typeof ModelClassMock;
-    _ModelPrototypeSaveMock: typeof Model.prototype.save;
-  }> = jest.fn(() => ModelClassMock);
-ModelModuleMock._ModelClassMock = ModelClassMock;
-ModelModuleMock._ModelPrototypeSaveMock = Model.prototype.save;
+const ModelModuleMock: TJestMock & {
+  _ModelClassMock: typeof ModelClassMock;
+  _ModelPrototypeSaveMock: typeof Model.prototype.save;
+} = Object.assign(
+  jest.fn(() => ModelClassMock),
+  {
+    _ModelClassMock: ModelClassMock,
+    _ModelPrototypeSaveMock: Model.prototype.save,
+  }
+);
 
 export default ModelModuleMock;
