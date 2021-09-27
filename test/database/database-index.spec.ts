@@ -28,7 +28,7 @@ describe('#database-index', () => {
   });
 
   describe('saveToDB()', () => {
-    const getModelPrototypeSaveMock = () => 
+    const getModelPrototypeSaveMock = () =>
       Object.getPrototypeOf(ModelModuleMock._ModelClassMock.getMockImplementation()()).save;
 
     it('should call getModel(..) with modelType param', async () => {
@@ -88,7 +88,11 @@ describe('#database-index', () => {
 
       await getFromDB(itemQuery, MODEL_TYPE, options);
 
-      expect(getPaginatedItemsMock).toHaveBeenCalledWith(ModelModuleMock._ModelClassMock, itemQuery, options.pagination);
+      expect(getPaginatedItemsMock).toHaveBeenCalledWith(
+        ModelModuleMock._ModelClassMock,
+        itemQuery,
+        options.pagination
+      );
     });
 
     it('should return result of calling getPaginatedItems(..) when provided options.pagination param is truthy', async () => {

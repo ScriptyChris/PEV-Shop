@@ -163,7 +163,7 @@ export type TProductsCategoriesReq = { productCategories: string };
 export type TProductNameReq = { name: string; caseSensitive: string | boolean };
 export type TProductFiltersReq = { productsFilters: string };
 
-export {
+export const queryBuilder = {
   isEmptyQueryObject,
   getSearchByNameConfig,
   getPaginationConfig,

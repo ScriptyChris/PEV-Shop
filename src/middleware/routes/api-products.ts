@@ -2,8 +2,9 @@ import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
 import { Request, Response } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
-import { getFromDB, saveToDB, updateOneModelInDB, queryBuilder } from '../../database/database-index';
+import { getFromDB, saveToDB, updateOneModelInDB } from '../../database/database-index';
 import {
+  queryBuilder,
   TIdListReq,
   TNameListReq,
   TPageLimit,

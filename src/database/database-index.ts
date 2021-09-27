@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import * as mongoose from 'mongoose';
 import getModel, { TModelType, IModel, TGenericModel } from './models/models-index';
-import * as queryBuilder from './utils/queryBuilder';
+import { queryBuilder } from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
 import * as dotenv from 'dotenv';
 import getLogger from '../../utils/logger';
