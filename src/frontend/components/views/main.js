@@ -26,7 +26,7 @@ export default function Main() {
           <NewProduct />
         </Route>
         <Route path="/modify-product">
-          <ModifyProduct productName="testowy" />
+          <ModifyProduct productName="testowy ext" />
         </Route>
         <Route path="/log-in">
           <LogIn />

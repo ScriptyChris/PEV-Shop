@@ -42,7 +42,7 @@ const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
 });
 
-function BaseInfo({ data: { initialData }, methods: { handleChange, handleBlur } }) {
+function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleBlur } }) {
   return (
     <fieldset>
       <legend>{translations.baseInformation}</legend>
@@ -168,8 +168,12 @@ ShortDescription.InputComponent = function InputComponent(props) {
   );
 };
 
-function CategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
+function CategorySelector({
+  data: { initialData = {} },
+  methods: { setProductCurrentSpecs, getSpecsForSelectedCategory },
+}) {
   const handleCategorySelect = (selectedCategoryName) => {
+    console.log('(CategorySelector) selectedCategoryName:', selectedCategoryName);
     setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
   };
 
@@ -181,7 +185,8 @@ function CategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelect
         name="category"
         required
         component={CategoriesTreeFormField}
-        onCategorySelect={(selectedCategory) => handleCategorySelect(selectedCategory)}
+        onCategorySelect={handleCategorySelect}
+        preSelectedCategory={initialData.category}
       />
       <ErrorMessage name="category" component={FormFieldError} />
     </fieldset>
@@ -307,7 +312,7 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
   );
 }
 
-const ProductForm = ({ initialData }) => {
+const ProductForm = ({ initialData = {} }) => {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
@@ -332,6 +337,8 @@ const ProductForm = ({ initialData }) => {
       const productSpecifications = await productSpecsService
         .getProductsSpecifications()
         .then(productSpecsService.structureProductsSpecifications);
+
+      console.log('[awaited!]');
 
       productSpecsMap.current.categoryToSpecs = productSpecifications.categoryToSpecs;
       productSpecsMap.current.specs = productSpecifications.specs.map((specObj) => ({
@@ -510,7 +517,12 @@ const ProductForm = ({ initialData }) => {
               data={{ initialData: formikRestProps.values }}
               component={ShortDescription}
             />
-            <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
+            {Object.values(productSpecsMap.current).filter(Boolean).length && (
+              <CategorySelector
+                data={{ initialData: formikRestProps.values }}
+                methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
+              />
+            )}
             <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
             <Field
               name="relatedProductsNames"
