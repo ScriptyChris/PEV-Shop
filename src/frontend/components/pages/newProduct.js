@@ -41,6 +41,7 @@ const SPEC_NAMES_SEPARATORS = Object.freeze({
 const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
 });
+const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP);
 
 function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleBlur } }) {
   return (
@@ -173,7 +174,6 @@ function CategorySelector({
   methods: { setProductCurrentSpecs, getSpecsForSelectedCategory },
 }) {
   const handleCategorySelect = (selectedCategoryName) => {
-    console.log('(CategorySelector) selectedCategoryName:', selectedCategoryName);
     setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
   };
 
@@ -193,13 +193,49 @@ function CategorySelector({
   );
 }
 
-function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange } }) {
+function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, methods: { handleChange, setFieldValue } }) {
+  const prepareInitialDataStructure = useMemo(() => {
+    const structure = initialData.reduce((output, spec) => {
+      const isSpecArray = Array.isArray(spec.data);
+      const BASE_HEADING = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.heading}`;
+
+      if (typeof spec.data === 'object' && !isSpecArray) {
+        return {
+          ...output,
+          ...Object.entries(spec.data).reduce(
+            (nestedOutput, [key, value]) => ({
+              ...nestedOutput,
+              [swapSpaceForGap(`${BASE_HEADING}${SPEC_NAMES_SEPARATORS.LEVEL}${key}`)]: value,
+            }),
+            {}
+          ),
+        };
+      }
+
+      return {
+        ...output,
+        [swapSpaceForGap(BASE_HEADING)]: isSpecArray ? spec.data.join(', ') : spec.data,
+      };
+    }, {});
+
+    return { structure, isFilled: !!Object.keys(structure).length };
+  }, [initialData]);
+
+  useEffect(() => {
+    if (prepareInitialDataStructure.isFilled) {
+      Object.entries(prepareInitialDataStructure.structure).forEach(([name, value]) => {
+        setFieldValue(name, value);
+      });
+    }
+  }, [prepareInitialDataStructure.structure]);
+
   const getSpecsFields = () => {
     return productCurrentSpecs.map((spec) => {
       const fieldIdentifier = `${spec.name
         .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
         .replace(/\s/g, '')}Field`;
       const minValue = spec.fieldType === 'number' ? 0 : null;
+      const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
 
       return (
         <div key={fieldIdentifier}>
@@ -211,7 +247,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
           {Array.isArray(spec.descriptions) ? (
             spec.descriptions.map((specDescription, index) => {
               const groupFieldIdentifier = `${fieldIdentifier}${index}`;
-              const mergedName = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+              const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
 
               return (
                 <div key={groupFieldIdentifier}>
@@ -225,6 +261,9 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
                     min={minValue}
                     id={groupFieldIdentifier}
                     onChange={handleChange}
+                    defaultValue={
+                      prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[mergedName] : ''
+                    }
                     required
                   />
                 </div>
@@ -232,11 +271,14 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
             })
           ) : (
             <input
-              name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
+              name={BASE_NAME}
               type={spec.fieldType}
               min={minValue}
               id={fieldIdentifier}
               onChange={handleChange}
+              defaultValue={
+                prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
+              }
               required
             />
           )}
@@ -338,36 +380,29 @@ const ProductForm = ({ initialData = {} }) => {
         .getProductsSpecifications()
         .then(productSpecsService.structureProductsSpecifications);
 
-      console.log('[awaited!]');
-
       productSpecsMap.current.categoryToSpecs = productSpecifications.categoryToSpecs;
       productSpecsMap.current.specs = productSpecifications.specs.map((specObj) => ({
         ...specObj,
-        fieldName: specObj.name.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP),
+        fieldName: swapSpaceForGap(specObj.name),
         fieldType: FIELD_TYPE_MAP[specObj.type],
       }));
 
-      setFormInitials((prevFormInitials) => {
-        console.log('??? prevFormInitials:', prevFormInitials);
-        return {
-          ...prevFormInitials,
-          ...Object.fromEntries(
-            productSpecsMap.current.specs.reduce((specEntries, spec) => {
-              const names = spec.descriptions
-                ? spec.descriptions.map(
-                    (description) => `${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${description}`
-                  )
-                : [spec.fieldName];
+      setFormInitials((prevFormInitials) => ({
+        ...prevFormInitials,
+        ...Object.fromEntries(
+          productSpecsMap.current.specs.reduce((specEntries, spec) => {
+            const names = spec.descriptions
+              ? spec.descriptions.map((description) => `${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${description}`)
+              : [spec.fieldName];
 
-              names.forEach((name) => {
-                specEntries.push([name, '']);
-              });
+            names.forEach((name) => {
+              specEntries.push([name, '']);
+            });
 
-              return specEntries;
-            }, [])
-          ),
-        };
-      });
+            return specEntries;
+          }, [])
+        ),
+      }));
     })();
   }, []);
 
@@ -523,7 +558,10 @@ const ProductForm = ({ initialData = {} }) => {
                 methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
               />
             )}
-            <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
+            <TechnicalSpecs
+              data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
+              methods={{ handleChange: formikRestProps.handleChange, setFieldValue: formikRestProps.setFieldValue }}
+            />
             <Field
               name="relatedProductsNames"
               data={{ initialData: formikRestProps.values }}
