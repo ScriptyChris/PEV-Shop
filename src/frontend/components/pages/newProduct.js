@@ -25,6 +25,7 @@ const translations = {
   lackOfData: 'No data!',
   emptyCategoryError: 'Category must be selected!',
   colourIsNotTextError: 'Colour value must be a text!',
+  modificationError: 'Cannot modify, because no changes were made!',
 };
 
 const FIELD_TYPE_MAP = Object.freeze({
@@ -37,6 +38,7 @@ const FIELD_TYPE_MAP = Object.freeze({
 const SPEC_NAMES_SEPARATORS = Object.freeze({
   GAP: '_',
   LEVEL: '__',
+  SPACE: ' ',
 });
 const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
@@ -240,7 +242,8 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
       return (
         <div key={fieldIdentifier}>
           <label htmlFor={fieldIdentifier}>
-            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}{' '}
+            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+            {SPEC_NAMES_SEPARATORS.SPACE}
             {spec.defaultUnit && `(${spec.defaultUnit})`}
           </label>
 
@@ -292,7 +295,8 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
   return (
     <fieldset>
       <legend>
-        {translations.technicalSpecs}{' '}
+        {translations.technicalSpecs}
+        {SPEC_NAMES_SEPARATORS.SPACE}
         {productCurrentSpecs.length === 0 && <span>({translations.chooseCategoryFirst})</span>}
       </legend>
 
@@ -354,7 +358,7 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
   );
 }
 
-const ProductForm = ({ initialData = {} }) => {
+const ProductForm = ({ initialData = {}, doSubmit }) => {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
@@ -461,7 +465,10 @@ const ProductForm = ({ initialData = {} }) => {
   };
   normalizeSubmittedValues.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
     const currentLevelKey = nestLevelKeys[currentLevel];
-    const normalizedCurrentLevelKey = currentLevelKey.replaceAll(SPEC_NAMES_SEPARATORS.GAP, ' ');
+    const normalizedCurrentLevelKey = currentLevelKey.replaceAll(
+      SPEC_NAMES_SEPARATORS.GAP,
+      SPEC_NAMES_SEPARATORS.SPACE
+    );
     const nextLevel = currentLevel + 1;
 
     if (!(currentLevelKey in obj)) {
@@ -499,18 +506,21 @@ const ProductForm = ({ initialData = {} }) => {
   };
 
   const onSubmitHandler = (values, { setSubmitting }) => {
-    const newProductData = normalizeSubmittedValues(filterOutUnrelatedFields(values));
+    let submission;
 
-    apiService.addProduct(newProductData).then(
-      () => {
-        console.log('Product successfully saved');
-        setSubmitting(false);
-      },
-      (err) => {
-        console.error('Product save error:', err);
-        setSubmitting(false);
-      }
-    );
+    if (Object.keys(initialData).length) {
+      submission = doSubmit(values);
+    } else {
+      const newProductData = normalizeSubmittedValues(filterOutUnrelatedFields(values));
+      submission = doSubmit(newProductData);
+    }
+
+    submission
+      .then(console.log)
+      .catch((errorMessage) => {
+        console.error('submit error message:', errorMessage);
+      })
+      .finally(() => setSubmitting(false));
   };
 
   const validateHandler = (values) => {
@@ -538,10 +548,24 @@ const ProductForm = ({ initialData = {} }) => {
     <section>
       <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
         {({ handleSubmit, ...formikRestProps }) => (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} /*onChange={(e) => console.log('(change) e:', e)} */>
             <h2>{translations.intro}</h2>
 
-            {JSON.stringify(formikRestProps.values)}
+            {
+              /* console.log(
+                // '>>> formikRestProps:',
+                // formikRestProps,
+                // '>>> formikRestProps.initialValues:',
+                // formikRestProps.initialValues,
+                // ' /formInitials:',
+                // formInitials,
+                '>>> initialData:',
+                initialData,
+                ' /formikRestProps.values:',
+                formikRestProps.values
+              ),*/
+              JSON.stringify(formikRestProps.values)
+            }
 
             <BaseInfo
               data={{ initialData: formikRestProps.values }}
@@ -582,9 +606,71 @@ const ProductForm = ({ initialData = {} }) => {
 };
 ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 'relatedProductsNames'];
 
-const NewProduct = () => <ProductForm />;
+const NewProduct = () => {
+  const doSubmit = (newProductData) => {
+    return apiService.addProduct(newProductData).then(
+      () => {
+        console.log('Product successfully saved');
+      },
+      (err) => {
+        console.error('Product save error:', err);
+
+        return err;
+      }
+    );
+  };
+
+  return <ProductForm doSubmit={doSubmit} />;
+};
 const ModifyProduct = ({ productName }) => {
   const [productData, setProductData] = useState(null);
+  const [modificationError, setModificationError] = useState(false);
+  const checkIfFieldsChanged = useCallback(
+    (values) => {
+      const flatTechnicalSpecs = productData.technicalSpecs.reduce((output, spec) => {
+        const obj = {};
+        const PREFIX = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${swapSpaceForGap(spec.heading)}`;
+
+        if (typeof spec.data === 'object' && !Array.isArray(spec.data)) {
+          Object.entries(spec.data).forEach(([key, value]) => {
+            obj[`${PREFIX}${SPEC_NAMES_SEPARATORS.LEVEL}${key}`] = value;
+          });
+        } else if (Array.isArray(spec.data)) {
+          obj[PREFIX] = spec.data.join(', ');
+        } else {
+          obj[PREFIX] = spec.data;
+        }
+
+        return {
+          ...output,
+          ...obj,
+        };
+      }, {});
+
+      const normalizedInitialProductData = { ...productData, ...flatTechnicalSpecs };
+      delete normalizedInitialProductData.technicalSpecs;
+
+      const areFieldsChanged = !Object.entries(values).every(([key, value]) => {
+        if (Array.isArray(value)) {
+          return normalizedInitialProductData[key].toString() === value.toString();
+        }
+
+        return normalizedInitialProductData[key] === value;
+      });
+
+      console.log(
+        '(onSubmitHandler) productData:',
+        productData,
+        ' /values:',
+        values,
+        ' /flatTechnicalSpecs:',
+        flatTechnicalSpecs
+      );
+
+      return areFieldsChanged;
+    },
+    [productData]
+  );
 
   useEffect(() => {
     (async () => {
@@ -595,7 +681,27 @@ const ModifyProduct = ({ productName }) => {
     })();
   }, []);
 
-  return productData ? <ProductForm initialData={productData} /> : translations.lackOfData;
+  const doSubmit = (values) => {
+    const fieldsChanged = checkIfFieldsChanged(values);
+    console.log('fields changed?:', fieldsChanged);
+
+    if (fieldsChanged) {
+      setModificationError(false);
+      return Promise.resolve('modify ok');
+    }
+
+    setModificationError(true);
+    return Promise.reject('modify impossible');
+  };
+
+  return productData ? (
+    <>
+      <ProductForm initialData={productData} doSubmit={doSubmit} />
+      {modificationError && <FormFieldError>{translations.modificationError}</FormFieldError>}
+    </>
+  ) : (
+    translations.lackOfData
+  );
 };
 
 export { NewProduct, ModifyProduct };
