@@ -278,14 +278,14 @@ describe('#api-products', () => {
         );
       });
 
-      it('should call res.status(..).json(..) with correct params', () => {
+      it('should call res.status(..).json(..) with correct params', async () => {
         const resMock = getResMock();
 
-        apiProductsRouter._modifyProduct(getReqMock(), resMock);
+        await apiProductsRouter._modifyProduct(getReqMock(), resMock);
 
         updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._succeededCall);
 
-        expect(resMock.status).toHaveBeenCalledWith(201);
+        expect(resMock.status).toHaveBeenCalledWith(200);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: updateOneModelInDBMock() });
       });
     });
