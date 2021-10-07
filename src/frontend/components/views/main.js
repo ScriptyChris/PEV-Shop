@@ -25,9 +25,7 @@ export default function Main() {
         <Route path="/add-new-product">
           <NewProduct />
         </Route>
-        <Route path="/modify-product">
-          <ModifyProduct productName="testowy ext" />
-        </Route>
+        <Route path="/modify-product" component={ModifyProduct} />
         <Route path="/log-in">
           <LogIn />
         </Route>

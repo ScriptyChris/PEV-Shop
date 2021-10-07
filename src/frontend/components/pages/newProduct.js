@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
@@ -612,7 +613,8 @@ const NewProduct = () => {
 
   return <ProductForm doSubmit={doSubmit} />;
 };
-const ModifyProduct = ({ productName }) => {
+const ModifyProduct = () => {
+  const productName = useLocation().state;
   const [productData, setProductData] = useState(null);
   const [modificationError, setModificationError] = useState(false);
   const getChangedFields = useCallback(
