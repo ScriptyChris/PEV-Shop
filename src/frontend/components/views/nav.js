@@ -14,6 +14,7 @@ export default observer(function Nav() {
     start: 'Start',
     shop: 'Sklep',
     addNewProduct: 'Dodaj nowy produkt',
+    modifyProduct: 'Modyfikuj produkt',
     logIn: 'Zaloguj się',
     logOut: 'Wyloguj się',
     account: 'Moje konto',
@@ -30,6 +31,9 @@ export default observer(function Nav() {
         </li>
         <li>
           <Link to="/add-new-product">{translations.addNewProduct}</Link>
+        </li>
+        <li>
+          <Link to="/modify-product">{translations.modifyProduct}</Link>
         </li>
         <li>
           {appStore.userSessionState === USER_SESSION_STATES.LOGGED_OUT ? (

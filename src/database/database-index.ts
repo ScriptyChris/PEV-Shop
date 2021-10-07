@@ -85,11 +85,11 @@ async function getFromDB(
 }
 
 // TODO: consider making this function either specific to update case or generic dependent on params
-function updateOneModelInDB(
+async function updateOneModelInDB(
   itemQuery: any,
   updateData: any,
   modelType: TModelType
-): ReturnType<typeof Model.findOneAndUpdate> | null {
+): Promise<ReturnType<typeof Model.findOneAndUpdate> | null> {
   const Model = getModel(modelType);
 
   // TODO: improve querying via various ways
@@ -113,6 +113,7 @@ function updateOneModelInDB(
       break;
     }
     default: {
+      logger.error(`No operator for "${updateData.action}" action to update was matched!`);
       return null;
     }
   }
@@ -122,7 +123,7 @@ function updateOneModelInDB(
     [operator]: updateData.data,
   };
 
-  return Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
+  return await Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 }
 
 export { saveToDB, getFromDB, updateOneModelInDB, queryBuilder, ObjectId };

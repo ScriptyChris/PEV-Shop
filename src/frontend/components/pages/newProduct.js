@@ -377,6 +377,62 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 
     return productSpecsMap.current.specs.filter((spec) => specsFromChosenCategory.includes(spec.name));
   }, []);
+  const getNestedEntries = useMemo(() => {
+    const _getNestedEntries = (entries) =>
+      (Array.isArray(entries) ? entries : Object.entries(entries))
+        .filter(([key]) => key.includes(SPEC_NAMES_SEPARATORS.LEVEL))
+        .reduce((obj, [key, value]) => {
+          const nestLevelKeys = key.split(SPEC_NAMES_SEPARATORS.LEVEL);
+
+          _getNestedEntries.createNestedProperty(obj, nestLevelKeys, value);
+
+          return obj;
+        }, Object.create(null));
+
+    _getNestedEntries.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
+      const currentLevelKey = nestLevelKeys[currentLevel];
+      const normalizedCurrentLevelKey = currentLevelKey.replaceAll(
+        SPEC_NAMES_SEPARATORS.GAP,
+        SPEC_NAMES_SEPARATORS.SPACE
+      );
+      const nextLevel = currentLevel + 1;
+
+      if (!(currentLevelKey in obj)) {
+        if (currentLevel === 0) {
+          obj[currentLevelKey] = {};
+        } else if (currentLevel === 1) {
+          obj[normalizedCurrentLevelKey] = {
+            value: {},
+            defaultUnit: undefined,
+          };
+
+          const specWithDefaultUnit = productSpecsMap.current.specs.find(
+            (specObj) => specObj.fieldName === currentLevelKey && specObj.defaultUnit
+          );
+
+          if (specWithDefaultUnit) {
+            obj[normalizedCurrentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
+          }
+        }
+      }
+
+      if (nestLevelKeys[nextLevel]) {
+        _getNestedEntries.createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
+      } else {
+        if (currentLevel > 1) {
+          obj.value[normalizedCurrentLevelKey] = value;
+        } else {
+          const isSpecWithChoiceType = productSpecsMap.current.specs.some(
+            (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
+          );
+
+          obj[normalizedCurrentLevelKey].value = isSpecWithChoiceType ? [value] : value;
+        }
+      }
+    };
+
+    return _getNestedEntries;
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -439,15 +495,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   const normalizeSubmittedValues = (values) => {
     const entries = Object.entries(values);
     const entriesWithNaturalKeys = entries.filter(([key]) => !key.includes(SPEC_NAMES_SEPARATORS.LEVEL));
-    const nestedEntries = entries
-      .filter(([key]) => key.includes(SPEC_NAMES_SEPARATORS.LEVEL))
-      .reduce((obj, [key, value]) => {
-        const nestLevelKeys = key.split(SPEC_NAMES_SEPARATORS.LEVEL);
-
-        normalizeSubmittedValues.createNestedProperty(obj, nestLevelKeys, value);
-
-        return obj;
-      }, Object.create(null));
+    const nestedEntries = getNestedEntries(entries);
 
     const normalizedValues = {
       ...Object.fromEntries(entriesWithNaturalKeys),
@@ -463,62 +511,21 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 
     return normalizedValues;
   };
-  normalizeSubmittedValues.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
-    const currentLevelKey = nestLevelKeys[currentLevel];
-    const normalizedCurrentLevelKey = currentLevelKey.replaceAll(
-      SPEC_NAMES_SEPARATORS.GAP,
-      SPEC_NAMES_SEPARATORS.SPACE
-    );
-    const nextLevel = currentLevel + 1;
-
-    if (!(currentLevelKey in obj)) {
-      if (currentLevel === 0) {
-        obj[currentLevelKey] = {};
-      } else if (currentLevel === 1) {
-        obj[normalizedCurrentLevelKey] = {
-          value: {},
-          defaultUnit: undefined,
-        };
-
-        const specWithDefaultUnit = productSpecsMap.current.specs.find(
-          (specObj) => specObj.fieldName === currentLevelKey && specObj.defaultUnit
-        );
-
-        if (specWithDefaultUnit) {
-          obj[normalizedCurrentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
-        }
-      }
-    }
-
-    if (nestLevelKeys[nextLevel]) {
-      normalizeSubmittedValues.createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
-    } else {
-      if (currentLevel > 1) {
-        obj.value[normalizedCurrentLevelKey] = value;
-      } else {
-        const isSpecWithChoiceType = productSpecsMap.current.specs.some(
-          (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
-        );
-
-        obj[normalizedCurrentLevelKey].value = isSpecWithChoiceType ? [value] : value;
-      }
-    }
-  };
 
   const onSubmitHandler = (values, { setSubmitting }) => {
+    const isProductModification = Object.keys(initialData).length > 0;
     let submission;
 
-    if (Object.keys(initialData).length) {
-      submission = doSubmit(values);
+    if (isProductModification) {
+      submission = doSubmit(values, normalizeSubmittedValues(filterOutUnrelatedFields(values)).technicalSpecs);
     } else {
       const newProductData = normalizeSubmittedValues(filterOutUnrelatedFields(values));
       submission = doSubmit(newProductData);
     }
 
     submission
-      .then(console.log)
       .catch((errorMessage) => {
-        console.error('submit error message:', errorMessage);
+        console.error('Submission error:', errorMessage);
       })
       .finally(() => setSubmitting(false));
   };
@@ -548,24 +555,8 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
     <section>
       <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
         {({ handleSubmit, ...formikRestProps }) => (
-          <form onSubmit={handleSubmit} /*onChange={(e) => console.log('(change) e:', e)} */>
+          <form onSubmit={handleSubmit}>
             <h2>{translations.intro}</h2>
-
-            {
-              /* console.log(
-                // '>>> formikRestProps:',
-                // formikRestProps,
-                // '>>> formikRestProps.initialValues:',
-                // formikRestProps.initialValues,
-                // ' /formInitials:',
-                // formInitials,
-                '>>> initialData:',
-                initialData,
-                ' /formikRestProps.values:',
-                formikRestProps.values
-              ),*/
-              JSON.stringify(formikRestProps.values)
-            }
 
             <BaseInfo
               data={{ initialData: formikRestProps.values }}
@@ -607,8 +598,8 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 'relatedProductsNames'];
 
 const NewProduct = () => {
-  const doSubmit = (newProductData) => {
-    return apiService.addProduct(newProductData).then(
+  const doSubmit = (newProductData) =>
+    apiService.addProduct(newProductData).then(
       () => {
         console.log('Product successfully saved');
       },
@@ -618,14 +609,13 @@ const NewProduct = () => {
         return err;
       }
     );
-  };
 
   return <ProductForm doSubmit={doSubmit} />;
 };
 const ModifyProduct = ({ productName }) => {
   const [productData, setProductData] = useState(null);
   const [modificationError, setModificationError] = useState(false);
-  const checkIfFieldsChanged = useCallback(
+  const getChangedFields = useCallback(
     (values) => {
       const flatTechnicalSpecs = productData.technicalSpecs.reduce((output, spec) => {
         const obj = {};
@@ -650,24 +640,15 @@ const ModifyProduct = ({ productName }) => {
       const normalizedInitialProductData = { ...productData, ...flatTechnicalSpecs };
       delete normalizedInitialProductData.technicalSpecs;
 
-      const areFieldsChanged = !Object.entries(values).every(([key, value]) => {
+      const changedFields = Object.entries(values).filter(([key, value]) => {
         if (Array.isArray(value)) {
-          return normalizedInitialProductData[key].toString() === value.toString();
+          return normalizedInitialProductData[key].toString() !== value.toString();
         }
 
-        return normalizedInitialProductData[key] === value;
+        return normalizedInitialProductData[key] !== value;
       });
 
-      console.log(
-        '(onSubmitHandler) productData:',
-        productData,
-        ' /values:',
-        values,
-        ' /flatTechnicalSpecs:',
-        flatTechnicalSpecs
-      );
-
-      return areFieldsChanged;
+      return changedFields;
     },
     [productData]
   );
@@ -675,23 +656,35 @@ const ModifyProduct = ({ productName }) => {
   useEffect(() => {
     (async () => {
       // TODO: implement `getProductByName` method instead of (or along with) `getProduct[ById]`
-      const _productData = await apiService.getProductsByNames([productName]);
-      console.log('_productData:', _productData);
-      setProductData(_productData[0]);
+      const initialProductData = await apiService.getProductsByNames([productName]);
+      setProductData(initialProductData[0]);
     })();
   }, []);
 
-  const doSubmit = (values) => {
-    const fieldsChanged = checkIfFieldsChanged(values);
-    console.log('fields changed?:', fieldsChanged);
+  const normalizeTechnicalSpecsProps = (changedFields, technicalSpecsField) => {
+    const fieldEntriesWithoutTechnicalSpecs = changedFields.filter(
+      ([key]) => !key.startsWith(FIELD_NAME_PREFIXES.TECHNICAL_SPECS)
+    );
 
-    if (fieldsChanged) {
+    if (fieldEntriesWithoutTechnicalSpecs.length === changedFields.length) {
+      return changedFields;
+    }
+
+    const technicalSpecsEntry = ['technicalSpecs', technicalSpecsField];
+    return [...fieldEntriesWithoutTechnicalSpecs, technicalSpecsEntry];
+  };
+
+  const doSubmit = (values, technicalSpecsField) => {
+    const changedFields = normalizeTechnicalSpecsProps(getChangedFields(values), technicalSpecsField);
+
+    if (changedFields.length) {
       setModificationError(false);
-      return Promise.resolve('modify ok');
+
+      return apiService.modifyProduct(values.name, Object.fromEntries(changedFields)).then(setProductData);
     }
 
     setModificationError(true);
-    return Promise.reject('modify impossible');
+    return Promise.reject('modify impossible, due to not changed data');
   };
 
   return productData ? (
