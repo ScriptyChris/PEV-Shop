@@ -16,13 +16,15 @@ const flexibleListStates = Object.freeze({
   EDITING_INDEX: 'EDITING_INDEX',
 });
 
-function FlexibleList({ newItemComponent, editItemComponent, emitUpdatedItemsList }) {
+function FlexibleList({ initialListItems = [], newItemComponent, editItemComponent, emitUpdatedItemsList }) {
   if (!newItemComponent || !editItemComponent) {
     throw ReferenceError('newItemComponent, editItemComponent and renderInput must be provided!');
   }
 
   const EMPTY_LIST_ITEM = '';
-  const [listItems, setListItems] = useState([EMPTY_LIST_ITEM]);
+  const [listItems, setListItems] = useState(() =>
+    initialListItems.length ? initialListItems.concat(EMPTY_LIST_ITEM) : [EMPTY_LIST_ITEM]
+  );
   const [state, dispatch] = useReducer(flexibleListReducer, {
     [flexibleListStates.ADD_BTN_VISIBILITY]: true,
     [flexibleListStates.EDITING_INDEX]: -1,

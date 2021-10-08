@@ -141,7 +141,7 @@ async function addProduct(req: Request, res: Response): Promise<void> {
   }
 }
 
-function modifyProduct(req: Request & { userPermissions: any }, res: Response): void {
+async function modifyProduct(req: Request & { userPermissions: any }, res: Response): Promise<void> {
   try {
     logger.log('[products PATCH] req.body', req.body);
 
@@ -150,10 +150,13 @@ function modifyProduct(req: Request & { userPermissions: any }, res: Response): 
     }
 
     // TODO: prepare to be used with various product properties
-    const modifiedProduct = updateOneModelInDB(req.body.productId, req.body.modifications, 'Product');
+    const modifiedProduct = await updateOneModelInDB(
+      req.body.productId || { name: req.body.name },
+      req.body.modifications,
+      'Product'
+    );
 
-    logger.log('Product modified', modifiedProduct);
-    res.status(201).json({ payload: modifiedProduct });
+    res.status(200).json({ payload: modifiedProduct });
   } catch (exception) {
     logger.error('Modifying product exception:', exception);
 

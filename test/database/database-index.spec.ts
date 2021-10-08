@@ -176,8 +176,8 @@ describe('#database-index', () => {
     });
 
     it('should return null if updateData.action prop was not matched', () => {
-      expect(updateOneModelInDB({}, {}, MODEL_TYPE)).toBeNull();
-      expect(updateOneModelInDB({}, { action: 'add' }, MODEL_TYPE)).toBeNull();
+      expect(updateOneModelInDB({}, {}, MODEL_TYPE)).resolves.toBeNull();
+      expect(updateOneModelInDB({}, { action: 'add' }, MODEL_TYPE)).resolves.toBeNull();
     });
 
     it('should return value or null depend on Model.findOneAndUpdate(..) result', () => {
@@ -187,11 +187,11 @@ describe('#database-index', () => {
 
       const updateData = { action: 'addUnique' };
 
-      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).toStrictEqual(
+      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toStrictEqual(
         // @ts-ignore
         new ModelModuleMock._ModelClassMock.findOneAndUpdate._clazz()
       );
-      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).toBeNull();
+      expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toBeNull();
     });
   });
 });

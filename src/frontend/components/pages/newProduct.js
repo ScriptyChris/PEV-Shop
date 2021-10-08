@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Formik, Field, ErrorMessage } from 'formik';
 import apiService from '../../features/apiService';
 import productSpecsService from '../../features/productSpecsService';
@@ -22,8 +23,10 @@ const translations = {
   relatedProductName: 'Product name',
   shortDescription: 'Short description',
   duplicatedDescription: 'Description item must be unique!',
+  lackOfData: 'No data!',
   emptyCategoryError: 'Category must be selected!',
   colourIsNotTextError: 'Colour value must be a text!',
+  modificationError: 'Cannot modify, because no changes were made!',
 };
 
 const FIELD_TYPE_MAP = Object.freeze({
@@ -36,18 +39,28 @@ const FIELD_TYPE_MAP = Object.freeze({
 const SPEC_NAMES_SEPARATORS = Object.freeze({
   GAP: '_',
   LEVEL: '__',
+  SPACE: ' ',
 });
 const FIELD_NAME_PREFIXES = Object.freeze({
   TECHNICAL_SPECS: `technicalSpecs${SPEC_NAMES_SEPARATORS.LEVEL}`,
 });
+const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP);
 
-function BaseInfo({ methods: { handleChange, handleBlur } }) {
+function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleBlur } }) {
   return (
     <fieldset>
       <legend>{translations.baseInformation}</legend>
 
       <label htmlFor="newProductName">{translations.name}</label>
-      <input id="newProductName" name="name" type="text" onChange={handleChange} onBlur={handleBlur} required />
+      <input
+        id="newProductName"
+        name="name"
+        type="text"
+        onChange={handleChange}
+        onBlur={handleBlur}
+        defaultValue={initialData.name}
+        required
+      />
 
       <label htmlFor="newProductPrice">{translations.price}</label>
       <input
@@ -58,13 +71,14 @@ function BaseInfo({ methods: { handleChange, handleBlur } }) {
         min="0.01"
         onChange={handleChange}
         onBlur={handleBlur}
+        defaultValue={initialData.price}
         required
       />
     </fieldset>
   );
 }
 
-function ShortDescription({ field: formikField, form: { setFieldValue } }) {
+function ShortDescription({ data: { initialData = {} }, field: formikField, form: { setFieldValue } }) {
   const [shortDescriptionList, setShortDescriptionList] = useState([]);
 
   useEffect(() => {
@@ -76,6 +90,7 @@ function ShortDescription({ field: formikField, form: { setFieldValue } }) {
       <legend>{translations.shortDescription}</legend>
 
       <FlexibleList
+        initialListItems={initialData[formikField.name]}
         newItemComponent={(listFeatures) => (
           <ShortDescription.InputComponent shortDescriptionList={shortDescriptionList} listFeatures={listFeatures} />
         )}
@@ -157,7 +172,10 @@ ShortDescription.InputComponent = function InputComponent(props) {
   );
 };
 
-function CategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelectedCategory } }) {
+function CategorySelector({
+  data: { initialData = {} },
+  methods: { setProductCurrentSpecs, getSpecsForSelectedCategory },
+}) {
   const handleCategorySelect = (selectedCategoryName) => {
     setProductCurrentSpecs(getSpecsForSelectedCategory(selectedCategoryName));
   };
@@ -170,32 +188,70 @@ function CategorySelector({ methods: { setProductCurrentSpecs, getSpecsForSelect
         name="category"
         required
         component={CategoriesTreeFormField}
-        onCategorySelect={(selectedCategory) => handleCategorySelect(selectedCategory)}
+        onCategorySelect={handleCategorySelect}
+        preSelectedCategory={initialData.category}
       />
       <ErrorMessage name="category" component={FormFieldError} />
     </fieldset>
   );
 }
 
-function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange } }) {
+function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, methods: { handleChange, setFieldValue } }) {
+  const prepareInitialDataStructure = useMemo(() => {
+    const structure = initialData.reduce((output, spec) => {
+      const isSpecArray = Array.isArray(spec.data);
+      const BASE_HEADING = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.heading}`;
+
+      if (typeof spec.data === 'object' && !isSpecArray) {
+        return {
+          ...output,
+          ...Object.entries(spec.data).reduce(
+            (nestedOutput, [key, value]) => ({
+              ...nestedOutput,
+              [swapSpaceForGap(`${BASE_HEADING}${SPEC_NAMES_SEPARATORS.LEVEL}${key}`)]: value,
+            }),
+            {}
+          ),
+        };
+      }
+
+      return {
+        ...output,
+        [swapSpaceForGap(BASE_HEADING)]: isSpecArray ? spec.data.join(', ') : spec.data,
+      };
+    }, {});
+
+    return { structure, isFilled: !!Object.keys(structure).length };
+  }, [initialData]);
+
+  useEffect(() => {
+    if (prepareInitialDataStructure.isFilled) {
+      Object.entries(prepareInitialDataStructure.structure).forEach(([name, value]) => {
+        setFieldValue(name, value);
+      });
+    }
+  }, [prepareInitialDataStructure.structure]);
+
   const getSpecsFields = () => {
     return productCurrentSpecs.map((spec) => {
       const fieldIdentifier = `${spec.name
         .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
         .replace(/\s/g, '')}Field`;
       const minValue = spec.fieldType === 'number' ? 0 : null;
+      const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
 
       return (
         <div key={fieldIdentifier}>
           <label htmlFor={fieldIdentifier}>
-            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}{' '}
+            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+            {SPEC_NAMES_SEPARATORS.SPACE}
             {spec.defaultUnit && `(${spec.defaultUnit})`}
           </label>
 
           {Array.isArray(spec.descriptions) ? (
             spec.descriptions.map((specDescription, index) => {
               const groupFieldIdentifier = `${fieldIdentifier}${index}`;
-              const mergedName = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+              const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
 
               return (
                 <div key={groupFieldIdentifier}>
@@ -209,6 +265,9 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
                     min={minValue}
                     id={groupFieldIdentifier}
                     onChange={handleChange}
+                    defaultValue={
+                      prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[mergedName] : ''
+                    }
                     required
                   />
                 </div>
@@ -216,11 +275,14 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
             })
           ) : (
             <input
-              name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
+              name={BASE_NAME}
               type={spec.fieldType}
               min={minValue}
               id={fieldIdentifier}
               onChange={handleChange}
+              defaultValue={
+                prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
+              }
               required
             />
           )}
@@ -234,7 +296,8 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
   return (
     <fieldset>
       <legend>
-        {translations.technicalSpecs}{' '}
+        {translations.technicalSpecs}
+        {SPEC_NAMES_SEPARATORS.SPACE}
         {productCurrentSpecs.length === 0 && <span>({translations.chooseCategoryFirst})</span>}
       </legend>
 
@@ -243,7 +306,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs }, methods: { handleChange
   );
 }
 
-function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
+function RelatedProductsNames({ data: { initialData = {} }, field: formikField, form: { setFieldValue } }) {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([]);
 
   useEffect(() => {
@@ -279,6 +342,7 @@ function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
       <legend>{translations.relatedProductsNames}</legend>
 
       <FlexibleList
+        initialListItems={initialData[formikField.name]}
         newItemComponent={(listFeatures) => <BoundSearchSingleProductByName listFeatures={listFeatures} />}
         editItemComponent={(relatedProductName, index, listFeatures) => (
           <BoundSearchSingleProductByName
@@ -295,19 +359,15 @@ function RelatedProductsNames({ field: formikField, form: { setFieldValue } }) {
   );
 }
 
-export default function NewProduct() {
+const ProductForm = ({ initialData = {}, doSubmit }) => {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
     categoryToSpecs: null,
   });
-  const [formInitials, setFormInitials] = useState({
-    name: '',
-    price: '',
-    shortDescription: '',
-    category: '',
-    relatedProductsNames: '',
-  });
+  const [formInitials, setFormInitials] = useState(() =>
+    Object.fromEntries(ProductForm.initialFormKeys.map((key) => [key, initialData[key] || '']))
+  );
   const ORIGINAL_FORM_INITIALS_KEYS = useMemo(() => Object.keys(formInitials), []);
   const getSpecsForSelectedCategory = useCallback((selectedCategoryName) => {
     const specsFromChosenCategory = (
@@ -317,6 +377,62 @@ export default function NewProduct() {
     ) /* TODO: remove fallback when CategoriesTree will handle ignoring toggle'able nodes */.specs;
 
     return productSpecsMap.current.specs.filter((spec) => specsFromChosenCategory.includes(spec.name));
+  }, []);
+  const getNestedEntries = useMemo(() => {
+    const _getNestedEntries = (entries) =>
+      (Array.isArray(entries) ? entries : Object.entries(entries))
+        .filter(([key]) => key.includes(SPEC_NAMES_SEPARATORS.LEVEL))
+        .reduce((obj, [key, value]) => {
+          const nestLevelKeys = key.split(SPEC_NAMES_SEPARATORS.LEVEL);
+
+          _getNestedEntries.createNestedProperty(obj, nestLevelKeys, value);
+
+          return obj;
+        }, Object.create(null));
+
+    _getNestedEntries.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
+      const currentLevelKey = nestLevelKeys[currentLevel];
+      const normalizedCurrentLevelKey = currentLevelKey.replaceAll(
+        SPEC_NAMES_SEPARATORS.GAP,
+        SPEC_NAMES_SEPARATORS.SPACE
+      );
+      const nextLevel = currentLevel + 1;
+
+      if (!(currentLevelKey in obj)) {
+        if (currentLevel === 0) {
+          obj[currentLevelKey] = {};
+        } else if (currentLevel === 1) {
+          obj[normalizedCurrentLevelKey] = {
+            value: {},
+            defaultUnit: undefined,
+          };
+
+          const specWithDefaultUnit = productSpecsMap.current.specs.find(
+            (specObj) => specObj.fieldName === currentLevelKey && specObj.defaultUnit
+          );
+
+          if (specWithDefaultUnit) {
+            obj[normalizedCurrentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
+          }
+        }
+      }
+
+      if (nestLevelKeys[nextLevel]) {
+        _getNestedEntries.createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
+      } else {
+        if (currentLevel > 1) {
+          obj.value[normalizedCurrentLevelKey] = value;
+        } else {
+          const isSpecWithChoiceType = productSpecsMap.current.specs.some(
+            (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
+          );
+
+          obj[normalizedCurrentLevelKey].value = isSpecWithChoiceType ? [value] : value;
+        }
+      }
+    };
+
+    return _getNestedEntries;
   }, []);
 
   useEffect(() => {
@@ -328,7 +444,7 @@ export default function NewProduct() {
       productSpecsMap.current.categoryToSpecs = productSpecifications.categoryToSpecs;
       productSpecsMap.current.specs = productSpecifications.specs.map((specObj) => ({
         ...specObj,
-        fieldName: specObj.name.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP),
+        fieldName: swapSpaceForGap(specObj.name),
         fieldType: FIELD_TYPE_MAP[specObj.type],
       }));
 
@@ -380,15 +496,7 @@ export default function NewProduct() {
   const normalizeSubmittedValues = (values) => {
     const entries = Object.entries(values);
     const entriesWithNaturalKeys = entries.filter(([key]) => !key.includes(SPEC_NAMES_SEPARATORS.LEVEL));
-    const nestedEntries = entries
-      .filter(([key]) => key.includes(SPEC_NAMES_SEPARATORS.LEVEL))
-      .reduce((obj, [key, value]) => {
-        const nestLevelKeys = key.split(SPEC_NAMES_SEPARATORS.LEVEL);
-
-        normalizeSubmittedValues.createNestedProperty(obj, nestLevelKeys, value);
-
-        return obj;
-      }, Object.create(null));
+    const nestedEntries = getNestedEntries(entries);
 
     const normalizedValues = {
       ...Object.fromEntries(entriesWithNaturalKeys),
@@ -404,58 +512,23 @@ export default function NewProduct() {
 
     return normalizedValues;
   };
-  normalizeSubmittedValues.createNestedProperty = (obj, nestLevelKeys, value, currentLevel = 0) => {
-    const currentLevelKey = nestLevelKeys[currentLevel];
-    const normalizedCurrentLevelKey = currentLevelKey.replaceAll(SPEC_NAMES_SEPARATORS.GAP, ' ');
-    const nextLevel = currentLevel + 1;
-
-    if (!(currentLevelKey in obj)) {
-      if (currentLevel === 0) {
-        obj[currentLevelKey] = {};
-      } else if (currentLevel === 1) {
-        obj[normalizedCurrentLevelKey] = {
-          value: {},
-          defaultUnit: undefined,
-        };
-
-        const specWithDefaultUnit = productSpecsMap.current.specs.find(
-          (specObj) => specObj.fieldName === currentLevelKey && specObj.defaultUnit
-        );
-
-        if (specWithDefaultUnit) {
-          obj[normalizedCurrentLevelKey].defaultUnit = specWithDefaultUnit.defaultUnit;
-        }
-      }
-    }
-
-    if (nestLevelKeys[nextLevel]) {
-      normalizeSubmittedValues.createNestedProperty(obj[currentLevelKey], nestLevelKeys, value, nextLevel);
-    } else {
-      if (currentLevel > 1) {
-        obj.value[normalizedCurrentLevelKey] = value;
-      } else {
-        const isSpecWithChoiceType = productSpecsMap.current.specs.some(
-          (specObj) => specObj.name === currentLevelKey && specObj.type === 'CHOICE'
-        );
-
-        obj[normalizedCurrentLevelKey].value = isSpecWithChoiceType ? [value] : value;
-      }
-    }
-  };
 
   const onSubmitHandler = (values, { setSubmitting }) => {
-    const newProductData = normalizeSubmittedValues(filterOutUnrelatedFields(values));
+    const isProductModification = Object.keys(initialData).length > 0;
+    let submission;
 
-    apiService.addProduct(newProductData).then(
-      () => {
-        console.log('Product successfully saved');
-        setSubmitting(false);
-      },
-      (err) => {
-        console.error('Product save error:', err);
-        setSubmitting(false);
-      }
-    );
+    if (isProductModification) {
+      submission = doSubmit(values, normalizeSubmittedValues(filterOutUnrelatedFields(values)).technicalSpecs);
+    } else {
+      const newProductData = normalizeSubmittedValues(filterOutUnrelatedFields(values));
+      submission = doSubmit(newProductData);
+    }
+
+    submission
+      .catch((errorMessage) => {
+        console.error('Submission error:', errorMessage);
+      })
+      .finally(() => setSubmitting(false));
   };
 
   const validateHandler = (values) => {
@@ -487,12 +560,29 @@ export default function NewProduct() {
             <h2>{translations.intro}</h2>
 
             <BaseInfo
+              data={{ initialData: formikRestProps.values }}
               methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
             />
-            <Field name="shortDescription" component={ShortDescription} />
-            <CategorySelector methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }} />
-            <TechnicalSpecs data={{ productCurrentSpecs }} methods={{ handleChange: formikRestProps.handleChange }} />
-            <Field name="relatedProductsNames" component={RelatedProductsNames} />
+            <Field
+              name="shortDescription"
+              data={{ initialData: formikRestProps.values }}
+              component={ShortDescription}
+            />
+            {Object.values(productSpecsMap.current).filter(Boolean).length && (
+              <CategorySelector
+                data={{ initialData: formikRestProps.values }}
+                methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
+              />
+            )}
+            <TechnicalSpecs
+              data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
+              methods={{ handleChange: formikRestProps.handleChange, setFieldValue: formikRestProps.setFieldValue }}
+            />
+            <Field
+              name="relatedProductsNames"
+              data={{ initialData: formikRestProps.values }}
+              component={RelatedProductsNames}
+            />
 
             <button
               type="submit"
@@ -505,4 +595,108 @@ export default function NewProduct() {
       </Formik>
     </section>
   );
-}
+};
+ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 'relatedProductsNames'];
+
+const NewProduct = () => {
+  const doSubmit = (newProductData) =>
+    apiService.addProduct(newProductData).then(
+      () => {
+        console.log('Product successfully saved');
+      },
+      (err) => {
+        console.error('Product save error:', err);
+
+        return err;
+      }
+    );
+
+  return <ProductForm doSubmit={doSubmit} />;
+};
+const ModifyProduct = () => {
+  const productName = useLocation().state;
+  const [productData, setProductData] = useState(null);
+  const [modificationError, setModificationError] = useState(false);
+  const getChangedFields = useCallback(
+    (values) => {
+      const flatTechnicalSpecs = productData.technicalSpecs.reduce((output, spec) => {
+        const obj = {};
+        const PREFIX = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${swapSpaceForGap(spec.heading)}`;
+
+        if (typeof spec.data === 'object' && !Array.isArray(spec.data)) {
+          Object.entries(spec.data).forEach(([key, value]) => {
+            obj[`${PREFIX}${SPEC_NAMES_SEPARATORS.LEVEL}${key}`] = value;
+          });
+        } else if (Array.isArray(spec.data)) {
+          obj[PREFIX] = spec.data.join(', ');
+        } else {
+          obj[PREFIX] = spec.data;
+        }
+
+        return {
+          ...output,
+          ...obj,
+        };
+      }, {});
+
+      const normalizedInitialProductData = { ...productData, ...flatTechnicalSpecs };
+      delete normalizedInitialProductData.technicalSpecs;
+
+      const changedFields = Object.entries(values).filter(([key, value]) => {
+        if (Array.isArray(value)) {
+          return normalizedInitialProductData[key].toString() !== value.toString();
+        }
+
+        return normalizedInitialProductData[key] !== value;
+      });
+
+      return changedFields;
+    },
+    [productData]
+  );
+
+  useEffect(() => {
+    (async () => {
+      // TODO: implement `getProductByName` method instead of (or along with) `getProduct[ById]`
+      const initialProductData = await apiService.getProductsByNames([productName]);
+      setProductData(initialProductData[0]);
+    })();
+  }, []);
+
+  const normalizeTechnicalSpecsProps = (changedFields, technicalSpecsField) => {
+    const fieldEntriesWithoutTechnicalSpecs = changedFields.filter(
+      ([key]) => !key.startsWith(FIELD_NAME_PREFIXES.TECHNICAL_SPECS)
+    );
+
+    if (fieldEntriesWithoutTechnicalSpecs.length === changedFields.length) {
+      return changedFields;
+    }
+
+    const technicalSpecsEntry = ['technicalSpecs', technicalSpecsField];
+    return [...fieldEntriesWithoutTechnicalSpecs, technicalSpecsEntry];
+  };
+
+  const doSubmit = (values, technicalSpecsField) => {
+    const changedFields = normalizeTechnicalSpecsProps(getChangedFields(values), technicalSpecsField);
+
+    if (changedFields.length) {
+      setModificationError(false);
+
+      return apiService.modifyProduct(values.name, Object.fromEntries(changedFields)).then(setProductData);
+    }
+
+    setModificationError(true);
+    return Promise.reject('modify impossible, due to not changed data');
+  };
+
+  return productData ? (
+    <>
+      <ProductForm initialData={productData} doSubmit={doSubmit} />
+      {modificationError && <FormFieldError>{translations.modificationError}</FormFieldError>}
+    </>
+  ) : (
+    translations.lackOfData
+  );
+};
+
+export { NewProduct, ModifyProduct };

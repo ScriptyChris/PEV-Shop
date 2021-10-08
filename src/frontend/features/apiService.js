@@ -3,6 +3,11 @@ class Ajax {
     this._API_PATH_NAME = 'api';
     this._BASE_API_URL = `${location.origin}/${this._API_PATH_NAME}`;
     this._AUTH_TOKEN = '';
+    this.HTTP_METHOD_NAME = Object.freeze({
+      GET: 'GET',
+      PATCH: 'PATCH',
+      POST: 'POST',
+    });
   }
 
   get _BASE_API_URL_OBJECT() {
@@ -20,6 +25,35 @@ class Ajax {
 
   _getAuthHeader() {
     return `Bearer ${this._AUTH_TOKEN}`;
+  }
+
+  _sendRequestWithPayload(methodName, apiEndpoint, data, useToken) {
+    const headers = new Headers(this._getContentTypeHeader());
+
+    if (useToken) {
+      headers.append('Authorization', this._getAuthHeader());
+    }
+
+    return (
+      fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
+        method: methodName,
+        headers,
+        body: JSON.stringify(data || {}),
+      })
+        .then((response) => {
+          console.warn(`${methodName} response headers:`, ...response.headers);
+
+          return response.json();
+        })
+        // TODO: handle error cases (like 401)
+        .then((body) => {
+          if (body.token) {
+            this._AUTH_TOKEN = body.token;
+          }
+
+          return body.payload;
+        })
+    );
   }
 
   // TODO: fix creating URL by apiEndpoint
@@ -48,32 +82,11 @@ class Ajax {
   }
 
   postRequest(apiEndpoint, data, useToken) {
-    const headers = new Headers(this._getContentTypeHeader());
+    return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.POST, apiEndpoint, data, useToken);
+  }
 
-    if (useToken) {
-      headers.append('Authorization', this._getAuthHeader());
-    }
-
-    return (
-      fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(data || {}),
-      })
-        .then((response) => {
-          console.warn('POST response headers', ...response.headers);
-
-          return response.json();
-        })
-        // TODO: handle error cases (like 401)
-        .then((body) => {
-          if (body.token) {
-            this._AUTH_TOKEN = body.token;
-          }
-
-          return body.payload;
-        })
-    );
+  patchRequest(apiEndpoint, data, useToken) {
+    return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.PATCH, apiEndpoint, data, useToken);
   }
 }
 
@@ -153,6 +166,17 @@ const apiService = new (class ApiService extends Ajax {
 
   getProductsSpecifications() {
     return this.getRequest(this.PRODUCTS_SPECS_URL);
+  }
+
+  modifyProduct(productName, productModifications) {
+    const modifiedProductData = {
+      name: productName,
+      modifications: {
+        action: 'modify',
+        data: productModifications,
+      },
+    };
+    return this.patchRequest(this.PRODUCTS_URL, modifiedProductData);
   }
 
   getUser() {

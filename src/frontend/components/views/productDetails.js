@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import ProductItem from './productItem';
 import apiService from '../../features/apiService';
 
@@ -12,6 +12,7 @@ const productDetailsTranslations = Object.freeze({
   reviews: 'Reviews',
   author: 'Author',
   relatedProducts: 'Related products',
+  editProduct: 'Edit',
   emptyData: 'No data!',
 });
 
@@ -190,6 +191,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
 export default function ProductDetails({ product }) {
   // TODO: fetch product data independently when page is loaded explicitly (not navigated to from other page)
   product = product || useLocation().state;
+  const history = useHistory();
 
   console.log('[ProductDetails] product received from navigation: ', product);
 
@@ -214,10 +216,15 @@ export default function ProductDetails({ product }) {
       .filter(([key]) => !ignoredProductKeys.includes(key))
       .map(([key, value]) => <Fragment key={key}>{prepareSpecificProductDetail(key, value, true)}</Fragment>);
 
+  const navigateToProductModify = () => {
+    history.push('/modify-product', productDetails.name);
+  };
+
   return (
     <section>
       <p>
         [{productDetails.category}]: {productDetails.name}
+        <button onClick={navigateToProductModify}>{productDetailsTranslations.editProduct}</button>
       </p>
 
       {getMainDetailsContent()}
