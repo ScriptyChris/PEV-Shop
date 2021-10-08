@@ -7,6 +7,7 @@ class Ajax {
       GET: 'GET',
       PATCH: 'PATCH',
       POST: 'POST',
+      DELETE: 'DELETE',
     });
   }
 
@@ -87,6 +88,26 @@ class Ajax {
 
   patchRequest(apiEndpoint, data, useToken) {
     return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.PATCH, apiEndpoint, data, useToken);
+  }
+
+  deleteRequest(apiEndpoint, useToken) {
+    const url = this._BASE_API_URL_OBJECT;
+    url.pathname += apiEndpoint;
+
+    const options = {
+      method: this.HTTP_METHOD_NAME.DELETE,
+    };
+
+    if (useToken) {
+      options.headers = {
+        Authorization: this._getAuthHeader(),
+      };
+    }
+
+    return fetch(url.toString(), options).then(async (response) => {
+      console.log('response:', response);
+      console.log('response.text:', await response.text());
+    });
   }
 }
 
@@ -177,6 +198,10 @@ const apiService = new (class ApiService extends Ajax {
       },
     };
     return this.patchRequest(this.PRODUCTS_URL, modifiedProductData);
+  }
+
+  deleteProduct(productName) {
+    return this.deleteRequest(`${this.PRODUCTS_URL}/${productName}`);
   }
 
   getUser() {

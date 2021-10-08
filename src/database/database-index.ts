@@ -126,4 +126,10 @@ async function updateOneModelInDB(
   return await Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 }
 
-export { saveToDB, getFromDB, updateOneModelInDB, queryBuilder, ObjectId };
+async function deleteFromDB(itemQuery: { name: string }, modelType: TModelType) {
+  const Model = getModel(modelType);
+
+  return await Model.deleteOne(itemQuery);
+}
+
+export { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, queryBuilder, ObjectId };

@@ -13,6 +13,7 @@ const productDetailsTranslations = Object.freeze({
   author: 'Author',
   relatedProducts: 'Related products',
   editProduct: 'Edit',
+  deleteProduct: 'Delete',
   emptyData: 'No data!',
 });
 
@@ -220,11 +221,19 @@ export default function ProductDetails({ product }) {
     history.push('/modify-product', productDetails.name);
   };
 
+  const deleteProduct = () => {
+    apiService.deleteProduct(productDetails.name).then((res) => {
+      console.log('deleteProduct res:', res);
+      history.push('/shop');
+    });
+  };
+
   return (
     <section>
       <p>
         [{productDetails.category}]: {productDetails.name}
         <button onClick={navigateToProductModify}>{productDetailsTranslations.editProduct}</button>
+        <button onClick={deleteProduct}>{productDetailsTranslations.deleteProduct}</button>
       </p>
 
       {getMainDetailsContent()}
