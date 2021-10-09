@@ -104,10 +104,7 @@ class Ajax {
       };
     }
 
-    return fetch(url.toString(), options).then(async (response) => {
-      console.log('response:', response);
-      console.log('response.text:', await response.text());
-    });
+    return fetch(url.toString(), options);
   }
 }
 
