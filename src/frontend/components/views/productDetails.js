@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import ProductItem from './productItem';
 import apiService from '../../features/apiService';
+import Popup from '../utils/popup';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -13,6 +14,7 @@ const productDetailsTranslations = Object.freeze({
   author: 'Author',
   relatedProducts: 'Related products',
   editProduct: 'Edit',
+  deleteProduct: 'Delete',
   emptyData: 'No data!',
 });
 
@@ -197,6 +199,7 @@ export default function ProductDetails({ product }) {
 
   const [productDetails, setProductDetails] = useState([]);
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
+  const [popupData, setPopupData] = useState(null);
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {
@@ -220,16 +223,48 @@ export default function ProductDetails({ product }) {
     history.push('/modify-product', productDetails.name);
   };
 
+  const deleteProduct = () => {
+    apiService.deleteProduct(productDetails.name).then((res) => {
+      if (res.status === 204) {
+        setPopupData({
+          type: 'SUCCESS',
+          message: 'Product successfully deleted!',
+          buttons: [
+            {
+              onClick: () => history.push('/shop'),
+              text: 'Go back to shop',
+            },
+          ],
+        });
+      } else {
+        console.error('(deleteProduct) failed res:', res);
+
+        setPopupData({
+          type: 'FAILURE',
+          message: 'Deleting product failed :(',
+          buttons: [
+            {
+              onClick: () => setPopupData(null),
+              text: 'Close',
+            },
+          ],
+        });
+      }
+    });
+  };
+
   return (
     <section>
       <p>
         [{productDetails.category}]: {productDetails.name}
         <button onClick={navigateToProductModify}>{productDetailsTranslations.editProduct}</button>
+        <button onClick={deleteProduct}>{productDetailsTranslations.deleteProduct}</button>
       </p>
 
       {getMainDetailsContent()}
 
       {renderRelatedProducts && prepareSpecificProductDetail('relatedProducts', productDetails.relatedProducts, true)}
+      {popupData && <Popup type={popupData.type} message={popupData.message} buttons={popupData.buttons} />}
     </section>
   );
 }

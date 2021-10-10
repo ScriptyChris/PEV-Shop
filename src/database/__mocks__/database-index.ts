@@ -39,10 +39,24 @@ updateOneModelInDB._succeededCall = () => new updateOneModelInDB._succeededCall.
 updateOneModelInDB._succeededCall._clazz = DataBaseResult;
 updateOneModelInDB._failedCall = () => null;
 
+const deleteFromDB: TMockWithProps = jest.fn(() => {
+  throw getMockImplementationError('deleteFromDB');
+});
+deleteFromDB._succeededCall = () => ({
+  ...new deleteFromDB._succeededCall._clazz(),
+  ok: true,
+  deletedCount: 1,
+});
+deleteFromDB._succeededCall._clazz = DataBaseResult;
+deleteFromDB._failedCall = {
+  general: () => ({ ok: false }),
+  nothingFound: () => ({ ok: true, deletedCount: 0 }),
+};
+
 class ObjectId {
   constructor(id = 'test') {
     return { _id: id };
   }
 }
 
-export { getFromDB, saveToDB, updateOneModelInDB, ObjectId };
+export { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB, ObjectId };

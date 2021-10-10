@@ -2,7 +2,7 @@ import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
 import { Request, Response } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
-import { getFromDB, saveToDB, updateOneModelInDB } from '../../database/database-index';
+import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '../../database/database-index';
 import {
   queryBuilder,
   TIdListReq,
@@ -32,12 +32,14 @@ router.get('/api/products/:id', getProductById);
 // TODO: add auth and user-role middlewares
 router.post('/api/products', addProduct);
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
+router.delete('/api/products/:name', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), deleteProduct);
 
 // expose for unit tests
 router._getProducts = getProducts;
 router._getProductById = getProductById;
 router._addProduct = addProduct;
 router._modifyProduct = modifyProduct;
+router._deleteProduct = deleteProduct;
 
 export default router;
 
@@ -159,6 +161,37 @@ async function modifyProduct(req: Request & { userPermissions: any }, res: Respo
     res.status(200).json({ payload: modifiedProduct });
   } catch (exception) {
     logger.error('Modifying product exception:', exception);
+
+    res.status(403).json({ exception });
+  }
+}
+
+async function deleteProduct(
+  req: Request & { userPermissions: any },
+  res: Response
+): Promise<void | Pick<Response, 'json'>> {
+  try {
+    logger.log('[products DELETE] req.params:', req.params);
+
+    if (!req.userPermissions) {
+      throw new Error('User has no permissions!');
+    }
+
+    const deletionResult = await deleteFromDB({ name: req.params.name }, 'Product');
+
+    if (!deletionResult.ok) {
+      logger.error('Deletion error occured...', deletionResult);
+
+      return res.status(500).json({ deletionResult });
+    } else if (deletionResult.deletedCount === 0) {
+      logger.error('Deleted nothing...', deletionResult);
+
+      return res.status(400).json({ deletionResult });
+    }
+
+    res.sendStatus(204);
+  } catch (exception) {
+    logger.error('Deleting product exception:', exception);
 
     res.status(403).json({ exception });
   }
