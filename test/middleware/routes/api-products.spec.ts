@@ -8,16 +8,23 @@ const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMi
 const { queryBuilder: queryBuilderMock } = jest
   .mock('../../../src/database/utils/queryBuilder')
   .requireMock('../../../src/database/utils/queryBuilder');
-const { getFromDB: getFromDBMock, saveToDB: saveToDBMock, updateOneModelInDB: updateOneModelInDBMock } = jest
-  .mock('../../../src/database/database-index')
-  .requireMock('../../../src/database/database-index');
+const {
+  getFromDB: getFromDBMock,
+  saveToDB: saveToDBMock,
+  updateOneModelInDB: updateOneModelInDBMock,
+  deleteFromDB: deleteFromDBMock,
+} = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
 
 describe('#api-products', () => {
   let apiProductsRouter: any = null;
 
   beforeAll(async () => {
-    authMiddlewareFnMock.mockImplementationOnce(authMiddlewareFnMock._succeededCall);
-    userRoleMiddlewareMock.mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
+    authMiddlewareFnMock
+      .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
+      .mockImplementationOnce(authMiddlewareFnMock._succeededCall);
+    userRoleMiddlewareMock
+      .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
+      .mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
 
     apiProductsRouter = (await import('../../../src/middleware/routes/api-products')).default;
   });
@@ -47,6 +54,12 @@ describe('#api-products', () => {
       expect.any(Function),
       expect.any(Function),
       apiProductsRouter._modifyProduct
+    );
+    expect(apiProductsRouter.delete).toHaveBeenCalledWith(
+      '/api/products/:name',
+      expect.any(Function),
+      expect.any(Function),
+      apiProductsRouter._deleteProduct
     );
   });
 
@@ -309,6 +322,69 @@ describe('#api-products', () => {
         // all cases
         expect(resMock.status).toHaveBeenCalledWith(403);
         expect(resMock.status).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
+
+  describe('deleteProduct(..)', () => {
+    const getReqMock = () => ({
+      userPermissions: true,
+      params: {
+        name: 'test',
+      },
+    });
+
+    describe('when succeeded', () => {
+      beforeEach(() => {
+        deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._succeededCall);
+      });
+
+      afterEach(() => {
+        deleteFromDBMock.mockClear();
+      });
+
+      it('should call deleteFromDB(..) with correct params', async () => {
+        const reqMock = getReqMock();
+
+        await apiProductsRouter._deleteProduct(reqMock, getResMock());
+
+        expect(deleteFromDBMock).toBeCalledWith(
+          {
+            name: reqMock.params.name,
+          },
+          'Product'
+        );
+      });
+
+      it('should call res.sendStatus(..) with correct params', async () => {
+        const resMock = getResMock();
+
+        await apiProductsRouter._deleteProduct(getReqMock(), resMock);
+
+        expect(resMock.sendStatus).toBeCalledWith(204);
+      });
+    });
+
+    describe('when failed', () => {
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const reqMock = getReqMock();
+
+        const resMock1 = getResMock();
+        await apiProductsRouter._deleteProduct({}, resMock1);
+        expect(resMock1.status).toBeCalledWith(403);
+        expect(resMock1._jsonMethod).toBeCalledWith({ exception: Error('User has no permissions!') });
+
+        const resMock2 = getResMock();
+        deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.general);
+        await apiProductsRouter._deleteProduct(reqMock, resMock2);
+        expect(resMock2.status).toBeCalledWith(500);
+        expect(resMock2._jsonMethod).toBeCalledWith({ deletionResult: deleteFromDBMock._failedCall.general() });
+
+        const resMock3 = getResMock();
+        deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.nothingFound);
+        await apiProductsRouter._deleteProduct(reqMock, resMock3);
+        expect(resMock3.status).toBeCalledWith(400);
+        expect(resMock3._jsonMethod).toBeCalledWith({ deletionResult: deleteFromDBMock._failedCall.nothingFound() });
       });
     });
   });
