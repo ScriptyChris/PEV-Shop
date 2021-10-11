@@ -31,7 +31,7 @@ function AddReview() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formInitials] = useState({
     author: 'TODO: put user nick here',
-    rating: 0,
+    rating: -1,
     content: '',
   });
   const [authorReadonly, setAuthorReadonly] = useState(false);

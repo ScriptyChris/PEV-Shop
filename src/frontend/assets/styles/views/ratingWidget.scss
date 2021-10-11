@@ -1,8 +1,26 @@
 .rating-widget {
-    // TODO: decorate ratings with (half)star icons (`clip-path` might help)
-    .rating-value {
-        &--active {
+    &__btn {
+        border: none;
+    }
+
+    &__icon {
+        display: block;
+        width: 25px;
+        height: 25px;
+        background: grey;
+        
+        clip-path: polygon(88% 35%, 100% 0, 100% 75%, 64% 100%, 80% 60%, 50% 35%);
+
+        &--odd {
+            transform: rotateY(180deg);
+        }
+
+        &--hover {
             background: orange;
+        }
+
+        &--active {
+            background: green;
         }
     }
 }
