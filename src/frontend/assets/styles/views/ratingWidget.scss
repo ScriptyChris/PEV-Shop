@@ -1,0 +1,8 @@
+.rating-widget {
+    // TODO: decorate ratings with (half)star icons (`clip-path` might help)
+    .rating-value {
+        &--active {
+            background: orange;
+        }
+    }
+}
