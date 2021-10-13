@@ -1,6 +1,6 @@
 import { model } from 'mongoose';
 import * as mongooseModule from 'mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
 import getLogger from '../../../utils/logger';
 
@@ -26,7 +26,14 @@ const reviewsSchema: mongooseModule.Schema = new Schema({
     required: true,
   },
   list: {
-    type: Array,
+    type: [
+      {
+        content: String,
+        reviewMeta: [String],
+        reviewAuthor: String,
+        reviewRate: Number,
+      },
+    ],
     required: true,
   },
 });
@@ -150,9 +157,9 @@ productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
 
 const ProductModel = model<IProduct>('Product', productSchema);
 
-export interface IReviews extends Document {
-  summary: string;
-  list: [];
+export interface IReviews extends Types.Subdocument {
+  summary: { rating: number; reviewsAmount: string };
+  list: Record<string, any>[];
 }
 
 export interface IProduct extends Document {

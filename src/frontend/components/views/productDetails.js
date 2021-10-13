@@ -27,11 +27,11 @@ const productDetailsTranslations = Object.freeze({
   emptyData: 'No data!',
 });
 
-function AddReview() {
+function AddReview({ productName }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formInitials] = useState({
     author: 'TODO: put user nick here',
-    rating: -1,
+    rating: 0,
     content: '',
   });
   const [authorReadonly, setAuthorReadonly] = useState(false);
@@ -43,6 +43,8 @@ function AddReview() {
 
   const onSubmitHandler = (values) => {
     console.log('submit review /values:', values);
+
+    apiService.addProductReview(productName, values);
   };
 
   if (showReviewForm) {
@@ -110,7 +112,7 @@ export async function getProductDetailsData(product) {
   };
 }
 
-export function prepareSpecificProductDetail(detailName, detailValue, includeHeader) {
+export function prepareSpecificProductDetail(detailName, detailValue, includeHeader, getAdditionalDetailData) {
   const getOptionalHeaderContent = (headerContent) => (includeHeader ? headerContent : null);
 
   switch (detailName) {
@@ -185,6 +187,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
     }
 
     case 'reviews': {
+      const productName = getAdditionalDetailData('name');
       let reviewsContent;
 
       // TODO: move to separate component as it will likely has some additional logic (like pagination, sorting, filtering)
@@ -229,7 +232,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
       return (
         <>
           {reviewsContent}
-          <AddReview />
+          <AddReview productName={productName} />
         </>
       );
     }
@@ -292,10 +295,14 @@ export default function ProductDetails({ product }) {
       .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
   }, []);
 
+  const getAdditionalDetailData = (detailName) => productDetails[detailName];
+
   const getMainDetailsContent = () =>
     Object.entries(productDetails)
       .filter(([key]) => !ignoredProductKeys.includes(key))
-      .map(([key, value]) => <Fragment key={key}>{prepareSpecificProductDetail(key, value, true)}</Fragment>);
+      .map(([key, value]) => (
+        <Fragment key={key}>{prepareSpecificProductDetail(key, value, true, getAdditionalDetailData)}</Fragment>
+      ));
 
   const navigateToProductModify = () => {
     history.push('/modify-product', productDetails.name);
