@@ -27,22 +27,46 @@ const productDetailsTranslations = Object.freeze({
   emptyData: 'No data!',
 });
 
-function AddReview({ productName }) {
+function AddReview({ productName, updateReviews }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formInitials] = useState({
     author: 'TODO: put user nick here',
     rating: 0,
     content: '',
   });
+  const [popupData, setPopupData] = useState(null);
 
   const onAnonymousChange = (checked, setFieldValue) => {
     setFieldValue('author', checked ? productDetailsTranslations.anonymous : formInitials.author);
   };
 
   const onSubmitHandler = (values) => {
-    console.log('submit review /values:', values);
-
-    apiService.addProductReview(productName, values);
+    apiService.addProductReview(productName, values).then((res) => {
+      if (res.list && res.averageRating) {
+        setPopupData({
+          type: 'SUCCESS',
+          message: 'Review added!',
+          buttons: [
+            {
+              onClick: () => setPopupData(null),
+              text: 'Close',
+            },
+          ],
+        });
+        updateReviews({ list: res.list, averageRating: res.averageRating });
+      } else {
+        setPopupData({
+          type: 'FAILURE',
+          message: 'Failed to add review :(',
+          buttons: [
+            {
+              onClick: () => setPopupData(null),
+              text: 'Close',
+            },
+          ],
+        });
+      }
+    });
   };
 
   if (showReviewForm) {
@@ -78,6 +102,7 @@ function AddReview({ productName }) {
         </Formik>
 
         <button onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</button>
+        {popupData && <Popup {...popupData} />}
       </>
     );
   }
@@ -110,8 +135,8 @@ export async function getProductDetailsData(product) {
   };
 }
 
-export function prepareSpecificProductDetail(detailName, detailValue, options = {}, getAdditionalDetailData) {
-  const getOptionalHeaderContent = (headerContent) => (options.includeHeader ? headerContent : null);
+export function prepareSpecificProductDetail(detailName, detailValue, extras = {}) {
+  const getOptionalHeaderContent = (headerContent) => (extras.includeHeader ? headerContent : null);
 
   switch (detailName) {
     case 'name':
@@ -170,7 +195,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, options = 
       );
 
       // TODO: collapse it on mobile by default and expand on PC by default
-      if (options.includeHeader) {
+      if (extras.includeHeader) {
         return (
           <>
             <details>
@@ -208,12 +233,14 @@ export function prepareSpecificProductDetail(detailName, detailValue, options = 
                   <li key={`review-${index}`}>
                     <article>
                       <header>
-                        ({reviewEntry.rating}) &nbsp;
-                        <b>
-                          {productDetailsTranslations.author}: {reviewEntry.author}
-                        </b>
-                        &nbsp;
-                        <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
+                        <RatingWidget presetValue={reviewEntry.rating} />
+                        <p>
+                          <b>
+                            {productDetailsTranslations.author}: {reviewEntry.author}
+                          </b>
+                          &nbsp;
+                          <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
+                        </p>
                       </header>
                       <cite>{reviewEntry.content}</cite>
                     </article>
@@ -228,7 +255,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, options = 
       return (
         <>
           {reviewsContent}
-          {options.showAddReview && <AddReview productName={getAdditionalDetailData('name')} />}
+          {extras.showAddReview && <AddReview productName={extras.productName} updateReviews={extras.updateReviews} />}
         </>
       );
     }
@@ -291,19 +318,21 @@ export default function ProductDetails({ product }) {
       .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
   }, []);
 
-  const getAdditionalDetailData = (detailName) => productDetails[detailName];
-
   const getMainDetailsContent = () =>
     Object.entries(productDetails)
       .filter(([key]) => !ignoredProductKeys.includes(key))
       .map(([key, value]) => (
         <Fragment key={key}>
-          {prepareSpecificProductDetail(
-            key,
-            value,
-            { includeHeader: true, showAddReview: key === 'reviews' },
-            getAdditionalDetailData
-          )}
+          {prepareSpecificProductDetail(key, value, {
+            includeHeader: true,
+            showAddReview: key === 'reviews',
+            productName: productDetails.name,
+            updateReviews: (reviews) =>
+              setProductDetails((prev) => ({
+                ...prev,
+                reviews,
+              })),
+          })}
         </Fragment>
       ));
 

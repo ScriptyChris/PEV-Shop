@@ -34,7 +34,7 @@ router.get('/api/products/:id', getProductById);
 router.post('/api/products', addProduct);
 router.patch(
   '/api/products/:name/add-review',
-  /* authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), */ addReview
+  /* authMiddleware(getFromDB), userRoleMiddlewareFn('client'), */ addReview
 );
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
 router.delete('/api/products/:name', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), deleteProduct);
@@ -189,7 +189,7 @@ async function addReview(req: Request, res: Response): Promise<void | Pick<Respo
 
     await productToUpdate.save();
 
-    res.status(200).json({ currentReviews: productReviews });
+    res.status(200).json({ payload: productReviews });
   } catch (exception) {
     logger.error('Adding review exception:', exception);
 

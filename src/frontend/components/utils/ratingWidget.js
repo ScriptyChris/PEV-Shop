@@ -8,12 +8,17 @@ const CLASS_NAMES = Object.freeze({
   ICON: 'rating-widget__icon',
 });
 
-export default function RatingWidget({ scale = RATING_MAX_VALUE, field: formikField, form: { setFieldValue } }) {
+export default function RatingWidget({
+  presetValue = 0,
+  scale = RATING_MAX_VALUE,
+  field: formikField,
+  form: { setFieldValue } = {},
+}) {
   if (Number.parseInt(scale) !== scale) {
     throw TypeError(`'scale' prop must be an integer! Received '${scale}'`);
   }
 
-  const [lastActiveRatingValue, setLastActiveRatingValue] = useState(0);
+  const [lastActiveRatingValue, setLastActiveRatingValue] = useState(presetValue);
   const [lastHoverRatingValue, setLastHoverRatingValue] = useState(0);
   const ratingValues = Array(scale * 2)
     .fill(1)
@@ -30,30 +35,45 @@ export default function RatingWidget({ scale = RATING_MAX_VALUE, field: formikFi
     setFieldValue(formikField.name, newRatingValue);
   };
 
+  const getRatingsMetadata = (ratingValue, index) => {
+    const iconClasses = [CLASS_NAMES.ICON];
+    const btnEventHandlers = {};
+
+    if (ratingValue <= lastActiveRatingValue) {
+      iconClasses.push(`${CLASS_NAMES.ICON}--active`);
+    }
+
+    const isOdd = index % 2 === 1;
+    if (isOdd) {
+      iconClasses.push(`${CLASS_NAMES.ICON}--odd`);
+    }
+
+    if (presetValue) {
+      iconClasses.push(`${CLASS_NAMES.ICON}--small`);
+    } else {
+      iconClasses.push(`${CLASS_NAMES.ICON}--big`);
+
+      if (ratingValue <= lastHoverRatingValue) {
+        iconClasses.push(`${CLASS_NAMES.ICON}--hover`);
+      }
+
+      btnEventHandlers.onMouseOver = () => onRatingHover(ratingValue);
+      btnEventHandlers.onMouseOut = () => onRatingHover(0);
+      btnEventHandlers.onClick = () => onRatingClick(ratingValue);
+    }
+
+    return { iconClasses, btnEventHandlers };
+  };
+
   return (
     <div className={CLASS_NAMES.WIDGET}>
       {ratingValues.map((ratingValue, index) => {
-        const iconClasses = [CLASS_NAMES.ICON];
-
-        if (ratingValue <= lastActiveRatingValue) {
-          iconClasses.push(`${CLASS_NAMES.ICON}--active`);
-        }
-
-        if (ratingValue <= lastHoverRatingValue) {
-          iconClasses.push(`${CLASS_NAMES.ICON}--hover`);
-        }
-
-        const isOdd = index % 2 === 1;
-        if (isOdd) {
-          iconClasses.push(`${CLASS_NAMES.ICON}--odd`);
-        }
+        const { iconClasses, btnEventHandlers } = getRatingsMetadata(ratingValue, index);
 
         return (
           <button
             className={CLASS_NAMES.BUTTON}
-            onMouseOver={() => onRatingHover(ratingValue)}
-            onMouseOut={() => onRatingHover(0)}
-            onClick={() => onRatingClick(ratingValue)}
+            {...btnEventHandlers}
             title={ratingValue}
             key={ratingValue}
             type="button"
@@ -63,7 +83,7 @@ export default function RatingWidget({ scale = RATING_MAX_VALUE, field: formikFi
         );
       })}
 
-      <input {...formikField} type="hidden" />
+      {formikField && <input {...formikField} type="hidden" />}
     </div>
   );
 }
