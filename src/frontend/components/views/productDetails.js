@@ -5,6 +5,7 @@ import ProductItem from './productItem';
 import apiService from '../../features/apiService';
 import Popup from '../utils/popup';
 import RatingWidget from '../utils/ratingWidget';
+import { getLocalizedDate } from '../../features/localization';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -18,7 +19,6 @@ const productDetailsTranslations = Object.freeze({
   editProduct: 'Edit',
   deleteProduct: 'Delete',
   addReview: 'Add review',
-  reviewAuthor: 'Author',
   anonymously: 'anonymously?',
   anonymous: 'Anonymous',
   reviewContentPlaceholder: 'You can share your opinion here...',
@@ -34,11 +34,9 @@ function AddReview({ productName }) {
     rating: 0,
     content: '',
   });
-  const [authorReadonly, setAuthorReadonly] = useState(false);
 
   const onAnonymousChange = (checked, setFieldValue) => {
     setFieldValue('author', checked ? productDetailsTranslations.anonymous : formInitials.author);
-    setAuthorReadonly(checked);
   };
 
   const onSubmitHandler = (values) => {
@@ -55,8 +53,8 @@ function AddReview({ productName }) {
             <form onSubmit={handleSubmit}>
               <div>
                 <span>
-                  <label htmlFor="author">{productDetailsTranslations.reviewAuthor}:</label>
-                  <Field name="author" type="text" readOnly={authorReadonly} />
+                  <label htmlFor="author">{productDetailsTranslations.author}:</label>
+                  <Field name="author" type="text" readOnly required />
                 </span>
 
                 <span>
@@ -112,8 +110,8 @@ export async function getProductDetailsData(product) {
   };
 }
 
-export function prepareSpecificProductDetail(detailName, detailValue, includeHeader, getAdditionalDetailData) {
-  const getOptionalHeaderContent = (headerContent) => (includeHeader ? headerContent : null);
+export function prepareSpecificProductDetail(detailName, detailValue, options = {}, getAdditionalDetailData) {
+  const getOptionalHeaderContent = (headerContent) => (options.includeHeader ? headerContent : null);
 
   switch (detailName) {
     case 'name':
@@ -172,7 +170,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
       );
 
       // TODO: collapse it on mobile by default and expand on PC by default
-      if (includeHeader) {
+      if (options.includeHeader) {
         return (
           <>
             <details>
@@ -187,7 +185,6 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
     }
 
     case 'reviews': {
-      const productName = getAdditionalDetailData('name');
       let reviewsContent;
 
       // TODO: move to separate component as it will likely has some additional logic (like pagination, sorting, filtering)
@@ -195,6 +192,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
         reviewsContent = productDetailsTranslations.emptyData;
       } else {
         const optionalHeaderContent = getOptionalHeaderContent(`${productDetailsTranslations.reviews}: `);
+        const RATING_MAX_VALUE = 5; /* TODO: get this from API */
 
         reviewsContent = (
           // TODO: collapse it on mobile by default and expand on PC by default
@@ -202,7 +200,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
             {/*TODO: do it in more aesthetic way*/}
             <summary>
               {optionalHeaderContent}
-              {detailValue.summary.rating}/5 [{detailValue.summary.reviewsAmount}]
+              {detailValue.averageRating} / {RATING_MAX_VALUE} [{detailValue.list.length}]
             </summary>
             <ul>
               {detailValue.list.map((reviewEntry, index) => {
@@ -210,14 +208,12 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
                   <li key={`review-${index}`}>
                     <article>
                       <header>
-                        ({reviewEntry.reviewRate}) &nbsp;
+                        ({reviewEntry.rating}) &nbsp;
                         <b>
-                          {productDetailsTranslations._author}: {reviewEntry.reviewAuthor}
+                          {productDetailsTranslations.author}: {reviewEntry.author}
                         </b>
                         &nbsp;
-                        <time>
-                          [{reviewEntry.reviewMeta.join() /*TODO: fix empty strings in array in some cases*/}]
-                        </time>
+                        <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
                       </header>
                       <cite>{reviewEntry.content}</cite>
                     </article>
@@ -232,7 +228,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
       return (
         <>
           {reviewsContent}
-          <AddReview productName={productName} />
+          {options.showAddReview && <AddReview productName={getAdditionalDetailData('name')} />}
         </>
       );
     }
@@ -301,7 +297,14 @@ export default function ProductDetails({ product }) {
     Object.entries(productDetails)
       .filter(([key]) => !ignoredProductKeys.includes(key))
       .map(([key, value]) => (
-        <Fragment key={key}>{prepareSpecificProductDetail(key, value, true, getAdditionalDetailData)}</Fragment>
+        <Fragment key={key}>
+          {prepareSpecificProductDetail(
+            key,
+            value,
+            { includeHeader: true, showAddReview: key === 'reviews' },
+            getAdditionalDetailData
+          )}
+        </Fragment>
       ));
 
   const navigateToProductModify = () => {

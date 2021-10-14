@@ -164,31 +164,30 @@ async function addReview(req: Request, res: Response): Promise<void | Pick<Respo
       return res.status(400).json({ exception: `Rating value must be less than ${RATING_MAX_VALUE}!` });
     } else if (!addReview.isIntOrDecimalHalf(rating)) {
       return res.status(400).json({ exception: `Rating value must be either an integer or .5 (a half) of it!` });
-    }
+    } else if (
+      !req.body.author ||
+      typeof req.body.author !== 'string' /* TODO: [AUTH] ensure author is a proper User or "Anonymous" */
+    ) {
+      return res.status(400).json({
+        exception: 'Author value must be a non-empty string representing a proper User or "Anonymous"!',
+      });
+    } /* TODO: [DUP] check if review is not a duplicate */
 
     // TODO: [DX] refactor update process to use some Mongo (declarative) aggregation atomicly
-    const updateData = {
-      content: req.body.content,
-      reviewMeta: [String(Date.now())],
-      reviewAuthor: req.body.author,
-      reviewRate: req.body.rating,
-    };
-    logger.log('updateData?:', updateData);
-
     const productToUpdate: IProduct = (await getFromDB({ name: req.params.name }, 'Product', {}))[0];
     const productReviews: IReviews = productToUpdate.reviews;
 
-    productReviews.list.push(updateData);
-    productReviews.summary.rating = Number(
-      (productReviews.list.reduce((sum, { reviewRate }) => sum + reviewRate, 0) / productReviews.list.length).toFixed(1)
+    productReviews.list.push({
+      ...req.body,
+      timestamp: Date.now(),
+    });
+    productReviews.averageRating = Number(
+      (
+        productReviews.list.reduce((sum, { rating }) => sum + (rating as number), 0) / productReviews.list.length
+      ).toFixed(1)
     );
-    productToUpdate.markModified('reviews.summary.rating');
-
-    logger.log('updated productReviews:', productReviews);
 
     await productToUpdate.save();
-
-    logger.log('saved?', (await getFromDB({ name: req.params.name }, 'Product', {}))[0].reviews.summary);
 
     res.status(200).json({ currentReviews: productReviews });
   } catch (exception) {

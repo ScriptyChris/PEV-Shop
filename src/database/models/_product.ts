@@ -12,28 +12,19 @@ const {
 } = mongooseModule;
 
 const reviewsSchema: mongooseModule.Schema = new Schema({
-  summary: {
-    type: {
-      rating: {
-        type: Number,
-        default: 0,
-      },
-      reviewsAmount: {
-        type: String,
-        default: '',
-      },
-    },
-    required: true,
-  },
   list: {
     type: [
       {
         content: String,
-        reviewMeta: [String],
-        reviewAuthor: String,
-        reviewRate: Number,
+        timestamp: Number,
+        author: String,
+        rating: Number,
       },
     ],
+    required: true,
+  },
+  averageRating: {
+    type: Number,
     required: true,
   },
 });
@@ -125,10 +116,7 @@ const productSchema: mongooseModule.Schema = new Schema({
     default() {
       return {
         list: [],
-        summary: {
-          summary: '',
-          reviewsAmount: 0,
-        },
+        averageRating: 0,
       };
     },
   },
@@ -158,8 +146,8 @@ productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
 const ProductModel = model<IProduct>('Product', productSchema);
 
 export interface IReviews extends Types.Subdocument {
-  summary: { rating: number; reviewsAmount: string };
-  list: Record<string, any>[];
+  list: Record<string, string | number>[];
+  averageRating: number;
 }
 
 export interface IProduct extends Document {
