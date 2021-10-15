@@ -11,7 +11,6 @@ const {
   default: { Schema },
 } = mongooseModule;
 
-// TODO: [BUG] inspect why schema-based validation not works properly when i.e. 'content' is null or 'timestamp' is string
 const reviewsItemSchema: mongooseModule.Schema = new Schema({
   content: String,
   timestamp: {

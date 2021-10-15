@@ -32,10 +32,7 @@ router.get('/api/products', getProducts);
 router.get('/api/products/:id', getProductById);
 // TODO: add auth and user-role middlewares
 router.post('/api/products', addProduct);
-router.patch(
-  '/api/products/:name/add-review',
-  /* authMiddleware(getFromDB), userRoleMiddlewareFn('client'), */ addReview
-);
+router.patch('/api/products/:name/add-review', authMiddleware(getFromDB), userRoleMiddlewareFn('client'), addReview);
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
 router.delete('/api/products/:name', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), deleteProduct);
 
@@ -44,6 +41,7 @@ router._getProducts = getProducts;
 router._getProductById = getProductById;
 router._addProduct = addProduct;
 router._modifyProduct = modifyProduct;
+router._addReview = addReview;
 router._deleteProduct = deleteProduct;
 
 export default router;
@@ -87,7 +85,6 @@ async function getProducts(
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const filters = queryBuilder.getFilters(req.query);
-    console.log('filters:', JSON.stringify(filters));
 
     let query = {};
 
@@ -180,6 +177,7 @@ async function addReview(req: Request, res: Response): Promise<void | Pick<Respo
     productReviews.list.push({
       ...req.body,
       timestamp: Date.now(),
+      content: req.body.content || '',
     });
     productReviews.averageRating = Number(
       (
@@ -196,10 +194,10 @@ async function addReview(req: Request, res: Response): Promise<void | Pick<Respo
     res.status(500).json({ exception });
   }
 }
-addReview.isNumber = (number: unknown): boolean => !Number.isNaN(Number(number));
-addReview.isIntOrDecimalHalf = (number: number): boolean => {
-  const isInt = Number.parseInt((number as unknown) as string) === number;
-  const isDecimalHalf = number % 1 === 0.5;
+addReview.isNumber = (value: unknown): boolean => value !== null && !Number.isNaN(Number(value));
+addReview.isIntOrDecimalHalf = (value: number): boolean => {
+  const isInt = Number.parseInt((value as unknown) as string) === value;
+  const isDecimalHalf = value % 1 === 0.5;
 
   return isInt || isDecimalHalf;
 };
