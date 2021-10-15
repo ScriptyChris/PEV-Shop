@@ -14,6 +14,7 @@ import {
 } from '../../database/utils/queryBuilder';
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 import mapProductsTechnicalSpecs from '../helpers/api-products-specs-mapper';
+import { IProduct, IReviews } from '../../database/models/_product';
 
 const {
   // @ts-ignore
@@ -31,6 +32,7 @@ router.get('/api/products', getProducts);
 router.get('/api/products/:id', getProductById);
 // TODO: add auth and user-role middlewares
 router.post('/api/products', addProduct);
+router.patch('/api/products/:name/add-review', authMiddleware(getFromDB), userRoleMiddlewareFn('client'), addReview);
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
 router.delete('/api/products/:name', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), deleteProduct);
 
@@ -39,6 +41,7 @@ router._getProducts = getProducts;
 router._getProductById = getProductById;
 router._addProduct = addProduct;
 router._modifyProduct = modifyProduct;
+router._addReview = addReview;
 router._deleteProduct = deleteProduct;
 
 export default router;
@@ -82,7 +85,6 @@ async function getProducts(
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const filters = queryBuilder.getFilters(req.query);
-    console.log('filters:', JSON.stringify(filters));
 
     let query = {};
 
@@ -142,6 +144,63 @@ async function addProduct(req: Request, res: Response): Promise<void> {
     res.status(500).json({ exception });
   }
 }
+
+async function addReview(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  try {
+    logger.log('[addReview] req.params.name:', req.params.name, ' /req.body:', req.body);
+
+    const RATING_MIN_VALUE = 0;
+    const RATING_MAX_VALUE = 5;
+    const rating = req.body.rating;
+
+    if (!addReview.isNumber(rating)) {
+      return res.status(400).json({ exception: 'Rating value must be a number!' });
+    } else if (rating < RATING_MIN_VALUE) {
+      return res.status(400).json({ exception: `Rating value must be greater than ${RATING_MIN_VALUE}!` });
+    } else if (rating > RATING_MAX_VALUE) {
+      return res.status(400).json({ exception: `Rating value must be less than ${RATING_MAX_VALUE}!` });
+    } else if (!addReview.isIntOrDecimalHalf(rating)) {
+      return res.status(400).json({ exception: `Rating value must be either an integer or .5 (a half) of it!` });
+    } else if (
+      !req.body.author ||
+      typeof req.body.author !== 'string' /* TODO: [AUTH] ensure author is a proper User or "Anonymous" */
+    ) {
+      return res.status(400).json({
+        exception: 'Author value must be a non-empty string representing a proper User or "Anonymous"!',
+      });
+    } /* TODO: [DUP] check if review is not a duplicate */
+
+    // TODO: [DX] refactor update process to use some Mongo (declarative) aggregation atomicly
+    const productToUpdate: IProduct = (await getFromDB({ name: req.params.name }, 'Product', {}))[0];
+    const productReviews: IReviews = productToUpdate.reviews;
+
+    productReviews.list.push({
+      ...req.body,
+      timestamp: Date.now(),
+      content: req.body.content || '',
+    });
+    productReviews.averageRating = Number(
+      (
+        productReviews.list.reduce((sum, { rating }) => sum + (rating as number), 0) / productReviews.list.length
+      ).toFixed(1)
+    );
+
+    await productToUpdate.save();
+
+    res.status(200).json({ payload: productReviews });
+  } catch (exception) {
+    logger.error('Adding review exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+}
+addReview.isNumber = (value: unknown): boolean => value !== null && !Number.isNaN(Number(value));
+addReview.isIntOrDecimalHalf = (value: number): boolean => {
+  const isInt = Number.parseInt((value as unknown) as string) === value;
+  const isDecimalHalf = value % 1 === 0.5;
+
+  return isInt || isDecimalHalf;
+};
 
 async function modifyProduct(req: Request & { userPermissions: any }, res: Response): Promise<void> {
   try {

@@ -1,8 +1,11 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
+import { Formik, Field } from 'formik';
 import ProductItem from './productItem';
 import apiService from '../../features/apiService';
 import Popup from '../utils/popup';
+import RatingWidget from '../utils/ratingWidget';
+import { getLocalizedDate } from '../../features/localization';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -15,8 +18,97 @@ const productDetailsTranslations = Object.freeze({
   relatedProducts: 'Related products',
   editProduct: 'Edit',
   deleteProduct: 'Delete',
+  addReview: 'Add review',
+  anonymously: 'anonymously?',
+  anonymous: 'Anonymous',
+  reviewContentPlaceholder: 'You can share your opinion here...',
+  cancelReview: 'Cancel review',
+  submitReview: 'Submit',
   emptyData: 'No data!',
 });
+
+function AddReview({ productName, updateReviews }) {
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [formInitials] = useState({
+    author: 'TODO: put user nick here',
+    rating: 0,
+    content: '',
+  });
+  const [popupData, setPopupData] = useState(null);
+
+  const onAnonymousChange = (checked, setFieldValue) => {
+    setFieldValue('author', checked ? productDetailsTranslations.anonymous : formInitials.author);
+  };
+
+  const onSubmitHandler = (values) => {
+    apiService.addProductReview(productName, values).then((res) => {
+      if (res.list && res.averageRating) {
+        setPopupData({
+          type: 'SUCCESS',
+          message: 'Review added!',
+          buttons: [
+            {
+              onClick: () => setPopupData(null),
+              text: 'Close',
+            },
+          ],
+        });
+        updateReviews({ list: res.list, averageRating: res.averageRating });
+      } else {
+        setPopupData({
+          type: 'FAILURE',
+          message: 'Failed to add review :(',
+          buttons: [
+            {
+              onClick: () => setPopupData(null),
+              text: 'Close',
+            },
+          ],
+        });
+      }
+    });
+  };
+
+  if (showReviewForm) {
+    return (
+      <>
+        <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
+          {({ handleSubmit, ...formikRestProps }) => (
+            <form onSubmit={handleSubmit}>
+              <div>
+                <span>
+                  <label htmlFor="author">{productDetailsTranslations.author}:</label>
+                  <Field name="author" type="text" readOnly required />
+                </span>
+
+                <span>
+                  <label htmlFor="asAnonymous">{productDetailsTranslations.anonymously}</label>
+                  <input
+                    id="asAnonymous"
+                    type="checkbox"
+                    onChange={({ target: { checked } }) => onAnonymousChange(checked, formikRestProps.setFieldValue)}
+                  />
+                </span>
+              </div>
+
+              <Field name="rating" component={RatingWidget} required />
+
+              {/* TODO: adjust <textarea> size to device */}
+              <Field name="content" placeholder={productDetailsTranslations.reviewContentPlaceholder} as="textarea" />
+
+              <button type="submit">{productDetailsTranslations.submitReview}</button>
+            </form>
+          )}
+        </Formik>
+
+        <button onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</button>
+        {popupData && <Popup {...popupData} />}
+      </>
+    );
+  }
+
+  return <button onClick={() => setShowReviewForm(true)}>{productDetailsTranslations.addReview}</button>;
+}
 
 export function getProductDetailsHeaders() {
   const detailKeys = ['category', 'name', 'price', 'shortDescription', 'technicalSpecs', 'reviews', 'relatedProducts'];
@@ -43,8 +135,8 @@ export async function getProductDetailsData(product) {
   };
 }
 
-export function prepareSpecificProductDetail(detailName, detailValue, includeHeader) {
-  const getOptionalHeaderContent = (headerContent) => (includeHeader ? headerContent : null);
+export function prepareSpecificProductDetail(detailName, detailValue, extras = {}) {
+  const getOptionalHeaderContent = (headerContent) => (extras.includeHeader ? headerContent : null);
 
   switch (detailName) {
     case 'name':
@@ -103,7 +195,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
       );
 
       // TODO: collapse it on mobile by default and expand on PC by default
-      if (includeHeader) {
+      if (extras.includeHeader) {
         return (
           <>
             <details>
@@ -118,41 +210,53 @@ export function prepareSpecificProductDetail(detailName, detailValue, includeHea
     }
 
     case 'reviews': {
+      let reviewsContent;
+
       // TODO: move to separate component as it will likely has some additional logic (like pagination, sorting, filtering)
       if (!detailValue.list.length) {
-        return productDetailsTranslations.emptyData;
+        reviewsContent = productDetailsTranslations.emptyData;
+      } else {
+        const optionalHeaderContent = getOptionalHeaderContent(`${productDetailsTranslations.reviews}: `);
+        const RATING_MAX_VALUE = 5; /* TODO: get this from API */
+
+        reviewsContent = (
+          // TODO: collapse it on mobile by default and expand on PC by default
+          <details>
+            {/*TODO: do it in more aesthetic way*/}
+            <summary>
+              {optionalHeaderContent}
+              {detailValue.averageRating} / {RATING_MAX_VALUE} [{detailValue.list.length}]
+            </summary>
+            <ul>
+              {detailValue.list.map((reviewEntry, index) => {
+                return (
+                  <li key={`review-${index}`}>
+                    <article>
+                      <header>
+                        <RatingWidget presetValue={reviewEntry.rating} />
+                        <p>
+                          <b>
+                            {productDetailsTranslations.author}: {reviewEntry.author}
+                          </b>
+                          &nbsp;
+                          <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
+                        </p>
+                      </header>
+                      <cite>{reviewEntry.content}</cite>
+                    </article>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        );
       }
 
-      const optionalHeaderContent = getOptionalHeaderContent(`${productDetailsTranslations.reviews}: `);
-
       return (
-        // TODO: collapse it on mobile by default and expand on PC by default
-        <details>
-          {/*TODO: do it in more aesthetic way*/}
-          <summary>
-            {optionalHeaderContent}
-            {detailValue.summary.rating}/5 [{detailValue.summary.reviewsAmount}]
-          </summary>
-          <ul>
-            {detailValue.list.map((reviewEntry, index) => {
-              return (
-                <li key={`review-${index}`}>
-                  <article>
-                    <header>
-                      ({reviewEntry.reviewRate}) &nbsp;
-                      <b>
-                        {productDetailsTranslations._author}: {reviewEntry.reviewAuthor}
-                      </b>
-                      &nbsp;
-                      <time>[{reviewEntry.reviewMeta.join() /*TODO: fix empty strings in array in some cases*/}]</time>
-                    </header>
-                    <cite>{reviewEntry.content}</cite>
-                  </article>
-                </li>
-              );
-            })}
-          </ul>
-        </details>
+        <>
+          {reviewsContent}
+          {extras.showAddReview && <AddReview productName={extras.productName} updateReviews={extras.updateReviews} />}
+        </>
       );
     }
 
@@ -217,7 +321,20 @@ export default function ProductDetails({ product }) {
   const getMainDetailsContent = () =>
     Object.entries(productDetails)
       .filter(([key]) => !ignoredProductKeys.includes(key))
-      .map(([key, value]) => <Fragment key={key}>{prepareSpecificProductDetail(key, value, true)}</Fragment>);
+      .map(([key, value]) => (
+        <Fragment key={key}>
+          {prepareSpecificProductDetail(key, value, {
+            includeHeader: true,
+            showAddReview: key === 'reviews',
+            productName: productDetails.name,
+            updateReviews: (reviews) =>
+              setProductDetails((prev) => ({
+                ...prev,
+                reviews,
+              })),
+          })}
+        </Fragment>
+      ));
 
   const navigateToProductModify = () => {
     history.push('/modify-product', productDetails.name);

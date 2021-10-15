@@ -1,6 +1,6 @@
 import { model } from 'mongoose';
 import * as mongooseModule from 'mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
 import getLogger from '../../../utils/logger';
 
@@ -11,22 +11,29 @@ const {
   default: { Schema },
 } = mongooseModule;
 
-const reviewsSchema: mongooseModule.Schema = new Schema({
-  summary: {
-    type: {
-      rating: {
-        type: Number,
-        default: 0,
-      },
-      reviewsAmount: {
-        type: String,
-        default: '',
-      },
-    },
+const reviewsItemSchema: mongooseModule.Schema = new Schema({
+  content: String,
+  timestamp: {
+    type: Number,
     required: true,
   },
+  author: {
+    type: String,
+    required: true,
+  },
+  rating: {
+    type: Number,
+    required: true,
+  },
+});
+
+const reviewsSchema: mongooseModule.Schema = new Schema({
   list: {
-    type: Array,
+    type: [reviewsItemSchema],
+    required: true,
+  },
+  averageRating: {
+    type: Number,
     required: true,
   },
 });
@@ -118,10 +125,7 @@ const productSchema: mongooseModule.Schema = new Schema({
     default() {
       return {
         list: [],
-        summary: {
-          summary: '',
-          reviewsAmount: 0,
-        },
+        averageRating: 0,
       };
     },
   },
@@ -150,9 +154,9 @@ productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
 
 const ProductModel = model<IProduct>('Product', productSchema);
 
-export interface IReviews extends Document {
-  summary: string;
-  list: [];
+export interface IReviews extends Types.Subdocument {
+  list: Record<string, string | number>[];
+  averageRating: number;
 }
 
 export interface IProduct extends Document {

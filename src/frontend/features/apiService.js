@@ -197,6 +197,10 @@ const apiService = new (class ApiService extends Ajax {
     return this.patchRequest(this.PRODUCTS_URL, modifiedProductData);
   }
 
+  addProductReview(productName, productReview) {
+    return this.patchRequest(`${this.PRODUCTS_URL}/${productName}/add-review`, productReview);
+  }
+
   deleteProduct(productName) {
     return this.deleteRequest(`${this.PRODUCTS_URL}/${productName}`);
   }

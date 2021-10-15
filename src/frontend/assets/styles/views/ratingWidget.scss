@@ -1,0 +1,34 @@
+.rating-widget {
+    &__btn {
+        border: none;
+    }
+
+    &__icon {
+        display: block;
+        width: var(--rating-widget-icon-size, 1em);
+        height: var(--rating-widget-icon-size, 1em);
+        background: grey;
+        
+        clip-path: polygon(88% 35%, 100% 0, 100% 75%, 64% 100%, 80% 60%, 50% 35%);
+
+        &--big {
+            --rating-widget-icon-size: 25px;
+        }
+
+        &--small {
+            --rating-widget-icon-size: 15px;
+        }
+
+        &--odd {
+            transform: rotateY(180deg);
+        }
+
+        &--hover {
+            background: orange;
+        }
+
+        &--active {
+            background: green;
+        }
+    }
+}

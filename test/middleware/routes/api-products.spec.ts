@@ -1,3 +1,4 @@
+import { getFromDB } from '../../../src/database/database-index';
 import { TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 
@@ -21,8 +22,10 @@ describe('#api-products', () => {
   beforeAll(async () => {
     authMiddlewareFnMock
       .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
+      .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
       .mockImplementationOnce(authMiddlewareFnMock._succeededCall);
     userRoleMiddlewareMock
+      .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
 
@@ -49,6 +52,12 @@ describe('#api-products', () => {
     expect(apiProductsRouter.get).toHaveBeenCalledWith('/api/products', apiProductsRouter._getProducts);
     expect(apiProductsRouter.get).toHaveBeenCalledWith('/api/products/:id', apiProductsRouter._getProductById);
     expect(apiProductsRouter.post).toHaveBeenCalledWith('/api/products', apiProductsRouter._addProduct);
+    expect(apiProductsRouter.patch).toHaveBeenCalledWith(
+      '/api/products/:name/add-review',
+      expect.any(Function),
+      expect.any(Function),
+      apiProductsRouter._addReview
+    );
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
       '/api/products/',
       expect.any(Function),
@@ -255,6 +264,152 @@ describe('#api-products', () => {
           exception: TypeError(`Cannot read property 'body' of null`),
         });
       });
+    });
+  });
+
+  describe('addReview(..)', () => {
+    const getReqMock = () => ({
+      params: {
+        name: 'test product',
+      },
+      body: {
+        author: 'Anonymous',
+        rating: 3.5,
+        content: 'some text',
+      },
+    });
+
+    describe('when succeeded', () => {
+      const getReviewsMock = () => [
+        {
+          reviews: {
+            list: [],
+          },
+          save: getFromDBMock._succeededCall._clazz.prototype.save,
+        },
+      ];
+
+      afterEach(() => {
+        getFromDBMock.mockClear();
+      });
+
+      it('should call getFromDB(..) with correct params', async () => {
+        const reqMock = getReqMock();
+        const reviewsMock = getReviewsMock();
+
+        getFromDBMock.mockImplementationOnce(() => reviewsMock);
+        await apiProductsRouter._addReview(reqMock, getResMock());
+
+        expect(getFromDBMock).toBeCalledWith({ name: reqMock.params.name }, 'Product', {});
+      });
+
+      it('should call .save(..) with correct params', async () => {
+        const reqMock = getReqMock();
+        const reviewsMock = getReviewsMock();
+
+        getFromDBMock.mockImplementationOnce(() => reviewsMock);
+        await apiProductsRouter._addReview(reqMock, getResMock());
+
+        expect(reviewsMock[0].save).toBeCalled();
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
+        const reviewsMock = getReviewsMock();
+
+        getFromDBMock.mockImplementationOnce(() => reviewsMock);
+        await apiProductsRouter._addReview(getReqMock(), resMock);
+
+        expect(resMock.status).toBeCalledWith(200);
+        expect(resMock._jsonMethod).toBeCalledWith({ payload: reviewsMock[0].reviews });
+      });
+    });
+
+    describe('when failed', () => {
+      it('should call res.status(400).json({ exception: String }) if validation failed', async () => {
+        await Promise.all(
+          [
+            {
+              ...getReqMock(),
+              body: {
+                ...getReqMock().body,
+                rating: 'not a number',
+              },
+              __exception: 'a number',
+            },
+            {
+              ...getReqMock(),
+              body: {
+                ...getReqMock().body,
+                rating: -1,
+              },
+              __exception: 'greater than',
+            },
+            {
+              ...getReqMock(),
+              body: {
+                ...getReqMock().body,
+                rating: 6,
+              },
+              __exception: 'less than',
+            },
+            {
+              ...getReqMock(),
+              body: {
+                ...getReqMock().body,
+                rating: 1.25,
+              },
+              __exception: 'integer or .5 (a half)',
+            },
+            {
+              ...getReqMock(),
+              body: {
+                ...getReqMock().body,
+                author: null,
+              },
+              __exception: 'Author value',
+            },
+          ].map(async (reqMock) => {
+            const resMock = getResMock();
+
+            await apiProductsRouter._addReview(reqMock, resMock);
+
+            expect(resMock.status).toBeCalledWith(400);
+            expect(resMock._jsonMethod).toBeCalledWith({ exception: expect.stringContaining(reqMock.__exception) });
+          })
+        );
+      });
+
+      it('should call res.status(500).json({ exception: Error }) if getFromDB failed', async () => {
+        const resMock = getResMock();
+
+        await apiProductsRouter._addReview(getReqMock(), resMock);
+
+        expect(resMock.status).toBeCalledWith(500);
+        expect(resMock._jsonMethod).toBeCalledWith({ exception: expect.any(Error) });
+      });
+    });
+  });
+
+  describe('addReview.isNumber(..)', () => {
+    it('should return true when passed number and false otherwise', () => {
+      expect(apiProductsRouter._addReview.isNumber(1)).toBe(true);
+      expect(apiProductsRouter._addReview.isNumber(0.5)).toBe(true);
+      expect(apiProductsRouter._addReview.isNumber('a')).toBe(false);
+      expect(apiProductsRouter._addReview.isNumber(null)).toBe(false);
+      expect(apiProductsRouter._addReview.isNumber(undefined)).toBe(false);
+    });
+  });
+
+  describe('addReview.isIntOrDecimalHalf(..)', () => {
+    it('should return true when passed number is integer or decimal-half and false otherwise', () => {
+      expect(apiProductsRouter._addReview.isIntOrDecimalHalf(0)).toBe(true);
+      expect(apiProductsRouter._addReview.isIntOrDecimalHalf(1)).toBe(true);
+      expect(apiProductsRouter._addReview.isIntOrDecimalHalf(0.5)).toBe(true);
+      expect(apiProductsRouter._addReview.isIntOrDecimalHalf(1.5)).toBe(true);
+      expect(apiProductsRouter._addReview.isIntOrDecimalHalf(0.25)).toBe(false);
+      expect(apiProductsRouter._addReview.isIntOrDecimalHalf(1.25)).toBe(false);
+      expect(apiProductsRouter._addReview.isIntOrDecimalHalf(4.75)).toBe(false);
     });
   });
 
