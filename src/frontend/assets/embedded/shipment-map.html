@@ -6,16 +6,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <!-- TODO: [a11y] change title -->
-        <title>Shipment Map</title>
-        
-        <!-- <script src="https://geowidget.easypack24.net/js/sdk-for-javascript.js"></script> -->
-        <script src="/embedded/shipment-map-3rd-party.js"></script>
-        
+        <title>Geo-Map</title>
+
+        <% if (webpackConfig.mode === 'development') { %>
+            <script src="/embedded/shipment-map-3rd-party.js"></script>
+            <link rel="stylesheet" href="/embedded/shipment-map-3rd-party.css"/>
+        <% } else { %>
+            <script src="https://geowidget.easypack24.net/js/sdk-for-javascript.js"></script>
+            <link rel="stylesheet" href="https://geowidget.easypack24.net/css/easypack.css"/>
+        <% } %>
+
         <script src="/embedded/shipment-map.js"></script>
-        
-        <!-- <link rel="stylesheet" href="https://geowidget.easypack24.net/css/easypack.css"/> -->
-        <link rel="stylesheet" href="/embedded/shipment-map-3rd-party.css"/>
     </head>
 
     <body>

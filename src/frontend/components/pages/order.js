@@ -28,11 +28,7 @@ const Shipment = memo(function Shipment({ updateChosenShipmentPoint }) {
     };
   }, []);
 
-  return (
-    <>
-      <iframe src="/embedded/shipment-map.html" style={{ width: '100%', minHeight: '75%' }}></iframe>
-    </>
-  );
+  return <iframe src="/embedded/shipment-map.html" style={{ width: '100%', minHeight: '75%' }}></iframe>;
 });
 
 export default function Order() {
