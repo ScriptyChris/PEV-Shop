@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import appStore from '../../features/appStore';
 import { getUserCartStateFromStorage, saveUserCartStateToStorage } from '../../features/storageApi';
-import apiService from '../../features/apiService';
+import appStore from '../../features/appStore';
 
 export default observer(function Cart() {
   const [cartVisibility, updateCartVisibility] = useState(false);
+  const history = useHistory();
 
   const translations = {
     header: 'Cart',
@@ -39,14 +40,7 @@ export default observer(function Cart() {
   };
 
   const handleCartSubmission = () => {
-    apiService
-      .submitCart(appStore.userCartProducts)
-      .then(({ redirectUri }) => {
-        appStore.clearUserCartState();
-        window.location = redirectUri;
-      })
-      // TODO: handle error in better way
-      .catch((error) => console.error('submitCart error:', error));
+    history.push('/order');
   };
 
   return (

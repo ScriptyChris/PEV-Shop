@@ -1,6 +1,7 @@
 const { resolve } = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
 require('dotenv').config();
 
@@ -46,6 +47,20 @@ module.exports = (env) => {
       }),
       new HtmlWebpackPlugin({
         template: './src/frontend/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'embedded/shipment-map.html',
+        template: './src/frontend/assets/embedded/shipment-map.html',
+        inject: false,
+      }),
+      new CopyPlugin({
+        patterns: [
+          'shipment-map-3rd-party.js', 'shipment-map-3rd-party.css',
+          'shipment-map.js',
+        ].map((fileName) => ({
+          from: `./src/frontend/assets/embedded/${fileName}`,
+          to: `./embedded/${fileName}`
+        })),
       }),
     ],
     devtool: 'source-map',
