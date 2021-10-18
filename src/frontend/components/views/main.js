@@ -7,6 +7,7 @@ import { NewProduct, ModifyProduct } from '../pages/newProduct';
 import LogIn from '../pages/logIn';
 import Account from '../pages/account';
 import Compare from '../pages/compare';
+import Order from '../pages/order';
 
 export default function Main() {
   return (
@@ -32,6 +33,7 @@ export default function Main() {
         <Route path="/account">
           <Account />
         </Route>
+        <Route path="/order" component={Order} />
       </Switch>
     </main>
   );
