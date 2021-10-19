@@ -3,6 +3,13 @@ import { Redirect } from 'react-router-dom';
 import appStore, { USER_SESSION_STATES } from '../../features/appStore';
 import apiService from '../../features/apiService';
 
+const translations = Object.freeze({
+  logInHeader: 'Login to shop',
+  logInField: 'Login',
+  passwordField: 'Password',
+  submitLogIn: 'Login!',
+});
+
 export default function LogIn() {
   const [userLogin, setUserLogin] = useState('');
   const [userPassword, setUserPassword] = useState('');
@@ -31,22 +38,23 @@ export default function LogIn() {
 
   return (
     <section>
-      LogIn!
       <form onSubmit={handleSubmit}>
         <fieldset>
-          <legend>Please type your account login and password</legend>
+          <legend>
+            <h2>{translations.logInHeader}</h2>
+          </legend>
 
           <div>
-            <label htmlFor="login">Login</label>
+            <label htmlFor="login">{translations.logInField}</label>
             <input id="login" type="text" value={userLogin} onChange={onInputChange} required />
           </div>
 
           <div>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{translations.passwordField}</label>
             <input id="password" type="password" value={userPassword} onChange={onInputChange} required />
           </div>
 
-          <button type="submit">Log in!</button>
+          <button type="submit">{translations.submitLogIn}</button>
         </fieldset>
       </form>
       {loggedInUserData && (
