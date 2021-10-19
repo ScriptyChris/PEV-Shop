@@ -51,7 +51,15 @@ export default function LogIn() {
 
           <div>
             <label htmlFor="password">{translations.passwordField}</label>
-            <input id="password" type="password" value={userPassword} onChange={onInputChange} required />
+            <input
+              id="password"
+              type="password"
+              value={userPassword}
+              onChange={onInputChange}
+              minLength="8"
+              maxLength="20"
+              required
+            />
           </div>
 
           <button type="submit">{translations.submitLogIn}</button>

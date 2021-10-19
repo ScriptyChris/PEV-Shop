@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
-import fetch, { FetchError, RequestInit, Response as FetchResponse } from 'node-fetch';
+import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { PAYU_DEFAULTS } from '../helpers/payu-api';
 
 // @ts-ignore

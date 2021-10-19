@@ -1,8 +1,21 @@
-import { model } from 'mongoose';
-import { Schema, Document } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 import { getToken, comparePasswords } from '../../middleware/features/auth';
 
-const USER_CREDENTIALS_ERROR = new Error('Unable to login');
+require('mongoose-type-email');
+
+const USER_CREDENTIALS_ERROR = new Error('Credentials error');
+const PASSWORD_METADATA = {
+  EMPTY_OR_INCORRECT_TYPE: 'password must be a non-empty string!',
+  MIN_LENGTH: {
+    value: 8,
+    errorMessage: 'password should has at least 8 chars!',
+  },
+  MAX_LENGTH: {
+    value: 20,
+    errorMessage: 'password should has maximum of 20 chars!',
+  },
+};
+const ACCOUNT_TYPES = ['client', 'retailer'] as const;
 
 const userSchema = new Schema({
   login: {
@@ -13,6 +26,20 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
+  },
+  email: {
+    // @ts-ignore
+    type: Schema.Types.Email,
+    unique: true,
+    required: true,
+  },
+  accountType: {
+    type: String,
+    required: true,
+    enum: {
+      values: ACCOUNT_TYPES,
+      message: '{VALUE} is not a proper account type!',
+    },
   },
   tokens: [
     {
@@ -54,6 +81,22 @@ userSchema.methods.matchPassword = function (password: string): Promise<boolean>
   return comparePasswords(password, this.password);
 };
 
+userSchema.statics.validatePassword = (password: any): string => {
+  if (typeof password !== 'string') {
+    return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE;
+  }
+
+  if (password.length < PASSWORD_METADATA.MIN_LENGTH.value) {
+    return PASSWORD_METADATA.MIN_LENGTH.errorMessage;
+  }
+
+  if (password.length > PASSWORD_METADATA.MAX_LENGTH.value) {
+    return PASSWORD_METADATA.MAX_LENGTH.errorMessage;
+  }
+
+  return '';
+};
+
 // TODO: remove if unused
 userSchema.statics.findByCredentials = async (userModel: any, nick: string, password: string) => {
   const user = userModel.findOne({ nick });
@@ -76,10 +119,15 @@ const UserModel = model<IUser>('User', userSchema);
 export interface IUser extends Document {
   login: string;
   password: string;
+  email: string;
+  accountType: typeof ACCOUNT_TYPES[number];
   tokens: string[];
   generateAuthToken(): Promise<string>;
   toJSON(): IUser;
   matchPassword(password: string): Promise<boolean>;
+
+  // TODO: [TS] fix TS error related to non-static method
+  //static validatePassword(password: any): string;
 }
 
 export default UserModel;

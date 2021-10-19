@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Formik, Field } from 'formik';
+import { useHistory } from 'react-router-dom';
+import apiService from '../../features/apiService';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -19,9 +22,34 @@ export default function Register() {
     email: '',
     accountType: '',
   });
+  const [popupData, setPopupData] = useState(null);
+  const history = useHistory();
 
   const onSubmitHandler = (values) => {
     console.log('register submit values:', values);
+
+    apiService.registerUser(values).then((res) => {
+      console.log('register res:', res, ' /typeof res:', typeof res);
+
+      if (typeof res === 'string') {
+        setPopupData({
+          type: POPUP_TYPES.SUCCESS,
+          message: 'Account registered!',
+          buttons: [
+            {
+              onClick: () => history.push('/log-in'),
+              text: 'Go to login',
+            },
+          ],
+        });
+      } else {
+        setPopupData({
+          type: POPUP_TYPES.FAILURE,
+          message: 'Failed to register new account :(',
+          buttons: [getClosePopupBtn(setPopupData)],
+        });
+      }
+    });
   };
 
   return (
@@ -41,7 +69,14 @@ export default function Register() {
 
               <div>
                 <label htmlFor="registrationPassword">{translations.passwordField}</label>
-                <Field name="password" id="registrationPassword" type="password" required />
+                <Field
+                  name="password"
+                  id="registrationPassword"
+                  type="password"
+                  minLength="8"
+                  maxLength="20"
+                  required
+                />
               </div>
 
               <div>
@@ -75,6 +110,8 @@ export default function Register() {
           </form>
         )}
       </Formik>
+
+      {popupData && <Popup {...popupData} />}
     </section>
   );
 }

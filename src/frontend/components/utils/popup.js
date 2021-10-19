@@ -6,6 +6,17 @@ const POPUP_TYPES = {
   FAILURE: 'FAILURE',
 };
 
+const getClosePopupBtn = (setPopupData) => {
+  if (typeof setPopupData !== 'function') {
+    throw TypeError(`setPopupData should be a function! Received: ${setPopupData}`);
+  }
+
+  return {
+    onClick: () => setPopupData(null),
+    text: 'Close',
+  };
+};
+
 function getClassNameByType(type) {
   switch (type) {
     case POPUP_TYPES.SUCCESS: {
@@ -21,6 +32,8 @@ function getClassNameByType(type) {
     }
   }
 }
+
+export { POPUP_TYPES, getClosePopupBtn };
 
 export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, buttons = [] }) {
   if (!Object.keys(POPUP_TYPES).includes(type)) {

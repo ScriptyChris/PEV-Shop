@@ -3,7 +3,7 @@ import * as expressModule from 'express';
 import { Request, Response } from 'express';
 import { saveToDB, getFromDB, updateOneModelInDB, ObjectId } from '../../database/database-index';
 import { authMiddlewareFn, hashPassword } from '../features/auth';
-import { IUser } from '../../database/models/_user';
+import UserModel, { IUser } from '../../database/models/_user';
 
 const {
   // @ts-ignore
@@ -13,6 +13,7 @@ const logger = getLogger(module.filename);
 
 const router: any = Router();
 router.post('/api/users/', updateUser);
+router.post('/api/users/register', registerUser);
 router.post('/api/users/login', logInUser);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
@@ -30,6 +31,7 @@ async function updateUser(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[POST] /users req.body', req.body);
 
+    // TODO: [error-handling] validate password before hashing it, as in `registerUser` function
     req.body.password = await hashPassword(req.body.password);
     const savedUser = (await saveToDB(req.body, 'User')) as IUser;
 
@@ -55,8 +57,31 @@ async function updateUser(req: Request, res: Response): Promise<void> {
   }
 }
 
+async function registerUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(registerUser) req.body:', req.body);
+
+  try {
+    // @ts-ignore
+    const validatedPassword = UserModel.validatePassword(req.body.password);
+
+    if (validatedPassword) {
+      return res.status(400).json({ exception: validatedPassword });
+    }
+
+    req.body.password = await hashPassword(req.body.password);
+
+    await saveToDB(req.body, 'User');
+
+    res.sendStatus(204);
+  } catch (exception) {
+    logger.error('(registerUser) exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+}
+
 async function logInUser(req: Request, res: Response): Promise<void> {
-  logger.log('[POST] /login');
+  logger.log('(logInUser) req.body:', req.body);
 
   try {
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
