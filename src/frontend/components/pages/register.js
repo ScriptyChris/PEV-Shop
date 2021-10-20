@@ -13,6 +13,13 @@ const translations = Object.freeze({
   accountType: 'Account type',
   clientType: 'Client',
   retailerType: 'Retailer',
+  emailSuccessMsg: `
+    Account registered! 
+    You need to confirm your account via the link we sent you on email, 
+    before you'll be able to log in.
+  `.trim(),
+  emailFailureMsg: 'Failed to register new account :(',
+  popupGoToLogin: 'Go to login',
 });
 
 export default function Register() {
@@ -31,21 +38,21 @@ export default function Register() {
     apiService.registerUser(values).then((res) => {
       console.log('register res:', res, ' /typeof res:', typeof res);
 
-      if (typeof res === 'string') {
+      if (res.msg) {
         setPopupData({
           type: POPUP_TYPES.SUCCESS,
-          message: 'Account registered!',
+          message: translations.emailSuccessMsg,
           buttons: [
             {
               onClick: () => history.push('/log-in'),
-              text: 'Go to login',
+              text: translations.popupGoToLogin,
             },
           ],
         });
       } else {
         setPopupData({
           type: POPUP_TYPES.FAILURE,
-          message: 'Failed to register new account :(',
+          message: translations.emailFailureMsg,
           buttons: [getClosePopupBtn(setPopupData)],
         });
       }

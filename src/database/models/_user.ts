@@ -1,4 +1,6 @@
 import { model, Schema, Document } from 'mongoose';
+// TODO: [refactor] swap it for crypto.randomBytes(..)
+import { v4 as uuidv4 } from 'uuid';
 import { getToken, comparePasswords } from '../../middleware/features/auth';
 
 require('mongoose-type-email');
@@ -16,8 +18,9 @@ const PASSWORD_METADATA = {
   },
 };
 const ACCOUNT_TYPES = ['client', 'retailer'] as const;
+const TEMP_TOKEN_EXPIRE_TIME_MS = 1000 * 60 * 60;
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
   login: {
     type: String,
     unique: true,
@@ -40,6 +43,15 @@ const userSchema = new Schema({
       values: ACCOUNT_TYPES,
       message: '{VALUE} is not a proper account type!',
     },
+  },
+  isConfirmed: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  tempToken: {
+    type: String,
+    required: false,
   },
   tokens: [
     {
@@ -79,6 +91,19 @@ userSchema.methods.toJSON = function (): IUser {
 
 userSchema.methods.matchPassword = function (password: string): Promise<boolean> {
   return comparePasswords(password, this.password);
+};
+
+userSchema.methods.assignTempToken = function (): Promise<IUser> {
+  this.tempToken = uuidv4();
+
+  setTimeout(() => this.deleteTempToken(), TEMP_TOKEN_EXPIRE_TIME_MS);
+
+  return this.save();
+};
+
+userSchema.methods.deleteTempToken = function (): Promise<IUser> {
+  this.tempToken = undefined;
+  return this.save();
 };
 
 userSchema.statics.validatePassword = (password: any): string => {
@@ -121,10 +146,14 @@ export interface IUser extends Document {
   password: string;
   email: string;
   accountType: typeof ACCOUNT_TYPES[number];
-  tokens: string[];
+  isConfirmed: boolean;
+  tempToken?: string;
+  tokens: Record<'token', string>[];
   generateAuthToken(): Promise<string>;
   toJSON(): IUser;
   matchPassword(password: string): Promise<boolean>;
+  assignTempToken(): Promise<IUser>;
+  deleteTempToken(): Promise<IUser>;
 
   // TODO: [TS] fix TS error related to non-static method
   //static validatePassword(password: any): string;

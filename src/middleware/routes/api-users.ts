@@ -1,9 +1,10 @@
 import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
 import { Request, Response } from 'express';
-import { saveToDB, getFromDB, updateOneModelInDB, ObjectId } from '../../database/database-index';
+import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, ObjectId } from '../../database/database-index';
 import { authMiddlewareFn, hashPassword } from '../features/auth';
 import UserModel, { IUser } from '../../database/models/_user';
+import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
 
 const {
   // @ts-ignore
@@ -17,6 +18,7 @@ router.post('/api/users/register', registerUser);
 router.post('/api/users/login', logInUser);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
+router.get('/api/users/confirm-registration/:temp_token', confirmRegistration);
 
 // expose functions for unit tests
 router._updateUser = updateUser;
@@ -64,19 +66,72 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
     // @ts-ignore
     const validatedPassword = UserModel.validatePassword(req.body.password);
 
-    if (validatedPassword) {
+    if (validatedPassword !== '') {
       return res.status(400).json({ exception: validatedPassword });
     }
 
     req.body.password = await hashPassword(req.body.password);
 
-    await saveToDB(req.body, 'User');
+    const newUser = (await saveToDB(req.body, 'User')) as IUser;
+    await newUser.assignTempToken();
 
-    res.sendStatus(204);
+    sendMail(
+      req.body.email,
+      EMAIL_TYPES.ACTIVATION,
+      `http://localhost:3000/api/users/confirm-registration/${newUser.tempToken}`
+    )
+      .then(async (emailSentInfo) => {
+        if (emailSentInfo.rejected.length) {
+          logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
+
+          await deleteFromDB({ name: req.body.login }, 'User');
+
+          return res.status(400).json({
+            exception: {
+              msg: 'Sending email rejection',
+              reason: emailSentInfo.rejected,
+            },
+          });
+        }
+
+        res.status(201).json({ msg: 'User account created! Check your email.' });
+      })
+      .catch(async (emailSentError) => {
+        logger.error('emailSentError:', emailSentError);
+
+        await deleteFromDB({ name: req.body.login }, 'User');
+
+        res.status(500).json({
+          exception: {
+            msg: `Email sent error: '${emailSentError.message}'`,
+            reason: emailSentError,
+          },
+        });
+      });
   } catch (exception) {
     logger.error('(registerUser) exception:', exception);
 
     res.status(500).json({ exception });
+  }
+}
+
+async function confirmRegistration(req: Request, res: Response): Promise<void> {
+  logger.log('(confirmRegistration) req.params.temp_token:', req.params.temp_token);
+
+  try {
+    const userToConfirm = (await getFromDB({ tempToken: req.params.temp_token }, 'User')) as IUser;
+
+    if (userToConfirm) {
+      await userToConfirm.deleteTempToken();
+
+      res.status(200).send(`Registration for user "${userToConfirm.login}" confirmed!`);
+    } else {
+      res.status(404).send(`Registration confirmation failed: token expired or is invalid.`);
+    }
+  } catch (exception) {
+    logger.error('(confirmRegistration) exception:', exception);
+
+    res.status(500).send(JSON.stringify(exception));
   }
 }
 
