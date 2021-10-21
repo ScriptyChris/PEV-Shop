@@ -9,6 +9,7 @@ import LogIn from '../pages/logIn';
 import Account from '../pages/account';
 import Compare from '../pages/compare';
 import Order from '../pages/order';
+import ConfirmRegistration from '../pages/confirmRegistration';
 
 export default function Main() {
   return (
@@ -31,6 +32,9 @@ export default function Main() {
         </Route>
         <Route path="/register">
           <Register />
+        </Route>
+        <Route path="/confirm-registration">
+          <ConfirmRegistration />
         </Route>
         <Route path="/log-in">
           <LogIn />

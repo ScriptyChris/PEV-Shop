@@ -51,10 +51,19 @@ if (process.env.BACKEND_ONLY === 'true') {
 export default middleware;
 
 function wrappedMiddleware(): void {
+  const frontendPath = getFrontendPath();
+
   const app: Application = Express();
-  app.use(Express.static(getFrontendPath()));
+  app.use(Express.static(frontendPath));
 
   middleware(app);
+
+  // TODO: [REFACTOR] this probably should detect what resource the URL wants and maybe not always return index.html
+  app.use('/', (req, res) => {
+    console.log('global (404?) req.url:', req.url);
+
+    res.sendFile(`${frontendPath}/index.html`);
+  });
   app.listen(process.env.PORT, () => {
     logger.log(`Server is listening on port ${process.env.PORT}`);
   });

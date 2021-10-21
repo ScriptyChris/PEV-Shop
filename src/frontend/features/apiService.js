@@ -232,6 +232,10 @@ const apiService = new (class ApiService extends Ajax {
   registerUser(registrationData) {
     return this.postRequest(`${this.USERS_URL}/register`, registrationData);
   }
+
+  confirmRegistration(token) {
+    return this.postRequest(`${this.USERS_URL}/confirm-registration`, { tempToken: token });
+  }
 })();
 
 export default apiService;

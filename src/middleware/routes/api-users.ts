@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
 import { Request, Response } from 'express';
@@ -5,6 +6,8 @@ import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, ObjectId } from 
 import { authMiddlewareFn, hashPassword } from '../features/auth';
 import UserModel, { IUser } from '../../database/models/_user';
 import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
+
+dotenv.config();
 
 const {
   // @ts-ignore
@@ -15,10 +18,10 @@ const logger = getLogger(module.filename);
 const router: any = Router();
 router.post('/api/users/', updateUser);
 router.post('/api/users/register', registerUser);
+router.post('/api/users/confirm-registration', confirmRegistration);
 router.post('/api/users/login', logInUser);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
-router.get('/api/users/confirm-registration/:temp_token', confirmRegistration);
 
 // expose functions for unit tests
 router._updateUser = updateUser;
@@ -63,6 +66,8 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
   logger.log('(registerUser) req.body:', req.body);
 
   try {
+    // TODO: [SECURITY] add some debounce for register amount per IP
+
     // @ts-ignore
     const validatedPassword = UserModel.validatePassword(req.body.password);
 
@@ -78,7 +83,7 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
     sendMail(
       req.body.email,
       EMAIL_TYPES.ACTIVATION,
-      `http://localhost:3000/api/users/confirm-registration/${newUser.tempToken}`
+      `http://localhost:${process.env.PORT}/confirm-registration/?token=${newUser.tempToken}`
     )
       .then(async (emailSentInfo) => {
         if (emailSentInfo.rejected.length) {
@@ -116,30 +121,36 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
 }
 
 async function confirmRegistration(req: Request, res: Response): Promise<void> {
-  logger.log('(confirmRegistration) req.params.temp_token:', req.params.temp_token);
+  logger.log('(confirmRegistration) req.body.tempToken:', req.body.tempToken);
 
   try {
-    const userToConfirm = (await getFromDB({ tempToken: req.params.temp_token }, 'User')) as IUser;
+    const userToConfirm = (await getFromDB({ tempToken: req.body.tempToken }, 'User')) as IUser;
 
     if (userToConfirm) {
+      await userToConfirm.confirmUser();
       await userToConfirm.deleteTempToken();
 
-      res.status(200).send(`Registration for user "${userToConfirm.login}" confirmed!`);
+      res.status(200).json({ payload: { isUserConfirmed: true } });
     } else {
-      res.status(404).send(`Registration confirmation failed: token expired or is invalid.`);
+      res.status(400).json({ payload: { isUserConfirmed: false } });
     }
   } catch (exception) {
     logger.error('(confirmRegistration) exception:', exception);
 
-    res.status(500).send(JSON.stringify(exception));
+    res.status(500).json({ exception });
   }
 }
 
-async function logInUser(req: Request, res: Response): Promise<void> {
+async function logInUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
   logger.log('(logInUser) req.body:', req.body);
 
   try {
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
+
+    if (!user.isConfirmed) {
+      return res.status(401).json({ msg: 'Login failed, because user registration is not confirmed!' });
+    }
+
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {

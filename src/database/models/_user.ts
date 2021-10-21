@@ -106,6 +106,11 @@ userSchema.methods.deleteTempToken = function (): Promise<IUser> {
   return this.save();
 };
 
+userSchema.methods.confirmUser = function (): Promise<IUser> {
+  this.isConfirmed = true;
+  return this.save();
+};
+
 userSchema.statics.validatePassword = (password: any): string => {
   if (typeof password !== 'string') {
     return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE;
@@ -154,6 +159,7 @@ export interface IUser extends Document {
   matchPassword(password: string): Promise<boolean>;
   assignTempToken(): Promise<IUser>;
   deleteTempToken(): Promise<IUser>;
+  confirmUser(): Promise<IUser>;
 
   // TODO: [TS] fix TS error related to non-static method
   //static validatePassword(password: any): string;
