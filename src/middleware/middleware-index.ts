@@ -21,6 +21,7 @@ dotenv.default.config();
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
+// TODO: [SECURITY] https://expressjs.com/en/advanced/best-practice-security.html
 const middleware = (app: Application): void => {
   app.use(bodyParser.json());
   app.use(apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);

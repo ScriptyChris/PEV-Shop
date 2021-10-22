@@ -236,6 +236,10 @@ const apiService = new (class ApiService extends Ajax {
   confirmRegistration(token) {
     return this.postRequest(`${this.USERS_URL}/confirm-registration`, { token });
   }
+
+  resendConfirmRegistration(email) {
+    return this.postRequest(`${this.USERS_URL}/resend-confirm-registration`, { email });
+  }
 })();
 
 export default apiService;

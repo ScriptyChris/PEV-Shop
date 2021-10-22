@@ -35,7 +35,7 @@ function getClassNameByType(type) {
 
 export { POPUP_TYPES, getClosePopupBtn };
 
-export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, buttons = [] }) {
+export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage, buttons = [], altButtons }) {
   if (!Object.keys(POPUP_TYPES).includes(type)) {
     throw TypeError(
       `'type' prop must be one of POPUP_TYPES!\n
@@ -63,6 +63,21 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, buttons = [
     <div className="popup-container">
       <aside className={`${baseClassName} ${baseClassName}${getClassNameByType(type)}`}>
         <p className={`${baseClassName}__message`}>{message}</p>
+        {altMessage && (
+          <p className={`${baseClassName}__message--alt`}>
+            {altMessage}
+
+            {altButtons && (
+              <div className={`${baseClassName}__buttons--alt`}>
+                {altButtons.map((altBtn) => (
+                  <button onClick={altBtn.onClick} key={altBtn.text}>
+                    {altBtn.text}
+                  </button>
+                ))}
+              </div>
+            )}
+          </p>
+        )}
 
         <div className={`${baseClassName}__buttons`}>
           {buttons.map((btn) => (

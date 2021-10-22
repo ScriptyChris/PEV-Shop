@@ -19,6 +19,7 @@ const router: any = Router();
 router.post('/api/users/', updateUser);
 router.post('/api/users/register', registerUser);
 router.post('/api/users/confirm-registration', confirmRegistration);
+router.post('/api/users/resend-confirm-registration', resendConfirmRegistration);
 router.post('/api/users/login', logInUser);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
@@ -30,6 +31,56 @@ router._logOutUser = logOutUser;
 router._getUser = getUser;
 
 export default router;
+
+type TPromisedJSON = Promise<Pick<Response, 'json'>>;
+// workaround fix for TS1055 error: https://stackoverflow.com/a/45929350/4983840
+const TPromisedJSON = Promise;
+
+const sendRegistrationEmail = async ({
+  email,
+  login,
+  token,
+  res,
+}: {
+  email: string;
+  login: string;
+  token: string;
+  res: Response;
+}): TPromisedJSON => {
+  return sendMail(
+    email,
+    EMAIL_TYPES.ACTIVATION,
+    `http://localhost:${process.env.PORT}/confirm-registration/?token=${token}`
+  )
+    .then(async (emailSentInfo) => {
+      if (emailSentInfo.rejected.length) {
+        logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
+
+        await deleteFromDB({ name: login }, 'User');
+
+        return res.status(400).json({
+          exception: {
+            msg: 'Sending email rejection',
+            reason: emailSentInfo.rejected,
+          },
+        });
+      }
+
+      return res.status(201).json({ msg: 'User account created! Check your email.' });
+    })
+    .catch(async (emailSentError) => {
+      logger.error('emailSentError:', emailSentError);
+
+      await deleteFromDB({ name: login }, 'User');
+
+      return res.status(500).json({
+        exception: {
+          msg: `Email sent error: '${emailSentError.message}'`,
+          reason: emailSentError,
+        },
+      });
+    });
+};
 
 // TODO: implement updating various user data
 async function updateUser(req: Request, res: Response): Promise<void> {
@@ -80,39 +131,12 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
     const newUser = (await saveToDB(req.body, 'User')) as IUser;
     await newUser.setConfirmRegistrationToken();
 
-    sendMail(
-      req.body.email,
-      EMAIL_TYPES.ACTIVATION,
-      `http://localhost:${process.env.PORT}/confirm-registration/?token=${newUser.tokens.confirmRegistration}`
-    )
-      .then(async (emailSentInfo) => {
-        if (emailSentInfo.rejected.length) {
-          logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
-
-          await deleteFromDB({ name: req.body.login }, 'User');
-
-          return res.status(400).json({
-            exception: {
-              msg: 'Sending email rejection',
-              reason: emailSentInfo.rejected,
-            },
-          });
-        }
-
-        res.status(201).json({ msg: 'User account created! Check your email.' });
-      })
-      .catch(async (emailSentError) => {
-        logger.error('emailSentError:', emailSentError);
-
-        await deleteFromDB({ name: req.body.login }, 'User');
-
-        res.status(500).json({
-          exception: {
-            msg: `Email sent error: '${emailSentError.message}'`,
-            reason: emailSentError,
-          },
-        });
-      });
+    return await sendRegistrationEmail({
+      login: req.body.login,
+      email: req.body.email,
+      token: newUser.tokens.confirmRegistration as string,
+      res,
+    });
   } catch (exception) {
     logger.error('(registerUser) exception:', exception);
 
@@ -138,6 +162,44 @@ async function confirmRegistration(req: Request, res: Response): Promise<void> {
     logger.error('(confirmRegistration) exception:', exception);
 
     res.status(500).json({ exception });
+  }
+}
+
+// TODO: [SECURITY] set some debounce to limit number of sent emails per time
+async function resendConfirmRegistration(req: Request, res: Response): TPromisedJSON {
+  logger.log('(resendConfirmRegistration) req.body:', req.body);
+
+  try {
+    const userToResendConfirmation = (await getFromDB(
+      {
+        email: req.body.email,
+        isConfirmed: false,
+        'tokens.confirmRegistration': { $exists: true },
+      },
+      'User'
+    )) as IUser;
+
+    logger.log(
+      'userToResendConfirmation:',
+      userToResendConfirmation,
+      ' /userToResendConfirmation.tokens.confirmRegistration:',
+      userToResendConfirmation.tokens.confirmRegistration
+    );
+
+    if (userToResendConfirmation) {
+      return await sendRegistrationEmail({
+        login: userToResendConfirmation.login,
+        email: req.body.email,
+        token: userToResendConfirmation.tokens.confirmRegistration as string,
+        res,
+      });
+    } else {
+      return res.status(400).json({ payload: { isConfirmationReSend: false } });
+    }
+  } catch (exception) {
+    logger.error('(resendConfirmRegistration) exception:', exception);
+
+    return res.status(500).json({ exception });
   }
 }
 

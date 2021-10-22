@@ -19,6 +19,8 @@ const translations = Object.freeze({
     before you'll be able to log in.
   `.trim(),
   emailFailureMsg: 'Failed to register new account :(',
+  emailSuccessAltMsg: "Email hasn't arrived yet? Click the button and we will re-send the email again.",
+  popupReSendEmail: 'Re-send email',
   popupGoToLogin: 'Go to login',
 });
 
@@ -42,10 +44,17 @@ export default function Register() {
         setPopupData({
           type: POPUP_TYPES.SUCCESS,
           message: translations.emailSuccessMsg,
+          altMessage: translations.emailSuccessAltMsg,
           buttons: [
             {
               onClick: () => history.push('/log-in'),
               text: translations.popupGoToLogin,
+            },
+          ],
+          altButtons: [
+            {
+              onClick: () => resendConfirmRegistration(values.email),
+              text: translations.popupReSendEmail,
             },
           ],
         });
@@ -57,6 +66,11 @@ export default function Register() {
         });
       }
     });
+  };
+
+  // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time
+  const resendConfirmRegistration = (email) => {
+    apiService.resendConfirmRegistration(email);
   };
 
   return (
