@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { PAYU_DEFAULTS } from '../helpers/payu-api';
+import { IUser } from '../../database/models/_user';
 
 // @ts-ignore
 dotenv.default.config();
@@ -43,17 +44,19 @@ const verifyToken = (token: string): TToken => {
 };
 
 const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ any): ((...args: any) => Promise<void>) => {
-  return async (req: Request & { token: string; user: any }, res: Response, next: NextFunction) => {
+  return async (req: Request & { authToken: string; user: IUser }, res: Response, next: NextFunction) => {
     try {
-      const token: string = (req.header('Authorization') as string).replace('Bearer ', '');
-      const decodedToken: TToken = verifyToken(token);
-      const user: any = await getFromDB({ _id: decodedToken._id.toString(), 'tokens.token': token }, 'User');
+      const authToken: string = (req.header('Authorization') as string).replace('Bearer ', '');
+      const decodedToken: TToken = verifyToken(authToken);
+      const user = (await getFromDB(
+        { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: authToken } },
+        'User'
+      )) as IUser;
 
       if (!user) {
         throw new Error('Auth failed!');
       }
 
-      req.token = token;
       req.user = user;
 
       next();

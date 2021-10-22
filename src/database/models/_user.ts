@@ -18,7 +18,7 @@ const PASSWORD_METADATA = {
   },
 };
 const ACCOUNT_TYPES = ['client', 'retailer'] as const;
-const TEMP_TOKEN_EXPIRE_TIME_MS = 1000 * 60 * 60;
+const CONFIRM_REG_TOKEN_EXPIRE_TIME_MS = 1000 * 60 * 60;
 
 const userSchema = new Schema<IUser>({
   login: {
@@ -49,18 +49,16 @@ const userSchema = new Schema<IUser>({
     required: true,
     default: false,
   },
-  tempToken: {
-    type: String,
-    required: false,
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true,
-      },
+  tokens: {
+    auth: {
+      type: [String],
+      default: undefined,
     },
-  ],
+    confirmRegistration: {
+      type: String,
+      default: undefined,
+    },
+  },
 });
 
 userSchema.virtual('roleName', {
@@ -74,12 +72,17 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
   const user = this;
   const token = getToken({ _id: user._id });
 
-  user.tokens.push({ token });
+  if (!user.tokens.auth) {
+    user.tokens.auth = [];
+  }
+
+  user.tokens.auth.push(token);
   await user.save();
 
   return token;
 };
 
+// TODO: [REFACTOR] this should rather return object containing only: login, email, _id
 userSchema.methods.toJSON = function (): IUser {
   const user = this.toObject();
 
@@ -93,16 +96,16 @@ userSchema.methods.matchPassword = function (password: string): Promise<boolean>
   return comparePasswords(password, this.password);
 };
 
-userSchema.methods.assignTempToken = function (): Promise<IUser> {
-  this.tempToken = uuidv4();
+userSchema.methods.setConfirmRegistrationToken = function (): Promise<IUser> {
+  this.tokens.confirmRegistration = uuidv4();
 
-  setTimeout(() => this.deleteTempToken(), TEMP_TOKEN_EXPIRE_TIME_MS);
+  setTimeout(() => this.deleteConfirmRegistrationToken(), CONFIRM_REG_TOKEN_EXPIRE_TIME_MS);
 
   return this.save();
 };
 
-userSchema.methods.deleteTempToken = function (): Promise<IUser> {
-  this.tempToken = undefined;
+userSchema.methods.deleteConfirmRegistrationToken = function (): Promise<IUser> {
+  this.tokens.confirmRegistration = undefined;
   return this.save();
 };
 
@@ -152,13 +155,15 @@ export interface IUser extends Document {
   email: string;
   accountType: typeof ACCOUNT_TYPES[number];
   isConfirmed: boolean;
-  tempToken?: string;
-  tokens: Record<'token', string>[];
+  tokens: {
+    auth: string[] | undefined;
+    confirmRegistration: string | undefined;
+  };
   generateAuthToken(): Promise<string>;
   toJSON(): IUser;
   matchPassword(password: string): Promise<boolean>;
-  assignTempToken(): Promise<IUser>;
-  deleteTempToken(): Promise<IUser>;
+  setConfirmRegistrationToken(): Promise<IUser>;
+  deleteConfirmRegistrationToken(): Promise<IUser>;
   confirmUser(): Promise<IUser>;
 
   // TODO: [TS] fix TS error related to non-static method

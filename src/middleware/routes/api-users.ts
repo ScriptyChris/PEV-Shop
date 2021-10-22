@@ -78,12 +78,12 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
     req.body.password = await hashPassword(req.body.password);
 
     const newUser = (await saveToDB(req.body, 'User')) as IUser;
-    await newUser.assignTempToken();
+    await newUser.setConfirmRegistrationToken();
 
     sendMail(
       req.body.email,
       EMAIL_TYPES.ACTIVATION,
-      `http://localhost:${process.env.PORT}/confirm-registration/?token=${newUser.tempToken}`
+      `http://localhost:${process.env.PORT}/confirm-registration/?token=${newUser.tokens.confirmRegistration}`
     )
       .then(async (emailSentInfo) => {
         if (emailSentInfo.rejected.length) {
@@ -121,14 +121,14 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
 }
 
 async function confirmRegistration(req: Request, res: Response): Promise<void> {
-  logger.log('(confirmRegistration) req.body.tempToken:', req.body.tempToken);
+  logger.log('(confirmRegistration) req.body.token:', req.body.token);
 
   try {
-    const userToConfirm = (await getFromDB({ tempToken: req.body.tempToken }, 'User')) as IUser;
+    const userToConfirm = (await getFromDB({ 'tokens.confirmRegistration': req.body.token }, 'User')) as IUser;
 
     if (userToConfirm) {
       await userToConfirm.confirmUser();
-      await userToConfirm.deleteTempToken();
+      await userToConfirm.deleteConfirmRegistrationToken();
 
       res.status(200).json({ payload: { isUserConfirmed: true } });
     } else {
@@ -147,14 +147,18 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
   try {
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
 
+    if (!user) {
+      return res.status(401).json({ msg: 'Invalid credentials!' });
+    }
+
     if (!user.isConfirmed) {
-      return res.status(401).json({ msg: 'Login failed, because user registration is not confirmed!' });
+      return res.status(401).json({ msg: 'User registration is not confirmed!' });
     }
 
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      throw { message: 'Invalid credentials', status: 401 };
+      return res.status(401).json({ msg: 'Invalid credentials!' });
     }
 
     const token = await user.generateAuthToken();
@@ -163,14 +167,18 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
   } catch (exception) {
     logger.error('Login user exception:', exception);
 
-    res.status(exception.status || 500).json({ payload: exception });
+    res.status(500).json({ exception });
   }
 }
 
-async function logOutUser(req: Request & { user: any; token: string }, res: Response): Promise<void> {
+async function logOutUser(req: Request & { user: IUser; token: string }, res: Response): Promise<void> {
   try {
-    // TODO: what if .filter(..) returns an empty array? should req.user be saved then?
-    req.user.tokens = req.user.tokens.filter((tokenItem: { token: string }) => tokenItem.token !== req.token);
+    req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
+
+    if (req.user.tokens.auth.length === 0) {
+      delete req.user.tokens.auth;
+    }
+
     await req.user.save();
 
     res.status(200).json({ payload: 'Logged out!' });
