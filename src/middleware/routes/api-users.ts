@@ -25,6 +25,7 @@ router.post('/api/users/reset-password', resetPassword);
 router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.patch('/api/users/set-new-password', setNewPassword);
+router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 
 // expose functions for unit tests
@@ -171,6 +172,7 @@ async function setNewPassword(req: Request, res: Response): Promise<void | Pick<
     if (validatedPassword !== '') {
       return res.status(400).json({ exception: validatedPassword });
     }
+
     const hashedPassword = await hashPassword(req.body.newPassword);
     const tokenQuery = {
       [`tokens.resetPassword`]: req.body.token.replace(/\s/g, '+'),
