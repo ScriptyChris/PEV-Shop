@@ -19,7 +19,11 @@ const PASSWORD_METADATA = {
   },
 };
 const ACCOUNT_TYPES = ['client', 'retailer'] as const;
-const CONFIRM_REG_TOKEN_EXPIRE_TIME_MS = 1000 * 60 * 60;
+const SINGLE_TOKEN_EXPIRE_TIME_MS = 1000 * 60 * 60;
+
+type TTokensKeys = keyof IUser['tokens'];
+type TDeclaredTokens = { [k in TTokensKeys]: string };
+type TSingleTokensKeys = Exclude<keyof TDeclaredTokens, 'auth'>;
 
 const userSchema = new Schema<IUser>({
   login: {
@@ -56,6 +60,10 @@ const userSchema = new Schema<IUser>({
       default: undefined,
     },
     confirmRegistration: {
+      type: String,
+      default: undefined,
+    },
+    resetPassword: {
       type: String,
       default: undefined,
     },
@@ -96,16 +104,17 @@ userSchema.methods.matchPassword = function (password: string): Promise<boolean>
   return comparePasswords(password, this.password);
 };
 
-userSchema.methods.setConfirmRegistrationToken = function (): Promise<IUser> {
-  this.tokens.confirmRegistration = uuidv4();
+userSchema.methods.setSingleToken = function (tokenName: TSingleTokensKeys): Promise<IUser> {
+  this.tokens[tokenName] = uuidv4();
 
-  setTimeout(() => this.deleteConfirmRegistrationToken(), CONFIRM_REG_TOKEN_EXPIRE_TIME_MS);
+  setTimeout(() => this.deleteSingleToken(tokenName), SINGLE_TOKEN_EXPIRE_TIME_MS);
 
   return this.save();
 };
 
-userSchema.methods.deleteConfirmRegistrationToken = function (): Promise<IUser> {
-  this.tokens.confirmRegistration = undefined;
+userSchema.methods.deleteSingleToken = function (tokenName: TSingleTokensKeys): Promise<IUser> {
+  this.tokens[tokenName] = undefined;
+
   return this.save();
 };
 
@@ -158,12 +167,13 @@ export interface IUser extends Document {
   tokens: {
     auth: string[] | undefined;
     confirmRegistration: string | undefined;
+    resetPassword: string | undefined;
   };
   generateAuthToken(): Promise<string>;
   toJSON(): IUser;
   matchPassword(password: string): Promise<boolean>;
-  setConfirmRegistrationToken(): Promise<IUser>;
-  deleteConfirmRegistrationToken(): Promise<IUser>;
+  setSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
+  deleteSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   confirmUser(): Promise<IUser>;
 
   // TODO: [TS] fix TS error related to non-static method

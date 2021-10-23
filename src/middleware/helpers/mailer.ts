@@ -1,12 +1,9 @@
 import * as dotenv from 'dotenv';
 import { createTransport } from 'nodemailer';
 import SMTPTransport = require('nodemailer/lib/smtp-transport');
-import getLogger from '../../../utils/logger';
 
 // @ts-ignore
 dotenv.config();
-
-const logger = getLogger(module.filename);
 
 const translations = Object.freeze({
   activationSubject: 'Account activation',
@@ -15,6 +12,15 @@ const translations = Object.freeze({
 
     <p>Thank you for creating a new account. In order to use it, you have to 
     activate it first by clicking on the following link: 
+    <a href="{URL}" target="_blank">{URL}</a></p>
+    <p>The above link will expire after 1 hour.</p>
+  `.trim(),
+  resetPasswordSubject: 'Reset password',
+  resetPasswordMessage: `
+    <h1>Hello from the PEV Shop!</h1>
+
+    <p>We received your request to reset your account's password. In order to do it, you have to 
+    set a new one by clicking on the following link: 
     <a href="{URL}" target="_blank">{URL}</a></p>
     <p>The above link will expire after 1 hour.</p>
   `.trim(),
@@ -29,6 +35,12 @@ const EMAIL_TYPES_CONFIG = Object.freeze({
     subject: translations.activationSubject,
     getMessage(url: string): string {
       return translations.activationMessage.replace(/{URL}/g, url);
+    },
+  },
+  RESET_PASSWORD: {
+    subject: translations.resetPasswordSubject,
+    getMessage(url: string): string {
+      return translations.resetPasswordMessage.replace(/{URL}/g, url);
     },
   },
 } as const);

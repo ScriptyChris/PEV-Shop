@@ -21,7 +21,9 @@ router.post('/api/users/register', registerUser);
 router.post('/api/users/confirm-registration', confirmRegistration);
 router.post('/api/users/resend-confirm-registration', resendConfirmRegistration);
 router.post('/api/users/login', logInUser);
+router.post('/api/users/reset-password', resetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
+router.patch('/api/users/update-adhoc', updateAdHoc);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 
 // expose functions for unit tests
@@ -85,6 +87,46 @@ const sendRegistrationEmail = async ({
     });
 };
 
+const sendResetPasswordEmail = async ({
+  email,
+  token,
+  res,
+}: {
+  email: string;
+  token: string;
+  res: Response;
+}): TPromisedJSON => {
+  return sendMail(
+    email,
+    EMAIL_TYPES.RESET_PASSWORD,
+    `http://localhost:${process.env.PORT}/set-new-password/?token=${token}`
+  )
+    .then(async (emailSentInfo) => {
+      if (emailSentInfo.rejected.length) {
+        logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
+
+        return res.status(400).json({
+          exception: {
+            msg: 'Sending email rejection',
+            reason: emailSentInfo.rejected,
+          },
+        });
+      }
+
+      return res.status(200).json({ msg: 'Password resetting process began! Check your email.' });
+    })
+    .catch(async (emailSentError) => {
+      logger.error('emailSentError:', emailSentError);
+
+      return res.status(500).json({
+        exception: {
+          msg: `Email sent error: '${emailSentError.message}'`,
+          reason: emailSentError,
+        },
+      });
+    });
+};
+
 // TODO: implement updating various user data
 async function updateUser(req: Request, res: Response): Promise<void> {
   try {
@@ -116,6 +158,63 @@ async function updateUser(req: Request, res: Response): Promise<void> {
   }
 }
 
+async function updateAdHoc(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(updateAdHoc) req.body:', req.body);
+
+  try {
+    // TODO: [REFACTOR] this logic should be flexible to handle various fields
+    // @ts-ignore
+    const validatedPassword = UserModel.validatePassword(req.body.userModifications.value);
+
+    if (validatedPassword !== '') {
+      return res.status(400).json({ exception: validatedPassword });
+    }
+    const hashedPassword = await hashPassword(req.body.userModifications.value);
+
+    const { name: tokenName, value: tokenValue } = req.body.tokenObj;
+    const userToUpdateAdHoc = (await getFromDB(
+      {
+        [`tokens.${tokenName}`]: tokenValue,
+        // isConfirmed: false,
+        // 'tokens.confirmRegistration': { $exists: true },
+      },
+      'User'
+    )) as IUser;
+
+    if (userToUpdateAdHoc) {
+      logger.log(
+        '(resetPassword) userToUpdateAdHoc.password:',
+        userToUpdateAdHoc.password,
+        ' /modification:',
+        req.body.userModifications,
+        ' /hashed pass:',
+        hashedPassword
+      );
+
+      await updateOneModelInDB(
+        { [`tokens.${tokenName}`]: tokenValue },
+        {
+          action: 'modify',
+          data: {
+            [req.body.userModifications.name]: hashedPassword, // req.body.userModifications.value,
+          },
+        },
+        'User'
+      );
+
+      await userToUpdateAdHoc.deleteSingleToken('resetPassword');
+
+      res.status(201).json({ msg: 'Password updated!' });
+    } else {
+      return res.status(400).json({ msg: 'User not found!' });
+    }
+  } catch (exception) {
+    logger.error('(updateAdHoc) exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+}
+
 async function registerUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
   logger.log('(registerUser) req.body:', req.body);
 
@@ -132,7 +231,7 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
     req.body.password = await hashPassword(req.body.password);
 
     const newUser = (await saveToDB(req.body, 'User')) as IUser;
-    await newUser.setConfirmRegistrationToken();
+    await newUser.setSingleToken('confirmRegistration');
 
     return await sendRegistrationEmail({
       login: req.body.login,
@@ -155,7 +254,7 @@ async function confirmRegistration(req: Request, res: Response): Promise<void> {
 
     if (userToConfirm) {
       await userToConfirm.confirmUser();
-      await userToConfirm.deleteConfirmRegistrationToken();
+      await userToConfirm.deleteSingleToken('confirmRegistration');
 
       res.status(200).json({ payload: { isUserConfirmed: true } });
     } else {
@@ -224,6 +323,10 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
       return res.status(401).json({ msg: 'Invalid credentials!' });
     }
 
+    if (!user.isConfirmed) {
+      return res.status(401).json({ msg: 'User registration is not confirmed!' });
+    }
+
     const token = await user.generateAuthToken();
 
     res.status(200).json({ payload: user, token });
@@ -231,6 +334,39 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
     logger.error('Login user exception:', exception);
 
     res.status(500).json({ exception });
+  }
+}
+
+async function resetPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(resetPassword) req.body:', req.body);
+
+  try {
+    const userToResetPassword = (await getFromDB(
+      {
+        email: req.body.email,
+        // isConfirmed: false,
+        // 'tokens.confirmRegistration': { $exists: true },
+      },
+      'User'
+    )) as IUser;
+
+    if (userToResetPassword) {
+      logger.log('(resetPassword) userToResetPassword:', userToResetPassword.password);
+
+      await userToResetPassword.setSingleToken('resetPassword');
+
+      await sendResetPasswordEmail({
+        email: userToResetPassword.email,
+        token: userToResetPassword.tokens.resetPassword as string,
+        res,
+      });
+    } else {
+      return res.status(400).json({ msg: 'User not found!' });
+    }
+  } catch (exception) {
+    logger.error('(resetPassword) exception:', exception);
+
+    return res.status(500).json({ exception });
   }
 }
 
