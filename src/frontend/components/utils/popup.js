@@ -64,8 +64,8 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
       <aside className={`${baseClassName} ${baseClassName}${getClassNameByType(type)}`}>
         <p className={`${baseClassName}__message`}>{message}</p>
         {altMessage && (
-          <p className={`${baseClassName}__message--alt`}>
-            {altMessage}
+          <div className={`${baseClassName}__message--alt`}>
+            <p>{altMessage}</p>
 
             {altButtons && (
               <div className={`${baseClassName}__buttons--alt`}>
@@ -76,7 +76,7 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
                 ))}
               </div>
             )}
-          </p>
+          </div>
         )}
 
         <div className={`${baseClassName}__buttons`}>

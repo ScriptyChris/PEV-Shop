@@ -3,16 +3,19 @@ import { Formik, Field } from 'formik';
 import { useHistory } from 'react-router-dom';
 import apiService from '../../features/apiService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
+import FormFieldError from '../utils/formFieldError';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
   logInField: 'Login',
   passwordField: 'Password',
+  repeatedPasswordField: 'Repeat password',
   submitRegistration: 'Register!',
   email: 'Email',
   accountType: 'Account type',
   clientType: 'Client',
   retailerType: 'Retailer',
+  bothPasswordFieldsMustBeEqual: 'Both password fields must be equal!',
   emailSuccessMsg: `
     Account registered! 
     You need to confirm your account via the link we sent you on email, 
@@ -28,18 +31,32 @@ export default function Register() {
   const [formInitials] = useState({
     login: '',
     password: '',
+    repeatedPassword: '',
     email: '',
     accountType: '',
   });
   const [popupData, setPopupData] = useState(null);
   const history = useHistory();
 
+  // TODO: [UX] show password related errors independently, based on recently blurred field
+  const formValidator = (values) => {
+    const errors = {};
+
+    if (values.password && values.repeatedPassword && values.password !== values.repeatedPassword) {
+      errors.password = translations.bothPasswordFieldsMustBeEqual;
+      errors.repeatedPassword = translations.bothPasswordFieldsMustBeEqual;
+    }
+
+    return errors;
+  };
+
   const onSubmitHandler = (values) => {
     console.log('register submit values:', values);
 
-    apiService.registerUser(values).then((res) => {
+    apiService.registerUser({ ...values, repeatedPassword: undefined }).then((res) => {
       console.log('register res:', res, ' /typeof res:', typeof res);
 
+      // TODO: [BUG] fix reacting to response: exception, error and success
       if (res.msg) {
         setPopupData({
           type: POPUP_TYPES.SUCCESS,
@@ -75,8 +92,8 @@ export default function Register() {
 
   return (
     <section>
-      <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
-        {({ handleSubmit /* ...formikRestProps */ }) => (
+      <Formik onSubmit={onSubmitHandler} validateOnChange={false} validate={formValidator} initialValues={formInitials}>
+        {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
             <fieldset>
               <legend>
@@ -90,6 +107,7 @@ export default function Register() {
 
               <div>
                 <label htmlFor="registrationPassword">{translations.passwordField}</label>
+                {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
                 <Field
                   name="password"
                   id="registrationPassword"
@@ -98,6 +116,23 @@ export default function Register() {
                   maxLength="20"
                   required
                 />
+
+                {formikRestProps.errors.password && <FormFieldError>{formikRestProps.errors.password}</FormFieldError>}
+              </div>
+              <div>
+                <label htmlFor="registrationRepeatedPassword">{translations.repeatedPasswordField}</label>
+                <Field
+                  name="repeatedPassword"
+                  id="registrationRepeatedPassword"
+                  type="password"
+                  minLength="8"
+                  maxLength="20"
+                  required
+                />
+
+                {formikRestProps.errors.repeatedPassword && (
+                  <FormFieldError>{formikRestProps.errors.repeatedPassword}</FormFieldError>
+                )}
               </div>
 
               <div>
