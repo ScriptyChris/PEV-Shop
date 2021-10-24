@@ -1,4 +1,4 @@
-import { TJestMock } from '../../../src/types';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 
 const { Router, _router } = jest.mock('express').requireMock('express').default;
@@ -132,7 +132,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._updateUser(getReqMock(), resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(201);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.CREATED);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ msg: 'Success!' });
       });
     });
@@ -143,7 +143,7 @@ describe('#api-users', () => {
         const rejectionReason = TypeError(`Cannot read property 'password' of undefined`);
 
         apiUsersRouter._updateUser({}, resMock).catch(() => {
-          expect(resMock.status).toHaveBeenCalledWith(500);
+          expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
           expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception: rejectionReason });
         });
       });
@@ -251,7 +251,7 @@ describe('#api-users', () => {
         });
 
         // all cases
-        expect(resMock.status).toHaveBeenCalledWith(401);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.UNAUTHORIZED);
         expect(resMock.status).toHaveBeenCalledTimes(3);
       });
     });
@@ -282,7 +282,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._logOutUser(getReqMock(), resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(200);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: 'Logged out!' });
       });
     });
@@ -312,7 +312,7 @@ describe('#api-users', () => {
         });
 
         // all cases
-        expect(resMock.status).toHaveBeenCalledWith(500);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
         expect(resMock.status).toHaveBeenCalledTimes(2);
       });
     });
@@ -347,7 +347,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._getUser(getReqMock(), resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(200);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
           payload: await getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall)(),
         });
@@ -376,7 +376,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._getUser(emptyReqMock, resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(200);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: null });
       });
     });

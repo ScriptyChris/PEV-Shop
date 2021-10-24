@@ -1,4 +1,4 @@
-import { TJestMock } from '../../../src/types';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 import { findAssociatedSrcModulePath } from '../../test-index';
 
@@ -83,7 +83,7 @@ describe('#api-product-categories', () => {
 
           await routerGetCallback(reqMock, resMock).catch(console.error);
 
-          expect(resMock.status).toHaveBeenCalledWith(200);
+          expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
           expect(resMock._jsonMethod).toHaveBeenCalledWith(value.output);
 
           // inline mocks cleanup
@@ -101,7 +101,7 @@ describe('#api-product-categories', () => {
 
       const exception = new TypeError("Cannot read property 'forEach' of null");
 
-      expect(resMock.status).toHaveBeenCalledWith(500);
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception });
     });
   });

@@ -15,6 +15,7 @@ import {
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 import mapProductsTechnicalSpecs from '../helpers/api-products-specs-mapper';
 import { IProduct, IReviews } from '../../database/models/_product';
+import { HTTP_STATUS_CODE } from '../../types';
 
 const {
   // @ts-ignore
@@ -61,11 +62,11 @@ async function getProductsSpecs(req: Request, res: Response) {
     };
     const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
 
-    res.status(200).json(productsSpec);
+    res.status(HTTP_STATUS_CODE.OK).json(productsSpec);
   } catch (exception) {
     logger.error('Retrieving product specs exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -109,11 +110,11 @@ async function getProducts(
 
     const paginatedProducts = await getFromDB(query, 'Product', options);
 
-    res.status(200).json(paginatedProducts);
+    res.status(HTTP_STATUS_CODE.OK).json(paginatedProducts);
   } catch (exception) {
     logger.error('Retrieving product exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -123,11 +124,11 @@ async function getProductById(req: Request, res: Response): Promise<void> {
 
     const product = await getFromDB(req.params._id, 'Product');
 
-    res.status(200).json(product);
+    res.status(HTTP_STATUS_CODE.OK).json(product);
   } catch (exception) {
     logger.error('Retrieving product exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -137,11 +138,11 @@ async function addProduct(req: Request, res: Response): Promise<void> {
 
     await saveToDB(req.body, 'Product');
 
-    res.status(201).json({ msg: 'Success!' });
+    res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Success!' });
   } catch (exception) {
     logger.error('Saving product exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -154,18 +155,24 @@ async function addReview(req: Request, res: Response): Promise<void | Pick<Respo
     const rating = req.body.rating;
 
     if (!addReview.isNumber(rating)) {
-      return res.status(400).json({ exception: 'Rating value must be a number!' });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ exception: 'Rating value must be a number!' });
     } else if (rating < RATING_MIN_VALUE) {
-      return res.status(400).json({ exception: `Rating value must be greater than ${RATING_MIN_VALUE}!` });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json({ exception: `Rating value must be greater than ${RATING_MIN_VALUE}!` });
     } else if (rating > RATING_MAX_VALUE) {
-      return res.status(400).json({ exception: `Rating value must be less than ${RATING_MAX_VALUE}!` });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json({ exception: `Rating value must be less than ${RATING_MAX_VALUE}!` });
     } else if (!addReview.isIntOrDecimalHalf(rating)) {
-      return res.status(400).json({ exception: `Rating value must be either an integer or .5 (a half) of it!` });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json({ exception: `Rating value must be either an integer or .5 (a half) of it!` });
     } else if (
       !req.body.author ||
       typeof req.body.author !== 'string' /* TODO: [AUTH] ensure author is a proper User or "Anonymous" */
     ) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
         exception: 'Author value must be a non-empty string representing a proper User or "Anonymous"!',
       });
     } /* TODO: [DUP] check if review is not a duplicate */
@@ -187,11 +194,11 @@ async function addReview(req: Request, res: Response): Promise<void | Pick<Respo
 
     await productToUpdate.save();
 
-    res.status(200).json({ payload: productReviews });
+    res.status(HTTP_STATUS_CODE.OK).json({ payload: productReviews });
   } catch (exception) {
     logger.error('Adding review exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 addReview.isNumber = (value: unknown): boolean => value !== null && !Number.isNaN(Number(value));
@@ -217,11 +224,11 @@ async function modifyProduct(req: Request & { userPermissions: any }, res: Respo
       'Product'
     );
 
-    res.status(200).json({ payload: modifiedProduct });
+    res.status(HTTP_STATUS_CODE.OK).json({ payload: modifiedProduct });
   } catch (exception) {
     logger.error('Modifying product exception:', exception);
 
-    res.status(403).json({ exception });
+    res.status(HTTP_STATUS_CODE.FORBIDDEN).json({ exception });
   }
 }
 
@@ -241,18 +248,18 @@ async function deleteProduct(
     if (!deletionResult.ok) {
       logger.error('Deletion error occured...', deletionResult);
 
-      return res.status(500).json({ deletionResult });
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ deletionResult });
     } else if (deletionResult.deletedCount === 0) {
       logger.error('Deleted nothing...', deletionResult);
 
-      return res.status(400).json({ deletionResult });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ deletionResult });
     }
 
-    res.sendStatus(204);
+    res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     logger.error('Deleting product exception:', exception);
 
-    res.status(403).json({ exception });
+    res.status(HTTP_STATUS_CODE.FORBIDDEN).json({ exception });
   }
 }
 

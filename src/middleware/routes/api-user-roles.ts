@@ -4,6 +4,7 @@ import getLogger from '../../../utils/logger';
 import { authMiddlewareFn as authMiddleware } from '../features/auth';
 import { saveToDB, getFromDB, updateOneModelInDB } from '../../database/database-index';
 import { IUserRole } from '../../database/models/_userRole';
+import { HTTP_STATUS_CODE } from '../../types';
 
 // @ts-ignore
 const { Router } = express.default;
@@ -47,7 +48,7 @@ async function saveUserRole(req: Request, res: Response): Promise<void> {
 
   logger.log('savedUserRole:', savedUserRole);
 
-  res.status(200).json({ payload: savedUserRole });
+  res.status(HTTP_STATUS_CODE.OK).json({ payload: savedUserRole });
 }
 
 function updateUserRole(req: Request, res: Response): void {
@@ -56,7 +57,7 @@ function updateUserRole(req: Request, res: Response): void {
   const updatedUserRole = updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'User-Role');
   logger.log('updatedUserRole:', updatedUserRole);
 
-  res.status(200).json({ payload: updatedUserRole });
+  res.status(HTTP_STATUS_CODE.OK).json({ payload: updatedUserRole });
 }
 
 async function getUserRole(req: Request, res: Response): Promise<void> {
@@ -65,5 +66,5 @@ async function getUserRole(req: Request, res: Response): Promise<void> {
   const userRole = (await getFromDB({ roleName: req.params.roleName }, 'User-Role')) as IUserRole;
   await userRole.populate('owners').execPopulate();
 
-  res.status(200).json({ payload: userRole });
+  res.status(HTTP_STATUS_CODE.OK).json({ payload: userRole });
 }

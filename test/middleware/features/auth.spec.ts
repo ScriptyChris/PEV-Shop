@@ -1,4 +1,4 @@
-import { TJestMock } from '../../../src/types';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 // @ts-ignore
 import getType from '../../../node_modules/jest-get-type/build/index';
@@ -189,7 +189,7 @@ describe('#auth', () => {
         const authMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB);
 
         await authMiddlewareFnResult(getReqMock(), resMock, getNextMock());
-        expect(resMock.status).toHaveBeenCalledWith(401);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.UNAUTHORIZED);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'You are unauthorized!' });
       });
     });
@@ -286,7 +286,7 @@ describe('#auth', () => {
         const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
 
         await userRoleMiddlewareFnResult(reqMock, resMock, getNextMock());
-        expect(resMock.status).toHaveBeenCalledWith(403);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: "You don't have permissions!" });
       });
     });

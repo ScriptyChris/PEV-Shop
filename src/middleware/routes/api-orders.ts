@@ -4,7 +4,7 @@ import * as expressModule from 'express';
 import fetch, { FetchError, RequestInit, Response as FetchResponse } from 'node-fetch';
 import { getFromDB } from '../../database/database-index';
 import { authToPayU as getToken } from '../features/auth';
-import { IPayByLinkMethod, IProductInOrder } from '../../types';
+import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '../../types';
 import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '../helpers/payu-api';
 
 const {
@@ -51,7 +51,7 @@ router.post('/api/orders', async (req: Request, res: Response) => {
       errorMsg: 'Server failed to auth to PayU API...',
       error: token,
     };
-    res.status(511).json({ payload });
+    res.status(HTTP_STATUS_CODE.NETWORK_AUTH_REQUIRED).json({ payload });
   }
 
   const [minPrice, maxPrice] = getMinAndMaxPrice(products);
@@ -78,7 +78,7 @@ router.post('/api/orders', async (req: Request, res: Response) => {
     .catch((error: FetchError) => {
       logger.error('PayU order error:', error);
 
-      res.status(500).json(error);
+      res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(error);
     });
 });
 

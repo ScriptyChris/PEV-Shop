@@ -2,6 +2,7 @@ import getLogger from '../../../utils/logger';
 import { Request, Response } from 'express';
 import * as expressModule from 'express';
 import { getFromDB } from '../../database/database-index';
+import { HTTP_STATUS_CODE } from '../../types';
 
 const {
   // @ts-ignore
@@ -57,10 +58,10 @@ async function getProductCategoriesHierarchy(req: Request, res: Response): Promi
 
     const categoriesHierarchy = createCategoriesHierarchy(productCategories);
 
-    res.status(200).json(categoriesHierarchy);
+    res.status(HTTP_STATUS_CODE.OK).json(categoriesHierarchy);
   } catch (exception) {
     logger.error('Retrieving product categories exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }

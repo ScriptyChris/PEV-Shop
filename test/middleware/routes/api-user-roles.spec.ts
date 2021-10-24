@@ -1,4 +1,4 @@
-import { TJestMock } from '../../../src/types';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 
 const {
@@ -111,7 +111,7 @@ describe('#api-user-roles', () => {
 
       await apiUserRolesRouter._saveUserRole(reqMock, resMock);
 
-      expect(resMock.status).toHaveBeenCalledWith(200);
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await saveToDBMock() });
     });
   });
@@ -142,7 +142,7 @@ describe('#api-user-roles', () => {
 
       apiUserRolesRouter._updateUserRole(reqMock, resMock);
 
-      expect(resMock.status).toHaveBeenCalledWith(200);
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: updateOneModelInDBMock() });
     });
   });
@@ -181,7 +181,7 @@ describe('#api-user-roles', () => {
 
       await apiUserRolesRouter._getUserRole(reqMock, resMock);
 
-      expect(resMock.status).toHaveBeenCalledWith(200);
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await getFromDBMock() });
     });
   });

@@ -6,6 +6,7 @@ import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, ObjectId } from 
 import { authMiddlewareFn, hashPassword } from '../features/auth';
 import UserModel, { IUser } from '../../database/models/_user';
 import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
+import { HTTP_STATUS_CODE } from '../../types';
 
 dotenv.config();
 
@@ -68,7 +69,7 @@ const sendRegistrationEmail = async ({
 
         await deleteFromDB({ name: login }, 'User');
 
-        return res.status(400).json({
+        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
           exception: {
             msg: 'Sending email rejection',
             reason: emailSentInfo.rejected,
@@ -76,14 +77,14 @@ const sendRegistrationEmail = async ({
         });
       }
 
-      return res.status(201).json({ msg: 'User account created! Check your email.' });
+      return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'User account created! Check your email.' });
     })
     .catch(async (emailSentError) => {
       logger.error('emailSentError:', emailSentError);
 
       await deleteFromDB({ name: login }, 'User');
 
-      return res.status(500).json({
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({
         exception: {
           msg: `Email sent error: '${emailSentError.message}'`,
           reason: emailSentError,
@@ -110,7 +111,7 @@ const sendResetPasswordEmail = async ({
       if (emailSentInfo.rejected.length) {
         logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
 
-        return res.status(400).json({
+        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
           exception: {
             msg: 'Sending email rejection',
             reason: emailSentInfo.rejected,
@@ -118,12 +119,12 @@ const sendResetPasswordEmail = async ({
         });
       }
 
-      return res.status(200).json({ msg: 'Password resetting process began! Check your email.' });
+      return res.status(HTTP_STATUS_CODE.OK).json({ msg: 'Password resetting process began! Check your email.' });
     })
     .catch(async (emailSentError) => {
       logger.error('emailSentError:', emailSentError);
 
-      return res.status(500).json({
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({
         exception: {
           msg: `Email sent error: '${emailSentError.message}'`,
           reason: emailSentError,
@@ -155,11 +156,11 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 
     logger.log('User saved', savedUser);
 
-    res.status(201).json({ msg: 'Success!' });
+    res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Success!' });
   } catch (exception) {
     logger.error('Saving user exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -170,7 +171,7 @@ async function setNewPassword(req: Request, res: Response): Promise<void | Pick<
     const validatedPassword = UserModel.validatePassword(req.body.newPassword);
 
     if (validatedPassword !== '') {
-      return res.status(400).json({ exception: validatedPassword });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ exception: validatedPassword });
     }
 
     const hashedPassword = await hashPassword(req.body.newPassword);
@@ -194,14 +195,14 @@ async function setNewPassword(req: Request, res: Response): Promise<void | Pick<
 
       await userToSetNewPassword.deleteSingleToken('resetPassword');
 
-      res.status(201).json({ msg: 'Password updated!' });
+      res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Password updated!' });
     } else {
-      return res.status(400).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ msg: 'User not found!' });
     }
   } catch (exception) {
     logger.error('(setNewPassword) exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -215,7 +216,7 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
     const validatedPassword = UserModel.validatePassword(req.body.password);
 
     if (validatedPassword !== '') {
-      return res.status(400).json({ exception: validatedPassword });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ exception: validatedPassword });
     }
 
     req.body.password = await hashPassword(req.body.password);
@@ -232,7 +233,7 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
   } catch (exception) {
     logger.error('(registerUser) exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -249,14 +250,14 @@ async function confirmRegistration(req: Request, res: Response): Promise<void> {
       await userToConfirm.confirmUser();
       await userToConfirm.deleteSingleToken('confirmRegistration');
 
-      res.status(200).json({ payload: { isUserConfirmed: true } });
+      res.status(HTTP_STATUS_CODE.OK).json({ payload: { isUserConfirmed: true } });
     } else {
-      res.status(400).json({ payload: { isUserConfirmed: false } });
+      res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ payload: { isUserConfirmed: false } });
     }
   } catch (exception) {
     logger.error('(confirmRegistration) exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -282,12 +283,12 @@ async function resendConfirmRegistration(req: Request, res: Response): TPromised
         res,
       });
     } else {
-      return res.status(400).json({ payload: { isConfirmationReSend: false } });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ payload: { isConfirmationReSend: false } });
     }
   } catch (exception) {
     logger.error('(resendConfirmRegistration) exception:', exception);
 
-    return res.status(500).json({ exception });
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -298,28 +299,26 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
 
     if (!user) {
-      return res.status(401).json({ msg: 'Invalid credentials!' });
-    } else if (!user.isConfirmed) {
-      return res.status(401).json({ msg: 'User registration is not confirmed!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ msg: 'Invalid credentials!' });
     }
 
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      return res.status(401).json({ msg: 'Invalid credentials!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ msg: 'Invalid credentials!' });
     }
 
     if (!user.isConfirmed) {
-      return res.status(401).json({ msg: 'User registration is not confirmed!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ msg: 'User registration is not confirmed!' });
     }
 
     const token = await user.generateAuthToken();
 
-    res.status(200).json({ payload: user, token });
+    res.status(HTTP_STATUS_CODE.OK).json({ payload: user, token });
   } catch (exception) {
     logger.error('Login user exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -342,12 +341,12 @@ async function resetPassword(req: Request, res: Response): Promise<void | Pick<R
         res,
       });
     } else {
-      return res.status(400).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ msg: 'User not found!' });
     }
   } catch (exception) {
     logger.error('(resetPassword) exception:', exception);
 
-    return res.status(500).json({ exception });
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -396,11 +395,11 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 
     await req.user.save();
 
-    res.status(200).json({ payload: 'Logged out!' });
+    res.status(HTTP_STATUS_CODE.OK).json({ payload: 'Logged out!' });
   } catch (exception) {
     logger.error('Logout user exception:', exception);
 
-    res.status(500).json({ exception });
+    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
   }
 }
 
@@ -409,5 +408,5 @@ async function getUser(req: Request, res: Response): Promise<void> {
   // TODO: handle case when user is not found in database
   const user = await getFromDB(req.params.id, 'User');
 
-  res.status(200).json({ payload: user });
+  res.status(HTTP_STATUS_CODE.OK).json({ payload: user });
 }

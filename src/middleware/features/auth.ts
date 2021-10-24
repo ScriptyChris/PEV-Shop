@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { PAYU_DEFAULTS } from '../helpers/payu-api';
 import { IUser } from '../../database/models/_user';
+import { HTTP_STATUS_CODE } from '../../types';
 
 // @ts-ignore
 dotenv.default.config();
@@ -62,7 +63,7 @@ const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ any): ((...args:
       next();
     } catch (exception) {
       logger.error('authMiddleware exception', exception);
-      res.status(401).json({ error: 'You are unauthorized!' });
+      res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'You are unauthorized!' });
     }
   };
 };
@@ -85,7 +86,7 @@ const userRoleMiddlewareFn = (roleName: string): any => {
       next();
     } catch (exception) {
       logger.error('userRoleMiddlewareFn exception', exception);
-      res.status(403).json({ error: "You don't have permissions!" });
+      res.status(HTTP_STATUS_CODE.FORBIDDEN).json({ error: "You don't have permissions!" });
     }
   };
 };
