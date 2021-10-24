@@ -1,12 +1,13 @@
 import * as dotenv from 'dotenv';
 import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, ObjectId } from '../../database/database-index';
 import { authMiddlewareFn, hashPassword } from '../features/auth';
 import UserModel, { IUser } from '../../database/models/_user';
 import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
 import { HTTP_STATUS_CODE } from '../../types';
+import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.patch('/api/users/set-new-password', setNewPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
+router.use(getMiddlewareErrorHandler(logger));
 
 // expose functions for unit tests
 router._updateUser = updateUser;
@@ -43,21 +45,19 @@ router._getUser = getUser;
 
 export default router;
 
-type TPromisedJSON = Promise<Pick<Response, 'json'>>;
-// workaround fix for TS1055 error: https://stackoverflow.com/a/45929350/4983840
-const TPromisedJSON = Promise;
-
 const sendRegistrationEmail = async ({
   email,
   login,
   token,
   res,
-}: {
+}: // next,
+{
   email: string;
   login: string;
   token: string;
   res: Response;
-}): TPromisedJSON => {
+  // next: NextFunction;
+}): Promise<Response | void> => {
   return sendMail(
     email,
     EMAIL_TYPES.ACTIVATION,
@@ -70,7 +70,7 @@ const sendRegistrationEmail = async ({
         await deleteFromDB({ name: login }, 'User');
 
         return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
-          exception: {
+          error: {
             msg: 'Sending email rejection',
             reason: emailSentInfo.rejected,
           },
@@ -79,11 +79,12 @@ const sendRegistrationEmail = async ({
 
       return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'User account created! Check your email.' });
     })
-    .catch(async (emailSentError) => {
+    .catch(async (emailSentError: Error) => {
       logger.error('emailSentError:', emailSentError);
 
       await deleteFromDB({ name: login }, 'User');
 
+      // next(new Error())
       return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({
         exception: {
           msg: `Email sent error: '${emailSentError.message}'`,
@@ -101,7 +102,7 @@ const sendResetPasswordEmail = async ({
   email: string;
   token: string;
   res: Response;
-}): TPromisedJSON => {
+}): Promise<Response | void> => {
   return sendMail(
     email,
     EMAIL_TYPES.RESET_PASSWORD,
@@ -134,7 +135,7 @@ const sendResetPasswordEmail = async ({
 };
 
 // TODO: implement updating various user data
-async function updateUser(req: Request, res: Response): Promise<void> {
+async function updateUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
     logger.log('[POST] /users req.body', req.body);
 
@@ -156,22 +157,20 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 
     logger.log('User saved', savedUser);
 
-    res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Success!' });
+    return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Success!' });
   } catch (exception) {
-    logger.error('Saving user exception:', exception);
-
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
-async function setNewPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function setNewPassword(req: Request, res: Response, next: NextFunction): Promise<void | Pick<Response, 'json'>> {
   logger.log('(setNewPassword) req.body:', req.body);
 
   try {
-    const validatedPassword = UserModel.validatePassword(req.body.newPassword);
+    const validatedPasswordMsg = UserModel.validatePassword(req.body.newPassword);
 
-    if (validatedPassword !== '') {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ exception: validatedPassword });
+    if (validatedPasswordMsg !== '') {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: validatedPasswordMsg });
     }
 
     const hashedPassword = await hashPassword(req.body.newPassword);
@@ -195,28 +194,26 @@ async function setNewPassword(req: Request, res: Response): Promise<void | Pick<
 
       await userToSetNewPassword.deleteSingleToken('resetPassword');
 
-      res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Password updated!' });
+      return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Password updated!' });
     } else {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User not found!' });
     }
   } catch (exception) {
-    logger.error('(setNewPassword) exception:', exception);
-
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
-async function registerUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function registerUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   logger.log('(registerUser) req.body:', req.body);
 
   try {
     // TODO: [SECURITY] add some debounce for register amount per IP
 
     // @ts-ignore
-    const validatedPassword = UserModel.validatePassword(req.body.password);
+    const validatedPasswordMsg = UserModel.validatePassword(req.body.password);
 
-    if (validatedPassword !== '') {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ exception: validatedPassword });
+    if (validatedPasswordMsg !== '') {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: validatedPasswordMsg });
     }
 
     req.body.password = await hashPassword(req.body.password);
@@ -231,16 +228,18 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
       res,
     });
   } catch (exception) {
-    logger.error('(registerUser) exception:', exception);
-
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
-async function confirmRegistration(req: Request, res: Response): Promise<void> {
+async function confirmRegistration(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   logger.log('(confirmRegistration) req.body.token:', req.body.token);
 
   try {
+    if (!req.body.token) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Token is empty or not attached!' });
+    }
+
     const userToConfirm = (await getFromDB(
       { 'tokens.confirmRegistration': req.body.token.replace(/\s/g, '+') },
       'User'
@@ -250,22 +249,24 @@ async function confirmRegistration(req: Request, res: Response): Promise<void> {
       await userToConfirm.confirmUser();
       await userToConfirm.deleteSingleToken('confirmRegistration');
 
-      res.status(HTTP_STATUS_CODE.OK).json({ payload: { isUserConfirmed: true } });
+      return res.status(HTTP_STATUS_CODE.OK).json({ payload: { isUserConfirmed: true } });
     } else {
-      res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ payload: { isUserConfirmed: false } });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ payload: { isUserConfirmed: false } });
     }
   } catch (exception) {
-    logger.error('(confirmRegistration) exception:', exception);
-
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
 // TODO: [SECURITY] set some debounce to limit number of sent emails per time
-async function resendConfirmRegistration(req: Request, res: Response): TPromisedJSON {
+async function resendConfirmRegistration(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   logger.log('(resendConfirmRegistration) req.body:', req.body);
 
   try {
+    if (!req.body.email) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Email is empty or not attached!' });
+    }
+
     const userToResendConfirmation = (await getFromDB(
       {
         email: req.body.email,
@@ -283,49 +284,53 @@ async function resendConfirmRegistration(req: Request, res: Response): TPromised
         res,
       });
     } else {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ payload: { isConfirmationReSend: false } });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ payload: { isConfirmationReSend: false } });
     }
   } catch (exception) {
-    logger.error('(resendConfirmRegistration) exception:', exception);
-
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
-async function logInUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function logInUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   logger.log('(logInUser) req.body:', req.body);
 
   try {
+    if (!req.body.login) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'User login is empty or not attached!' });
+    }
+
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
 
     if (!user) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ msg: 'Invalid credentials!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'Invalid credentials!' });
     }
 
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ msg: 'Invalid credentials!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'Invalid credentials!' });
     }
 
     if (!user.isConfirmed) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ msg: 'User registration is not confirmed!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'User registration is not confirmed!' });
     }
 
     const token = await user.generateAuthToken();
 
-    res.status(HTTP_STATUS_CODE.OK).json({ payload: user, token });
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: user, token });
   } catch (exception) {
-    logger.error('Login user exception:', exception);
-
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
-async function resetPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function resetPassword(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   logger.log('(resetPassword) req.body:', req.body);
 
   try {
+    if (!req.body.email) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Email is empty or not attached!' });
+    }
+
     const userToResetPassword = (await getFromDB(
       {
         email: req.body.email,
@@ -335,18 +340,17 @@ async function resetPassword(req: Request, res: Response): Promise<void | Pick<R
 
     if (userToResetPassword) {
       await userToResetPassword.setSingleToken('resetPassword');
-      await sendResetPasswordEmail({
+
+      return await sendResetPasswordEmail({
         email: userToResetPassword.email,
         token: userToResetPassword.tokens.resetPassword as string,
         res,
       });
     } else {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User not found!' });
     }
   } catch (exception) {
-    logger.error('(resetPassword) exception:', exception);
-
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
@@ -385,7 +389,11 @@ async function resendResetPassword(req: Request, res: Response) {
   }
 }
 
-async function logOutUser(req: Request & { user: IUser; token: string }, res: Response): Promise<void> {
+async function logOutUser(
+  req: Request & { user: IUser; token: string },
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> {
   try {
     req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
 
@@ -395,18 +403,28 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 
     await req.user.save();
 
-    res.status(HTTP_STATUS_CODE.OK).json({ payload: 'Logged out!' });
+    return res.status(HTTP_STATUS_CODE.OK).json({ msg: 'Logged out!' });
   } catch (exception) {
-    logger.error('Logout user exception:', exception);
-
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }
 
-async function getUser(req: Request, res: Response): Promise<void> {
+async function getUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   logger.log('[GET] /:id', req.params.id);
-  // TODO: handle case when user is not found in database
-  const user = await getFromDB(req.params.id, 'User');
 
-  res.status(HTTP_STATUS_CODE.OK).json({ payload: user });
+  try {
+    if (!req.params.id) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'User id is empty or not attached!' });
+    }
+
+    const user: IUser = await getFromDB(req.params.id, 'User');
+
+    if (!user) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: `User not found!` });
+    }
+
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: user });
+  } catch (exception) {
+    return next(exception);
+  }
 }

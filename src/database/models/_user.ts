@@ -7,7 +7,9 @@ require('mongoose-type-email');
 
 const USER_CREDENTIALS_ERROR = new Error('Credentials error');
 const PASSWORD_METADATA = {
-  EMPTY_OR_INCORRECT_TYPE: 'password must be a non-empty string!',
+  EMPTY_OR_INCORRECT_TYPE: {
+    errorMessage: 'password must be a non-empty string!',
+  },
   MIN_LENGTH: {
     value: 8,
     errorMessage: 'password should has at least 8 chars!',
@@ -124,7 +126,7 @@ userSchema.methods.confirmUser = function (): Promise<IUser> {
 
 userSchema.statics.validatePassword = (password: any): string => {
   if (typeof password !== 'string') {
-    return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE;
+    return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE.errorMessage;
   }
 
   if (password.length < PASSWORD_METADATA.MIN_LENGTH.value) {
