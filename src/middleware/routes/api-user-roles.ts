@@ -1,19 +1,22 @@
 import * as express from 'express';
-import { Router as IRouter, Request, Response } from 'express-serve-static-core';
+import { Router as IRouter, Request, Response, NextFunction } from 'express-serve-static-core';
 import getLogger from '../../../utils/logger';
 import { authMiddlewareFn as authMiddleware } from '../features/auth';
 import { saveToDB, getFromDB, updateOneModelInDB } from '../../database/database-index';
 import { IUserRole } from '../../database/models/_userRole';
 import { HTTP_STATUS_CODE } from '../../types';
+import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
+
+type TMiddlewareFn = (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
 
 // @ts-ignore
 const { Router } = express.default;
 const logger = getLogger(module.filename);
 const router: IRouter &
   Partial<{
-    _saveUserRole: TSaveUserRole;
-    _updateUserRole: TUpdateUserRole;
-    _getUserRole: TGetUserRole;
+    _saveUserRole: TMiddlewareFn;
+    _updateUserRole: TMiddlewareFn;
+    _getUserRole: TMiddlewareFn;
   }> = Router();
 
 // @ts-ignore
@@ -22,10 +25,7 @@ router.post('/api/user-roles', authMiddleware(getFromDB), saveUserRole);
 router.patch('/api/user-roles', authMiddleware(getFromDB), updateUserRole);
 // @ts-ignore
 router.get('/api/user-roles/:roleName', authMiddleware(getFromDB), getUserRole);
-//
-type TSaveUserRole = (req: Request, res: Response) => Promise<void>;
-type TUpdateUserRole = (req: Request, res: Response) => void;
-type TGetUserRole = (req: Request, res: Response) => Promise<void>;
+router.use(getMiddlewareErrorHandler(logger));
 
 // expose functions for unit tests
 router._saveUserRole = saveUserRole;
@@ -34,37 +34,84 @@ router._getUserRole = getUserRole;
 
 export default router;
 
-async function saveUserRole(req: Request, res: Response): Promise<void> {
+async function saveUserRole(req: Request, res: Response, next: NextFunction) {
   logger.log('[POST] /user-roles:', req.body);
 
-  const userRole = {
-    roleName: req.body.roleName,
-    permissions: req.body.permissions,
-  };
-  logger.log('userRole: ', userRole);
+  try {
+    if (!req.body) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
+    } else if (!req.body.roleName) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Param "roleName" is empty or not attached!' });
+    } else if (!req.body.permissions) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Param "permissions" is empty or not attached!' });
+    }
 
-  const savedUserRole = (await saveToDB(userRole, 'User-Role')) as IUserRole;
-  await savedUserRole.save();
+    const userRole = {
+      roleName: req.body.roleName,
+      permissions: req.body.permissions,
+    };
+    logger.log('userRole: ', userRole);
 
-  logger.log('savedUserRole:', savedUserRole);
+    const savedUserRole = (await saveToDB(userRole, 'User-Role')) as IUserRole;
+    await savedUserRole.save();
 
-  res.status(HTTP_STATUS_CODE.OK).json({ payload: savedUserRole });
+    logger.log('savedUserRole:', savedUserRole);
+
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: savedUserRole });
+  } catch (exception) {
+    return next(exception);
+  }
 }
 
-function updateUserRole(req: Request, res: Response): void {
+async function updateUserRole(req: Request, res: Response, next: NextFunction) {
   logger.log('[PATCH] /user-roles:', req.body);
 
-  const updatedUserRole = updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'User-Role');
-  logger.log('updatedUserRole:', updatedUserRole);
+  try {
+    if (!req.body) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
+    } else if (!req.body.roleName) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Param "roleName" is empty or not attached!' });
+    } else if (!req.body.permissions) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Param "permissions" is empty or not attached!' });
+    }
 
-  res.status(HTTP_STATUS_CODE.OK).json({ payload: updatedUserRole });
+    const updatedUserRole = await updateOneModelInDB(
+      { roleName: req.body.roleName },
+      req.body.permissions,
+      'User-Role'
+    );
+    logger.log('updatedUserRole:', updatedUserRole);
+
+    if (!updatedUserRole) {
+      return res
+        .status(HTTP_STATUS_CODE.NOT_FOUND)
+        .json({ error: `Role '${req.body.roleName}' could not be updated, because was not found!` });
+    }
+
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: updatedUserRole });
+  } catch (exception) {
+    return next(exception);
+  }
 }
 
-async function getUserRole(req: Request, res: Response): Promise<void> {
+async function getUserRole(req: Request, res: Response, next: NextFunction) {
   logger.log('[GET] /user-roles:', req.params);
 
-  const userRole = (await getFromDB({ roleName: req.params.roleName }, 'User-Role')) as IUserRole;
-  await userRole.populate('owners').execPopulate();
+  try {
+    if (!req.params || !req.params.roleName) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Param "roleName" is empty or not attached!' });
+    }
 
-  res.status(HTTP_STATUS_CODE.OK).json({ payload: userRole });
+    const userRole = (await getFromDB({ roleName: req.params.roleName }, 'User-Role')) as IUserRole;
+
+    if (!userRole) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: `Role '${req.body.roleName}' not found!` });
+    }
+
+    await userRole.populate('owners').execPopulate();
+
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: userRole });
+  } catch (exception) {
+    return next(exception);
+  }
 }

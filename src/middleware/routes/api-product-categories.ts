@@ -1,8 +1,9 @@
 import getLogger from '../../../utils/logger';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as expressModule from 'express';
 import { getFromDB } from '../../database/database-index';
 import { HTTP_STATUS_CODE } from '../../types';
+import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
 
 const {
   // @ts-ignore
@@ -46,22 +47,25 @@ function createCategoriesHierarchy(productCategories: string[]): string[] {
 }
 
 router.get('/api/productCategories', getProductCategoriesHierarchy);
+router.use(getMiddlewareErrorHandler(logger));
 
 export default router;
 
-async function getProductCategoriesHierarchy(req: Request, res: Response): Promise<void> {
+async function getProductCategoriesHierarchy(req: Request, res: Response, next: NextFunction) {
   logger.log('[productCategories GET] req.params:', req.params);
 
   try {
     const productCategories = (await getFromDB('category', 'Product', { isDistinct: true })) as string[];
     // logger.log('productCategories:', productCategories);
 
+    if (!productCategories) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'Product categories not found!' });
+    }
+
     const categoriesHierarchy = createCategoriesHierarchy(productCategories);
 
-    res.status(HTTP_STATUS_CODE.OK).json(categoriesHierarchy);
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: categoriesHierarchy });
   } catch (exception) {
-    logger.error('Retrieving product categories exception:', exception);
-
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception });
+    return next(exception);
   }
 }

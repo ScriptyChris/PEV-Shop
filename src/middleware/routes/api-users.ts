@@ -57,7 +57,7 @@ const sendRegistrationEmail = async ({
   token: string;
   res: Response;
   // next: NextFunction;
-}): Promise<Response | void> => {
+}) => {
   return sendMail(
     email,
     EMAIL_TYPES.ACTIVATION,
@@ -94,15 +94,7 @@ const sendRegistrationEmail = async ({
     });
 };
 
-const sendResetPasswordEmail = async ({
-  email,
-  token,
-  res,
-}: {
-  email: string;
-  token: string;
-  res: Response;
-}): Promise<Response | void> => {
+const sendResetPasswordEmail = async ({ email, token, res }: { email: string; token: string; res: Response }) => {
   return sendMail(
     email,
     EMAIL_TYPES.RESET_PASSWORD,
@@ -135,7 +127,7 @@ const sendResetPasswordEmail = async ({
 };
 
 // TODO: implement updating various user data
-async function updateUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+async function updateUser(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('[POST] /users req.body', req.body);
 
@@ -163,7 +155,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
-async function setNewPassword(req: Request, res: Response, next: NextFunction): Promise<void | Pick<Response, 'json'>> {
+async function setNewPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(setNewPassword) req.body:', req.body);
 
   try {
@@ -203,7 +195,7 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction): 
   }
 }
 
-async function registerUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+async function registerUser(req: Request, res: Response, next: NextFunction) {
   logger.log('(registerUser) req.body:', req.body);
 
   try {
@@ -232,7 +224,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
-async function confirmRegistration(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+async function confirmRegistration(req: Request, res: Response, next: NextFunction) {
   logger.log('(confirmRegistration) req.body.token:', req.body.token);
 
   try {
@@ -259,7 +251,7 @@ async function confirmRegistration(req: Request, res: Response, next: NextFuncti
 }
 
 // TODO: [SECURITY] set some debounce to limit number of sent emails per time
-async function resendConfirmRegistration(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+async function resendConfirmRegistration(req: Request, res: Response, next: NextFunction) {
   logger.log('(resendConfirmRegistration) req.body:', req.body);
 
   try {
@@ -291,7 +283,7 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
   }
 }
 
-async function logInUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+async function logInUser(req: Request, res: Response, next: NextFunction) {
   logger.log('(logInUser) req.body:', req.body);
 
   try {
@@ -323,7 +315,7 @@ async function logInUser(req: Request, res: Response, next: NextFunction): Promi
   }
 }
 
-async function resetPassword(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+async function resetPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(resetPassword) req.body:', req.body);
 
   try {
@@ -355,7 +347,7 @@ async function resetPassword(req: Request, res: Response, next: NextFunction): P
 }
 
 // TODO: [SECURITY] set some debounce to limit number of sent emails per time
-async function resendResetPassword(req: Request, res: Response) {
+async function resendResetPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(resendResetPassword) req.body:', req.body);
 
   try {
@@ -383,17 +375,11 @@ async function resendResetPassword(req: Request, res: Response) {
       return res.status(404).json({ msg: 'User not found!' });
     }
   } catch (exception) {
-    logger.error('(resendResetPassword) exception:', exception);
-
-    return res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function logOutUser(
-  req: Request & { user: IUser; token: string },
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> {
+async function logOutUser(req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) {
   try {
     req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
 
@@ -409,7 +395,7 @@ async function logOutUser(
   }
 }
 
-async function getUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+async function getUser(req: Request, res: Response, next: NextFunction) {
   logger.log('[GET] /:id', req.params.id);
 
   try {
