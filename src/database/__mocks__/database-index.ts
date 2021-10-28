@@ -21,9 +21,18 @@ DataBaseResult.prototype.generateAuthToken = jest.fn(() => Promise.resolve('auth
 const getFromDB: TMockWithProps = jest.fn(() => {
   throw getMockImplementationError('getFromDB');
 });
-getFromDB._succeededCall = () => Promise.resolve(new getFromDB._succeededCall._clazz());
+getFromDB._succeededCall = () =>
+  Promise.resolve(
+    Object.create(getFromDB._succeededCall._clazz.prototype, { isConfirmed: { value: true, enumerable: true } })
+  );
 getFromDB._succeededCall._clazz = DataBaseResult;
-getFromDB._failedCall = () => Promise.resolve(null);
+getFromDB._failedCall = {
+  general: () => Promise.resolve(null),
+  notConfirmed: () =>
+    Promise.resolve(
+      Object.create(getFromDB._succeededCall._clazz.prototype, { isConfirmed: { value: false, enumerable: true } })
+    ),
+};
 
 const saveToDB: TMockWithProps = jest.fn(() => {
   throw getMockImplementationError('saveToDB');

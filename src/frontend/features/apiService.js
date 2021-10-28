@@ -9,6 +9,9 @@ class Ajax {
       POST: 'POST',
       DELETE: 'DELETE',
     });
+    this.HTTP_RESPONSE_STATUS = Object.freeze({
+      NO_CONTENT: 204,
+    });
   }
 
   get _BASE_API_URL_OBJECT() {
@@ -44,6 +47,10 @@ class Ajax {
         .then((response) => {
           console.warn(`${methodName} response headers:`, ...response.headers);
 
+          if (response.status === this.HTTP_RESPONSE_STATUS.NO_CONTENT) {
+            return response.statusText;
+          }
+
           return response.json();
         })
         // TODO: handle error cases (like 401)
@@ -52,7 +59,7 @@ class Ajax {
             this._AUTH_TOKEN = body.token;
           }
 
-          return body.payload;
+          return body.payload || body.exception || body;
         })
     );
   }
@@ -220,6 +227,18 @@ const apiService = new (class ApiService extends Ajax {
 
   logoutUser() {
     return this.postRequest(`${this.USERS_URL}/logout`, null, true);
+  }
+
+  registerUser(registrationData) {
+    return this.postRequest(`${this.USERS_URL}/register`, registrationData);
+  }
+
+  confirmRegistration(token) {
+    return this.postRequest(`${this.USERS_URL}/confirm-registration`, { token });
+  }
+
+  resendConfirmRegistration(email) {
+    return this.postRequest(`${this.USERS_URL}/resend-confirm-registration`, { email });
   }
 })();
 

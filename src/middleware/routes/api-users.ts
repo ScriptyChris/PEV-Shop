@@ -1,9 +1,13 @@
+import * as dotenv from 'dotenv';
 import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
 import { Request, Response } from 'express';
-import { saveToDB, getFromDB, updateOneModelInDB, ObjectId } from '../../database/database-index';
+import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, ObjectId } from '../../database/database-index';
 import { authMiddlewareFn, hashPassword } from '../features/auth';
-import { IUser } from '../../database/models/_user';
+import UserModel, { IUser } from '../../database/models/_user';
+import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
+
+dotenv.config();
 
 const {
   // @ts-ignore
@@ -13,23 +17,80 @@ const logger = getLogger(module.filename);
 
 const router: any = Router();
 router.post('/api/users/', updateUser);
+router.post('/api/users/register', registerUser);
+router.post('/api/users/confirm-registration', confirmRegistration);
+router.post('/api/users/resend-confirm-registration', resendConfirmRegistration);
 router.post('/api/users/login', logInUser);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 
 // expose functions for unit tests
 router._updateUser = updateUser;
+router._registerUser = registerUser;
+router._confirmRegistration = confirmRegistration;
+router._resendConfirmRegistration = resendConfirmRegistration;
 router._logInUser = logInUser;
 router._logOutUser = logOutUser;
 router._getUser = getUser;
 
 export default router;
 
+type TPromisedJSON = Promise<Pick<Response, 'json'>>;
+// workaround fix for TS1055 error: https://stackoverflow.com/a/45929350/4983840
+const TPromisedJSON = Promise;
+
+const sendRegistrationEmail = async ({
+  email,
+  login,
+  token,
+  res,
+}: {
+  email: string;
+  login: string;
+  token: string;
+  res: Response;
+}): TPromisedJSON => {
+  return sendMail(
+    email,
+    EMAIL_TYPES.ACTIVATION,
+    `http://localhost:${process.env.PORT}/confirm-registration/?token=${token}`
+  )
+    .then(async (emailSentInfo) => {
+      if (emailSentInfo.rejected.length) {
+        logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
+
+        await deleteFromDB({ name: login }, 'User');
+
+        return res.status(400).json({
+          exception: {
+            msg: 'Sending email rejection',
+            reason: emailSentInfo.rejected,
+          },
+        });
+      }
+
+      return res.status(201).json({ msg: 'User account created! Check your email.' });
+    })
+    .catch(async (emailSentError) => {
+      logger.error('emailSentError:', emailSentError);
+
+      await deleteFromDB({ name: login }, 'User');
+
+      return res.status(500).json({
+        exception: {
+          msg: `Email sent error: '${emailSentError.message}'`,
+          reason: emailSentError,
+        },
+      });
+    });
+};
+
 // TODO: implement updating various user data
 async function updateUser(req: Request, res: Response): Promise<void> {
   try {
     logger.log('[POST] /users req.body', req.body);
 
+    // TODO: [error-handling] validate password before hashing it, as in `registerUser` function
     req.body.password = await hashPassword(req.body.password);
     const savedUser = (await saveToDB(req.body, 'User')) as IUser;
 
@@ -55,15 +116,112 @@ async function updateUser(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function logInUser(req: Request, res: Response): Promise<void> {
-  logger.log('[POST] /login');
+async function registerUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(registerUser) req.body:', req.body);
+
+  try {
+    // TODO: [SECURITY] add some debounce for register amount per IP
+
+    // @ts-ignore
+    const validatedPassword = UserModel.validatePassword(req.body.password);
+
+    if (validatedPassword !== '') {
+      return res.status(400).json({ exception: validatedPassword });
+    }
+
+    req.body.password = await hashPassword(req.body.password);
+
+    const newUser = (await saveToDB(req.body, 'User')) as IUser;
+    await newUser.setConfirmRegistrationToken();
+
+    return await sendRegistrationEmail({
+      login: req.body.login,
+      email: req.body.email,
+      token: newUser.tokens.confirmRegistration as string,
+      res,
+    });
+  } catch (exception) {
+    logger.error('(registerUser) exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+}
+
+async function confirmRegistration(req: Request, res: Response): Promise<void> {
+  logger.log('(confirmRegistration) req.body.token:', req.body.token);
+
+  try {
+    const userToConfirm = (await getFromDB({ 'tokens.confirmRegistration': req.body.token }, 'User')) as IUser;
+
+    if (userToConfirm) {
+      await userToConfirm.confirmUser();
+      await userToConfirm.deleteConfirmRegistrationToken();
+
+      res.status(200).json({ payload: { isUserConfirmed: true } });
+    } else {
+      res.status(400).json({ payload: { isUserConfirmed: false } });
+    }
+  } catch (exception) {
+    logger.error('(confirmRegistration) exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+}
+
+// TODO: [SECURITY] set some debounce to limit number of sent emails per time
+async function resendConfirmRegistration(req: Request, res: Response): TPromisedJSON {
+  logger.log('(resendConfirmRegistration) req.body:', req.body);
+
+  try {
+    const userToResendConfirmation = (await getFromDB(
+      {
+        email: req.body.email,
+        isConfirmed: false,
+        'tokens.confirmRegistration': { $exists: true },
+      },
+      'User'
+    )) as IUser;
+
+    logger.log(
+      'userToResendConfirmation:',
+      userToResendConfirmation,
+      ' /userToResendConfirmation.tokens.confirmRegistration:',
+      userToResendConfirmation.tokens.confirmRegistration
+    );
+
+    if (userToResendConfirmation) {
+      return await sendRegistrationEmail({
+        login: userToResendConfirmation.login,
+        email: req.body.email,
+        token: userToResendConfirmation.tokens.confirmRegistration as string,
+        res,
+      });
+    } else {
+      return res.status(400).json({ payload: { isConfirmationReSend: false } });
+    }
+  } catch (exception) {
+    logger.error('(resendConfirmRegistration) exception:', exception);
+
+    return res.status(500).json({ exception });
+  }
+}
+
+async function logInUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(logInUser) req.body:', req.body);
 
   try {
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
+
+    if (!user) {
+      return res.status(401).json({ msg: 'Invalid credentials!' });
+    } else if (!user.isConfirmed) {
+      return res.status(401).json({ msg: 'User registration is not confirmed!' });
+    }
+
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      throw { message: 'Invalid credentials', status: 401 };
+      return res.status(401).json({ msg: 'Invalid credentials!' });
     }
 
     const token = await user.generateAuthToken();
@@ -72,14 +230,18 @@ async function logInUser(req: Request, res: Response): Promise<void> {
   } catch (exception) {
     logger.error('Login user exception:', exception);
 
-    res.status(exception.status || 500).json({ payload: exception });
+    res.status(500).json({ exception });
   }
 }
 
-async function logOutUser(req: Request & { user: any; token: string }, res: Response): Promise<void> {
+async function logOutUser(req: Request & { user: IUser; token: string }, res: Response): Promise<void> {
   try {
-    // TODO: what if .filter(..) returns an empty array? should req.user be saved then?
-    req.user.tokens = req.user.tokens.filter((tokenItem: { token: string }) => tokenItem.token !== req.token);
+    req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
+
+    if (req.user.tokens.auth.length === 0) {
+      delete req.user.tokens.auth;
+    }
+
     await req.user.save();
 
     res.status(200).json({ payload: 'Logged out!' });

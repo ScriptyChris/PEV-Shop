@@ -1,4 +1,3 @@
-import { getFromDB } from '../../../src/database/database-index';
 import { TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 

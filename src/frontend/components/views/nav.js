@@ -4,20 +4,21 @@ import { observer } from 'mobx-react-lite';
 import appStore, { USER_SESSION_STATES } from '../../features/appStore';
 import apiService from '../../features/apiService';
 
+const translations = Object.freeze({
+  start: 'Start',
+  shop: 'Shop',
+  addNewProduct: 'Add new product',
+  modifyProduct: 'Modify product',
+  register: 'Register',
+  logIn: 'Log in',
+  logOut: 'Log out',
+  account: 'Account',
+});
+
 export default observer(function Nav() {
   const logOut = async () => {
     await apiService.logoutUser();
     appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
-  };
-
-  const translations = {
-    start: 'Start',
-    shop: 'Sklep',
-    addNewProduct: 'Dodaj nowy produkt',
-    modifyProduct: 'Modyfikuj produkt',
-    logIn: 'Zaloguj się',
-    logOut: 'Wyloguj się',
-    account: 'Moje konto',
   };
 
   return (
@@ -44,6 +45,11 @@ export default observer(function Nav() {
             </Link>
           )}
         </li>
+        {appStore.userSessionState === USER_SESSION_STATES.LOGGED_OUT && (
+          <li>
+            <Link to="/register">{translations.register}</Link>
+          </li>
+        )}
         <li>
           <Link to="/account">{translations.account}</Link>
         </li>
