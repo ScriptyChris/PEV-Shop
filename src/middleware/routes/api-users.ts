@@ -32,7 +32,9 @@ router._registerUser = registerUser;
 router._confirmRegistration = confirmRegistration;
 router._resendConfirmRegistration = resendConfirmRegistration;
 router._logInUser = logInUser;
+router._resetPassword = resetPassword;
 router._logOutUser = logOutUser;
+router._updateAdHoc = updateAdHoc;
 router._getUser = getUser;
 
 export default router;

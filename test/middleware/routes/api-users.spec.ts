@@ -48,7 +48,8 @@ describe('#api-users', () => {
   });
 
   it('should call router.post(..) and router.get(..) specific amount of times with correct params', () => {
-    expect(apiUsersRouter.post).toHaveBeenCalledTimes(6);
+    expect(apiUsersRouter.post).toHaveBeenCalledTimes(7);
+    expect(apiUsersRouter.patch).toHaveBeenCalledTimes(1);
     expect(apiUsersRouter.get).toHaveBeenCalledTimes(1);
 
     expect(apiUsersRouter.post).toHaveBeenNthCalledWith(1, '/api/users/', apiUsersRouter._updateUser);
@@ -64,12 +65,15 @@ describe('#api-users', () => {
       apiUsersRouter._resendConfirmRegistration
     );
     expect(apiUsersRouter.post).toHaveBeenNthCalledWith(5, '/api/users/login', apiUsersRouter._logInUser);
+    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(6, '/api/users/reset-password', apiUsersRouter._resetPassword);
     expect(apiUsersRouter.post).toHaveBeenNthCalledWith(
-      6,
+      7,
       '/api/users/logout',
       authMiddlewareReturnedFn,
       apiUsersRouter._logOutUser
     );
+
+    expect(apiUsersRouter.patch).toHaveBeenCalledWith('/api/users/update-adhoc', apiUsersRouter._updateAdHoc);
     expect(apiUsersRouter.get).toHaveBeenCalledWith(
       '/api/users/:id',
       authMiddlewareReturnedFn,
