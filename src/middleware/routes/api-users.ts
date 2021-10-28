@@ -26,6 +26,9 @@ router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 
 // expose functions for unit tests
 router._updateUser = updateUser;
+router._registerUser = registerUser;
+router._confirmRegistration = confirmRegistration;
+router._resendConfirmRegistration = resendConfirmRegistration;
 router._logInUser = logInUser;
 router._logOutUser = logOutUser;
 router._getUser = getUser;
@@ -211,9 +214,7 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
 
     if (!user) {
       return res.status(401).json({ msg: 'Invalid credentials!' });
-    }
-
-    if (!user.isConfirmed) {
+    } else if (!user.isConfirmed) {
       return res.status(401).json({ msg: 'User registration is not confirmed!' });
     }
 

@@ -1,4 +1,5 @@
-import { model, Schema, Document } from 'mongoose';
+import type { Document } from 'mongoose';
+import { model, Schema } from 'mongoose';
 // TODO: [refactor] swap it for crypto.randomBytes(..)
 import { v4 as uuidv4 } from 'uuid';
 import { getToken, comparePasswords } from '../../middleware/features/auth';
@@ -68,8 +69,7 @@ userSchema.virtual('roleName', {
 });
 
 userSchema.methods.generateAuthToken = async function (): Promise<string> {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
+  const user = this as IUser;
   const token = getToken({ _id: user._id });
 
   if (!user.tokens.auth) {

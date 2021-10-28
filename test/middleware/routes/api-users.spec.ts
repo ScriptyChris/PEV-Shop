@@ -11,6 +11,9 @@ const {
   updateOneModelInDB: updateOneModelInDBMock,
   ObjectId: ObjectIdMock,
 } = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
+const { validatePassword } = jest
+  .mock('../../../src/database/models/_user')
+  .requireMock('../../../src/database/models/_user').default;
 
 describe('#api-users', () => {
   const authMiddlewareReturnedFn = () => undefined;
@@ -45,13 +48,24 @@ describe('#api-users', () => {
   });
 
   it('should call router.post(..) and router.get(..) specific amount of times with correct params', () => {
-    expect(apiUsersRouter.post).toHaveBeenCalledTimes(3);
+    expect(apiUsersRouter.post).toHaveBeenCalledTimes(6);
     expect(apiUsersRouter.get).toHaveBeenCalledTimes(1);
 
     expect(apiUsersRouter.post).toHaveBeenNthCalledWith(1, '/api/users/', apiUsersRouter._updateUser);
-    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(2, '/api/users/login', apiUsersRouter._logInUser);
+    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(2, '/api/users/register', apiUsersRouter._registerUser);
     expect(apiUsersRouter.post).toHaveBeenNthCalledWith(
       3,
+      '/api/users/confirm-registration',
+      apiUsersRouter._confirmRegistration
+    );
+    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(
+      4,
+      '/api/users/resend-confirm-registration',
+      apiUsersRouter._resendConfirmRegistration
+    );
+    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(5, '/api/users/login', apiUsersRouter._logInUser);
+    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(
+      6,
       '/api/users/logout',
       authMiddlewareReturnedFn,
       apiUsersRouter._logOutUser
@@ -185,42 +199,54 @@ describe('#api-users', () => {
         matchPasswordMock.mockClear();
       });
 
-      it('should not call res.status(..).json(..) with correct params', async () => {
+      it('should catch TypeError when req.body is empty', async () => {
         const resMock = getResMock();
-        getFromDBMock.mockImplementation(getFromDBMock._succeededCall);
 
-        // first case
         await apiUsersRouter._logInUser({}, resMock);
 
+        expect(resMock.status).toHaveBeenCalledWith(500);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          payload: TypeError(`Cannot read property 'login' of undefined`),
+          exception: TypeError(`Cannot read property 'login' of undefined`),
         });
+      });
 
-        resMock._jsonMethod.mockClear();
+      it('should not call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
 
-        // second case
-        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall);
+        // empty user
+        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.general);
 
         await apiUsersRouter._logInUser(getReqMock(), resMock);
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          payload: TypeError(`Cannot read property 'matchPassword' of null`),
+          msg: 'Invalid credentials!',
         });
 
-        // third case
+        resMock._jsonMethod.mockClear();
+
+        // user not confirmed
+        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.notConfirmed);
+
+        await apiUsersRouter._logInUser(getReqMock(), resMock);
+
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          msg: 'User registration is not confirmed!',
+        });
+
+        resMock._jsonMethod.mockClear();
+
+        // password not matched
+        getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
         matchPasswordMock.mockImplementationOnce(matchPasswordMock._failedCall);
 
         await apiUsersRouter._logInUser(getReqMock(), resMock);
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          payload: {
-            message: `Invalid credentials`,
-            status: 401,
-          },
+          msg: 'Invalid credentials!',
         });
 
         // all cases
-        expect(resMock.status).toHaveBeenCalledWith(500);
+        expect(resMock.status).toHaveBeenCalledWith(401);
         expect(resMock.status).toHaveBeenCalledTimes(3);
       });
     });
@@ -230,10 +256,12 @@ describe('#api-users', () => {
     describe('when succeeded', () => {
       const getReqMock = () => {
         const user = new getFromDBMock._succeededCall._clazz();
-        user.tokens = ['some token'];
+        user.tokens = {
+          auth: ['some token from db'],
+        };
 
         return {
-          token: 'a token',
+          token: 'a token from req',
           user,
         };
       };
@@ -332,7 +360,7 @@ describe('#api-users', () => {
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {
-        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall);
+        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.general);
 
         const emptyReqMock = {
           params: {

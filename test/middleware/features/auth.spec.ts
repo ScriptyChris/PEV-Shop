@@ -146,18 +146,31 @@ describe('#auth', () => {
     });
 
     describe('when found user in database', () => {
-      it('should assign proper token and user props to req object', async () => {
+      it('should call getFromDB(..) with proper params', async () => {
+        const reqMock = getReqMock();
+        const getFromDBSucceededMock = jest.fn(mockedSucceededGetFromDB);
+        const authMiddlewareFnResult = authMiddlewareFn(getFromDBSucceededMock);
+
+        await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+
+        expect(getFromDBSucceededMock).toHaveBeenCalledWith(
+          {
+            _id: expect.any(String),
+            'tokens.auth': { $exists: true, $eq: reqMock.header() },
+          },
+          'User'
+        );
+      });
+
+      it('should assign found user prop to req object', async () => {
         const reqMock = getReqMock();
 
-        expect('token' in reqMock).toBe(false);
         expect('user' in reqMock).toBe(false);
 
-        const token = reqMock.header();
         const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
 
         await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
 
-        expect(reqMock.token).toBe(token);
         expect(reqMock.user instanceof mockedSucceededGetFromDB._clazz).toBe(true);
       });
 

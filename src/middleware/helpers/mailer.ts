@@ -58,5 +58,3 @@ export default function sendMail(
 
   return transporter.sendMail(mailOptions);
 }
-
-// sendMail('ScriptyChris@gmail.com', 'ACTIVATION', 'https://example.org');
