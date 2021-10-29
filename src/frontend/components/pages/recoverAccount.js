@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { /* useHistory, */ useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import FormFieldError from '../utils/formFieldError';
 import apiService from '../../features/apiService';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '../../components/utils/popup';
 
 const translations = Object.freeze({
   resetPasswordHeader: 'Reset password',
@@ -13,17 +14,57 @@ const translations = Object.freeze({
   repeatNewPasswordField: 'Repeat password',
   bothPasswordFieldsMustBeEqual: 'Both password fields must be equal!',
   submitNewPassword: 'Update password',
+  resetPasswordSuccessMsg: `
+    Account password reset procedure began! 
+    To set up new password you need to click the link we sent you on email.
+  `.trim(),
+  resetPasswordFailureMsg: 'Failed to begin reset password procedure :(',
+  resetPasswordSuccessAltMsg: "Email hasn't arrived yet? Click the button and we will re-send the email again.",
+  popupReSendEmail: 'Re-send email',
+  setNewPasswordEmptyTokenMsg: '// TODO: [UX] empty token case should be handled by routing guard',
+  setNewPasswordSuccessMsg: `
+    Account password reset completed! 
+    You can now login with the new password.
+  `.trim(),
+  setNewPasswordFailureMsg: 'Failed to set new password :(',
+  popupGoToLogIn: 'Go to log in',
 });
 
 function ResetPassword() {
-  console.log('(ResetPassword)');
-
   const [formInitials] = useState({
     email: '',
   });
+  const [popupData, setPopupData] = useState(null);
+
+  // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time
+  const resendResetPassword = (email) => {
+    apiService.resendResetPassword(email);
+  };
 
   const onSubmitHandler = (values) => {
-    apiService.resetPassword(values.email).then((res) => console.log('reset password res:', res));
+    apiService.resetPassword(values.email).then((res) => {
+      console.log('reset password res:', res);
+
+      if (res.msg) {
+        setPopupData({
+          type: POPUP_TYPES.SUCCESS,
+          message: translations.resetPasswordSuccessMsg,
+          altMessage: translations.resetPasswordSuccessAltMsg,
+          buttons: [
+            {
+              onClick: () => resendResetPassword(values.email),
+              text: translations.popupReSendEmail,
+            },
+          ],
+        });
+      } else {
+        setPopupData({
+          type: POPUP_TYPES.FAILURE,
+          message: translations.resetPasswordFailureMsg,
+          buttons: [getClosePopupBtn(setPopupData)],
+        });
+      }
+    });
   };
 
   return (
@@ -46,6 +87,8 @@ function ResetPassword() {
           </form>
         )}
       </Formik>
+
+      {popupData && <Popup {...popupData} />}
     </section>
   );
 }
@@ -56,7 +99,8 @@ function SetNewPassword() {
     newPassword: '',
     repeatedNewPassword: '',
   });
-  //   const history = useHistory();
+  const [popupData, setPopupData] = useState(null);
+  const history = useHistory();
   const { search: searchParam } = useLocation();
 
   useEffect(() => {
@@ -76,27 +120,36 @@ function SetNewPassword() {
 
   const onSubmitHandler = (values) => {
     if (token) {
-      apiService
-        .updateUserAdHoc(
-          {
-            name: 'password',
-            value: values.newPassword,
-          },
-          { name: 'resetPassword', value: token }
-        )
-        .then((res) => {
-          console.log('(resetPassword) res?', res);
+      apiService.setNewPassword(values.newPassword, token).then((res) => {
+        console.log('(resetPassword) res?', res);
 
-          // if ('isPasswordReset' in res) {
-          //   setRegConfirmStatus(res.isPasswordReset ? RESET_CONFIRM_STATUS.SUCCEEDED : RESET_CONFIRM_STATUS.FAILED);
-          // }
-        });
-    } /*  else {
-        setRegConfirmStatus(REG_CONFIRM_STATUS.FAILED);
-      } */
+        if (res.msg) {
+          setPopupData({
+            type: POPUP_TYPES.SUCCESS,
+            message: translations.setNewPasswordSuccessMsg,
+            buttons: [
+              {
+                onClick: () => history.push('/log-in'),
+                text: translations.popupGoToLogIn,
+              },
+            ],
+          });
+        } else {
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: translations.setNewPasswordFailureMsg,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        }
+      });
+    } else {
+      setPopupData({
+        type: POPUP_TYPES.FAILURE,
+        message: translations.setNewPasswordEmptyTokenMsg,
+        buttons: [getClosePopupBtn(setPopupData)],
+      });
+    }
   };
-
-  //   const logIn = () => history.push('/log-in');
 
   return (
     <section>
@@ -139,6 +192,8 @@ function SetNewPassword() {
           </form>
         )}
       </Formik>
+
+      {popupData && <Popup {...popupData} />}
     </section>
   );
 }

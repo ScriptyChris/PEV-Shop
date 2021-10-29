@@ -10,7 +10,7 @@ import Account from '../pages/account';
 import Compare from '../pages/compare';
 import Order from '../pages/order';
 import ConfirmRegistration from '../pages/confirmRegistration';
-import * as AdHocUserUpdate from '../pages/adHocUserUpdate';
+import * as RecoverAccount from '../pages/recoverAccount';
 
 export default function Main() {
   return (
@@ -41,10 +41,10 @@ export default function Main() {
           <LogIn />
         </Route>
         <Route path="/reset-password">
-          <AdHocUserUpdate.ResetPassword />
+          <RecoverAccount.ResetPassword />
         </Route>
         <Route path="/set-new-password">
-          <AdHocUserUpdate.SetNewPassword />
+          <RecoverAccount.SetNewPassword />
         </Route>
         <Route path="/account">
           <Account />

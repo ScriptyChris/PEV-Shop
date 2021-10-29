@@ -22,8 +22,9 @@ router.post('/api/users/confirm-registration', confirmRegistration);
 router.post('/api/users/resend-confirm-registration', resendConfirmRegistration);
 router.post('/api/users/login', logInUser);
 router.post('/api/users/reset-password', resetPassword);
+router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
-router.patch('/api/users/update-adhoc', updateAdHoc);
+router.patch('/api/users/set-new-password', setNewPassword);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 
 // expose functions for unit tests
@@ -33,8 +34,9 @@ router._confirmRegistration = confirmRegistration;
 router._resendConfirmRegistration = resendConfirmRegistration;
 router._logInUser = logInUser;
 router._resetPassword = resetPassword;
+router._resendResetPassword = resendResetPassword;
 router._logOutUser = logOutUser;
-router._updateAdHoc = updateAdHoc;
+router._setNewPassword = setNewPassword;
 router._getUser = getUser;
 
 export default router;
@@ -160,58 +162,50 @@ async function updateUser(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function updateAdHoc(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
-  logger.log('(updateAdHoc) req.body:', req.body);
+async function setNewPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(setNewPassword) req.body:', req.body);
 
   try {
-    // TODO: [REFACTOR] this logic should be flexible to handle various fields
     // @ts-ignore
-    const validatedPassword = UserModel.validatePassword(req.body.userModifications.value);
+    const validatedPassword = UserModel.validatePassword(req.body.newPassword);
 
     if (validatedPassword !== '') {
       return res.status(400).json({ exception: validatedPassword });
     }
-    const hashedPassword = await hashPassword(req.body.userModifications.value);
+    const hashedPassword = await hashPassword(req.body.newPassword);
+    const tokenQuery = {
+      [`tokens.resetPassword`]: req.body.token.replace(/\s/g, '+'),
+    };
 
-    const { name: tokenName, value: tokenValue } = req.body.tokenObj;
-    const userToUpdateAdHoc = (await getFromDB(
-      {
-        [`tokens.${tokenName}`]: tokenValue,
-        // isConfirmed: false,
-        // 'tokens.confirmRegistration': { $exists: true },
-      },
-      'User'
-    )) as IUser;
+    const userToSetNewPassword = (await getFromDB(tokenQuery, 'User')) as IUser;
 
-    if (userToUpdateAdHoc) {
+    if (userToSetNewPassword) {
       logger.log(
-        '(resetPassword) userToUpdateAdHoc.password:',
-        userToUpdateAdHoc.password,
-        ' /modification:',
-        req.body.userModifications,
+        '(setNewPassword) userToSetNewPassword.password:',
+        userToSetNewPassword.password,
         ' /hashed pass:',
         hashedPassword
       );
 
       await updateOneModelInDB(
-        { [`tokens.${tokenName}`]: tokenValue },
+        tokenQuery,
         {
           action: 'modify',
           data: {
-            [req.body.userModifications.name]: hashedPassword, // req.body.userModifications.value,
+            password: hashedPassword,
           },
         },
         'User'
       );
 
-      await userToUpdateAdHoc.deleteSingleToken('resetPassword');
+      await userToSetNewPassword.deleteSingleToken('resetPassword');
 
       res.status(201).json({ msg: 'Password updated!' });
     } else {
       return res.status(400).json({ msg: 'User not found!' });
     }
   } catch (exception) {
-    logger.error('(updateAdHoc) exception:', exception);
+    logger.error('(setNewPassword) exception:', exception);
 
     res.status(500).json({ exception });
   }
@@ -252,7 +246,10 @@ async function confirmRegistration(req: Request, res: Response): Promise<void> {
   logger.log('(confirmRegistration) req.body.token:', req.body.token);
 
   try {
-    const userToConfirm = (await getFromDB({ 'tokens.confirmRegistration': req.body.token }, 'User')) as IUser;
+    const userToConfirm = (await getFromDB(
+      { 'tokens.confirmRegistration': req.body.token.replace(/\s/g, '+') },
+      'User'
+    )) as IUser;
 
     if (userToConfirm) {
       await userToConfirm.confirmUser();
@@ -346,8 +343,6 @@ async function resetPassword(req: Request, res: Response): Promise<void | Pick<R
     const userToResetPassword = (await getFromDB(
       {
         email: req.body.email,
-        // isConfirmed: false,
-        // 'tokens.confirmRegistration': { $exists: true },
       },
       'User'
     )) as IUser;
@@ -367,6 +362,41 @@ async function resetPassword(req: Request, res: Response): Promise<void | Pick<R
     }
   } catch (exception) {
     logger.error('(resetPassword) exception:', exception);
+
+    return res.status(500).json({ exception });
+  }
+}
+
+// TODO: [SECURITY] set some debounce to limit number of sent emails per time
+async function resendResetPassword(req: Request, res: Response) {
+  logger.log('(resendResetPassword) req.body:', req.body);
+
+  try {
+    if (!req.body) {
+      return res.status(400).json({ error: 'Request body is empty or not attached!' });
+    } else if (!req.body.email) {
+      return res.status(400).json({ error: 'Email prop is empty or not attached!' });
+    }
+
+    const userToResendResetPassword = (await getFromDB(
+      {
+        email: req.body.email,
+        'tokens.resetPassword': { $exists: true },
+      },
+      'User'
+    )) as IUser;
+
+    if (userToResendResetPassword) {
+      await sendResetPasswordEmail({
+        email: userToResendResetPassword.email,
+        token: userToResendResetPassword.tokens.resetPassword as string,
+        res,
+      });
+    } else {
+      return res.status(404).json({ msg: 'User not found!' });
+    }
+  } catch (exception) {
+    logger.error('(resendResetPassword) exception:', exception);
 
     return res.status(500).json({ exception });
   }

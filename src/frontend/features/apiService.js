@@ -229,6 +229,10 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(`${this.USERS_URL}/reset-password`, { email });
   }
 
+  resendResetPassword(email) {
+    return this.postRequest(`${this.USERS_URL}/resend-reset-password`, { email });
+  }
+
   logoutUser() {
     return this.postRequest(`${this.USERS_URL}/logout`, null, true);
   }
@@ -245,8 +249,8 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(`${this.USERS_URL}/resend-confirm-registration`, { email });
   }
 
-  updateUserAdHoc(userModifications, tokenObj) {
-    return this.patchRequest(`${this.USERS_URL}/update-adhoc`, { userModifications, tokenObj });
+  setNewPassword(newPassword, token) {
+    return this.patchRequest(`${this.USERS_URL}/set-new-password`, { newPassword, token });
   }
 })();
 

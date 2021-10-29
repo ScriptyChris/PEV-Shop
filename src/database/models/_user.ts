@@ -1,7 +1,6 @@
 import type { Document } from 'mongoose';
 import { model, Schema } from 'mongoose';
-// TODO: [refactor] swap it for crypto.randomBytes(..)
-import { v4 as uuidv4 } from 'uuid';
+import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '../../middleware/features/auth';
 
 require('mongoose-type-email');
@@ -105,7 +104,7 @@ userSchema.methods.matchPassword = function (password: string): Promise<boolean>
 };
 
 userSchema.methods.setSingleToken = function (tokenName: TSingleTokensKeys): Promise<IUser> {
-  this.tokens[tokenName] = uuidv4();
+  this.tokens[tokenName] = randomBytes(256).toString('base64');
 
   setTimeout(() => this.deleteSingleToken(tokenName), SINGLE_TOKEN_EXPIRE_TIME_MS);
 
