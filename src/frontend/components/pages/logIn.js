@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import appStore, { USER_SESSION_STATES } from '../../features/appStore';
 import apiService from '../../features/apiService';
 
@@ -8,6 +8,8 @@ const translations = Object.freeze({
   logInField: 'Login',
   passwordField: 'Password',
   submitLogIn: 'Login!',
+  resetPasswordHint: `Don't remember password?`,
+  resetPasswordLink: 'Reset it!',
 });
 
 export default function LogIn() {
@@ -65,6 +67,15 @@ export default function LogIn() {
           <button type="submit">{translations.submitLogIn}</button>
         </fieldset>
       </form>
+
+      <div>
+        <p>{translations.resetPasswordHint}</p>
+        <Link to={'/reset-password'}>{translations.resetPasswordLink}</Link>
+      </div>
+
+      {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}
+      {/* TODO: [UX] if User credentials are invalid, show regarding info instead of redirecting to /account  */}
+
       {loggedInUserData && (
         <Redirect
           to={{

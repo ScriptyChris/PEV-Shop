@@ -48,28 +48,33 @@ describe('#api-users', () => {
   });
 
   it('should call router.post(..) and router.get(..) specific amount of times with correct params', () => {
-    expect(apiUsersRouter.post).toHaveBeenCalledTimes(6);
+    expect(apiUsersRouter.post).toHaveBeenCalledTimes(8);
+    expect(apiUsersRouter.patch).toHaveBeenCalledTimes(1);
     expect(apiUsersRouter.get).toHaveBeenCalledTimes(1);
 
-    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(1, '/api/users/', apiUsersRouter._updateUser);
-    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(2, '/api/users/register', apiUsersRouter._registerUser);
-    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(
-      3,
+    expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/', apiUsersRouter._updateUser);
+    expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/register', apiUsersRouter._registerUser);
+    expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/confirm-registration',
       apiUsersRouter._confirmRegistration
     );
-    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(
-      4,
+    expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/resend-confirm-registration',
       apiUsersRouter._resendConfirmRegistration
     );
-    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(5, '/api/users/login', apiUsersRouter._logInUser);
-    expect(apiUsersRouter.post).toHaveBeenNthCalledWith(
-      6,
+    expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/login', apiUsersRouter._logInUser);
+    expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/reset-password', apiUsersRouter._resetPassword);
+    expect(apiUsersRouter.post).toHaveBeenCalledWith(
+      '/api/users/resend-reset-password',
+      apiUsersRouter._resendResetPassword
+    );
+    expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/logout',
       authMiddlewareReturnedFn,
       apiUsersRouter._logOutUser
     );
+
+    expect(apiUsersRouter.patch).toHaveBeenCalledWith('/api/users/set-new-password', apiUsersRouter._setNewPassword);
     expect(apiUsersRouter.get).toHaveBeenCalledWith(
       '/api/users/:id',
       authMiddlewareReturnedFn,

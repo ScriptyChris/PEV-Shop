@@ -16,13 +16,13 @@ const translations = Object.freeze({
   clientType: 'Client',
   retailerType: 'Retailer',
   bothPasswordFieldsMustBeEqual: 'Both password fields must be equal!',
-  emailSuccessMsg: `
+  registrationSuccessMsg: `
     Account registered! 
     You need to confirm your account via the link we sent you on email, 
     before you'll be able to log in.
   `.trim(),
-  emailFailureMsg: 'Failed to register new account :(',
-  emailSuccessAltMsg: "Email hasn't arrived yet? Click the button and we will re-send the email again.",
+  registrationFailureMsg: 'Failed to register new account :(',
+  registrationSuccessAltMsg: "Email hasn't arrived yet? Click the button and we will re-send the email again.",
   popupReSendEmail: 'Re-send email',
   popupGoToLogin: 'Go to login',
 });
@@ -60,8 +60,8 @@ export default function Register() {
       if (res.msg) {
         setPopupData({
           type: POPUP_TYPES.SUCCESS,
-          message: translations.emailSuccessMsg,
-          altMessage: translations.emailSuccessAltMsg,
+          message: translations.registrationSuccessMsg,
+          altMessage: translations.registrationSuccessAltMsg,
           buttons: [
             {
               onClick: () => history.push('/log-in'),
@@ -78,7 +78,7 @@ export default function Register() {
       } else {
         setPopupData({
           type: POPUP_TYPES.FAILURE,
-          message: translations.emailFailureMsg,
+          message: translations.registrationFailureMsg,
           buttons: [getClosePopupBtn(setPopupData)],
         });
       }

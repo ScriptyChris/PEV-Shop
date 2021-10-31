@@ -21,7 +21,10 @@ router.post('/api/users/register', registerUser);
 router.post('/api/users/confirm-registration', confirmRegistration);
 router.post('/api/users/resend-confirm-registration', resendConfirmRegistration);
 router.post('/api/users/login', logInUser);
+router.post('/api/users/reset-password', resetPassword);
+router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
+router.patch('/api/users/set-new-password', setNewPassword);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 
 // expose functions for unit tests
@@ -30,7 +33,10 @@ router._registerUser = registerUser;
 router._confirmRegistration = confirmRegistration;
 router._resendConfirmRegistration = resendConfirmRegistration;
 router._logInUser = logInUser;
+router._resetPassword = resetPassword;
+router._resendResetPassword = resendResetPassword;
 router._logOutUser = logOutUser;
+router._setNewPassword = setNewPassword;
 router._getUser = getUser;
 
 export default router;
@@ -85,6 +91,46 @@ const sendRegistrationEmail = async ({
     });
 };
 
+const sendResetPasswordEmail = async ({
+  email,
+  token,
+  res,
+}: {
+  email: string;
+  token: string;
+  res: Response;
+}): TPromisedJSON => {
+  return sendMail(
+    email,
+    EMAIL_TYPES.RESET_PASSWORD,
+    `http://localhost:${process.env.PORT}/set-new-password/?token=${token}`
+  )
+    .then(async (emailSentInfo) => {
+      if (emailSentInfo.rejected.length) {
+        logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
+
+        return res.status(400).json({
+          exception: {
+            msg: 'Sending email rejection',
+            reason: emailSentInfo.rejected,
+          },
+        });
+      }
+
+      return res.status(200).json({ msg: 'Password resetting process began! Check your email.' });
+    })
+    .catch(async (emailSentError) => {
+      logger.error('emailSentError:', emailSentError);
+
+      return res.status(500).json({
+        exception: {
+          msg: `Email sent error: '${emailSentError.message}'`,
+          reason: emailSentError,
+        },
+      });
+    });
+};
+
 // TODO: implement updating various user data
 async function updateUser(req: Request, res: Response): Promise<void> {
   try {
@@ -116,6 +162,47 @@ async function updateUser(req: Request, res: Response): Promise<void> {
   }
 }
 
+async function setNewPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(setNewPassword) req.body:', req.body);
+
+  try {
+    const validatedPassword = UserModel.validatePassword(req.body.newPassword);
+
+    if (validatedPassword !== '') {
+      return res.status(400).json({ exception: validatedPassword });
+    }
+    const hashedPassword = await hashPassword(req.body.newPassword);
+    const tokenQuery = {
+      [`tokens.resetPassword`]: req.body.token.replace(/\s/g, '+'),
+    };
+
+    const userToSetNewPassword = (await getFromDB(tokenQuery, 'User')) as IUser;
+
+    if (userToSetNewPassword) {
+      await updateOneModelInDB(
+        tokenQuery,
+        {
+          action: 'modify',
+          data: {
+            password: hashedPassword,
+          },
+        },
+        'User'
+      );
+
+      await userToSetNewPassword.deleteSingleToken('resetPassword');
+
+      res.status(201).json({ msg: 'Password updated!' });
+    } else {
+      return res.status(400).json({ msg: 'User not found!' });
+    }
+  } catch (exception) {
+    logger.error('(setNewPassword) exception:', exception);
+
+    res.status(500).json({ exception });
+  }
+}
+
 async function registerUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
   logger.log('(registerUser) req.body:', req.body);
 
@@ -132,7 +219,7 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
     req.body.password = await hashPassword(req.body.password);
 
     const newUser = (await saveToDB(req.body, 'User')) as IUser;
-    await newUser.setConfirmRegistrationToken();
+    await newUser.setSingleToken('confirmRegistration');
 
     return await sendRegistrationEmail({
       login: req.body.login,
@@ -151,11 +238,14 @@ async function confirmRegistration(req: Request, res: Response): Promise<void> {
   logger.log('(confirmRegistration) req.body.token:', req.body.token);
 
   try {
-    const userToConfirm = (await getFromDB({ 'tokens.confirmRegistration': req.body.token }, 'User')) as IUser;
+    const userToConfirm = (await getFromDB(
+      { 'tokens.confirmRegistration': req.body.token.replace(/\s/g, '+') },
+      'User'
+    )) as IUser;
 
     if (userToConfirm) {
       await userToConfirm.confirmUser();
-      await userToConfirm.deleteConfirmRegistrationToken();
+      await userToConfirm.deleteSingleToken('confirmRegistration');
 
       res.status(200).json({ payload: { isUserConfirmed: true } });
     } else {
@@ -181,13 +271,6 @@ async function resendConfirmRegistration(req: Request, res: Response): TPromised
       },
       'User'
     )) as IUser;
-
-    logger.log(
-      'userToResendConfirmation:',
-      userToResendConfirmation,
-      ' /userToResendConfirmation.tokens.confirmRegistration:',
-      userToResendConfirmation.tokens.confirmRegistration
-    );
 
     if (userToResendConfirmation) {
       return await sendRegistrationEmail({
@@ -224,6 +307,10 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
       return res.status(401).json({ msg: 'Invalid credentials!' });
     }
 
+    if (!user.isConfirmed) {
+      return res.status(401).json({ msg: 'User registration is not confirmed!' });
+    }
+
     const token = await user.generateAuthToken();
 
     res.status(200).json({ payload: user, token });
@@ -231,6 +318,69 @@ async function logInUser(req: Request, res: Response): Promise<void | Pick<Respo
     logger.error('Login user exception:', exception);
 
     res.status(500).json({ exception });
+  }
+}
+
+async function resetPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+  logger.log('(resetPassword) req.body:', req.body);
+
+  try {
+    const userToResetPassword = (await getFromDB(
+      {
+        email: req.body.email,
+      },
+      'User'
+    )) as IUser;
+
+    if (userToResetPassword) {
+      await userToResetPassword.setSingleToken('resetPassword');
+      await sendResetPasswordEmail({
+        email: userToResetPassword.email,
+        token: userToResetPassword.tokens.resetPassword as string,
+        res,
+      });
+    } else {
+      return res.status(400).json({ msg: 'User not found!' });
+    }
+  } catch (exception) {
+    logger.error('(resetPassword) exception:', exception);
+
+    return res.status(500).json({ exception });
+  }
+}
+
+// TODO: [SECURITY] set some debounce to limit number of sent emails per time
+async function resendResetPassword(req: Request, res: Response) {
+  logger.log('(resendResetPassword) req.body:', req.body);
+
+  try {
+    if (!req.body) {
+      return res.status(400).json({ error: 'Request body is empty or not attached!' });
+    } else if (!req.body.email) {
+      return res.status(400).json({ error: 'Email prop is empty or not attached!' });
+    }
+
+    const userToResendResetPassword = (await getFromDB(
+      {
+        email: req.body.email,
+        'tokens.resetPassword': { $exists: true },
+      },
+      'User'
+    )) as IUser;
+
+    if (userToResendResetPassword) {
+      await sendResetPasswordEmail({
+        email: userToResendResetPassword.email,
+        token: userToResendResetPassword.tokens.resetPassword as string,
+        res,
+      });
+    } else {
+      return res.status(404).json({ msg: 'User not found!' });
+    }
+  } catch (exception) {
+    logger.error('(resendResetPassword) exception:', exception);
+
+    return res.status(500).json({ exception });
   }
 }
 
