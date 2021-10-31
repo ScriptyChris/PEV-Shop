@@ -11,7 +11,7 @@ const translations = Object.freeze({
   submitReset: 'Reset',
   setNewPasswordHeader: 'Set new password',
   newPasswordField: 'Password',
-  repeatNewPasswordField: 'Repeat password',
+  repeatedNewPasswordField: 'Repeat password',
   bothPasswordFieldsMustBeEqual: 'Both password fields must be equal!',
   submitNewPassword: 'Update password',
   resetPasswordSuccessMsg: `
@@ -163,7 +163,7 @@ function SetNewPassword() {
 
               {/* TODO: [DUP] move password related elements to generic component to avoid redundancy */}
               <div>
-                <label htmlFor="newPassword">{translations.passwordField}</label>
+                <label htmlFor="newPassword">{translations.newPasswordField}</label>
                 {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
                 <Field name="newPassword" id="newPassword" type="password" minLength="8" maxLength="20" required />
 
@@ -172,7 +172,7 @@ function SetNewPassword() {
                 )}
               </div>
               <div>
-                <label htmlFor="repeatedNewPassword">{translations.repeatedPasswordField}</label>
+                <label htmlFor="repeatedNewPassword">{translations.repeatedNewPasswordField}</label>
                 <Field
                   name="repeatedNewPassword"
                   id="repeatedNewPassword"

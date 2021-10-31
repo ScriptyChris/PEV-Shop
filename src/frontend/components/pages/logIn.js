@@ -74,6 +74,7 @@ export default function LogIn() {
       </div>
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}
+      {/* TODO: [UX] if User credentials are invalid, show regarding info instead of redirecting to /account  */}
 
       {loggedInUserData && (
         <Redirect

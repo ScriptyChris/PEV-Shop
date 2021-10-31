@@ -166,7 +166,6 @@ async function setNewPassword(req: Request, res: Response): Promise<void | Pick<
   logger.log('(setNewPassword) req.body:', req.body);
 
   try {
-    // @ts-ignore
     const validatedPassword = UserModel.validatePassword(req.body.newPassword);
 
     if (validatedPassword !== '') {
@@ -180,13 +179,6 @@ async function setNewPassword(req: Request, res: Response): Promise<void | Pick<
     const userToSetNewPassword = (await getFromDB(tokenQuery, 'User')) as IUser;
 
     if (userToSetNewPassword) {
-      logger.log(
-        '(setNewPassword) userToSetNewPassword.password:',
-        userToSetNewPassword.password,
-        ' /hashed pass:',
-        hashedPassword
-      );
-
       await updateOneModelInDB(
         tokenQuery,
         {
@@ -280,13 +272,6 @@ async function resendConfirmRegistration(req: Request, res: Response): TPromised
       'User'
     )) as IUser;
 
-    logger.log(
-      'userToResendConfirmation:',
-      userToResendConfirmation,
-      ' /userToResendConfirmation.tokens.confirmRegistration:',
-      userToResendConfirmation.tokens.confirmRegistration
-    );
-
     if (userToResendConfirmation) {
       return await sendRegistrationEmail({
         login: userToResendConfirmation.login,
@@ -348,10 +333,7 @@ async function resetPassword(req: Request, res: Response): Promise<void | Pick<R
     )) as IUser;
 
     if (userToResetPassword) {
-      logger.log('(resetPassword) userToResetPassword:', userToResetPassword.password);
-
       await userToResetPassword.setSingleToken('resetPassword');
-
       await sendResetPasswordEmail({
         email: userToResetPassword.email,
         token: userToResetPassword.tokens.resetPassword as string,

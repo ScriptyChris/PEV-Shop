@@ -1,4 +1,4 @@
-import type { Document } from 'mongoose';
+import type { Document, Model } from 'mongoose';
 import { model, Schema } from 'mongoose';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '../../middleware/features/auth';
@@ -155,7 +155,11 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
   return user;
 };
 
-const UserModel = model<IUser>('User', userSchema);
+const UserModel = model<IUser, IUserStatics>('User', userSchema);
+
+interface IUserStatics extends Model<IUser> {
+  validatePassword(password: any): string;
+}
 
 export interface IUser extends Document {
   login: string;
@@ -174,9 +178,6 @@ export interface IUser extends Document {
   setSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   deleteSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   confirmUser(): Promise<IUser>;
-
-  // TODO: [TS] fix TS error related to non-static method
-  //static validatePassword(password: any): string;
 }
 
 export default UserModel;
