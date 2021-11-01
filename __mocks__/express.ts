@@ -19,6 +19,10 @@ const router: Partial<{ get: TJestMock; post: TJestMock; patch: TJestMock }> = O
       value: jest.fn(),
       writable: false,
     },
+    use: {
+      value: jest.fn(),
+      writable: false,
+    },
   }
 );
 

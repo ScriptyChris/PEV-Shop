@@ -27,7 +27,6 @@ router.post('/api/users/reset-password', resetPassword);
 router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.patch('/api/users/set-new-password', setNewPassword);
-router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 router.use(getMiddlewareErrorHandler(logger));
 
@@ -135,8 +134,10 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
     req.body.password = await hashPassword(req.body.password);
     const savedUser = (await saveToDB(req.body, 'User')) as IUser;
 
+    logger.log('User saved:', savedUser);
+
     // TODO: expose appropriate function from user role module?
-    updateOneModelInDB(
+    const updatedUser = await updateOneModelInDB(
       { roleName: req.body.roleName },
       {
         action: 'addUnique',
@@ -147,7 +148,9 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
       'User-Role'
     );
 
-    logger.log('User saved', savedUser);
+    if (!updatedUser) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User to update was not found!' });
+    }
 
     return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Success!' });
   } catch (exception) {
@@ -284,10 +287,12 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
 }
 
 async function logInUser(req: Request, res: Response, next: NextFunction) {
-  logger.log('(logInUser) req.body:', req.body);
-
   try {
-    if (!req.body.login) {
+    logger.log('(logInUser) req.body:', req.body);
+
+    if (!req.body) {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
+    } else if (!req.body.login) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'User login is empty or not attached!' });
     }
 
@@ -396,9 +401,9 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 }
 
 async function getUser(req: Request, res: Response, next: NextFunction) {
-  logger.log('[GET] /:id', req.params.id);
-
   try {
+    logger.log('[GET] /:id', req.params.id);
+
     if (!req.params.id) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'User id is empty or not attached!' });
     }

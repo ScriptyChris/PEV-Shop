@@ -52,11 +52,10 @@ router.use(getMiddlewareErrorHandler(logger));
 export default router;
 
 async function getProductCategoriesHierarchy(req: Request, res: Response, next: NextFunction) {
-  logger.log('[productCategories GET] req.params:', req.params);
-
   try {
+    logger.log('(getProductCategoriesHierarchy) req.params:', req.params);
+
     const productCategories = (await getFromDB('category', 'Product', { isDistinct: true })) as string[];
-    // logger.log('productCategories:', productCategories);
 
     if (!productCategories) {
       return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'Product categories not found!' });

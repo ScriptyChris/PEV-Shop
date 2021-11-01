@@ -35,9 +35,9 @@ router._getUserRole = getUserRole;
 export default router;
 
 async function saveUserRole(req: Request, res: Response, next: NextFunction) {
-  logger.log('[POST] /user-roles:', req.body);
-
   try {
+    logger.log('(saveUserRole) /user-roles:', req.body);
+
     if (!req.body) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
     } else if (!req.body.roleName) {
@@ -64,9 +64,9 @@ async function saveUserRole(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateUserRole(req: Request, res: Response, next: NextFunction) {
-  logger.log('[PATCH] /user-roles:', req.body);
-
   try {
+    logger.log('(updateUserRole) /user-roles:', req.body);
+
     if (!req.body) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
     } else if (!req.body.roleName) {
@@ -95,9 +95,9 @@ async function updateUserRole(req: Request, res: Response, next: NextFunction) {
 }
 
 async function getUserRole(req: Request, res: Response, next: NextFunction) {
-  logger.log('[GET] /user-roles:', req.params);
-
   try {
+    logger.log('(getUserRole) /user-roles:', req.params);
+
     if (!req.params || !req.params.roleName) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Param "roleName" is empty or not attached!' });
     }
@@ -105,7 +105,7 @@ async function getUserRole(req: Request, res: Response, next: NextFunction) {
     const userRole = (await getFromDB({ roleName: req.params.roleName }, 'User-Role')) as IUserRole;
 
     if (!userRole) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: `Role '${req.body.roleName}' not found!` });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: `Role '${req.params.roleName}' not found!` });
     }
 
     await userRole.populate('owners').execPopulate();

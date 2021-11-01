@@ -1,5 +1,6 @@
+import getMiddlewareErrorHandler from '../../../src/middleware/helpers/middleware-error-handler';
 import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
-import { getResMock } from '../../mockUtils';
+import { getNextFnMock, getResMock } from '../../mockUtils';
 
 const { Router, _router } = jest.mock('express').requireMock('express').default;
 const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMiddlewareMock } = jest
@@ -69,6 +70,7 @@ describe('#api-products', () => {
       expect.any(Function),
       apiProductsRouter._deleteProduct
     );
+    expect(apiProductsRouter.use).toHaveBeenCalledWith(expect.any(Function));
   });
 
   describe('getProducts(..)', () => {
@@ -207,14 +209,22 @@ describe('#api-products', () => {
     });
 
     describe('when failed', () => {
+      it('should call next(..) when req is empty', async () => {
+        const nextFnMock = getNextFnMock();
+
+        await apiProductsRouter._getProductById(null, getResMock(), nextFnMock);
+
+        expect(nextFnMock).toHaveBeenCalledWith(TypeError(`Cannot read property 'params' of null`));
+      });
+
       it('should call res.status(..).json(..) with correct params', async () => {
         const resMock = getResMock();
 
         await apiProductsRouter._getProductById({}, resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property '_id' of undefined`),
+          error: 'Id params is empty or not attached!',
         });
       });
     });
@@ -253,14 +263,22 @@ describe('#api-products', () => {
     });
 
     describe('when failed', () => {
+      it('should call next(..) when req is empty', async () => {
+        const nextFnMock = getNextFnMock();
+
+        await apiProductsRouter._addProduct(null, getResMock(), nextFnMock);
+
+        expect(nextFnMock).toHaveBeenCalledWith(TypeError(`Cannot read property 'body' of null`));
+      });
+
       it('should call res.status(..).json(..) with correct params', async () => {
         const resMock = getResMock();
 
-        await apiProductsRouter._addProduct(null, resMock);
+        await apiProductsRouter._addProduct({}, resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property 'body' of null`),
+          error: 'Product data is empty or not attached!',
         });
       });
     });
@@ -325,7 +343,7 @@ describe('#api-products', () => {
     });
 
     describe('when failed', () => {
-      it('should call res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ exception: String }) if validation failed', async () => {
+      it('should call res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: String }) if validation failed', async () => {
         await Promise.all(
           [
             {
@@ -334,7 +352,7 @@ describe('#api-products', () => {
                 ...getReqMock().body,
                 rating: 'not a number',
               },
-              __exception: 'a number',
+              __error: 'a number',
             },
             {
               ...getReqMock(),
@@ -342,7 +360,7 @@ describe('#api-products', () => {
                 ...getReqMock().body,
                 rating: -1,
               },
-              __exception: 'greater than',
+              __error: 'greater than',
             },
             {
               ...getReqMock(),
@@ -350,7 +368,7 @@ describe('#api-products', () => {
                 ...getReqMock().body,
                 rating: 6,
               },
-              __exception: 'less than',
+              __error: 'less than',
             },
             {
               ...getReqMock(),
@@ -358,7 +376,7 @@ describe('#api-products', () => {
                 ...getReqMock().body,
                 rating: 1.25,
               },
-              __exception: 'integer or .5 (a half)',
+              __error: 'integer or .5 (a half)',
             },
             {
               ...getReqMock(),
@@ -366,26 +384,27 @@ describe('#api-products', () => {
                 ...getReqMock().body,
                 author: null,
               },
-              __exception: 'Author value',
+              __error: 'Author value',
             },
           ].map(async (reqMock) => {
             const resMock = getResMock();
 
-            await apiProductsRouter._addReview(reqMock, resMock);
+            await apiProductsRouter._addReview(reqMock, resMock, getNextFnMock());
 
             expect(resMock.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
-            expect(resMock._jsonMethod).toBeCalledWith({ exception: expect.stringContaining(reqMock.__exception) });
+            expect(resMock._jsonMethod).toBeCalledWith({ error: expect.stringContaining(reqMock.__error) });
           })
         );
       });
 
-      it('should call res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ exception: Error }) if getFromDB failed', async () => {
+      it('should call next(..) with an exception if getFromDB failed', async () => {
         const resMock = getResMock();
+        const nextFnMock = getNextFnMock();
 
-        await apiProductsRouter._addReview(getReqMock(), resMock);
+        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.general);
+        await apiProductsRouter._addReview(getReqMock(), resMock, nextFnMock);
 
-        expect(resMock.status).toBeCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
-        expect(resMock._jsonMethod).toBeCalledWith({ exception: expect.any(Error) });
+        expect(nextFnMock).toBeCalledWith(TypeError(`Cannot read property '0' of null`));
       });
     });
   });
@@ -433,10 +452,10 @@ describe('#api-products', () => {
         updateOneModelInDBMock.mockClear();
       });
 
-      it('should call updateOneModelInDB(..) with correct params', () => {
+      it('should call updateOneModelInDB(..) with correct params', async () => {
         const reqMock = getReqMock();
 
-        apiProductsRouter._modifyProduct(reqMock, getResMock());
+        await apiProductsRouter._modifyProduct(reqMock, getResMock());
 
         expect(updateOneModelInDBMock).toHaveBeenCalledWith(
           reqMock.body.productId,
@@ -458,24 +477,37 @@ describe('#api-products', () => {
     });
 
     describe('when failed', () => {
-      it('should call res.status(..).json(..) with correct params', () => {
+      it('should call next(..) with an exception if req is empty', async () => {
+        const nextFnMock = getNextFnMock();
+
+        await apiProductsRouter._modifyProduct(null, getResMock(), nextFnMock);
+
+        expect(nextFnMock).toHaveBeenCalledWith(TypeError(`Cannot read property 'body' of null`));
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
         const resMock = getResMock();
 
-        // no user permissions case
-        apiProductsRouter._modifyProduct({ userPermissions: false }, resMock);
-
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception: Error('User has no permissions!') });
-
         // null req.body case
-        apiProductsRouter._modifyProduct({ userPermissions: true, body: null }, resMock);
+        await apiProductsRouter._modifyProduct({ userPermissions: true, body: null }, resMock);
 
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property 'productId' of null`),
+          error: 'Request body is empty or not attached!',
         });
 
-        // all cases
+        // no user permissions case
+        await apiProductsRouter._modifyProduct({ userPermissions: false, body: {} }, resMock);
+
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
-        expect(resMock.status).toHaveBeenCalledTimes(2);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'User has no permissions!' });
+
+        // product to modify not found
+        updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._failedCall);
+        await apiProductsRouter._modifyProduct({ userPermissions: true, body: {} }, resMock);
+
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'Product to modify not found!' });
       });
     });
   });
@@ -523,22 +555,27 @@ describe('#api-products', () => {
       it('should call res.status(..).json(..) with correct params', async () => {
         const reqMock = getReqMock();
 
+        const resMock0 = getResMock();
+        await apiProductsRouter._deleteProduct({}, resMock0);
+        expect(resMock0.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
+        expect(resMock0._jsonMethod).toBeCalledWith({ error: 'Name param is empty or not attached!' });
+
         const resMock1 = getResMock();
-        await apiProductsRouter._deleteProduct({}, resMock1);
+        await apiProductsRouter._deleteProduct({ params: { name: 'test name' } }, resMock1);
         expect(resMock1.status).toBeCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
-        expect(resMock1._jsonMethod).toBeCalledWith({ exception: Error('User has no permissions!') });
+        expect(resMock1._jsonMethod).toBeCalledWith({ error: 'User has no permissions!' });
 
         const resMock2 = getResMock();
         deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.general);
         await apiProductsRouter._deleteProduct(reqMock, resMock2);
         expect(resMock2.status).toBeCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
-        expect(resMock2._jsonMethod).toBeCalledWith({ deletionResult: deleteFromDBMock._failedCall.general() });
+        expect(resMock2._jsonMethod).toBeCalledWith({ exception: deleteFromDBMock._failedCall.general() });
 
         const resMock3 = getResMock();
         deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.nothingFound);
         await apiProductsRouter._deleteProduct(reqMock, resMock3);
-        expect(resMock3.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
-        expect(resMock3._jsonMethod).toBeCalledWith({ deletionResult: deleteFromDBMock._failedCall.nothingFound() });
+        expect(resMock3.status).toBeCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+        expect(resMock3._jsonMethod).toBeCalledWith({ error: 'Could not find product to delete!' });
       });
     });
   });

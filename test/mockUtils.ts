@@ -14,4 +14,6 @@ const getResMock = (): { status: TJestMock; _jsonMethod: TJestMock; sendStatus: 
   };
 };
 
-export { getResMock, getMockImplementationError };
+const getNextFnMock = () => jest.fn(() => undefined);
+
+export { getResMock, getMockImplementationError, getNextFnMock };

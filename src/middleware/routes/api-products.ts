@@ -238,7 +238,7 @@ addReview.isIntOrDecimalHalf = (value: number): boolean => {
 
 async function modifyProduct(req: Request & { userPermissions: any }, res: Response, next: NextFunction) {
   try {
-    logger.log('[products PATCH] req.body', req.body);
+    logger.log('(products PATCH) req.body:', req.body);
 
     if (!req.body) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
@@ -282,7 +282,7 @@ async function deleteProduct(req: Request & { userPermissions: any }, res: Respo
     } else if (deletionResult.deletedCount === 0) {
       logger.error('Deleted nothing...', deletionResult);
 
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Could not delete the product!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'Could not find product to delete!' });
     }
 
     return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
