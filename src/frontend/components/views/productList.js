@@ -45,11 +45,33 @@ export default function ProductList() {
     const isHighestProductsPerPage = productsPerPage === productsPerPageLimits[productsPerPageLimits.length - 1];
 
     if (isHighestProductsPerPage) {
-      setProductsList(products || (await apiService.getProducts({ productCategories, productsFilters })));
+      if (products) {
+        setProductsList(products);
+      } else {
+        setProductsList(
+          await apiService.getProducts({ productCategories, productsFilters }).then((res) => {
+            if (res.__EXCEPTION_ALREADY_HANDLED) {
+              return;
+            }
+
+            return res;
+          })
+        );
+      }
+
       setTotalPages(1);
     } else {
       const pagination = { pageNumber, productsPerPage };
-      products = products || (await apiService.getProducts({ pagination, productCategories, productsFilters }));
+
+      if (!products) {
+        products = await apiService.getProducts({ pagination, productCategories, productsFilters }).then((res) => {
+          if (res.__EXCEPTION_ALREADY_HANDLED) {
+            return;
+          }
+
+          return res;
+        });
+      }
 
       setProductsList(products.productsList);
       setTotalPages(products.totalPages);

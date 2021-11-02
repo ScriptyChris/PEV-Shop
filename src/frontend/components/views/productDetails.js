@@ -3,7 +3,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import ProductItem from './productItem';
 import apiService from '../../features/apiService';
-import Popup from '../utils/popup';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import RatingWidget from '../utils/ratingWidget';
 import { getLocalizedDate } from '../../features/localization';
 
@@ -41,32 +41,27 @@ function AddReview({ productName, updateReviews }) {
   };
 
   const onSubmitHandler = (values) => {
-    apiService.addProductReview(productName, values).then((res) => {
-      if (res.list && res.averageRating) {
-        setPopupData({
-          type: 'SUCCESS',
-          message: 'Review added!',
-          buttons: [
-            {
-              onClick: () => setPopupData(null),
-              text: 'Close',
-            },
-          ],
-        });
-        updateReviews({ list: res.list, averageRating: res.averageRating });
-      } else {
-        setPopupData({
-          type: 'FAILURE',
-          message: 'Failed to add review :(',
-          buttons: [
-            {
-              onClick: () => setPopupData(null),
-              text: 'Close',
-            },
-          ],
-        });
-      }
-    });
+    apiService
+      .disableGenericErrorHandler()
+      .addProductReview(productName, values)
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (res.list && res.averageRating) {
+          setPopupData({
+            type: POPUP_TYPES.SUCCESS,
+            message: 'Review added!',
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+          updateReviews({ list: res.list, averageRating: res.averageRating });
+        } else {
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: 'Failed to add review :(',
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        }
+      });
   };
 
   if (showReviewForm) {
@@ -120,19 +115,23 @@ export function getProductDetailsHeaders() {
   }, {});
 }
 
-export async function getProductDetailsData(product) {
-  const relatedProducts = await apiService.getProductsByNames(product.relatedProductsNames);
+export function getProductDetailsData(product) {
+  return apiService.getProductsByNames(product.relatedProductsNames).then((res) => {
+    if (res.__EXCEPTION_ALREADY_HANDLED) {
+      return;
+    }
 
-  return {
-    category: product.category,
-    name: product.name,
-    price: product.price,
-    shortDescription: product.shortDescription,
-    technicalSpecs: product.technicalSpecs,
-    reviews: product.reviews,
-    url: product.url,
-    relatedProducts,
-  };
+    return {
+      category: product.category,
+      name: product.name,
+      price: product.price,
+      shortDescription: product.shortDescription,
+      technicalSpecs: product.technicalSpecs,
+      reviews: product.reviews,
+      url: product.url,
+      relatedProducts: res,
+    };
+  });
 }
 
 export function prepareSpecificProductDetail(detailName, detailValue, extras = {}) {
@@ -341,33 +340,33 @@ export default function ProductDetails({ product }) {
   };
 
   const deleteProduct = () => {
-    apiService.deleteProduct(productDetails.name).then((res) => {
-      if (res.status === 204) {
-        setPopupData({
-          type: 'SUCCESS',
-          message: 'Product successfully deleted!',
-          buttons: [
-            {
-              onClick: () => history.push('/shop'),
-              text: 'Go back to shop',
-            },
-          ],
-        });
-      } else {
-        console.error('(deleteProduct) failed res:', res);
+    apiService
+      .disableGenericErrorHandler()
+      .deleteProduct(productDetails.name)
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (res.__IS_OK_WITHOUT_CONTENT) {
+          setPopupData({
+            type: POPUP_TYPES.SUCCESS,
+            message: 'Product successfully deleted!',
+            buttons: [
+              {
+                onClick: () => history.push('/shop'),
+                text: 'Go back to shop',
+              },
+            ],
+          });
+        } else {
+          console.error('(deleteProduct) failed res:', res);
 
-        setPopupData({
-          type: 'FAILURE',
-          message: 'Deleting product failed :(',
-          buttons: [
-            {
-              onClick: () => setPopupData(null),
-              text: 'Close',
-            },
-          ],
-        });
-      }
-    });
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: 'Deleting product failed :(',
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        }
+      });
   };
 
   return (

@@ -357,9 +357,9 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
 
   try {
     if (!req.body) {
-      return res.status(400).json({ error: 'Request body is empty or not attached!' });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
     } else if (!req.body.email) {
-      return res.status(400).json({ error: 'Email prop is empty or not attached!' });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Email prop is empty or not attached!' });
     }
 
     const userToResendResetPassword = (await getFromDB(
@@ -377,7 +377,7 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
         res,
       });
     } else {
-      return res.status(404).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User not found!' });
     }
   } catch (exception) {
     return next(exception);

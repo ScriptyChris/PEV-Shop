@@ -21,7 +21,13 @@ const productSpecsService = (() => {
 
   async function getProductsSpecifications() {
     if (productSpecifications.length === 0) {
-      productSpecifications = await apiService.getProductsSpecifications();
+      productSpecifications = await apiService.getProductsSpecifications().then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        }
+
+        return res;
+      });
     }
 
     return productSpecifications;

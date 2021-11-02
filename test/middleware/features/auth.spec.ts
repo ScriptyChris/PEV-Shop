@@ -133,7 +133,7 @@ describe('#auth', () => {
       expect(succeededAuthMiddlewareFnResultPromise).resolves.toBe(undefined);
 
       // for caught error case
-      const failedAuthMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB);
+      const failedAuthMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB.general);
       const failedAuthMiddlewareFnResultPromise = failedAuthMiddlewareFnResult(
         getReqMock(),
         getResMock(),
@@ -186,11 +186,11 @@ describe('#auth', () => {
     describe("when didn't find user in database", () => {
       it('should call res.status(..).json(..) with appropriate params', async () => {
         const resMock = getResMock();
-        const authMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB);
+        const authMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB.general);
 
         await authMiddlewareFnResult(getReqMock(), resMock, getNextMock());
-        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.UNAUTHORIZED);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'You are unauthorized!' });
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'User to authorize not found!' });
       });
     });
   });
@@ -287,7 +287,7 @@ describe('#auth', () => {
 
         await userRoleMiddlewareFnResult(reqMock, resMock, getNextMock());
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: "You don't have permissions!" });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: `You don't have permissions!` });
       });
     });
   });

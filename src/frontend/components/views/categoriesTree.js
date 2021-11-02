@@ -28,11 +28,13 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const productCategories = await apiService.getProductCategories();
+    apiService.getProductCategories().then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
 
-      setCategoriesMap(productCategories);
-    })();
+      setCategoriesMap(res);
+    });
   }, []);
 
   useEffect(() => {

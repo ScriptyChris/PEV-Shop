@@ -44,7 +44,9 @@ const verifyToken = (token: string): TToken => {
   return verify(token, process.env.SECRET_KEY) as TToken;
 };
 
-const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ any): ((...args: any) => Promise<void>) => {
+const authMiddlewareFn = (
+  getFromDB: /* TODO: [DX] correct typing */ any
+): ((...args: any) => Promise<Pick<Response, 'json'> | void>) => {
   return async (req: Request & { authToken: string; user: IUser }, res: Response, next: NextFunction) => {
     try {
       const authToken: string = (req.header('Authorization') as string).replace('Bearer ', '');
@@ -55,15 +57,14 @@ const authMiddlewareFn = (getFromDB: /* TODO: correct typing */ any): ((...args:
       )) as IUser;
 
       if (!user) {
-        throw new Error('Auth failed!');
+        return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User to authorize not found!' });
       }
 
       req.user = user;
 
-      next();
+      return next();
     } catch (exception) {
-      logger.error('authMiddleware exception', exception);
-      res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'You are unauthorized!' });
+      return next(exception);
     }
   };
 };
@@ -72,7 +73,7 @@ const userRoleMiddlewareFn = (roleName: string): any => {
   return async (req: Request & { user: any; userPermissions: string[] }, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
-        throw new Error('No user provided - probably forgot to do auth first.');
+        return res.status(HTTP_STATUS_CODE.FORBIDDEN).json({ error: `You don't have permissions!` });
       }
 
       // TODO: improve selecting data while populating
@@ -83,10 +84,9 @@ const userRoleMiddlewareFn = (roleName: string): any => {
 
       req.userPermissions = req.user.roleName[0].permissions;
 
-      next();
+      return next();
     } catch (exception) {
-      logger.error('userRoleMiddlewareFn exception', exception);
-      res.status(HTTP_STATUS_CODE.FORBIDDEN).json({ error: "You don't have permissions!" });
+      return next(exception);
     }
   };
 };

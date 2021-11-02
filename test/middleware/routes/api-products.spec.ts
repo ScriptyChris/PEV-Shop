@@ -148,7 +148,7 @@ describe('#api-products', () => {
         const getPaginatedProducts = getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith(await getPaginatedProducts());
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await getPaginatedProducts() });
       });
     });
 
@@ -204,7 +204,7 @@ describe('#api-products', () => {
         getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith(await getFromDBMock());
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await getFromDBMock() });
       });
     });
 

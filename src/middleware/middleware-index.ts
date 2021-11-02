@@ -31,13 +31,11 @@ const middleware = (app: Application): void => {
     const imagePath = req.url.split('/').pop() as string;
 
     getImage(imagePath)
-      .then((image) => {
-        res.sendFile(image);
-      })
+      .then((image) => res.sendFile(image))
       .catch((error) => {
         logger.log('Image searching error: ', error, ' /imagePath: ', imagePath);
 
-        res.status(HTTP_STATUS_CODE.NOT_FOUND).end();
+        return res.status(HTTP_STATUS_CODE.NOT_FOUND).end();
       });
   });
 };
@@ -64,7 +62,7 @@ function wrappedMiddleware(): void {
   app.use('/', (req, res) => {
     console.log('global (404?) req.url:', req.url);
 
-    res.sendFile(`${frontendPath}/index.html`);
+    return res.sendFile(`${frontendPath}/index.html`);
   });
   app.listen(process.env.PORT, () => {
     logger.log(`Server is listening on port ${process.env.PORT}`);

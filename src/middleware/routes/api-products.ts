@@ -123,7 +123,7 @@ async function getProducts(
       return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'Products not found!' });
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(paginatedProducts);
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: paginatedProducts });
   } catch (exception) {
     return next(exception);
   }
@@ -143,7 +143,7 @@ async function getProductById(req: Request, res: Response, next: NextFunction) {
       return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'Product not found!' });
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(product);
+    return res.status(HTTP_STATUS_CODE.OK).json({ payload: product });
   } catch (exception) {
     return next(exception);
   }

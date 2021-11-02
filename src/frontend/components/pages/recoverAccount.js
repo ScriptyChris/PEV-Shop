@@ -42,29 +42,34 @@ function ResetPassword() {
   };
 
   const onSubmitHandler = (values) => {
-    apiService.resetPassword(values.email).then((res) => {
-      console.log('reset password res:', res);
+    apiService
+      .disableGenericErrorHandler()
+      .resetPassword(values.email)
+      .then((res) => {
+        console.log('reset password res:', res);
 
-      if (res.msg) {
-        setPopupData({
-          type: POPUP_TYPES.SUCCESS,
-          message: translations.resetPasswordSuccessMsg,
-          altMessage: translations.resetPasswordSuccessAltMsg,
-          buttons: [
-            {
-              onClick: () => resendResetPassword(values.email),
-              text: translations.popupReSendEmail,
-            },
-          ],
-        });
-      } else {
-        setPopupData({
-          type: POPUP_TYPES.FAILURE,
-          message: translations.resetPasswordFailureMsg,
-          buttons: [getClosePopupBtn(setPopupData)],
-        });
-      }
-    });
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (res.__ERROR_TO_HANDLE) {
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: translations.resetPasswordFailureMsg,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        } else {
+          setPopupData({
+            type: POPUP_TYPES.SUCCESS,
+            message: translations.resetPasswordSuccessMsg,
+            altMessage: translations.resetPasswordSuccessAltMsg,
+            buttons: [
+              {
+                onClick: () => resendResetPassword(values.email),
+                text: translations.popupReSendEmail,
+              },
+            ],
+          });
+        }
+      });
   };
 
   return (
@@ -120,28 +125,33 @@ function SetNewPassword() {
 
   const onSubmitHandler = (values) => {
     if (token) {
-      apiService.setNewPassword(values.newPassword, token).then((res) => {
-        console.log('(resetPassword) res?', res);
+      apiService
+        .disableGenericErrorHandler()
+        .setNewPassword(values.newPassword, token)
+        .then((res) => {
+          console.log('(resetPassword) res?', res);
 
-        if (res.msg) {
-          setPopupData({
-            type: POPUP_TYPES.SUCCESS,
-            message: translations.setNewPasswordSuccessMsg,
-            buttons: [
-              {
-                onClick: () => history.push('/log-in'),
-                text: translations.popupGoToLogIn,
-              },
-            ],
-          });
-        } else {
-          setPopupData({
-            type: POPUP_TYPES.FAILURE,
-            message: translations.setNewPasswordFailureMsg,
-            buttons: [getClosePopupBtn(setPopupData)],
-          });
-        }
-      });
+          if (res.__EXCEPTION_ALREADY_HANDLED) {
+            return;
+          } else if (res.__ERROR_TO_HANDLE) {
+            setPopupData({
+              type: POPUP_TYPES.FAILURE,
+              message: translations.setNewPasswordFailureMsg,
+              buttons: [getClosePopupBtn(setPopupData)],
+            });
+          } else {
+            setPopupData({
+              type: POPUP_TYPES.SUCCESS,
+              message: translations.setNewPasswordSuccessMsg,
+              buttons: [
+                {
+                  onClick: () => history.push('/log-in'),
+                  text: translations.popupGoToLogIn,
+                },
+              ],
+            });
+          }
+        });
     } else {
       setPopupData({
         type: POPUP_TYPES.FAILURE,
