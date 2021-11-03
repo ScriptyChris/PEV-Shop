@@ -34,14 +34,14 @@ const Shipment = memo(function Shipment({ updateChosenShipmentPoint }) {
 export default function Order() {
   const [chosenShipmentPoint, setChosenShipmentPoint] = useState(null);
   const payForOrder = () => {
-    apiService
-      .submitCart(appStore.userCartProducts)
-      .then(({ redirectUri }) => {
-        appStore.clearUserCartState();
-        window.location = redirectUri;
-      })
-      // TODO: handle error in better way
-      .catch((error) => console.error('submitCart error:', error));
+    apiService.submitCart(appStore.userCartProducts).then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
+
+      appStore.clearUserCartState();
+      window.location = res.redirectUri;
+    });
   };
 
   useEffect(() => {

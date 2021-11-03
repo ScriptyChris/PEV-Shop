@@ -12,6 +12,7 @@ class Ajax {
     this.HTTP_RESPONSE_STATUS = Object.freeze({
       NO_CONTENT: 204,
     });
+    this._isGenericErrorHandlerActive = true;
   }
 
   get _BASE_API_URL_OBJECT() {
@@ -31,6 +32,50 @@ class Ajax {
     return `Bearer ${this._AUTH_TOKEN}`;
   }
 
+  disableGenericErrorHandler() {
+    this._isGenericErrorHandlerActive = false;
+
+    return this;
+  }
+
+  _enableGenericErrorHandler() {
+    this._isGenericErrorHandlerActive = true;
+
+    return this;
+  }
+
+  _fetchBaseHandler(fetchResult) {
+    const isGenericErrorHandlerActive = this._isGenericErrorHandlerActive;
+    const fetchPromise = fetchResult
+      .then((response) => {
+        if (response.status === this.HTTP_RESPONSE_STATUS.NO_CONTENT) {
+          return { __IS_OK_WITHOUT_CONTENT: true };
+        }
+
+        return response.json();
+      })
+      .then((body) => {
+        if (body.token) {
+          this._AUTH_TOKEN = body.token;
+        } else if (body.error) {
+          throw { error: body.error, isGenericErrorHandlerActive };
+        } else if (body.exception) {
+          throw body.exception;
+        }
+
+        return body && (body.payload || body.message);
+      })
+      .catch((exception) => {
+        console.error('(_fetchBaseHandler) caught an error:', exception);
+
+        return apiServiceSubscriber.callSubscribers(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, exception);
+      });
+
+    this._enableGenericErrorHandler();
+
+    return fetchPromise;
+  }
+
   _sendRequestWithPayload(methodName, apiEndpoint, data, useToken) {
     const headers = new Headers(this._getContentTypeHeader());
 
@@ -38,29 +83,12 @@ class Ajax {
       headers.append('Authorization', this._getAuthHeader());
     }
 
-    return (
+    return this._fetchBaseHandler(
       fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
         method: methodName,
         headers,
         body: JSON.stringify(data || {}),
       })
-        .then((response) => {
-          console.warn(`${methodName} response headers:`, ...response.headers);
-
-          if (response.status === this.HTTP_RESPONSE_STATUS.NO_CONTENT) {
-            return response.statusText;
-          }
-
-          return response.json();
-        })
-        // TODO: handle error cases (like 401)
-        .then((body) => {
-          if (body.token) {
-            this._AUTH_TOKEN = body.token;
-          }
-
-          return body.payload || body.exception || body;
-        })
     );
   }
 
@@ -86,7 +114,7 @@ class Ajax {
       };
     }
 
-    return fetch(url.toString(), options).then((response) => response.json());
+    return this._fetchBaseHandler(fetch(url.toString(), options));
   }
 
   postRequest(apiEndpoint, data, useToken) {
@@ -111,7 +139,7 @@ class Ajax {
       };
     }
 
-    return fetch(url.toString(), options);
+    return this._fetchBaseHandler(fetch(url.toString(), options));
   }
 }
 
@@ -253,5 +281,37 @@ const apiService = new (class ApiService extends Ajax {
     return this.patchRequest(`${this.USERS_URL}/set-new-password`, { newPassword, token });
   }
 })();
+
+const apiServiceSubscriber = (() => {
+  const _subscribers = {
+    EXCEPTION: null,
+  };
+
+  return {
+    SUBSCRIPTION_TYPE: Object.freeze(Object.fromEntries(Object.keys(_subscribers).map((key) => [key, key]))),
+
+    callSubscribers(type, value) {
+      return _subscribers[type](value);
+    },
+
+    subscribe(type, callback) {
+      if (_subscribers[type] === 'function') {
+        throw Error(`'${type}' is already subscribing!`);
+      }
+
+      _subscribers[type] = callback;
+    },
+
+    unSubscribe(type) {
+      if (_subscribers[type] !== 'function') {
+        throw ReferenceError(`'${type}' is not subscribing!`);
+      }
+
+      _subscribers[type] = null;
+    },
+  };
+})();
+
+export { apiServiceSubscriber };
 
 export default apiService;

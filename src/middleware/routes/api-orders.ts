@@ -4,8 +4,9 @@ import * as expressModule from 'express';
 import fetch, { FetchError, RequestInit, Response as FetchResponse } from 'node-fetch';
 import { getFromDB } from '../../database/database-index';
 import { authToPayU as getToken } from '../features/auth';
-import { IPayByLinkMethod, IProductInOrder } from '../../types';
+import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '../../types';
 import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '../helpers/payu-api';
+import { embraceResponse } from '../helpers/middleware-response-wrapper';
 
 const {
   // @ts-ignore
@@ -25,7 +26,7 @@ router.options('/api/orders', (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Headers', 'authorization,content,content-type');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
 
-  res.send();
+  return res.send();
 });
 
 router.post('/api/orders', async (req: Request, res: Response) => {
@@ -47,11 +48,9 @@ router.post('/api/orders', async (req: Request, res: Response) => {
   const token: string | Error = await getToken();
   if (typeof token !== 'string') {
     // TODO: improve error handling
-    const payload = {
-      errorMsg: 'Server failed to auth to PayU API...',
-      error: token,
-    };
-    res.status(511).json({ payload });
+    return res
+      .status(HTTP_STATUS_CODE.NETWORK_AUTH_REQUIRED)
+      .json(embraceResponse({ error: `Server failed to auth to PayU API due to: ${token?.message}` }));
   }
 
   const [minPrice, maxPrice] = getMinAndMaxPrice(products);
@@ -73,12 +72,13 @@ router.post('/api/orders', async (req: Request, res: Response) => {
       const resValue = await response.json();
       logger.log('PayU order response:', resValue, ' /status:', response.status, ' /statusText:', response.statusText);
 
-      res.status(response.status).json({ payload: resValue });
+      // TODO: [REFACTOR] respond with either 'msg', 'payload' or 'error' depending or `response.status`
+      return res.status(response.status).json(embraceResponse({ payload: resValue }));
     })
     .catch((error: FetchError) => {
       logger.error('PayU order error:', error);
 
-      res.status(500).json(error);
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(embraceResponse({ exception: error }));
     });
 });
 

@@ -63,7 +63,7 @@ function SearchProductsByName(props) {
   const [isCaseSensitive, setCaseSensitive] = useState(false);
 
   // TODO: fix issue with stale isCaseSensitive value when checkbox is ticked between user types query and debounce delays reaction
-  const handleInputSearchChange = async (searchValue) => {
+  const handleInputSearchChange = (searchValue) => {
     const pagination = props.pagination
       ? {
           pageNumber: props.pagination.currentProductPage,
@@ -71,9 +71,13 @@ function SearchProductsByName(props) {
         }
       : null;
 
-    const foundProducts = await apiService.getProductsByName(searchValue, isCaseSensitive, pagination);
+    apiService.getProductsByName(searchValue, isCaseSensitive, pagination).then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
 
-    props.onReceivedProductsByName(foundProducts);
+      props.onReceivedProductsByName(res);
+    });
   };
 
   const handleCaseSensitiveChange = ({ target: { checked } }) => {
@@ -113,7 +117,15 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
 
         const products = (newSearchValueContainsOld
           ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
-          : (await apiService.getProductsByName(searchRecentValues.newValue, false, null)).map(({ name }) => name)
+          : (await apiService.getProductsByName(searchRecentValues.newValue, false, null))
+              .then((res) => {
+                if (res.__EXCEPTION_ALREADY_HANDLED) {
+                  return;
+                }
+
+                return res;
+              })
+              .map(({ name }) => name)
         ).filter((productName) => !(props.ignoredProductNames || []).includes(productName));
 
         setSearchResults(products);

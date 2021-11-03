@@ -45,13 +45,14 @@ export default function ConfirmRegistration() {
     const token = new URLSearchParams(searchParam).get('token');
 
     if (token) {
-      apiService.confirmRegistration(token).then((res) => {
-        console.log('(confirmRegistration) res?', res);
+      apiService
+        .disableGenericErrorHandler()
+        .confirmRegistration(token)
+        .then((res) => {
+          console.log('(confirmRegistration) res?', res);
 
-        if ('isUserConfirmed' in res) {
-          setRegConfirmStatus(res.isUserConfirmed ? REG_CONFIRM_STATUS.SUCCEEDED : REG_CONFIRM_STATUS.FAILED);
-        }
-      });
+          setRegConfirmStatus(res?.isUserConfirmed ? REG_CONFIRM_STATUS.SUCCEEDED : REG_CONFIRM_STATUS.FAILED);
+        });
     } else {
       setRegConfirmStatus(REG_CONFIRM_STATUS.FAILED);
     }

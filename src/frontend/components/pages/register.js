@@ -53,36 +53,40 @@ export default function Register() {
   const onSubmitHandler = (values) => {
     console.log('register submit values:', values);
 
-    apiService.registerUser({ ...values, repeatedPassword: undefined }).then((res) => {
-      console.log('register res:', res, ' /typeof res:', typeof res);
+    apiService
+      .disableGenericErrorHandler()
+      .registerUser({ ...values, repeatedPassword: undefined })
+      .then((res) => {
+        console.log('register res:', res, ' /typeof res:', typeof res);
 
-      // TODO: [BUG] fix reacting to response: exception, error and success
-      if (res.msg) {
-        setPopupData({
-          type: POPUP_TYPES.SUCCESS,
-          message: translations.registrationSuccessMsg,
-          altMessage: translations.registrationSuccessAltMsg,
-          buttons: [
-            {
-              onClick: () => history.push('/log-in'),
-              text: translations.popupGoToLogin,
-            },
-          ],
-          altButtons: [
-            {
-              onClick: () => resendConfirmRegistration(values.email),
-              text: translations.popupReSendEmail,
-            },
-          ],
-        });
-      } else {
-        setPopupData({
-          type: POPUP_TYPES.FAILURE,
-          message: translations.registrationFailureMsg,
-          buttons: [getClosePopupBtn(setPopupData)],
-        });
-      }
-    });
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (res.__ERROR_TO_HANDLE) {
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: translations.registrationFailureMsg,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        } else {
+          setPopupData({
+            type: POPUP_TYPES.SUCCESS,
+            message: translations.registrationSuccessMsg,
+            altMessage: translations.registrationSuccessAltMsg,
+            buttons: [
+              {
+                onClick: () => history.push('/log-in'),
+                text: translations.popupGoToLogin,
+              },
+            ],
+            altButtons: [
+              {
+                onClick: () => resendConfirmRegistration(values.email),
+                text: translations.popupReSendEmail,
+              },
+            ],
+          });
+        }
+      });
   };
 
   // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time

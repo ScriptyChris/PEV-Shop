@@ -6,7 +6,6 @@ export default function Account() {
   // TODO: fix rendering component twice when redirected from LogIn page
   const { state: locationState } = useLocation();
   const [userData, setUserData] = useState(null);
-  console.warn('Account...state', locationState);
 
   useEffect(() => {
     if (locationState) {
@@ -15,12 +14,13 @@ export default function Account() {
       return;
     }
 
-    apiService.getUser().then(
-      (result) => setUserData(result),
-      (error) => {
-        console.log('getUser() error:', error);
+    apiService.getUser().then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
       }
-    );
+
+      setUserData(res);
+    });
   }, []);
 
   return (

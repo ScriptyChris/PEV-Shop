@@ -11,6 +11,7 @@ import Compare from '../pages/compare';
 import Order from '../pages/order';
 import ConfirmRegistration from '../pages/confirmRegistration';
 import * as RecoverAccount from '../pages/recoverAccount';
+import { GenericErrorPopup } from '../utils/popup';
 
 export default function Main() {
   return (
@@ -53,6 +54,8 @@ export default function Main() {
           <Order />
         </Route>
       </Switch>
+
+      <GenericErrorPopup />
     </main>
   );
 }

@@ -1,4 +1,4 @@
-import { TJestMock } from '../../src/types';
+import { HTTP_STATUS_CODE, TJestMock } from '../../src/types';
 import globMock from '../../__mocks__/glob';
 import bodyParserMock from '../../__mocks__/body-parser';
 
@@ -116,7 +116,7 @@ describe('#middleware-index', () => {
 
       return new Promise((resolve) => {
         setImmediate(() => {
-          expect(resMock.status).toHaveBeenCalledWith(404);
+          expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
           expect(resEndMock).toHaveBeenCalled();
 
           resolve();

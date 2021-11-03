@@ -1,4 +1,4 @@
-import { TJestMock } from '../../../src/types';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 
 const {
@@ -15,11 +15,11 @@ describe('#api-user-roles', () => {
   const authMiddlewareReturnedFn = () => undefined;
   const reqMock = Object.freeze({
     body: {
-      roleName: '',
+      roleName: '[body] test role',
       permissions: [],
     },
     params: {
-      roleName: '',
+      roleName: '[params] test role',
     },
   });
 
@@ -111,7 +111,7 @@ describe('#api-user-roles', () => {
 
       await apiUserRolesRouter._saveUserRole(reqMock, resMock);
 
-      expect(resMock.status).toHaveBeenCalledWith(200);
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await saveToDBMock() });
     });
   });
@@ -125,8 +125,8 @@ describe('#api-user-roles', () => {
       updateOneModelInDBMock.mockClear();
     });
 
-    it('should call updateOneModelInDB(..) once with correct params', () => {
-      apiUserRolesRouter._updateUserRole(reqMock, getResMock());
+    it('should call updateOneModelInDB(..) once with correct params', async () => {
+      await apiUserRolesRouter._updateUserRole(reqMock, getResMock());
 
       expect(updateOneModelInDBMock).toHaveBeenCalledTimes(1);
       expect(updateOneModelInDBMock).toHaveBeenCalledWith(
@@ -136,13 +136,13 @@ describe('#api-user-roles', () => {
       );
     });
 
-    it('should call res.status(..).json(..) with correct params', () => {
+    it('should call res.status(..).json(..) with correct params', async () => {
       updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._succeededCall);
       const resMock = getResMock();
 
-      apiUserRolesRouter._updateUserRole(reqMock, resMock);
+      await apiUserRolesRouter._updateUserRole(reqMock, resMock);
 
-      expect(resMock.status).toHaveBeenCalledWith(200);
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: updateOneModelInDBMock() });
     });
   });
@@ -181,7 +181,7 @@ describe('#api-user-roles', () => {
 
       await apiUserRolesRouter._getUserRole(reqMock, resMock);
 
-      expect(resMock.status).toHaveBeenCalledWith(200);
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
       expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: await getFromDBMock() });
     });
   });

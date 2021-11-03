@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback, memo, useState, useEffect } from 'react';
+import { apiServiceSubscriber } from '../../features/apiService';
 
 const POPUP_TYPES = {
   NEUTRAL: 'NEUTRAL',
@@ -17,7 +18,7 @@ const getClosePopupBtn = (setPopupData) => {
   };
 };
 
-function getClassNameByType(type) {
+const getClassNameByType = (type) => {
   switch (type) {
     case POPUP_TYPES.SUCCESS: {
       return '--success';
@@ -31,9 +32,42 @@ function getClassNameByType(type) {
       return '';
     }
   }
-}
+};
 
-export { POPUP_TYPES, getClosePopupBtn };
+const GenericErrorPopup = memo(function GenericErrorPopup() {
+  const [popupData, setPopupData] = useState(null);
+  const subscriptionHandler = useCallback((exceptionValue) => {
+    if (exceptionValue?.error && !exceptionValue.isGenericErrorHandlerActive) {
+      return {
+        __ERROR_TO_HANDLE: exceptionValue.error,
+      };
+    }
+
+    setPopupData({
+      type: POPUP_TYPES.FAILURE,
+      message: 'Sorry, but an unexpected error occured :(',
+      // TODO: [UX] format the generic error properly
+      altMessage: JSON.stringify(exceptionValue && exceptionValue.exception),
+      buttons: [getClosePopupBtn(setPopupData)],
+    });
+
+    return {
+      __EXCEPTION_ALREADY_HANDLED: true,
+    };
+  }, []);
+
+  useEffect(() => {
+    apiServiceSubscriber.subscribe(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
+
+    return () => {
+      apiServiceSubscriber.unSubscribe(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
+    };
+  }, []);
+
+  return popupData && <Popup {...popupData} />;
+});
+
+export { POPUP_TYPES, getClosePopupBtn, GenericErrorPopup };
 
 export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage, buttons = [], altButtons }) {
   if (!Object.keys(POPUP_TYPES).includes(type)) {
@@ -63,6 +97,7 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
     <div className="popup-container">
       <aside className={`${baseClassName} ${baseClassName}${getClassNameByType(type)}`}>
         <p className={`${baseClassName}__message`}>{message}</p>
+
         {altMessage && (
           <div className={`${baseClassName}__message--alt`}>
             <p>{altMessage}</p>

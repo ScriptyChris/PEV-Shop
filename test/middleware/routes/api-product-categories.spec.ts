@@ -1,4 +1,4 @@
-import { TJestMock } from '../../../src/types';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 import { findAssociatedSrcModulePath } from '../../test-index';
 
@@ -83,8 +83,8 @@ describe('#api-product-categories', () => {
 
           await routerGetCallback(reqMock, resMock).catch(console.error);
 
-          expect(resMock.status).toHaveBeenCalledWith(200);
-          expect(resMock._jsonMethod).toHaveBeenCalledWith(value.output);
+          expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
+          expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: value.output });
 
           // inline mocks cleanup
           resMock.status.mockClear();
@@ -99,10 +99,8 @@ describe('#api-product-categories', () => {
 
       await routerGetCallback(reqMock, resMock);
 
-      const exception = new TypeError("Cannot read property 'forEach' of null");
-
-      expect(resMock.status).toHaveBeenCalledWith(500);
-      expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception });
+      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+      expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'Product categories not found!' });
     });
   });
 });

@@ -51,4 +51,6 @@ function getLogger(moduleFileName: string): Logger {
   return new Logger(basename(moduleFileName));
 }
 
+export type TLogger = Logger;
+
 export default getLogger;

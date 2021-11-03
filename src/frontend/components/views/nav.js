@@ -16,9 +16,14 @@ const translations = Object.freeze({
 });
 
 export default observer(function Nav() {
-  const logOut = async () => {
-    await apiService.logoutUser();
-    appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
+  const logOut = () => {
+    apiService.logoutUser().then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
+
+      appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
+    });
   };
 
   return (

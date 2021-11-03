@@ -1,6 +1,6 @@
 import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
 import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '../../database/database-index';
 import {
@@ -15,6 +15,9 @@ import {
 import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
 import mapProductsTechnicalSpecs from '../helpers/api-products-specs-mapper';
 import { IProduct, IReviews } from '../../database/models/_product';
+import { HTTP_STATUS_CODE } from '../../types';
+import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
+import { embraceResponse, normalizePayloadType } from '../helpers/middleware-response-wrapper';
 
 const {
   // @ts-ignore
@@ -35,6 +38,7 @@ router.post('/api/products', addProduct);
 router.patch('/api/products/:name/add-review', authMiddleware(getFromDB), userRoleMiddlewareFn('client'), addReview);
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
 router.delete('/api/products/:name', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), deleteProduct);
+router.use(getMiddlewareErrorHandler(logger));
 
 // expose for unit tests
 router._getProducts = getProducts;
@@ -46,7 +50,7 @@ router._deleteProduct = deleteProduct;
 
 export default router;
 
-async function getProductsSpecs(req: Request, res: Response) {
+async function getProductsSpecs(req: Request, res: Response, next: NextFunction) {
   try {
     const specQuery = {
       name: {
@@ -61,11 +65,13 @@ async function getProductsSpecs(req: Request, res: Response) {
     };
     const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
 
-    res.status(200).json(productsSpec);
-  } catch (exception) {
-    logger.error('Retrieving product specs exception:', exception);
+    if (!productsSpec) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Products specs not found!' }));
+    }
 
-    res.status(500).json({ exception });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: productsSpec }));
+  } catch (exception) {
+    return next(exception);
   }
 }
 
@@ -73,11 +79,18 @@ async function getProducts(
   req: Request & {
     query: TIdListReq & TNameListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq & TProductFiltersReq;
   },
-  res: Response
-): Promise<void> {
+  res: Response,
+  next: NextFunction
+) {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
     logger.log('[products GET] req.query', req.query);
+
+    if (!req.query) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request query is empty or not attached!' }));
+    }
 
     // TODO: ... and really refactor this!
     const idListConfig = queryBuilder.getIdListConfig(req.query);
@@ -109,71 +122,109 @@ async function getProducts(
 
     const paginatedProducts = await getFromDB(query, 'Product', options);
 
-    res.status(200).json(paginatedProducts);
-  } catch (exception) {
-    logger.error('Retrieving product exception:', exception);
+    if (!paginatedProducts) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Products not found!' }));
+    }
 
-    res.status(500).json({ exception });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: paginatedProducts }));
+  } catch (exception) {
+    return next(exception);
   }
 }
 
-async function getProductById(req: Request, res: Response): Promise<void> {
+async function getProductById(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('[products/:id GET] req.param', req.params);
 
+    if (!req.params || !req.params._id) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Id params is empty or not attached!' }));
+    }
+
     const product = await getFromDB(req.params._id, 'Product');
 
-    res.status(200).json(product);
-  } catch (exception) {
-    logger.error('Retrieving product exception:', exception);
+    if (!product) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Product not found!' }));
+    }
 
-    res.status(500).json({ exception });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: product }));
+  } catch (exception) {
+    return next(exception);
   }
 }
 
-async function addProduct(req: Request, res: Response): Promise<void> {
+async function addProduct(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('[products POST] req.body', req.body);
 
+    if (!req.body) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Product data is empty or not attached!' }));
+    }
+
     await saveToDB(req.body, 'Product');
 
-    res.status(201).json({ msg: 'Success!' });
+    return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Success!' }));
   } catch (exception) {
-    logger.error('Saving product exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function addReview(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function addReview(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('[addReview] req.params.name:', req.params.name, ' /req.body:', req.body);
+
+    if (!req.params.name) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Name param is empty or not attached!' }));
+    } else if (!req.body) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+    }
 
     const RATING_MIN_VALUE = 0;
     const RATING_MAX_VALUE = 5;
     const rating = req.body.rating;
 
     if (!addReview.isNumber(rating)) {
-      return res.status(400).json({ exception: 'Rating value must be a number!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Rating value must be a number!' }));
     } else if (rating < RATING_MIN_VALUE) {
-      return res.status(400).json({ exception: `Rating value must be greater than ${RATING_MIN_VALUE}!` });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: `Rating value must be greater than ${RATING_MIN_VALUE}!` }));
     } else if (rating > RATING_MAX_VALUE) {
-      return res.status(400).json({ exception: `Rating value must be less than ${RATING_MAX_VALUE}!` });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: `Rating value must be less than ${RATING_MAX_VALUE}!` }));
     } else if (!addReview.isIntOrDecimalHalf(rating)) {
-      return res.status(400).json({ exception: `Rating value must be either an integer or .5 (a half) of it!` });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: `Rating value must be either an integer or .5 (a half) of it!` }));
     } else if (
       !req.body.author ||
       typeof req.body.author !== 'string' /* TODO: [AUTH] ensure author is a proper User or "Anonymous" */
     ) {
-      return res.status(400).json({
-        exception: 'Author value must be a non-empty string representing a proper User or "Anonymous"!',
-      });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
+        embraceResponse({
+          error: 'Author value must be a non-empty string representing a proper User or "Anonymous"!',
+        })
+      );
     } /* TODO: [DUP] check if review is not a duplicate */
 
     // TODO: [DX] refactor update process to use some Mongo (declarative) aggregation atomicly
     const productToUpdate: IProduct = (await getFromDB({ name: req.params.name }, 'Product', {}))[0];
-    const productReviews: IReviews = productToUpdate.reviews;
 
+    if (!productToUpdate) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Reviewed product not found!' }));
+    }
+
+    const productReviews = productToUpdate.reviews;
     productReviews.list.push({
       ...req.body,
       timestamp: Date.now(),
@@ -187,11 +238,13 @@ async function addReview(req: Request, res: Response): Promise<void | Pick<Respo
 
     await productToUpdate.save();
 
-    res.status(200).json({ payload: productReviews });
+    return res.status(HTTP_STATUS_CODE.OK).json(
+      embraceResponse({
+        payload: normalizePayloadType(productReviews) /* as Record<keyof IReviews, IReviews[keyof IReviews]> */,
+      })
+    );
   } catch (exception) {
-    logger.error('Adding review exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 addReview.isNumber = (value: unknown): boolean => value !== null && !Number.isNaN(Number(value));
@@ -202,12 +255,16 @@ addReview.isIntOrDecimalHalf = (value: number): boolean => {
   return isInt || isDecimalHalf;
 };
 
-async function modifyProduct(req: Request & { userPermissions: any }, res: Response): Promise<void> {
+async function modifyProduct(req: Request & { userPermissions: any }, res: Response, next: NextFunction) {
   try {
-    logger.log('[products PATCH] req.body', req.body);
+    logger.log('(products PATCH) req.body:', req.body);
 
-    if (!req.userPermissions) {
-      throw new Error('User has no permissions!');
+    if (!req.body) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+    } else if (!req.userPermissions) {
+      return res.status(HTTP_STATUS_CODE.FORBIDDEN).json(embraceResponse({ error: 'User has no permissions!' }));
     }
 
     // TODO: prepare to be used with various product properties
@@ -217,23 +274,26 @@ async function modifyProduct(req: Request & { userPermissions: any }, res: Respo
       'Product'
     );
 
-    res.status(200).json({ payload: modifiedProduct });
-  } catch (exception) {
-    logger.error('Modifying product exception:', exception);
+    if (!modifiedProduct) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Product to modify not found!' }));
+    }
 
-    res.status(403).json({ exception });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(modifiedProduct) }));
+  } catch (exception) {
+    return next(exception);
   }
 }
 
-async function deleteProduct(
-  req: Request & { userPermissions: any },
-  res: Response
-): Promise<void | Pick<Response, 'json'>> {
+async function deleteProduct(req: Request & { userPermissions: any }, res: Response, next: NextFunction) {
   try {
     logger.log('[products DELETE] req.params:', req.params);
 
-    if (!req.userPermissions) {
-      throw new Error('User has no permissions!');
+    if (!req.params || !req.params.name) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Name param is empty or not attached!' }));
+    } else if (!req.userPermissions) {
+      return res.status(HTTP_STATUS_CODE.FORBIDDEN).json(embraceResponse({ error: 'User has no permissions!' }));
     }
 
     const deletionResult = await deleteFromDB({ name: req.params.name }, 'Product');
@@ -241,18 +301,28 @@ async function deleteProduct(
     if (!deletionResult.ok) {
       logger.error('Deletion error occured...', deletionResult);
 
-      return res.status(500).json({ deletionResult });
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
+        embraceResponse({
+          exception: {
+            message: `Failed to delete the product - 
+              ok: ${deletionResult.ok}; 
+              n: ${deletionResult.n}; 
+              deletedCount: ${deletionResult.deletedCount}.
+            `.trim(),
+          },
+        })
+      );
     } else if (deletionResult.deletedCount === 0) {
       logger.error('Deleted nothing...', deletionResult);
 
-      return res.status(400).json({ deletionResult });
+      return res
+        .status(HTTP_STATUS_CODE.NOT_FOUND)
+        .json(embraceResponse({ error: 'Could not find product to delete!' }));
     }
 
-    res.sendStatus(204);
+    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
-    logger.error('Deleting product exception:', exception);
-
-    res.status(403).json({ exception });
+    return next(exception);
   }
 }
 

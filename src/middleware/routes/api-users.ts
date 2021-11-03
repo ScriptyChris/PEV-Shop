@@ -1,11 +1,14 @@
 import * as dotenv from 'dotenv';
 import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, ObjectId } from '../../database/database-index';
 import { authMiddlewareFn, hashPassword } from '../features/auth';
 import UserModel, { IUser } from '../../database/models/_user';
 import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
+import { HTTP_STATUS_CODE } from '../../types';
+import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
+import { embraceResponse, normalizePayloadType } from '../helpers/middleware-response-wrapper';
 
 dotenv.config();
 
@@ -26,6 +29,7 @@ router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.patch('/api/users/set-new-password', setNewPassword);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
+router.use(getMiddlewareErrorHandler(logger));
 
 // expose functions for unit tests
 router._updateUser = updateUser;
@@ -41,21 +45,19 @@ router._getUser = getUser;
 
 export default router;
 
-type TPromisedJSON = Promise<Pick<Response, 'json'>>;
-// workaround fix for TS1055 error: https://stackoverflow.com/a/45929350/4983840
-const TPromisedJSON = Promise;
-
 const sendRegistrationEmail = async ({
   email,
   login,
   token,
   res,
-}: {
+}: // next,
+{
   email: string;
   login: string;
   token: string;
   res: Response;
-}): TPromisedJSON => {
+  // next: NextFunction;
+}) => {
   return sendMail(
     email,
     EMAIL_TYPES.ACTIVATION,
@@ -67,39 +69,34 @@ const sendRegistrationEmail = async ({
 
         await deleteFromDB({ name: login }, 'User');
 
-        return res.status(400).json({
-          exception: {
-            msg: 'Sending email rejection',
-            reason: emailSentInfo.rejected,
-          },
-        });
+        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
+          embraceResponse({
+            error: `Sending email rejected: ${emailSentInfo.rejected}!`,
+          })
+        );
       }
 
-      return res.status(201).json({ msg: 'User account created! Check your email.' });
+      return res
+        .status(HTTP_STATUS_CODE.CREATED)
+        .json(embraceResponse({ message: 'User account created! Check your email.' }));
     })
-    .catch(async (emailSentError) => {
+    .catch(async (emailSentError: Error) => {
       logger.error('emailSentError:', emailSentError);
 
       await deleteFromDB({ name: login }, 'User');
 
-      return res.status(500).json({
-        exception: {
-          msg: `Email sent error: '${emailSentError.message}'`,
-          reason: emailSentError,
-        },
-      });
+      // next(new Error())
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
+        embraceResponse({
+          exception: {
+            message: `Email sent error: '${emailSentError.message}'!`,
+          },
+        })
+      );
     });
 };
 
-const sendResetPasswordEmail = async ({
-  email,
-  token,
-  res,
-}: {
-  email: string;
-  token: string;
-  res: Response;
-}): TPromisedJSON => {
+const sendResetPasswordEmail = async ({ email, token, res }: { email: string; token: string; res: Response }) => {
   return sendMail(
     email,
     EMAIL_TYPES.RESET_PASSWORD,
@@ -109,30 +106,34 @@ const sendResetPasswordEmail = async ({
       if (emailSentInfo.rejected.length) {
         logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
 
-        return res.status(400).json({
-          exception: {
-            msg: 'Sending email rejection',
-            reason: emailSentInfo.rejected,
-          },
-        });
+        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
+          embraceResponse({
+            exception: {
+              message: `Sending email rejection: ${emailSentInfo.rejected}`,
+            },
+          })
+        );
       }
 
-      return res.status(200).json({ msg: 'Password resetting process began! Check your email.' });
+      return res
+        .status(HTTP_STATUS_CODE.OK)
+        .json(embraceResponse({ message: 'Password resetting process began! Check your email.' }));
     })
     .catch(async (emailSentError) => {
       logger.error('emailSentError:', emailSentError);
 
-      return res.status(500).json({
-        exception: {
-          msg: `Email sent error: '${emailSentError.message}'`,
-          reason: emailSentError,
-        },
-      });
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
+        embraceResponse({
+          exception: {
+            message: `Email sent error: '${emailSentError.message}'!`,
+          },
+        })
+      );
     });
 };
 
 // TODO: implement updating various user data
-async function updateUser(req: Request, res: Response): Promise<void> {
+async function updateUser(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('[POST] /users req.body', req.body);
 
@@ -140,8 +141,10 @@ async function updateUser(req: Request, res: Response): Promise<void> {
     req.body.password = await hashPassword(req.body.password);
     const savedUser = (await saveToDB(req.body, 'User')) as IUser;
 
+    logger.log('User saved:', savedUser);
+
     // TODO: expose appropriate function from user role module?
-    updateOneModelInDB(
+    const updatedUser = await updateOneModelInDB(
       { roleName: req.body.roleName },
       {
         action: 'addUnique',
@@ -152,25 +155,26 @@ async function updateUser(req: Request, res: Response): Promise<void> {
       'User-Role'
     );
 
-    logger.log('User saved', savedUser);
+    if (!updatedUser) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to update was not found!' }));
+    }
 
-    res.status(201).json({ msg: 'Success!' });
+    return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Success!' }));
   } catch (exception) {
-    logger.error('Saving user exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function setNewPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function setNewPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(setNewPassword) req.body:', req.body);
 
   try {
-    const validatedPassword = UserModel.validatePassword(req.body.newPassword);
+    const validatedPasswordMsg = UserModel.validatePassword(req.body.newPassword);
 
-    if (validatedPassword !== '') {
-      return res.status(400).json({ exception: validatedPassword });
+    if (validatedPasswordMsg !== '') {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(embraceResponse({ error: validatedPasswordMsg }));
     }
+
     const hashedPassword = await hashPassword(req.body.newPassword);
     const tokenQuery = {
       [`tokens.resetPassword`]: req.body.token.replace(/\s/g, '+'),
@@ -192,28 +196,26 @@ async function setNewPassword(req: Request, res: Response): Promise<void | Pick<
 
       await userToSetNewPassword.deleteSingleToken('resetPassword');
 
-      res.status(201).json({ msg: 'Password updated!' });
+      return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Password updated!' }));
     } else {
-      return res.status(400).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User not found!' }));
     }
   } catch (exception) {
-    logger.error('(setNewPassword) exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function registerUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function registerUser(req: Request, res: Response, next: NextFunction) {
   logger.log('(registerUser) req.body:', req.body);
 
   try {
     // TODO: [SECURITY] add some debounce for register amount per IP
 
     // @ts-ignore
-    const validatedPassword = UserModel.validatePassword(req.body.password);
+    const validatedPasswordMsg = UserModel.validatePassword(req.body.password);
 
-    if (validatedPassword !== '') {
-      return res.status(400).json({ exception: validatedPassword });
+    if (validatedPasswordMsg !== '') {
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(embraceResponse({ error: validatedPasswordMsg }));
     }
 
     req.body.password = await hashPassword(req.body.password);
@@ -228,16 +230,20 @@ async function registerUser(req: Request, res: Response): Promise<void | Pick<Re
       res,
     });
   } catch (exception) {
-    logger.error('(registerUser) exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function confirmRegistration(req: Request, res: Response): Promise<void> {
+async function confirmRegistration(req: Request, res: Response, next: NextFunction) {
   logger.log('(confirmRegistration) req.body.token:', req.body.token);
 
   try {
+    if (!req.body.token) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Token is empty or not attached!' }));
+    }
+
     const userToConfirm = (await getFromDB(
       { 'tokens.confirmRegistration': req.body.token.replace(/\s/g, '+') },
       'User'
@@ -247,22 +253,26 @@ async function confirmRegistration(req: Request, res: Response): Promise<void> {
       await userToConfirm.confirmUser();
       await userToConfirm.deleteSingleToken('confirmRegistration');
 
-      res.status(200).json({ payload: { isUserConfirmed: true } });
+      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: { isUserConfirmed: true } }));
     } else {
-      res.status(400).json({ payload: { isUserConfirmed: false } });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ payload: { isUserConfirmed: false } }));
     }
   } catch (exception) {
-    logger.error('(confirmRegistration) exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
 // TODO: [SECURITY] set some debounce to limit number of sent emails per time
-async function resendConfirmRegistration(req: Request, res: Response): TPromisedJSON {
+async function resendConfirmRegistration(req: Request, res: Response, next: NextFunction) {
   logger.log('(resendConfirmRegistration) req.body:', req.body);
 
   try {
+    if (!req.body.email) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Email is empty or not attached!' }));
+    }
+
     const userToResendConfirmation = (await getFromDB(
       {
         email: req.body.email,
@@ -280,51 +290,63 @@ async function resendConfirmRegistration(req: Request, res: Response): TPromised
         res,
       });
     } else {
-      return res.status(400).json({ payload: { isConfirmationReSend: false } });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ payload: { isConfirmationReSend: false } }));
     }
   } catch (exception) {
-    logger.error('(resendConfirmRegistration) exception:', exception);
-
-    return res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function logInUser(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
-  logger.log('(logInUser) req.body:', req.body);
-
+async function logInUser(req: Request, res: Response, next: NextFunction) {
   try {
+    logger.log('(logInUser) req.body:', req.body);
+
+    if (!req.body) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+    } else if (!req.body.login) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'User login is empty or not attached!' }));
+    }
+
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
 
     if (!user) {
-      return res.status(401).json({ msg: 'Invalid credentials!' });
-    } else if (!user.isConfirmed) {
-      return res.status(401).json({ msg: 'User registration is not confirmed!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
     }
 
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      return res.status(401).json({ msg: 'Invalid credentials!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
     }
 
     if (!user.isConfirmed) {
-      return res.status(401).json({ msg: 'User registration is not confirmed!' });
+      return res
+        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
+        .json(embraceResponse({ error: 'User registration is not confirmed!' }));
     }
 
     const token = await user.generateAuthToken();
 
-    res.status(200).json({ payload: user, token });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user), token }));
   } catch (exception) {
-    logger.error('Login user exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function resetPassword(req: Request, res: Response): Promise<void | Pick<Response, 'json'>> {
+async function resetPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(resetPassword) req.body:', req.body);
 
   try {
+    if (!req.body.email) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Email is empty or not attached!' }));
+    }
+
     const userToResetPassword = (await getFromDB(
       {
         email: req.body.email,
@@ -334,30 +356,33 @@ async function resetPassword(req: Request, res: Response): Promise<void | Pick<R
 
     if (userToResetPassword) {
       await userToResetPassword.setSingleToken('resetPassword');
-      await sendResetPasswordEmail({
+
+      return await sendResetPasswordEmail({
         email: userToResetPassword.email,
         token: userToResetPassword.tokens.resetPassword as string,
         res,
       });
     } else {
-      return res.status(400).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User not found!' });
     }
   } catch (exception) {
-    logger.error('(resetPassword) exception:', exception);
-
-    return res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
 // TODO: [SECURITY] set some debounce to limit number of sent emails per time
-async function resendResetPassword(req: Request, res: Response) {
+async function resendResetPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(resendResetPassword) req.body:', req.body);
 
   try {
     if (!req.body) {
-      return res.status(400).json({ error: 'Request body is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
     } else if (!req.body.email) {
-      return res.status(400).json({ error: 'Email prop is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse(embraceResponse({ error: 'Email prop is empty or not attached!' })));
     }
 
     const userToResendResetPassword = (await getFromDB(
@@ -375,16 +400,14 @@ async function resendResetPassword(req: Request, res: Response) {
         res,
       });
     } else {
-      return res.status(404).json({ msg: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User not found!' }));
     }
   } catch (exception) {
-    logger.error('(resendResetPassword) exception:', exception);
-
-    return res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function logOutUser(req: Request & { user: IUser; token: string }, res: Response): Promise<void> {
+async function logOutUser(req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) {
   try {
     req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
 
@@ -394,18 +417,30 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 
     await req.user.save();
 
-    res.status(200).json({ payload: 'Logged out!' });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ message: 'Logged out!' }));
   } catch (exception) {
-    logger.error('Logout user exception:', exception);
-
-    res.status(500).json({ exception });
+    return next(exception);
   }
 }
 
-async function getUser(req: Request, res: Response): Promise<void> {
-  logger.log('[GET] /:id', req.params.id);
-  // TODO: handle case when user is not found in database
-  const user = await getFromDB(req.params.id, 'User');
+async function getUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    logger.log('[GET] /:id', req.params.id);
 
-  res.status(200).json({ payload: user });
+    if (!req.params.id) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'User id is empty or not attached!' }));
+    }
+
+    const user: IUser = await getFromDB(req.params.id, 'User');
+
+    if (!user) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: `User not found!` }));
+    }
+
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user) }));
+  } catch (exception) {
+    return next(exception);
+  }
 }

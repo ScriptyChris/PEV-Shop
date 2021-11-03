@@ -1,5 +1,5 @@
-import { TJestMock } from '../../../src/types';
-import { getResMock } from '../../mockUtils';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
+import { getResMock, getNextFnMock } from '../../mockUtils';
 
 const { Router, _router } = jest.mock('express').requireMock('express').default;
 const { authMiddlewareFn: authMiddlewareFnMock, hashPassword: hashPasswordMock } = jest
@@ -132,20 +132,18 @@ describe('#api-users', () => {
 
         await apiUsersRouter._updateUser(getReqMock(), resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(201);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ msg: 'Success!' });
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.CREATED);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ message: 'Success!' });
       });
     });
 
     describe('when failed', () => {
-      it('should call res.status(..).json(..) with correct params', () => {
-        const resMock = getResMock();
-        const rejectionReason = TypeError(`Cannot read property 'password' of undefined`);
+      it('should call next(..) if cannot read req.body.password', async () => {
+        const nextFnMock = getNextFnMock();
 
-        apiUsersRouter._updateUser({}, resMock).catch(() => {
-          expect(resMock.status).toHaveBeenCalledWith(500);
-          expect(resMock._jsonMethod).toHaveBeenCalledWith({ exception: rejectionReason });
-        });
+        await apiUsersRouter._updateUser({}, getResMock(), nextFnMock);
+
+        expect(nextFnMock).toBeCalledWith(TypeError(`Cannot read property 'password' of undefined`));
       });
     });
   });
@@ -204,38 +202,25 @@ describe('#api-users', () => {
         matchPasswordMock.mockClear();
       });
 
-      it('should catch TypeError when req.body is empty', async () => {
+      it('should call next(..) with exception when req is empty', async () => {
         const resMock = getResMock();
+        const nextFnMock = getNextFnMock();
 
-        await apiUsersRouter._logInUser({}, resMock);
+        await apiUsersRouter._logInUser(null, resMock, nextFnMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(500);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property 'login' of undefined`),
-        });
+        expect(nextFnMock).toHaveBeenCalledWith(TypeError(`Cannot read property 'body' of null`));
       });
 
-      it('should not call res.status(..).json(..) with correct params', async () => {
+      it('should call res.status(..).json(..) with correct params', async () => {
         const resMock = getResMock();
 
         // empty user
         getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.general);
 
-        await apiUsersRouter._logInUser(getReqMock(), resMock);
+        await apiUsersRouter._logInUser(getReqMock(), resMock, getNextFnMock());
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          msg: 'Invalid credentials!',
-        });
-
-        resMock._jsonMethod.mockClear();
-
-        // user not confirmed
-        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.notConfirmed);
-
-        await apiUsersRouter._logInUser(getReqMock(), resMock);
-
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          msg: 'User registration is not confirmed!',
+          error: 'Invalid credentials!',
         });
 
         resMock._jsonMethod.mockClear();
@@ -244,14 +229,26 @@ describe('#api-users', () => {
         getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
         matchPasswordMock.mockImplementationOnce(matchPasswordMock._failedCall);
 
-        await apiUsersRouter._logInUser(getReqMock(), resMock);
+        await apiUsersRouter._logInUser(getReqMock(), resMock, getNextFnMock());
 
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          msg: 'Invalid credentials!',
+          error: 'Invalid credentials!',
         });
 
+        // user not confirmed
+        getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.notConfirmed);
+        matchPasswordMock.mockImplementationOnce(matchPasswordMock._succeededCall);
+
+        await apiUsersRouter._logInUser(getReqMock(), resMock, getNextFnMock());
+
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({
+          error: 'User registration is not confirmed!',
+        });
+
+        resMock._jsonMethod.mockClear();
+
         // all cases
-        expect(resMock.status).toHaveBeenCalledWith(401);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.UNAUTHORIZED);
         expect(resMock.status).toHaveBeenCalledTimes(3);
       });
     });
@@ -282,38 +279,18 @@ describe('#api-users', () => {
 
         await apiUsersRouter._logOutUser(getReqMock(), resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(200);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: 'Logged out!' });
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ message: 'Logged out!' });
       });
     });
 
     describe('when failed', () => {
-      it('should call res.status(..).json(..) with correct params', async () => {
-        const resMock = getResMock();
+      it('should call next(..) with exception when req.user is empty', async () => {
+        const nextFnMock = getNextFnMock();
 
-        // empty req case
-        const emptyReqMock = {};
+        await apiUsersRouter._logOutUser({}, getResMock(), nextFnMock);
 
-        await apiUsersRouter._logOutUser(emptyReqMock, resMock);
-
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property 'tokens' of undefined`),
-        });
-
-        // empty req.user case
-        const reqMockWithEmptyUser = {
-          user: {},
-        };
-
-        await apiUsersRouter._logOutUser(reqMockWithEmptyUser, resMock);
-
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({
-          exception: TypeError(`Cannot read property 'tokens' of undefined`),
-        });
-
-        // all cases
-        expect(resMock.status).toHaveBeenCalledWith(500);
-        expect(resMock.status).toHaveBeenCalledTimes(2);
+        expect(nextFnMock).toHaveBeenCalledWith(TypeError(`Cannot read property 'tokens' of undefined`));
       });
     });
   });
@@ -347,7 +324,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._getUser(getReqMock(), resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(200);
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
           payload: await getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall)(),
         });
@@ -355,16 +332,15 @@ describe('#api-users', () => {
     });
 
     describe('when failed', () => {
-      it('should return promise rejected with correct reason', () => {
-        const emptyReqMock = {};
-        const resMock = getResMock();
+      it('should call next(..) with an exceotion when req.params.id is undefined', async () => {
+        const nextFnMock = getNextFnMock();
 
-        return apiUsersRouter._getUser(emptyReqMock, resMock).catch((error: Error) => {
-          expect(error).toEqual(TypeError(`Cannot read property 'id' of undefined`));
-        });
+        await apiUsersRouter._getUser({}, getResMock(), nextFnMock);
+
+        expect(nextFnMock).toHaveBeenCalledWith(TypeError(`Cannot read property 'id' of undefined`));
       });
 
-      it('should call res.status(..).json(..) with correct params', async () => {
+      it('should call res.status(..).json(..) with correct params when User was not found', async () => {
         getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.general);
 
         const emptyReqMock = {
@@ -376,8 +352,8 @@ describe('#api-users', () => {
 
         await apiUsersRouter._getUser(emptyReqMock, resMock);
 
-        expect(resMock.status).toHaveBeenCalledWith(200);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: null });
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'User not found!' });
       });
     });
   });

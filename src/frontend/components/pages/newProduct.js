@@ -600,16 +600,13 @@ ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 
 
 const NewProduct = () => {
   const doSubmit = (newProductData) =>
-    apiService.addProduct(newProductData).then(
-      () => {
-        console.log('Product successfully saved');
-      },
-      (err) => {
-        console.error('Product save error:', err);
-
-        return err;
+    apiService.addProduct(newProductData).then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
       }
-    );
+
+      console.log('Product successfully saved');
+    });
 
   return <ProductForm doSubmit={doSubmit} />;
 };
@@ -656,11 +653,14 @@ const ModifyProduct = () => {
   );
 
   useEffect(() => {
-    (async () => {
-      // TODO: implement `getProductByName` method instead of (or along with) `getProduct[ById]`
-      const initialProductData = await apiService.getProductsByNames([productName]);
-      setProductData(initialProductData[0]);
-    })();
+    // TODO: implement `getProductByName` method instead of (or along with) `getProduct[ById]`
+    apiService.getProductsByNames([productName]).then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
+
+      setProductData(res[0]);
+    });
   }, []);
 
   const normalizeTechnicalSpecsProps = (changedFields, technicalSpecsField) => {
@@ -682,7 +682,13 @@ const ModifyProduct = () => {
     if (changedFields.length) {
       setModificationError(false);
 
-      return apiService.modifyProduct(values.name, Object.fromEntries(changedFields)).then(setProductData);
+      return apiService.modifyProduct(values.name, Object.fromEntries(changedFields)).then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        }
+
+        setProductData(res);
+      });
     }
 
     setModificationError(true);

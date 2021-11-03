@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { createTransport } from 'nodemailer';
 import SMTPTransport = require('nodemailer/lib/smtp-transport');
+import SendmailTransport = require('nodemailer/lib/sendmail-transport');
 
 // @ts-ignore
 dotenv.config();
@@ -55,13 +56,13 @@ export const EMAIL_TYPES = Object
     ])
   ) as Record<emailTypesConfigKeys, emailTypesConfigKeys>;
 
-export default function sendMail(
+export default async function sendMail(
   receiver: string,
   emailType: emailTypesConfigKeys,
   link: string
-): Promise<SMTPTransport.SentMessageInfo> {
+): Promise<SendmailTransport.SentMessageInfo> {
   const transporter = createTransport(mailerConfig);
-  const mailOptions = {
+  const mailOptions: Partial<SendmailTransport.Options> = {
     from: process.env.EMAIL_FROM, //'PEV_Shop@example.org',
     to: receiver,
     subject: EMAIL_TYPES_CONFIG[emailType].subject,

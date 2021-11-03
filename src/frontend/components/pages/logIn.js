@@ -33,6 +33,10 @@ export default function LogIn() {
     apiService.loginUser({ login: userLogin, password: userPassword }).then((res) => {
       console.log('login res: ', res);
 
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
+
       setLoggedInUserData(res);
       appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_IN);
     });
