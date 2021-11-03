@@ -258,7 +258,7 @@ describe('#api-products', () => {
         await apiProductsRouter._addProduct(getReqMock(), resMock);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.CREATED);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ msg: 'Success!' });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ message: 'Success!' });
       });
     });
 
@@ -569,7 +569,9 @@ describe('#api-products', () => {
         deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.general);
         await apiProductsRouter._deleteProduct(reqMock, resMock2);
         expect(resMock2.status).toBeCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
-        expect(resMock2._jsonMethod).toBeCalledWith({ exception: deleteFromDBMock._failedCall.general() });
+        expect(resMock2._jsonMethod).toBeCalledWith({
+          exception: { message: expect.stringContaining('Failed to delete the product - ') },
+        });
 
         const resMock3 = getResMock();
         deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.nothingFound);

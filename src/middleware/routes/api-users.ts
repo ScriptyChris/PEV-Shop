@@ -8,6 +8,7 @@ import UserModel, { IUser } from '../../database/models/_user';
 import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
+import { embraceResponse, normalizePayloadType } from '../helpers/middleware-response-wrapper';
 
 dotenv.config();
 
@@ -68,15 +69,16 @@ const sendRegistrationEmail = async ({
 
         await deleteFromDB({ name: login }, 'User');
 
-        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
-          error: {
-            msg: 'Sending email rejection',
-            reason: emailSentInfo.rejected,
-          },
-        });
+        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
+          embraceResponse({
+            error: `Sending email rejected: ${emailSentInfo.rejected}!`,
+          })
+        );
       }
 
-      return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'User account created! Check your email.' });
+      return res
+        .status(HTTP_STATUS_CODE.CREATED)
+        .json(embraceResponse({ message: 'User account created! Check your email.' }));
     })
     .catch(async (emailSentError: Error) => {
       logger.error('emailSentError:', emailSentError);
@@ -84,12 +86,13 @@ const sendRegistrationEmail = async ({
       await deleteFromDB({ name: login }, 'User');
 
       // next(new Error())
-      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({
-        exception: {
-          msg: `Email sent error: '${emailSentError.message}'`,
-          reason: emailSentError,
-        },
-      });
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
+        embraceResponse({
+          exception: {
+            message: `Email sent error: '${emailSentError.message}'!`,
+          },
+        })
+      );
     });
 };
 
@@ -103,25 +106,29 @@ const sendResetPasswordEmail = async ({ email, token, res }: { email: string; to
       if (emailSentInfo.rejected.length) {
         logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
 
-        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
-          exception: {
-            msg: 'Sending email rejection',
-            reason: emailSentInfo.rejected,
-          },
-        });
+        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
+          embraceResponse({
+            exception: {
+              message: `Sending email rejection: ${emailSentInfo.rejected}`,
+            },
+          })
+        );
       }
 
-      return res.status(HTTP_STATUS_CODE.OK).json({ msg: 'Password resetting process began! Check your email.' });
+      return res
+        .status(HTTP_STATUS_CODE.OK)
+        .json(embraceResponse({ message: 'Password resetting process began! Check your email.' }));
     })
     .catch(async (emailSentError) => {
       logger.error('emailSentError:', emailSentError);
 
-      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({
-        exception: {
-          msg: `Email sent error: '${emailSentError.message}'`,
-          reason: emailSentError,
-        },
-      });
+      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
+        embraceResponse({
+          exception: {
+            message: `Email sent error: '${emailSentError.message}'!`,
+          },
+        })
+      );
     });
 };
 
@@ -149,10 +156,10 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
     );
 
     if (!updatedUser) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User to update was not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to update was not found!' }));
     }
 
-    return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Success!' });
+    return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Success!' }));
   } catch (exception) {
     return next(exception);
   }
@@ -165,7 +172,7 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
     const validatedPasswordMsg = UserModel.validatePassword(req.body.newPassword);
 
     if (validatedPasswordMsg !== '') {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: validatedPasswordMsg });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(embraceResponse({ error: validatedPasswordMsg }));
     }
 
     const hashedPassword = await hashPassword(req.body.newPassword);
@@ -189,9 +196,9 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
 
       await userToSetNewPassword.deleteSingleToken('resetPassword');
 
-      return res.status(HTTP_STATUS_CODE.CREATED).json({ msg: 'Password updated!' });
+      return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Password updated!' }));
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User not found!' }));
     }
   } catch (exception) {
     return next(exception);
@@ -208,7 +215,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
     const validatedPasswordMsg = UserModel.validatePassword(req.body.password);
 
     if (validatedPasswordMsg !== '') {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: validatedPasswordMsg });
+      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(embraceResponse({ error: validatedPasswordMsg }));
     }
 
     req.body.password = await hashPassword(req.body.password);
@@ -232,7 +239,9 @@ async function confirmRegistration(req: Request, res: Response, next: NextFuncti
 
   try {
     if (!req.body.token) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Token is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Token is empty or not attached!' }));
     }
 
     const userToConfirm = (await getFromDB(
@@ -244,9 +253,9 @@ async function confirmRegistration(req: Request, res: Response, next: NextFuncti
       await userToConfirm.confirmUser();
       await userToConfirm.deleteSingleToken('confirmRegistration');
 
-      return res.status(HTTP_STATUS_CODE.OK).json({ payload: { isUserConfirmed: true } });
+      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: { isUserConfirmed: true } }));
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ payload: { isUserConfirmed: false } });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ payload: { isUserConfirmed: false } }));
     }
   } catch (exception) {
     return next(exception);
@@ -259,7 +268,9 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
 
   try {
     if (!req.body.email) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Email is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Email is empty or not attached!' }));
     }
 
     const userToResendConfirmation = (await getFromDB(
@@ -279,7 +290,7 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
         res,
       });
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ payload: { isConfirmationReSend: false } });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ payload: { isConfirmationReSend: false } }));
     }
   } catch (exception) {
     return next(exception);
@@ -291,30 +302,36 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
     logger.log('(logInUser) req.body:', req.body);
 
     if (!req.body) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
     } else if (!req.body.login) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'User login is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'User login is empty or not attached!' }));
     }
 
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
 
     if (!user) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'Invalid credentials!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
     }
 
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'Invalid credentials!' });
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
     }
 
     if (!user.isConfirmed) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ error: 'User registration is not confirmed!' });
+      return res
+        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
+        .json(embraceResponse({ error: 'User registration is not confirmed!' }));
     }
 
     const token = await user.generateAuthToken();
 
-    return res.status(HTTP_STATUS_CODE.OK).json({ payload: user, token });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user), token }));
   } catch (exception) {
     return next(exception);
   }
@@ -325,7 +342,9 @@ async function resetPassword(req: Request, res: Response, next: NextFunction) {
 
   try {
     if (!req.body.email) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Email is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Email is empty or not attached!' }));
     }
 
     const userToResetPassword = (await getFromDB(
@@ -357,9 +376,13 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
 
   try {
     if (!req.body) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Request body is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
     } else if (!req.body.email) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'Email prop is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse(embraceResponse({ error: 'Email prop is empty or not attached!' })));
     }
 
     const userToResendResetPassword = (await getFromDB(
@@ -377,7 +400,7 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
         res,
       });
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User not found!' });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User not found!' }));
     }
   } catch (exception) {
     return next(exception);
@@ -394,7 +417,7 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 
     await req.user.save();
 
-    return res.status(HTTP_STATUS_CODE.OK).json({ msg: 'Logged out!' });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ message: 'Logged out!' }));
   } catch (exception) {
     return next(exception);
   }
@@ -405,16 +428,18 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
     logger.log('[GET] /:id', req.params.id);
 
     if (!req.params.id) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: 'User id is empty or not attached!' });
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'User id is empty or not attached!' }));
     }
 
     const user: IUser = await getFromDB(req.params.id, 'User');
 
     if (!user) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: `User not found!` });
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: `User not found!` }));
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json({ payload: user });
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user) }));
   } catch (exception) {
     return next(exception);
   }

@@ -133,7 +133,7 @@ describe('#api-users', () => {
         await apiUsersRouter._updateUser(getReqMock(), resMock);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.CREATED);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ msg: 'Success!' });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ message: 'Success!' });
       });
     });
 
@@ -280,7 +280,7 @@ describe('#api-users', () => {
         await apiUsersRouter._logOutUser(getReqMock(), resMock);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ msg: 'Logged out!' });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ message: 'Logged out!' });
       });
     });
 

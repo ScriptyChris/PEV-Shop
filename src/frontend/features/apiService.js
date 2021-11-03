@@ -63,7 +63,7 @@ class Ajax {
           throw body.exception;
         }
 
-        return body && (body.payload || body.msg);
+        return body && (body.payload || body.message);
       })
       .catch((exception) => {
         console.error('(_fetchBaseHandler) caught an error:', exception);

@@ -7,6 +7,7 @@ import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { PAYU_DEFAULTS } from '../helpers/payu-api';
 import { IUser } from '../../database/models/_user';
 import { HTTP_STATUS_CODE } from '../../types';
+import { embraceResponse } from '../helpers/middleware-response-wrapper';
 
 // @ts-ignore
 dotenv.default.config();
@@ -57,7 +58,7 @@ const authMiddlewareFn = (
       )) as IUser;
 
       if (!user) {
-        return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User to authorize not found!' });
+        return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to authorize not found!' }));
       }
 
       req.user = user;
@@ -73,7 +74,7 @@ const userRoleMiddlewareFn = (roleName: string): any => {
   return async (req: Request & { user: any; userPermissions: string[] }, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
-        return res.status(HTTP_STATUS_CODE.FORBIDDEN).json({ error: `You don't have permissions!` });
+        return res.status(HTTP_STATUS_CODE.FORBIDDEN).json(embraceResponse({ error: `You don't have permissions!` }));
       }
 
       // TODO: improve selecting data while populating
