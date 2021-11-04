@@ -4,20 +4,25 @@
 import getLogger from '../../../utils/logger';
 import { connect, connection } from 'mongoose';
 import { IProduct } from '../models/_product';
-import getModel, { TGenericModel } from '../models/models-index';
+import { IUser } from '../models/_user';
+import getModel, { TGenericModel, TModelType } from '../models/models-index';
 import * as dotenv from 'dotenv';
+import { hashPassword } from '../../middleware/features/auth';
 
 // @ts-ignore
 const envVar = dotenv.default.config({ path: '../../../.env' }); // ../
 const logger = getLogger(module.filename);
-const PARAMS: { CLEAN_ALL: string; PRODUCTS_JSON_FILE_PATH: string } = Object.freeze({
-  CLEAN_ALL: 'cleanAll',
-  PRODUCTS_JSON_FILE_PATH: 'productsJSONFilePath=',
+const PARAMS = Object.freeze({
+  CLEAN_ALL_BEFORE: 'cleanAllBefore',
+  JSON_FILE_PATH: {
+    PRODUCTS: 'productsInputPath=',
+    USERS: 'usersInputPath=',
+  },
 });
 
 let relatedProductsErrors = 0;
 
-// TODO: move to product or category schema
+// TODO: [REFACTOR] move to product or category schema
 // const CATEGORY_TO_SPEC_MAP: { [key: string]: Record<string, [number, number]> } = Object.freeze({
 //   'Accessories': {
 //     'Weight': [1, 10],
@@ -36,42 +41,59 @@ let relatedProductsErrors = 0;
 
 type TPopulatedData = Record<string, unknown>;
 
-logger.log('process.argv:', process.argv);
-// @ts-ignore
 logger.log(
-  'envVar:',
+  'process.argv:',
+  process.argv,
+  '\n/envVar:',
   envVar,
-  ' /__dirname:',
+  '\n/__dirname:',
   __dirname,
-  ' /INIT_CWD:',
+  '\n/INIT_CWD:',
   process.env.INIT_CWD,
-  ' /require.main.filename:',
-  require && require.main && require.main.filename
+  '\n/require.main.filename:',
+  require && require.main && require.main.filename,
+  '\n'
 );
 
-if (!getScriptParamValue(PARAMS.PRODUCTS_JSON_FILE_PATH)) {
-  throw ReferenceError(`CLI argument ${PARAMS.PRODUCTS_JSON_FILE_PATH} must be provided as non empty string`);
+if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
+  throw ReferenceError(`CLI argument ${PARAMS.JSON_FILE_PATH.PRODUCTS} must be provided as non empty string`);
 }
 
 (async () => {
   await connectToDB();
 
-  const Product: TGenericModel = getModel('Product');
+  const Product = getModel('Product');
+  const User = getModel('User');
 
-  if (getScriptParamValue(PARAMS.CLEAN_ALL)) {
-    const removedProducts = await Product.deleteMany({});
-    logger.log(`Cleaning done - removed ${removedProducts.deletedCount} products.`);
+  if (getScriptParamValue(PARAMS.CLEAN_ALL_BEFORE)) {
+    const removedData = await Promise.all(
+      [
+        { name: 'products', ctor: Product },
+        { name: 'users', ctor: User },
+      ].map(async ({ name, ctor }) => `\n-${name}: ${(await ctor.deleteMany({})).deletedCount}`)
+    );
+
+    logger.log(`Cleaning done. Removed: ${removedData}`);
   }
 
-  const sourceDataList = getSourceData() as TPopulatedData[];
-  await populateProducts(Product, sourceDataList);
-  await updateRelatedProductsNames(Product, sourceDataList);
+  if (getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
+    const productsSourceDataList = getSourceData('Product') as TPopulatedData[];
+    await populateProducts(Product, productsSourceDataList);
+    await updateRelatedProductsNames(Product, productsSourceDataList);
+  }
+
+  if (getScriptParamValue(PARAMS.JSON_FILE_PATH.USERS)) {
+    const usersSourceDataList = getSourceData('User') as TPopulatedData[];
+    await populateUsers(User, usersSourceDataList);
+  }
 
   logger.log(
     'Products amount after population:',
     await Product.find({}).countDocuments(),
     ' /relatedProductsErrors:',
-    relatedProductsErrors
+    relatedProductsErrors,
+    '\n Users amount after population:',
+    await User.find({}).countDocuments()
   );
 
   await connection.close();
@@ -84,11 +106,14 @@ function connectToDB(): ReturnType<typeof connect> {
   });
 }
 
-function getSourceData(): TPopulatedData[] | ReferenceError {
-  const sourceDataPath: string = getScriptParamValue(PARAMS.PRODUCTS_JSON_FILE_PATH);
+function getSourceData(modelType: TModelType): TPopulatedData[] | ReferenceError {
+  const normalizedModelType = `${modelType.toUpperCase()}S` as `${Uppercase<Exclude<TModelType, 'User-Role'>>}S`;
+  const sourceDataPath: string = getScriptParamValue(PARAMS.JSON_FILE_PATH[normalizedModelType]);
 
   if (!sourceDataPath) {
-    throw ReferenceError(`Path to data was not provided! You must pass "${PARAMS.PRODUCTS_JSON_FILE_PATH}" parameter.`);
+    throw ReferenceError(
+      `Path to data for "${modelType}" was not provided! You must pass "${PARAMS.JSON_FILE_PATH[normalizedModelType]}" parameter.`
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -109,14 +134,29 @@ function getSourceData(): TPopulatedData[] | ReferenceError {
   }
 }
 
-function populateProducts(ProductModel: TGenericModel, sourceDataList: TPopulatedData[]): Promise<IProduct[]> {
+function populateProducts(ProductModel: TGenericModel, productsSourceDataList: TPopulatedData[]): Promise<IProduct[]> {
   return Promise.all(
-    sourceDataList.map((data: TPopulatedData) => {
+    productsSourceDataList.map((data: TPopulatedData) => {
       const product = new ProductModel(data) as IProduct;
       product.set('relatedProductsNames', undefined);
 
       return product.save().catch((err) => {
-        logger.error('save err:', err, ' /data:', data);
+        logger.error('product save err:', err, ' /data:', data);
+
+        return err;
+      });
+    })
+  );
+}
+
+function populateUsers(UserModel: TGenericModel, usersSourceDataList: TPopulatedData[]): Promise<IUser[]> {
+  return Promise.all(
+    usersSourceDataList.map(async (data: TPopulatedData) => {
+      data.password = await hashPassword(data.password as string);
+      const user = new UserModel(data) as IUser;
+
+      return user.save().catch((err) => {
+        logger.error('user save err:', err, ' /data:', data);
 
         return err;
       });

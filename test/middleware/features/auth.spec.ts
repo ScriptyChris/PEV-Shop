@@ -11,6 +11,9 @@ const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFr
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 import { findAssociatedSrcModulePath } from '../../test-index';
 
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
+
 describe('#auth', () => {
   let comparePasswords: any,
     hashPassword: any,
@@ -70,10 +73,7 @@ describe('#auth', () => {
 
       getToken(payloadObj);
 
-      // this is auth's module private variable
-      const SECRET_KEY = 'VeRy-SeCrEt-KeY';
-
-      expect(mockedJwt.sign).toHaveBeenCalledWith(payloadObj, SECRET_KEY);
+      expect(mockedJwt.sign).toHaveBeenCalledWith(payloadObj, process.env.TOKEN_SECRET_KEY);
     });
 
     it('should return result returned by jwt.sign, cause this is its internal implementation', () => {
@@ -93,10 +93,7 @@ describe('#auth', () => {
 
       verifyToken(token);
 
-      // this is auth's module private variable
-      const SECRET_KEY = 'VeRy-SeCrEt-KeY';
-
-      expect(mockedJwt.verify).toHaveBeenCalledWith(token, SECRET_KEY);
+      expect(mockedJwt.verify).toHaveBeenCalledWith(token, process.env.TOKEN_SECRET_KEY);
     });
 
     it('should return result returned by jwt.verify, cause this is its internal implementation', () => {

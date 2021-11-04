@@ -7,9 +7,11 @@ const {
 const { authMiddlewareFn: authMiddlewareFnMock } = jest
   .mock('../../../src/middleware/features/auth')
   .requireMock('../../../src/middleware/features/auth');
-const { getFromDB: getFromDBMock, saveToDB: saveToDBMock, updateOneModelInDB: updateOneModelInDBMock } = jest
-  .mock('../../../src/database/database-index')
-  .requireMock('../../../src/database/database-index');
+const {
+  getFromDB: getFromDBMock,
+  saveToDB: saveToDBMock,
+  updateOneModelInDB: updateOneModelInDBMock,
+} = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
 
 describe('#api-user-roles', () => {
   const authMiddlewareReturnedFn = () => undefined;

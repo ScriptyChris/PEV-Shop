@@ -24,12 +24,11 @@ html {
 
 .app-root {
   display: grid;
-  grid-template-columns: 3fr 1fr;
-  grid-template-rows: 10vh auto 10vh;
+  grid-template-rows: 10vh 80vh 10vh;
   grid-template-areas:
-    "header header"
-    "main aside"
-    "footer footer";
+    "header"
+    "main"
+    "footer";
 
   & > * {
     border: 1px solid red;

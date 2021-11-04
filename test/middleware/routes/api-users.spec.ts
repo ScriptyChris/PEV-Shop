@@ -149,10 +149,8 @@ describe('#api-users', () => {
   });
 
   describe('logInUser(..)', () => {
-    const {
-      matchPassword: matchPasswordMock,
-      generateAuthToken: generateAuthTokenMock,
-    } = getFromDBMock._succeededCall._clazz.prototype;
+    const { matchPassword: matchPasswordMock, generateAuthToken: generateAuthTokenMock } =
+      getFromDBMock._succeededCall._clazz.prototype;
 
     describe('when succeeded', () => {
       beforeEach(() => {

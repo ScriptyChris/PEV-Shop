@@ -249,7 +249,7 @@ async function addReview(req: Request, res: Response, next: NextFunction) {
 }
 addReview.isNumber = (value: unknown): boolean => value !== null && !Number.isNaN(Number(value));
 addReview.isIntOrDecimalHalf = (value: number): boolean => {
-  const isInt = Number.parseInt((value as unknown) as string) === value;
+  const isInt = Number.parseInt(value as unknown as string) === value;
   const isDecimalHalf = value % 1 === 0.5;
 
   return isInt || isDecimalHalf;
