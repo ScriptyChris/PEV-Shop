@@ -28,17 +28,15 @@ export default function LogIn() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    console.warn('userLogin:', userLogin, ' /userPassword:', userPassword);
-
     apiService.loginUser({ login: userLogin, password: userPassword }).then((res) => {
-      console.log('login res: ', res);
+      console.log('(loginUser) res: ', res);
 
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      setLoggedInUserData(res);
       appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_IN);
+      setLoggedInUserData(res);
     });
   };
 
@@ -84,7 +82,7 @@ export default function LogIn() {
         <Redirect
           to={{
             pathname: '/account',
-            state: { data: loggedInUserData },
+            state: { loggedInUserData },
           }}
         />
       )}

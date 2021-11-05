@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import appStore, { USER_SESSION_STATES } from '../../features/appStore';
-import apiService from '../../features/apiService';
+import { logOutUser } from '../pages/account';
 
 const translations = Object.freeze({
   start: 'Start',
@@ -16,16 +16,6 @@ const translations = Object.freeze({
 });
 
 export default observer(function Nav() {
-  const logOut = () => {
-    apiService.logoutUser().then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
-        return;
-      }
-
-      appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
-    });
-  };
-
   return (
     <nav className="nav">
       <ul>
@@ -42,21 +32,20 @@ export default observer(function Nav() {
           <Link to="/modify-product">{translations.modifyProduct}</Link>
         </li>
         <li>
-          {appStore.userSessionState === USER_SESSION_STATES.LOGGED_OUT ? (
-            <Link to="/log-in">{translations.logIn}</Link>
-          ) : (
-            <Link to="/" onClick={logOut}>
+          {appStore.userSessionState === USER_SESSION_STATES.LOGGED_IN ? (
+            <Link to="/" onClick={logOutUser}>
               {translations.logOut}
             </Link>
+          ) : (
+            <Link to="/log-in">{translations.logIn}</Link>
           )}
         </li>
-        {appStore.userSessionState === USER_SESSION_STATES.LOGGED_OUT && (
-          <li>
-            <Link to="/register">{translations.register}</Link>
-          </li>
-        )}
         <li>
-          <Link to="/account">{translations.account}</Link>
+          {appStore.userSessionState === USER_SESSION_STATES.LOGGED_IN ? (
+            <Link to="/account">{translations.account}</Link>
+          ) : (
+            <Link to="/register">{translations.register}</Link>
+          )}
         </li>
       </ul>
     </nav>

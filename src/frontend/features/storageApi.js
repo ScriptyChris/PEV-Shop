@@ -1,23 +1,56 @@
-const saveUserCartStateToStorage = (userCartState) => {
+function updateStorage({ key, value }, shouldRemove) {
   try {
-    if (!userCartState || userCartState.toString() !== '[object Object]' || userCartState.totalCount === 0) {
-      window.localStorage.removeItem('userCartState');
+    if (shouldRemove()) {
+      window.localStorage.removeItem(key);
       return;
     }
 
-    window.localStorage.setItem('userCartState', JSON.stringify(userCartState));
+    window.localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error('saveUserCartStateToStorage error:', error);
+    console.error('updateStorage error:', error, ' /key:', key, ' /value:', value);
   }
-};
+}
 
-const getUserCartStateFromStorage = () => {
+function getFromStorage(key) {
   try {
-    return JSON.parse(window.localStorage.getItem('userCartState'));
+    return JSON.parse(window.localStorage.getItem(key));
   } catch (error) {
-    console.error('getUserCartStateFromStorage error:', error, '. Return empty object.');
+    console.error('getFromStorage error:', error, ' /key:', key);
     return null;
   }
-};
+}
 
-export { saveUserCartStateToStorage, getUserCartStateFromStorage };
+function removeFromStorage(key) {
+  updateStorage({ key }, () => true);
+}
+
+const USER_CART_STATE = Object.freeze({
+  __KEY__: 'userCartState',
+  updateStorage(cartState) {
+    updateStorage(
+      { key: this.__KEY__, value: cartState },
+      () => !cartState || cartState.toString() !== '[object Object]' || cartState.totalCount === 0
+    );
+  },
+  getFromStorage() {
+    return getFromStorage(this.__KEY__);
+  },
+});
+
+const USER_ACCOUNT_STATE = Object.freeze({
+  __KEY__: 'userAccountState',
+  updateStorage(accountState) {
+    updateStorage(
+      { key: this.__KEY__, value: accountState },
+      () => !accountState || accountState.toString() !== '[object Object]'
+    );
+  },
+  getFromStorage() {
+    return getFromStorage(this.__KEY__);
+  },
+  removeFromStorage() {
+    removeFromStorage(this.__KEY__);
+  },
+});
+
+export { USER_CART_STATE, USER_ACCOUNT_STATE };

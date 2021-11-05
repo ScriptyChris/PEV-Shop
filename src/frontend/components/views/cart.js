@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import { getUserCartStateFromStorage, saveUserCartStateToStorage } from '../../features/storageApi';
+import { USER_CART_STATE } from '../../features/storageApi';
 import appStore from '../../features/appStore';
 
 export default observer(function Cart() {
@@ -20,12 +20,12 @@ export default observer(function Cart() {
   };
 
   useEffect(() => {
-    appStore.replaceUserCartState(getUserCartStateFromStorage());
+    appStore.replaceUserCartState(USER_CART_STATE.getFromStorage());
 
     window.addEventListener(
       'beforeunload',
       () => {
-        saveUserCartStateToStorage(appStore.userCartState);
+        USER_CART_STATE.updateStorage(appStore.userCartState);
       },
       { once: true }
     );

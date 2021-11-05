@@ -91,14 +91,13 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
   return token;
 };
 
-// TODO: [REFACTOR] this should rather return object containing only: login, email, _id
-userSchema.methods.toJSON = function (): IUser {
-  const user = this.toObject();
+userSchema.methods.toJSON = function (): IUserPublic {
+  const user: IUser = this.toObject();
 
-  delete user.tokens;
-  delete user.password;
-
-  return user;
+  return {
+    login: user.login,
+    email: user.email,
+  };
 };
 
 userSchema.methods.matchPassword = function (password: string): Promise<boolean> {
@@ -159,6 +158,8 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
 
 const UserModel = model<IUser, IUserStatics>('User', userSchema);
 
+type IUserPublic = Pick<IUser, 'login' | 'email'>;
+
 interface IUserStatics extends Model<IUser> {
   validatePassword(password: any): string;
 }
@@ -175,7 +176,7 @@ export interface IUser extends Document {
     resetPassword: string | undefined;
   };
   generateAuthToken(): Promise<string>;
-  toJSON(): IUser;
+  toJSON(): IUserPublic;
   matchPassword(password: string): Promise<boolean>;
   setSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   deleteSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;

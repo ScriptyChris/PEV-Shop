@@ -115,17 +115,18 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
 
         setSearchRecentValues((prev) => ({ oldValue: prev.newValue, newValue: prev.newValue }));
 
-        const products = (newSearchValueContainsOld
-          ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
-          : (await apiService.getProductsByName(searchRecentValues.newValue, false, null))
-              .then((res) => {
-                if (res.__EXCEPTION_ALREADY_HANDLED) {
-                  return;
-                }
+        const products = (
+          newSearchValueContainsOld
+            ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
+            : (await apiService.getProductsByName(searchRecentValues.newValue, false, null))
+                .then((res) => {
+                  if (res.__EXCEPTION_ALREADY_HANDLED) {
+                    return;
+                  }
 
-                return res;
-              })
-              .map(({ name }) => name)
+                  return res;
+                })
+                .map(({ name }) => name)
         ).filter((productName) => !(props.ignoredProductNames || []).includes(productName));
 
         setSearchResults(products);
