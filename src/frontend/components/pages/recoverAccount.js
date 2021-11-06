@@ -98,7 +98,7 @@ function ResetPassword() {
   );
 }
 
-function SetNewPassword() {
+function SetNewPassword({ contextType = SetNewPassword.CONTEXT_TYPES.LOGGED_OUT }) {
   const [token, setToken] = useState('');
   const [formInitials] = useState({
     newPassword: '',
@@ -109,7 +109,12 @@ function SetNewPassword() {
   const { search: searchParam } = useLocation();
 
   useEffect(() => {
-    setToken(new URLSearchParams(searchParam).get('token'));
+    const contextBasedToken =
+      contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_OUT
+        ? new URLSearchParams(searchParam).get('token')
+        : null; /* TODO: [FEATURE] take token either from passed prop or from store */
+
+    setToken(contextBasedToken);
   }, []);
 
   const formValidator = (values) => {
@@ -125,6 +130,8 @@ function SetNewPassword() {
 
   const onSubmitHandler = (values) => {
     if (token) {
+      // TODO: [FEATURE] implement changing password from /account/security path
+
       apiService
         .disableGenericErrorHandler()
         .setNewPassword(values.newPassword, token)
@@ -207,5 +214,9 @@ function SetNewPassword() {
     </section>
   );
 }
+SetNewPassword.CONTEXT_TYPES = Object.freeze({
+  LOGGED_OUT: 'LOGGED_OUT',
+  LOGGED_IN: 'LOGGED_IN',
+});
 
 export { ResetPassword, SetNewPassword };

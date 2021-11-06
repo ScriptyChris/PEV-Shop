@@ -1,0 +1,11 @@
+.account {
+    &__menu {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+
+        &-list {
+            justify-self: center;
+            list-style: none;
+        }
+    }
+}
