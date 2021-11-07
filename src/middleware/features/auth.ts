@@ -64,7 +64,8 @@ const authMiddlewareFn = (
         return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to authorize not found!' }));
       }
 
-      req.user = user;
+      // TODO: [REFACTOR] normalize data returned by `getFromDB`
+      req.user = Array.isArray(user) ? user[0] : user;
       req.token = bearerToken;
 
       return next();

@@ -5,6 +5,7 @@ import apiService from '../../features/apiService';
 import { SetNewPassword } from '../views/password';
 import { USER_ACCOUNT_STATE } from '../../features/storageApi';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
+import ProductItem from '../views/productItem';
 
 const translations = Object.freeze({
   accountHeader: 'Account',
@@ -103,22 +104,18 @@ function Security() {
     if (typeof logOutFromSessionsConfirmation === 'boolean' && typeof shouldPreseveCurrentSession === 'boolean') {
       apiService
         .disableGenericErrorHandler()
-        .logOutUserFromAllSessions(shouldPreseveCurrentSession)
+        .logOutUserFromSessions(shouldPreseveCurrentSession)
         .then((res) => {
           if (res.__EXCEPTION_ALREADY_HANDLED) {
             return;
           } else if (shouldPreseveCurrentSession) {
-            if (res.__ERROR_TO_HANDLE) {
-              return setPopupData({
-                type: POPUP_TYPES.FAILURE,
-                message: translations.logOutFromOtherSessionsFailedMsg,
-                buttons: [getClosePopupBtn(setPopupData)],
-              });
-            }
-
+            setShouldPreseveCurrentSession(null);
+            setLogOutFromSessionsConfirmation(null);
             setPopupData({
-              type: POPUP_TYPES.SUCCESS,
-              message: translations.logOutFromOtherSessionsSuccessMsg,
+              type: res.__ERROR_TO_HANDLE ? POPUP_TYPES.FAILURE : POPUP_TYPES.SUCCESS,
+              message: res.__ERROR_TO_HANDLE
+                ? translations.logOutFromOtherSessionsFailedMsg
+                : translations.logOutFromOtherSessionsSuccessMsg,
               buttons: [getClosePopupBtn(setPopupData)],
             });
           } else {
@@ -144,7 +141,25 @@ function Security() {
 }
 
 function ObservedProducts() {
-  return <div>TODO: [FEATURE] implement observing products and list them here</div>;
+  const [observedProducts, setObservedProducts] = useState(null);
+
+  useEffect(() => {
+    apiService.getObservedProducts().then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      } else {
+        setObservedProducts(res);
+      }
+    });
+  }, []);
+
+  return (
+    <div className="account__menu-list">
+      {observedProducts
+        ? observedProducts.map((product) => <ProductItem key={product.name} product={product} />)
+        : translations.lackOfData}
+    </div>
+  );
 }
 
 function Orders() {

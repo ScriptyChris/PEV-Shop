@@ -6,6 +6,10 @@
         &-list {
             justify-self: center;
             list-style: none;
+
+            .activeClassName {
+                background: green;
+            }
         }
 
         &-tab {

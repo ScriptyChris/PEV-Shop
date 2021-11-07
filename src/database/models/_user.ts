@@ -55,6 +55,10 @@ const userSchema = new Schema<IUser>({
     required: true,
     default: false,
   },
+  observedProducts: {
+    type: [Schema.Types.ObjectId],
+    default: undefined,
+  },
   tokens: {
     auth: {
       type: [String],
@@ -123,6 +127,34 @@ userSchema.methods.confirmUser = function (): Promise<IUser> {
   return this.save();
 };
 
+userSchema.methods.addProductToObserved = function (productId: Schema.Types.ObjectId): boolean {
+  const user = this as IUser;
+
+  if (!user.observedProducts) {
+    user.observedProducts = [productId];
+  } else if (user.observedProducts.includes(productId)) {
+    return false;
+  } else {
+    user.observedProducts.push(productId);
+  }
+
+  return true;
+};
+
+userSchema.methods.removeProductFromObserved = function (productId: Schema.Types.ObjectId): boolean {
+  const user = this as IUser;
+
+  if (!user.observedProducts || !user.observedProducts.includes(productId)) {
+    return false;
+  } else {
+    user.observedProducts = user.observedProducts.filter((observedProductId) => observedProductId !== productId) as [
+      Schema.Types.ObjectId
+    ];
+  }
+
+  return true;
+};
+
 userSchema.statics.validatePassword = (password: any): string => {
   if (typeof password !== 'string') {
     return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE.errorMessage;
@@ -170,6 +202,7 @@ export interface IUser extends Document {
   email: string;
   accountType: typeof ACCOUNT_TYPES[number];
   isConfirmed: boolean;
+  observedProducts: [Schema.Types.ObjectId];
   tokens: {
     auth: string[] | undefined;
     confirmRegistration: string | undefined;
@@ -181,6 +214,8 @@ export interface IUser extends Document {
   setSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   deleteSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   confirmUser(): Promise<IUser>;
+  addProductToObserved(productId: Schema.Types.ObjectId): boolean;
+  removeProductFromObserved(productId: Schema.Types.ObjectId): boolean;
 }
 
 export default UserModel;

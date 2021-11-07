@@ -19,7 +19,12 @@ const {
 const logger = getLogger(module.filename);
 
 const router: any = Router();
-router.post('/api/users/', updateUser);
+
+// feature related
+router.post('/api/users/add-product-to-observed', authMiddlewareFn(getFromDB), addProductToObserved);
+router.get('/api/users/observed-products', authMiddlewareFn(getFromDB), getObservedProducts);
+
+// auth related
 router.post('/api/users/register', registerUser);
 router.post('/api/users/confirm-registration', confirmRegistration);
 router.post('/api/users/resend-confirm-registration', resendConfirmRegistration);
@@ -30,7 +35,11 @@ router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.post('/api/users/logout-all', authMiddlewareFn(getFromDB), logOutUserFromSessions);
 router.patch('/api/users/set-new-password', setNewPassword);
 router.patch('/api/users/change-password', authMiddlewareFn(getFromDB), changePassword);
+
+// general
+router.post('/api/users/', updateUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
+
 router.use(getMiddlewareErrorHandler(logger));
 
 // expose functions for unit tests
@@ -46,6 +55,8 @@ router._logOutUser = logOutUser;
 router._logOutUserFromSessions = logOutUserFromSessions;
 router._setNewPassword = setNewPassword;
 router._getUser = getUser;
+router._addProductToObserved = addProductToObserved;
+router._getObservedProducts = getObservedProducts;
 
 export default router;
 
@@ -501,6 +512,49 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
     }
 
     return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user) }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function addProductToObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    logger.log('(addProductToObserved) req.body:', req.body, '/req.user:', req.user.observedProducts);
+
+    if (!req.body || !req.body.productId) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body or `productId` param are empty or not attached!' }));
+    }
+
+    const isProductAddedToObserved = req.user
+      .addProductToObserved(req.body.productId);
+
+    if (!isProductAddedToObserved) {
+      return res
+        .status(HTTP_STATUS_CODE.CONFLICT)
+        .json(embraceResponse({ error: 'Product is already observed by user!' }));
+    }
+
+    await req.user.save();
+
+    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function getObservedProducts(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    logger.log('(getObservedProducts)');
+
+    if (!req.user.observedProducts) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'There are no observed products!' }));
+    }
+
+    const observedProducts = await getFromDB({ _id: req.user.observedProducts }, 'Product');
+
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: observedProducts }));
   } catch (exception) {
     return next(exception);
   }

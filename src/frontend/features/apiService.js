@@ -267,7 +267,7 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(`${this.USERS_URL}/logout`, null, true);
   }
 
-  logOutUserFromAllSessions(preseveCurrentSession = false) {
+  logOutUserFromSessions(preseveCurrentSession = false) {
     return this.postRequest(`${this.USERS_URL}/logout-all`, { preseveCurrentSession }, true);
   }
 
@@ -289,6 +289,14 @@ const apiService = new (class ApiService extends Ajax {
 
   changePassword(password, newPassword) {
     return this.patchRequest(`${this.USERS_URL}/change-password`, { password, newPassword }, true);
+  }
+
+  addProductToObserved(productId) {
+    return this.postRequest(`${this.USERS_URL}/add-product-to-observed`, { productId }, true);
+  }
+
+  getObservedProducts() {
+    return this.getRequest(`${this.USERS_URL}/observed-products`, true);
   }
 })();
 
