@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { useLocation, useHistory, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import appStore, { USER_SESSION_STATES } from '../../features/appStore';
 import apiService from '../../features/apiService';
 import { SetNewPassword } from '../views/password';
 import { USER_ACCOUNT_STATE } from '../../features/storageApi';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 
 const translations = Object.freeze({
   accountHeader: 'Account',
@@ -13,6 +14,13 @@ const translations = Object.freeze({
   goToOrders: 'Orders',
   editUserData: 'Edit',
   logOutFromAllSessions: 'Log out from all sessions',
+  logOutFromOtherSessions: 'Log out from other sessions',
+  logOutFromAllSessionsConfirmMsg: 'Are you sure you want to log out from all sessions?',
+  logOutFromOtherSessionsConfirmMsg: 'Are you sure you want to log out from other sessions except current one?',
+  logOutFromOtherSessionsSuccessMsg: 'Logged out from other sessions!',
+  logOutFromOtherSessionsFailedMsg: 'No other active sessions found!',
+  confirm: 'Confirm',
+  abort: 'Abort',
   lackOfData: 'No user data',
 });
 
@@ -64,13 +72,73 @@ function UserProfile({ initialUserData }) {
 }
 
 function Security() {
+  const [popupData, setPopupData] = useState(null);
+  const [shouldPreseveCurrentSession, setShouldPreseveCurrentSession] = useState(null);
+  const [logOutFromSessionsConfirmation, setLogOutFromSessionsConfirmation] = useState(null);
+  const history = useHistory();
+
+  const logOutFromSessions = (preseveCurrentSession = false) => {
+    setPopupData({
+      type: POPUP_TYPES.NEUTRAL,
+      message: preseveCurrentSession
+        ? translations.logOutFromOtherSessionsConfirmMsg
+        : translations.logOutFromAllSessionsConfirmMsg,
+      buttons: [
+        {
+          text: translations.confirm,
+          onClick: () => {
+            setShouldPreseveCurrentSession(preseveCurrentSession);
+            setLogOutFromSessionsConfirmation(true);
+          },
+        },
+        {
+          ...getClosePopupBtn(setPopupData),
+          text: translations.abort,
+        },
+      ],
+    });
+  };
+
+  useEffect(() => {
+    if (typeof logOutFromSessionsConfirmation === 'boolean' && typeof shouldPreseveCurrentSession === 'boolean') {
+      apiService
+        .disableGenericErrorHandler()
+        .logOutUserFromAllSessions(shouldPreseveCurrentSession)
+        .then((res) => {
+          if (res.__EXCEPTION_ALREADY_HANDLED) {
+            return;
+          } else if (shouldPreseveCurrentSession) {
+            if (res.__ERROR_TO_HANDLE) {
+              return setPopupData({
+                type: POPUP_TYPES.FAILURE,
+                message: translations.logOutFromOtherSessionsFailedMsg,
+                buttons: [getClosePopupBtn(setPopupData)],
+              });
+            }
+
+            setPopupData({
+              type: POPUP_TYPES.SUCCESS,
+              message: translations.logOutFromOtherSessionsSuccessMsg,
+              buttons: [getClosePopupBtn(setPopupData)],
+            });
+          } else {
+            appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
+            history.replace('/');
+          }
+        });
+    }
+  }, [logOutFromSessionsConfirmation, shouldPreseveCurrentSession]);
+
   return (
-    <div>
+    <div className="account__menu-tab">
       <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
-      <button onClick={() => console.log('TODO: [FEATURE] implement logging out from all sessions')}>
-        {translations.logOutFromAllSessions}
-      </button>
+      <div className="account__menu-tab logout-from-sessions">
+        <button onClick={() => logOutFromSessions(false)}>{translations.logOutFromAllSessions}</button>
+        <button onClick={() => logOutFromSessions(true)}>{translations.logOutFromOtherSessions}</button>
+
+        {popupData && <Popup {...popupData} />}
+      </div>
     </div>
   );
 }

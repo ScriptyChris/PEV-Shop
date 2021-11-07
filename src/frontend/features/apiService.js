@@ -267,6 +267,10 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(`${this.USERS_URL}/logout`, null, true);
   }
 
+  logOutUserFromAllSessions(preseveCurrentSession = false) {
+    return this.postRequest(`${this.USERS_URL}/logout-all`, { preseveCurrentSession }, true);
+  }
+
   registerUser(registrationData) {
     return this.postRequest(`${this.USERS_URL}/register`, registrationData);
   }

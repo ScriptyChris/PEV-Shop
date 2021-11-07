@@ -43,7 +43,7 @@ const verifyToken = (token: string): TToken => {
 const authMiddlewareFn = (
   getFromDB: /* TODO: [DX] correct typing */ any
 ): ((...args: any) => Promise<Pick<Response, 'json'> | void>) => {
-  return async (req: Request & { user: IUser }, res: Response, next: NextFunction) => {
+  return async (req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) => {
     try {
       const authToken = req.header('Authorization');
 
@@ -65,6 +65,7 @@ const authMiddlewareFn = (
       }
 
       req.user = user;
+      req.token = bearerToken;
 
       return next();
     } catch (exception) {

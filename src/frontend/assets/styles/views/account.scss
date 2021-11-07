@@ -7,5 +7,12 @@
             justify-self: center;
             list-style: none;
         }
+
+        &-tab {
+            &.logout-from-sessions {
+                display: flex;
+                justify-content: space-around;
+            }
+        }
     }
 }

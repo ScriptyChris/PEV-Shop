@@ -27,6 +27,7 @@ router.post('/api/users/login', logInUser);
 router.post('/api/users/reset-password', resetPassword);
 router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
+router.post('/api/users/logout-all', authMiddlewareFn(getFromDB), logOutUserFromSessions);
 router.patch('/api/users/set-new-password', setNewPassword);
 router.patch('/api/users/change-password', authMiddlewareFn(getFromDB), changePassword);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
@@ -42,6 +43,7 @@ router._changePassword = changePassword;
 router._resetPassword = resetPassword;
 router._resendResetPassword = resendResetPassword;
 router._logOutUser = logOutUser;
+router._logOutUserFromSessions = logOutUserFromSessions;
 router._setNewPassword = setNewPassword;
 router._getUser = getUser;
 
@@ -445,12 +447,38 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
     req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
 
     if (req.user.tokens.auth.length === 0) {
-      delete req.user.tokens.auth;
+      req.user.tokens.auth = undefined;
     }
 
     await req.user.save();
 
     return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ message: 'Logged out!' }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function logOutUserFromSessions(
+  req: Request & { user: IUser; token: string },
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    if (req.body.preseveCurrentSession) {
+      if ((req.user.tokens.auth as string[]).length === 1) {
+        return res
+          .status(HTTP_STATUS_CODE.NOT_FOUND)
+          .json(embraceResponse({ error: 'Current session is the only one, so there is no other sessions to end!' }));
+      }
+
+      req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((authToken) => authToken === req.token);
+    } else {
+      req.user.tokens.auth = undefined;
+    }
+
+    await req.user.save();
+
+    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }
