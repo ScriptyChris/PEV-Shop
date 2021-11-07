@@ -55,7 +55,9 @@ class Ajax {
         return response.json();
       })
       .then((body) => {
-        if (body.token) {
+        if (body.__IS_OK_WITHOUT_CONTENT) {
+          return body;
+        } else if (body.token) {
           this._AUTH_TOKEN = body.token;
         } else if (body.error) {
           throw { error: body.error, isGenericErrorHandlerActive };
@@ -63,7 +65,7 @@ class Ajax {
           throw body.exception;
         }
 
-        return body && (body.payload || body.message);
+        return (body && body.payload) || body.message;
       })
       .catch((exception) => {
         console.error('(_fetchBaseHandler) caught an error:', exception);
@@ -279,6 +281,10 @@ const apiService = new (class ApiService extends Ajax {
 
   setNewPassword(newPassword, token) {
     return this.patchRequest(`${this.USERS_URL}/set-new-password`, { newPassword, token });
+  }
+
+  changePassword(password, newPassword) {
+    return this.patchRequest(`${this.USERS_URL}/change-password`, { password, newPassword }, true);
   }
 })();
 

@@ -28,6 +28,7 @@ router.post('/api/users/reset-password', resetPassword);
 router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.patch('/api/users/set-new-password', setNewPassword);
+router.patch('/api/users/change-password', authMiddlewareFn(getFromDB), changePassword);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
 router.use(getMiddlewareErrorHandler(logger));
 
@@ -37,6 +38,7 @@ router._registerUser = registerUser;
 router._confirmRegistration = confirmRegistration;
 router._resendConfirmRegistration = resendConfirmRegistration;
 router._logInUser = logInUser;
+router._changePassword = changePassword;
 router._resetPassword = resetPassword;
 router._resendResetPassword = resendResetPassword;
 router._logOutUser = logOutUser;
@@ -169,6 +171,12 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(setNewPassword) req.body:', req.body);
 
   try {
+    if (!req.body || !req.body.newPassword || !req.body.token) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body or "newPassword" or "token" fields are empty!' }));
+    }
+
     const validatedPasswordMsg = UserModel.validatePassword(req.body.newPassword);
 
     if (validatedPasswordMsg !== '') {
@@ -332,6 +340,31 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
     const token = await user.generateAuthToken();
 
     return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user), token }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function changePassword(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    logger.log('(changePassword) req.body:', req.body);
+
+    if (!req.body || !req.body.password || !req.body.newPassword) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+    }
+
+    const isPasswordMatch = await req.user.matchPassword(req.body.password);
+
+    if (!isPasswordMatch) {
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
+    }
+
+    req.user.password = await hashPassword(req.body.newPassword);
+    req.user.save();
+
+    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }

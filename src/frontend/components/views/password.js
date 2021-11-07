@@ -3,14 +3,15 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import FormFieldError from '../utils/formFieldError';
 import apiService from '../../features/apiService';
-import Popup, { POPUP_TYPES, getClosePopupBtn } from '../../components/utils/popup';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 
 const translations = Object.freeze({
   resetPasswordHeader: 'Reset password',
   resettingEmailField: 'Email associated with user account',
   submitReset: 'Reset',
   setNewPasswordHeader: 'Set new password',
-  newPasswordField: 'Password',
+  currentPasswordField: 'Password',
+  newPasswordField: 'New password',
   repeatedNewPasswordField: 'Repeat password',
   bothPasswordFieldsMustBeEqual: 'Both password fields must be equal!',
   submitNewPassword: 'Update password',
@@ -27,8 +28,38 @@ const translations = Object.freeze({
     You can now login with the new password.
   `.trim(),
   setNewPasswordFailureMsg: 'Failed to set new password :(',
+  changePasswordSuccessMsg: 'Password changed!',
+  changePasswordFailureMsg: 'Failed to change password :(',
   popupGoToLogIn: 'Go to log in',
 });
+
+function PasswordField({ identity, translation, error }) {
+  if (!identity || !translation) {
+    throw ReferenceError(
+      `'identity' and 'translation' props must be non-empty! Received subsequently: '${identity}' and '${translation}'`
+    );
+  }
+
+  // TODO: [REFACTOR] take these values from some global config
+  const [passwordMinLength, passwordMaxLength] = [8, 20];
+
+  return (
+    <div>
+      <label htmlFor={identity}>{translation}</label>
+      {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
+      <Field
+        type="password"
+        name={identity}
+        id={identity}
+        minLength={passwordMinLength}
+        maxLength={passwordMaxLength}
+        required
+      />
+
+      {error && <FormFieldError>{error}</FormFieldError>}
+    </div>
+  );
+}
 
 function ResetPassword() {
   const [formInitials] = useState({
@@ -98,9 +129,16 @@ function ResetPassword() {
   );
 }
 
-function SetNewPassword({ contextType = SetNewPassword.CONTEXT_TYPES.LOGGED_OUT }) {
-  const [token, setToken] = useState('');
+function SetNewPassword({ contextType }) {
+  if (!Object.keys(SetNewPassword.CONTEXT_TYPES).some((contextKey) => contextKey === contextType)) {
+    throw ReferenceError(
+      `'contextType' must be either of '${Object.keys(SetNewPassword.CONTEXT_TYPES)}'! Received '${contextType}'.`
+    );
+  }
+
+  const [urlToken, setUrlToken] = useState(null);
   const [formInitials] = useState({
+    currentPassword: contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN ? '' : undefined,
     newPassword: '',
     repeatedNewPassword: '',
   });
@@ -109,12 +147,9 @@ function SetNewPassword({ contextType = SetNewPassword.CONTEXT_TYPES.LOGGED_OUT 
   const { search: searchParam } = useLocation();
 
   useEffect(() => {
-    const contextBasedToken =
-      contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_OUT
-        ? new URLSearchParams(searchParam).get('token')
-        : null; /* TODO: [FEATURE] take token either from passed prop or from store */
-
-    setToken(contextBasedToken);
+    if (contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_OUT) {
+      setUrlToken(new URLSearchParams(searchParam).get('token'));
+    }
   }, []);
 
   const formValidator = (values) => {
@@ -129,14 +164,36 @@ function SetNewPassword({ contextType = SetNewPassword.CONTEXT_TYPES.LOGGED_OUT 
   };
 
   const onSubmitHandler = (values) => {
-    if (token) {
-      // TODO: [FEATURE] implement changing password from /account/security path
-
+    if (contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN) {
       apiService
         .disableGenericErrorHandler()
-        .setNewPassword(values.newPassword, token)
+        .changePassword(values.currentPassword, values.newPassword)
         .then((res) => {
-          console.log('(resetPassword) res?', res);
+          console.log('(changePassword) res?', res);
+
+          if (res.__EXCEPTION_ALREADY_HANDLED) {
+            return;
+          } else if (res.__ERROR_TO_HANDLE) {
+            setPopupData({
+              type: POPUP_TYPES.FAILURE,
+              // TODO: [UX] also show failure reason
+              message: translations.changePasswordFailureMsg,
+              buttons: [getClosePopupBtn(setPopupData)],
+            });
+          } else {
+            setPopupData({
+              type: POPUP_TYPES.SUCCESS,
+              message: translations.changePasswordSuccessMsg,
+              buttons: [getClosePopupBtn(setPopupData)],
+            });
+          }
+        });
+    } else if (urlToken) {
+      apiService
+        .disableGenericErrorHandler()
+        .setNewPassword(values.newPassword, urlToken)
+        .then((res) => {
+          console.log('(setNewPassword) res?', res);
 
           if (res.__EXCEPTION_ALREADY_HANDLED) {
             return;
@@ -178,31 +235,25 @@ function SetNewPassword({ contextType = SetNewPassword.CONTEXT_TYPES.LOGGED_OUT 
                 <h2>{translations.setNewPasswordHeader}</h2>
               </legend>
 
-              {/* TODO: [DUP] move password related elements to generic component to avoid redundancy */}
-              <div>
-                <label htmlFor="newPassword">{translations.newPasswordField}</label>
-                {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
-                <Field name="newPassword" id="newPassword" type="password" minLength="8" maxLength="20" required />
-
-                {formikRestProps.errors.newPassword && (
-                  <FormFieldError>{formikRestProps.errors.newPassword}</FormFieldError>
-                )}
-              </div>
-              <div>
-                <label htmlFor="repeatedNewPassword">{translations.repeatedNewPasswordField}</label>
-                <Field
-                  name="repeatedNewPassword"
-                  id="repeatedNewPassword"
-                  type="password"
-                  minLength="8"
-                  maxLength="20"
-                  required
+              {contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN && (
+                <PasswordField
+                  identity="currentPassword"
+                  translation={translations.currentPasswordField}
+                  error={formikRestProps.errors.currentPassword}
                 />
+              )}
 
-                {formikRestProps.errors.repeatedNewPassword && (
-                  <FormFieldError>{formikRestProps.errors.repeatedNewPassword}</FormFieldError>
-                )}
-              </div>
+              <PasswordField
+                identity="newPassword"
+                translation={translations.newPasswordField}
+                error={formikRestProps.errors.newPassword}
+              />
+
+              <PasswordField
+                identity="repeatedNewPassword"
+                translation={translations.repeatedNewPasswordField}
+                error={formikRestProps.errors.repeatedNewPassword}
+              />
 
               <button>{translations.submitNewPassword}</button>
             </fieldset>
@@ -219,4 +270,4 @@ SetNewPassword.CONTEXT_TYPES = Object.freeze({
   LOGGED_IN: 'LOGGED_IN',
 });
 
-export { ResetPassword, SetNewPassword };
+export { ResetPassword, SetNewPassword, PasswordField };

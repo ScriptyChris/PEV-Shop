@@ -14,7 +14,7 @@ import Account from '../pages/account';
 import Compare from '../pages/compare';
 import Order from '../pages/order';
 import ConfirmRegistration from '../pages/confirmRegistration';
-import * as RecoverAccount from '../pages/recoverAccount';
+import { SetNewPassword, ResetPassword } from '../views/password';
 import { GenericErrorPopup } from '../utils/popup';
 
 export default observer(function Main() {
@@ -49,10 +49,10 @@ export default observer(function Main() {
           <LogIn />
         </Route>
         <Route path="/reset-password">
-          <RecoverAccount.ResetPassword />
+          <ResetPassword />
         </Route>
         <Route path="/set-new-password">
-          <RecoverAccount.SetNewPassword />
+          <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
         </Route>
         <Route path="/account">
           {appStore.userSessionState === USER_SESSION_STATES.LOGGED_IN ? <Account /> : <Redirect to="/not-logged-in" />}

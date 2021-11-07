@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import appStore, { USER_SESSION_STATES } from '../../features/appStore';
 import apiService from '../../features/apiService';
-import { SetNewPassword } from '../pages/recoverAccount';
+import { SetNewPassword } from '../views/password';
 import { USER_ACCOUNT_STATE } from '../../features/storageApi';
 
 const translations = Object.freeze({
@@ -66,7 +66,7 @@ function UserProfile({ initialUserData }) {
 function Security() {
   return (
     <div>
-      <SetNewPassword />
+      <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
       <button onClick={() => console.log('TODO: [FEATURE] implement logging out from all sessions')}>
         {translations.logOutFromAllSessions}

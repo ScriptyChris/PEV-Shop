@@ -3,7 +3,7 @@ import { Formik, Field } from 'formik';
 import { useHistory } from 'react-router-dom';
 import apiService from '../../features/apiService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
-import FormFieldError from '../utils/formFieldError';
+import { PasswordField } from '../views/password';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -109,35 +109,17 @@ export default function Register() {
                 <Field name="login" id="registrationLogin" required />
               </div>
 
-              <div>
-                <label htmlFor="registrationPassword">{translations.passwordField}</label>
-                {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
-                <Field
-                  name="password"
-                  id="registrationPassword"
-                  type="password"
-                  minLength="8"
-                  maxLength="20"
-                  required
-                />
+              <PasswordField
+                identity="password"
+                translation={translations.passwordField}
+                error={formikRestProps.errors.password}
+              />
 
-                {formikRestProps.errors.password && <FormFieldError>{formikRestProps.errors.password}</FormFieldError>}
-              </div>
-              <div>
-                <label htmlFor="registrationRepeatedPassword">{translations.repeatedPasswordField}</label>
-                <Field
-                  name="repeatedPassword"
-                  id="registrationRepeatedPassword"
-                  type="password"
-                  minLength="8"
-                  maxLength="20"
-                  required
-                />
-
-                {formikRestProps.errors.repeatedPassword && (
-                  <FormFieldError>{formikRestProps.errors.repeatedPassword}</FormFieldError>
-                )}
-              </div>
+              <PasswordField
+                identity="repeatedPassword"
+                translation={translations.repeatedPasswordField}
+                error={formikRestProps.errors.repeatedPassword}
+              />
 
               <div>
                 <label htmlFor="registrationEmail">{translations.email}</label>

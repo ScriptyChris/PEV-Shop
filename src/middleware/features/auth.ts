@@ -43,12 +43,20 @@ const verifyToken = (token: string): TToken => {
 const authMiddlewareFn = (
   getFromDB: /* TODO: [DX] correct typing */ any
 ): ((...args: any) => Promise<Pick<Response, 'json'> | void>) => {
-  return async (req: Request & { authToken: string; user: IUser }, res: Response, next: NextFunction) => {
+  return async (req: Request & { user: IUser }, res: Response, next: NextFunction) => {
     try {
-      const authToken: string = (req.header('Authorization') as string).replace('Bearer ', '');
-      const decodedToken: TToken = verifyToken(authToken);
+      const authToken = req.header('Authorization');
+
+      if (!authToken) {
+        return res
+          .status(HTTP_STATUS_CODE.BAD_REQUEST)
+          .json(embraceResponse({ error: 'Authorization token header is empty or not attached!' }));
+      }
+
+      const bearerToken = authToken.replace('Bearer ', '');
+      const decodedToken = verifyToken(bearerToken);
       const user = (await getFromDB(
-        { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: authToken } },
+        { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
         'User'
       )) as IUser;
 

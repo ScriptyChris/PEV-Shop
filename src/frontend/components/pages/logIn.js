@@ -42,6 +42,7 @@ export default function LogIn() {
 
   return (
     <section>
+      {/* TODO: [REFACTOR] use <Formik /> */}
       <form onSubmit={handleSubmit}>
         <fieldset>
           <legend>
@@ -53,6 +54,7 @@ export default function LogIn() {
             <input id="login" type="text" value={userLogin} onChange={onInputChange} required />
           </div>
 
+          {/* TODO: [REFACTOR] use `recoverAccount.PasswordField` component */}
           <div>
             <label htmlFor="password">{translations.passwordField}</label>
             <input
