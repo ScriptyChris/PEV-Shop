@@ -22,7 +22,16 @@ const router: any = Router();
 
 // feature related
 router.post('/api/users/add-product-to-observed', authMiddlewareFn(getFromDB), addProductToObserved);
-router.post('/api/users/remove-product-from-observed', authMiddlewareFn(getFromDB), removeProductFromObserved);
+router.delete(
+  '/api/users/remove-product-from-observed/:productId',
+  authMiddlewareFn(getFromDB),
+  removeProductFromObserved
+);
+router.delete(
+  '/api/users/remove-all-products-from-observed',
+  authMiddlewareFn(getFromDB),
+  removeAllProductsFromObserved
+);
 router.get('/api/users/observed-products', authMiddlewareFn(getFromDB), getObservedProducts);
 
 // auth related
@@ -58,6 +67,7 @@ router._setNewPassword = setNewPassword;
 router._getUser = getUser;
 router._addProductToObserved = addProductToObserved;
 router._removeProductFromObserved = removeProductFromObserved;
+router._removeAllProductsFromObserved = removeAllProductsFromObserved;
 router._getObservedProducts = getObservedProducts;
 
 export default router;
@@ -545,15 +555,15 @@ async function addProductToObserved(req: Request & { user: IUser }, res: Respons
 
 async function removeProductFromObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
   try {
-    logger.log('(removeProductFromObserved) req.body:', req.body);
+    logger.log('(removeProductFromObserved) req.params:', req.params);
 
-    if (!req.body || !req.body.productId) {
+    if (!req.params || !req.params.productId) {
       return res
         .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body or `productId` param are empty or not attached!' }));
+        .json(embraceResponse({ error: 'Request params or `productId` param are empty or not attached!' }));
     }
 
-    const observationRemovalError = req.user.removeProductFromObserved(req.body.productId);
+    const observationRemovalError = req.user.removeProductFromObserved(req.params.productId);
 
     if (observationRemovalError) {
       return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: observationRemovalError }));
@@ -567,12 +577,26 @@ async function removeProductFromObserved(req: Request & { user: IUser }, res: Re
   }
 }
 
+async function removeAllProductsFromObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    const observationsRemovalError = req.user.removeAllProductsFromObserved();
+
+    if (observationsRemovalError) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: observationsRemovalError }));
+    }
+
+    await req.user.save();
+
+    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
 async function getObservedProducts(req: Request & { user: IUser }, res: Response, next: NextFunction) {
   try {
-    logger.log('(getObservedProducts)');
-
     if (!req.user.observedProducts) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'There are no observed products!' }));
+      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: [] }));
     }
 
     const observedProducts = await getFromDB({ _id: req.user.observedProducts }, 'Product');

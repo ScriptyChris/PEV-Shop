@@ -3,7 +3,7 @@
         display: grid;
         grid-template-columns: 1fr 3fr;
 
-        &-list {
+        &-nav {
             justify-self: center;
             list-style: none;
 
@@ -13,6 +13,10 @@
         }
 
         &-tab {
+            &.observed-products-list {
+                list-style: none;
+            }
+
             &.logout-from-sessions {
                 display: flex;
                 justify-content: space-around;

@@ -14,6 +14,8 @@ const translations = Object.freeze({
   goToObservedProducts: 'Observed products',
   goToOrders: 'Orders',
   editUserData: 'Edit',
+  removeAllObservedProducts: 'Remove all',
+  removeAllObservedProductsFailedMsg: 'Failed to remove all products :(',
   logOutFromAllSessions: 'Log out from all sessions',
   logOutFromOtherSessions: 'Log out from other sessions',
   logOutFromAllSessionsConfirmMsg: 'Are you sure you want to log out from all sessions?',
@@ -142,22 +144,63 @@ function Security() {
 
 function ObservedProducts() {
   const [observedProducts, setObservedProducts] = useState(null);
+  const [canRemoveAllProducts, setCanRemoveAllProducts] = useState(false);
+  const [popupData, setPopupData] = useState(null);
 
   useEffect(() => {
-    apiService.getObservedProducts().then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
-        return;
-      } else {
-        setObservedProducts(res);
-      }
-    });
+    apiService
+      .disableGenericErrorHandler()
+      .getObservedProducts()
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else {
+          setObservedProducts(res);
+          setCanRemoveAllProducts(true);
+        }
+      });
   }, []);
 
+  const removeAll = () => {
+    apiService
+      .disableGenericErrorHandler()
+      .removeAllProductsFromObserved()
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (res.__ERROR_TO_HANDLE) {
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: translations.removeAllObservedProductsFailedMsg,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        } else {
+          setCanRemoveAllProducts(false);
+          setObservedProducts(null);
+        }
+      });
+  };
+
   return (
-    <div className="account__menu-list">
-      {observedProducts
-        ? observedProducts.map((product) => <ProductItem key={product.name} product={product} />)
-        : translations.lackOfData}
+    <div className="account__menu-tab">
+      <div>
+        {/* TODO: [UX] add searching and filtering for observed products */}
+        <button onClick={removeAll} disabled={!canRemoveAllProducts}>
+          {translations.removeAllObservedProducts}
+        </button>
+      </div>
+
+      <ol className="account__menu-tab observed-products-list">
+        {observedProducts
+          ? observedProducts.map((product) => (
+              <li key={product.name}>
+                <ProductItem product={product} />
+              </li>
+            ))
+          : translations.lackOfData}
+      </ol>
+
+      {popupData && <Popup {...popupData} />}
     </div>
   );
 }
@@ -209,7 +252,7 @@ export default function Account() {
       <h2>{translations.accountHeader}</h2>
 
       <div className="account__menu">
-        <ul className="account__menu-list">
+        <ul className="account__menu-nav">
           {MENU_ITEMS.map((item) => (
             <li key={item.url}>
               <NavLink to={`${url}/${item.url}`}>{item.translation}</NavLink>

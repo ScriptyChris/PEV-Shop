@@ -155,10 +155,28 @@ userSchema.methods.removeProductFromObserved = function (productId: string): str
     (observedProductId) => observedProductId.toString() !== productObjectId.toString()
   ) as [Schema.Types.ObjectId];
 
-  return lengthBeforeRemoval - 1 === user.observedProducts.length
-    ? ''
-    : `Product observation was either not removed or there were multiple observations for same product! 
-    Number of observed products before removing: ${lengthBeforeRemoval}; after: ${user.observedProducts.length}.`;
+  if (lengthBeforeRemoval - 1 === user.observedProducts.length) {
+    if (user.observedProducts.length === 0) {
+      user.observedProducts = undefined;
+    }
+
+    return '';
+  }
+
+  return `Product observation was either not removed or there were multiple observations for same product! 
+  Number of observed products before removing: ${lengthBeforeRemoval}; after: ${user.observedProducts.length}.`;
+};
+
+userSchema.methods.removeAllProductsFromObserved = function (): string {
+  const user = this as IUser;
+
+  if (!user.observedProducts) {
+    return 'No product was observed by user!';
+  }
+
+  user.observedProducts = undefined;
+
+  return '';
 };
 
 userSchema.statics.validatePassword = (password: any): string => {
@@ -208,7 +226,7 @@ export interface IUser extends Document {
   email: string;
   accountType: typeof ACCOUNT_TYPES[number];
   isConfirmed: boolean;
-  observedProducts: [Schema.Types.ObjectId];
+  observedProducts: Schema.Types.ObjectId[] | undefined;
   tokens: {
     auth: string[] | undefined;
     confirmRegistration: string | undefined;
@@ -222,6 +240,7 @@ export interface IUser extends Document {
   confirmUser(): Promise<IUser>;
   addProductToObserved(productId: string): string;
   removeProductFromObserved(productId: string): string;
+  removeAllProductsFromObserved(): string;
 }
 
 export default UserModel;

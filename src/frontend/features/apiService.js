@@ -296,7 +296,11 @@ const apiService = new (class ApiService extends Ajax {
   }
 
   removeProductFromObserved(productId) {
-    return this.postRequest(`${this.USERS_URL}/remove-product-from-observed`, { productId }, true);
+    return this.deleteRequest(`${this.USERS_URL}/remove-product-from-observed/${productId}`, true);
+  }
+
+  removeAllProductsFromObserved() {
+    return this.deleteRequest(`${this.USERS_URL}/remove-all-products-from-observed`, true);
   }
 
   getObservedProducts() {
