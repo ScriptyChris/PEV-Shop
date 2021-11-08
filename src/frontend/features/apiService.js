@@ -182,7 +182,6 @@ const apiService = new (class ApiService extends Ajax {
 
     if (productsFilters && productsFilters.length) {
       searchParams.append('productsFilters', productsFilters);
-      console.log('??? searchParams:', [...searchParams]);
     }
 
     return this.getRequest({ url: this.PRODUCTS_URL, searchParams });

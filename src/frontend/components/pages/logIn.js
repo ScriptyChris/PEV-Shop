@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect, Link } from 'react-router-dom';
-import appStore, { USER_SESSION_STATES } from '../../features/appStore';
+import appStore from '../../features/appStore';
 import apiService from '../../features/apiService';
 
 const translations = Object.freeze({
@@ -29,13 +29,11 @@ export default function LogIn() {
     event.preventDefault();
 
     apiService.loginUser({ login: userLogin, password: userPassword }).then((res) => {
-      console.log('(loginUser) res: ', res);
-
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_IN);
+      appStore.updateUserSessionState(res /* USER_SESSION_STATES.LOGGED_IN */);
       setLoggedInUserData(res);
     });
   };

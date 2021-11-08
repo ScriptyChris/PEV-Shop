@@ -1,10 +1,5 @@
 import { observable, decorate, action } from 'mobx';
 
-const USER_SESSION_STATES = Object.freeze({
-  LOGGED_IN: 'LOGGED_IN',
-  LOGGED_OUT: 'LOGGED_OUT',
-});
-
 const USER_CART_STATE = Object.freeze({
   totalPrice: 0,
   totalCount: 0,
@@ -13,7 +8,8 @@ const USER_CART_STATE = Object.freeze({
 
 class AppStore {
   constructor() {
-    this._userSessionState = USER_SESSION_STATES.LOGGED_OUT;
+    // TODO: [CONSISTENCY] keep userSessionState structure in sync with backend's IUserPublic
+    this._userSessionState = null;
     this._userCartState = { ...USER_CART_STATE };
     this._productComparisonState = [];
   }
@@ -107,7 +103,5 @@ decorate(AppStore, {
 });
 
 const appStore = new AppStore();
-
-export { USER_SESSION_STATES };
 
 export default appStore;

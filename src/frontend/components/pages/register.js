@@ -51,14 +51,10 @@ export default function Register() {
   };
 
   const onSubmitHandler = (values) => {
-    console.log('register submit values:', values);
-
     apiService
       .disableGenericErrorHandler()
       .registerUser({ ...values, repeatedPassword: undefined })
       .then((res) => {
-        console.log('register res:', res, ' /typeof res:', typeof res);
-
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         } else if (res.__ERROR_TO_HANDLE) {

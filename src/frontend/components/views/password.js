@@ -77,8 +77,6 @@ function ResetPassword() {
       .disableGenericErrorHandler()
       .resetPassword(values.email)
       .then((res) => {
-        console.log('reset password res:', res);
-
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         } else if (res.__ERROR_TO_HANDLE) {
@@ -169,8 +167,6 @@ function SetNewPassword({ contextType }) {
         .disableGenericErrorHandler()
         .changePassword(values.currentPassword, values.newPassword)
         .then((res) => {
-          console.log('(changePassword) res?', res);
-
           if (res.__EXCEPTION_ALREADY_HANDLED) {
             return;
           } else if (res.__ERROR_TO_HANDLE) {
@@ -193,8 +189,6 @@ function SetNewPassword({ contextType }) {
         .disableGenericErrorHandler()
         .setNewPassword(values.newPassword, urlToken)
         .then((res) => {
-          console.log('(setNewPassword) res?', res);
-
           if (res.__EXCEPTION_ALREADY_HANDLED) {
             return;
           } else if (res.__ERROR_TO_HANDLE) {

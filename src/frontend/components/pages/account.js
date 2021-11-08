@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useHistory, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
-import appStore, { USER_SESSION_STATES } from '../../features/appStore';
+import appStore from '../../features/appStore';
 import apiService from '../../features/apiService';
 import { SetNewPassword } from '../views/password';
 import { USER_ACCOUNT_STATE } from '../../features/storageApi';
@@ -121,7 +121,7 @@ function Security() {
               buttons: [getClosePopupBtn(setPopupData)],
             });
           } else {
-            appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
+            appStore.updateUserSessionState(null);
             history.replace('/');
           }
         });
@@ -143,23 +143,11 @@ function Security() {
 }
 
 function ObservedProducts() {
-  const [observedProducts, setObservedProducts] = useState(null);
-  const [canRemoveAllProducts, setCanRemoveAllProducts] = useState(false);
+  const [observedProducts, setObservedProducts] = useState(appStore.userSessionState?.observedProducts);
+  const [canRemoveAllProducts, setCanRemoveAllProducts] = useState(
+    !!appStore.userSessionState?.observedProducts.length
+  );
   const [popupData, setPopupData] = useState(null);
-
-  useEffect(() => {
-    apiService
-      .disableGenericErrorHandler()
-      .getObservedProducts()
-      .then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
-          return;
-        } else {
-          setObservedProducts(res);
-          setCanRemoveAllProducts(true);
-        }
-      });
-  }, []);
 
   const removeAll = () => {
     apiService
@@ -177,6 +165,10 @@ function ObservedProducts() {
         } else {
           setCanRemoveAllProducts(false);
           setObservedProducts(null);
+          appStore.updateUserSessionState({
+            ...appStore.userSessionState,
+            observedProducts: res,
+          });
         }
       });
   };
@@ -278,7 +270,7 @@ export const logOutUser = (history) =>
       return;
     }
 
-    appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
+    appStore.updateUserSessionState(null);
     USER_ACCOUNT_STATE.removeFromStorage();
     history.replace('/');
   });

@@ -48,11 +48,9 @@ export default function ConfirmRegistration() {
       apiService
         .disableGenericErrorHandler()
         .confirmRegistration(token)
-        .then((res) => {
-          console.log('(confirmRegistration) res?', res);
-
-          setRegConfirmStatus(res?.isUserConfirmed ? REG_CONFIRM_STATUS.SUCCEEDED : REG_CONFIRM_STATUS.FAILED);
-        });
+        .then((res) =>
+          setRegConfirmStatus(res?.isUserConfirmed ? REG_CONFIRM_STATUS.SUCCEEDED : REG_CONFIRM_STATUS.FAILED)
+        );
     } else {
       setRegConfirmStatus(REG_CONFIRM_STATUS.FAILED);
     }

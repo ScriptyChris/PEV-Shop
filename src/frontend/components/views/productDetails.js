@@ -6,6 +6,7 @@ import apiService from '../../features/apiService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import RatingWidget from '../utils/ratingWidget';
 import { getLocalizedDate } from '../../features/localization';
+import appStore from '../../features/appStore';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -18,6 +19,8 @@ const productDetailsTranslations = Object.freeze({
   relatedProducts: 'Related products',
   editProduct: 'Edit',
   deleteProduct: 'Delete',
+  promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
+  goTologIn: 'Log in',
   observeProduct: 'Observe',
   unObserveProduct: 'Unobserve',
   observingProductFailed: 'Failed adding product to observed!',
@@ -307,7 +310,9 @@ export default function ProductDetails({ product }) {
   const [productDetails, setProductDetails] = useState([]);
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
   const [popupData, setPopupData] = useState(null);
-  const [isProductObserved, setIsProductObserved] = useState(product?.isObserved);
+  const [isProductObserved, setIsProductObserved] = useState(
+    !!appStore.userSessionState?.observedProducts.some((observedProduct) => observedProduct._id === product._id)
+  );
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {
@@ -374,26 +379,31 @@ export default function ProductDetails({ product }) {
       });
   };
 
-  const toggleProductObserve = (shouldBeObserved) => {
-    console.log(
-      '(toggleProductObserve) product:',
-      product,
-      ' /product._id:',
-      product._id,
-      ' /shouldBeObserved:',
-      shouldBeObserved
-    );
+  const toggleProductObserve = () => {
+    if (!appStore.userSessionState) {
+      return setPopupData({
+        type: POPUP_TYPES.NEUTRAL,
+        message: productDetailsTranslations.promptToLoginBeforeProductObserveToggling,
+        buttons: [
+          {
+            text: productDetailsTranslations.goTologIn,
+            onClick: () => history.push(`/log-in`),
+          },
+          getClosePopupBtn(setPopupData),
+        ],
+      });
+    }
 
     apiService
       .disableGenericErrorHandler() /* eslint-disable-next-line no-unexpected-multiline */
-      [shouldBeObserved ? 'addProductToObserved' : 'removeProductFromObserved'](product._id)
+      [isProductObserved ? 'removeProductFromObserved' : 'addProductToObserved'](product._id)
       .then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         } else if (res.__ERROR_TO_HANDLE) {
-          const message = shouldBeObserved
-            ? productDetailsTranslations.observingProductFailed
-            : productDetailsTranslations.unOservingProductFailed;
+          const message = isProductObserved
+            ? productDetailsTranslations.unOservingProductFailed
+            : productDetailsTranslations.observingProductFailed;
 
           setPopupData({
             type: POPUP_TYPES.FAILURE,
@@ -401,7 +411,11 @@ export default function ProductDetails({ product }) {
             buttons: [getClosePopupBtn(setPopupData)],
           });
         } else {
-          setIsProductObserved(shouldBeObserved);
+          appStore.updateUserSessionState({
+            ...appStore.userSessionState,
+            observedProducts: res,
+          });
+          setIsProductObserved(!isProductObserved);
         }
       });
   };
@@ -412,11 +426,9 @@ export default function ProductDetails({ product }) {
         [{productDetails.category}]: {productDetails.name}
         <button onClick={navigateToProductModify}>{productDetailsTranslations.editProduct}</button>
         <button onClick={deleteProduct}>{productDetailsTranslations.deleteProduct}</button>
-        {isProductObserved ? (
-          <button onClick={() => toggleProductObserve(false)}>{productDetailsTranslations.unObserveProduct}</button>
-        ) : (
-          <button onClick={() => toggleProductObserve(true)}>{productDetailsTranslations.observeProduct}</button>
-        )}
+        <button onClick={toggleProductObserve}>
+          {isProductObserved ? productDetailsTranslations.unObserveProduct : productDetailsTranslations.observeProduct}
+        </button>
       </p>
 
       {getMainDetailsContent()}

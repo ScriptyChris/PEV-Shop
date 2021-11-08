@@ -1,7 +1,7 @@
 import { Link, useHistory } from 'react-router-dom';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import appStore, { USER_SESSION_STATES } from '../../features/appStore';
+import appStore from '../../features/appStore';
 import { logOutUser } from '../pages/account';
 
 const translations = Object.freeze({
@@ -34,7 +34,7 @@ export default observer(function Nav() {
           <Link to="/modify-product">{translations.modifyProduct}</Link>
         </li>
         <li>
-          {appStore.userSessionState === USER_SESSION_STATES.LOGGED_IN ? (
+          {appStore.userSessionState ? (
             <Link to="/" onClick={() => logOutUser(history)}>
               {translations.logOut}
             </Link>
@@ -43,7 +43,7 @@ export default observer(function Nav() {
           )}
         </li>
         <li>
-          {appStore.userSessionState === USER_SESSION_STATES.LOGGED_IN ? (
+          {appStore.userSessionState ? (
             <Link to="/account">{translations.account}</Link>
           ) : (
             <Link to="/register">{translations.register}</Link>

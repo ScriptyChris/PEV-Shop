@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import appStore, { USER_SESSION_STATES } from '../../features/appStore';
+import appStore from '../../features/appStore';
 
 import Home from '../pages/home';
 import Shop from '../pages/shop';
@@ -54,9 +54,7 @@ export default observer(function Main() {
         <Route path="/set-new-password">
           <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
         </Route>
-        <Route path="/account">
-          {appStore.userSessionState === USER_SESSION_STATES.LOGGED_IN ? <Account /> : <Redirect to="/not-logged-in" />}
-        </Route>
+        <Route path="/account">{appStore.userSessionState ? <Account /> : <Redirect to="/not-logged-in" />}</Route>
         <Route path="/order">
           <Order />
         </Route>

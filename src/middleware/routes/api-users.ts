@@ -21,16 +21,23 @@ const logger = getLogger(module.filename);
 const router: any = Router();
 
 // feature related
-router.post('/api/users/add-product-to-observed', authMiddlewareFn(getFromDB), addProductToObserved);
+router.post(
+  '/api/users/add-product-to-observed',
+  authMiddlewareFn(getFromDB),
+  addProductToObserved,
+  getObservedProducts
+);
 router.delete(
   '/api/users/remove-product-from-observed/:productId',
   authMiddlewareFn(getFromDB),
-  removeProductFromObserved
+  removeProductFromObserved,
+  getObservedProducts
 );
 router.delete(
   '/api/users/remove-all-products-from-observed',
   authMiddlewareFn(getFromDB),
-  removeAllProductsFromObserved
+  removeAllProductsFromObserved,
+  getObservedProducts
 );
 router.get('/api/users/observed-products', authMiddlewareFn(getFromDB), getObservedProducts);
 
@@ -364,7 +371,19 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
 
     const token = await user.generateAuthToken();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user), token }));
+    return res.status(HTTP_STATUS_CODE.OK).json(
+      embraceResponse({
+        payload: normalizePayloadType({
+          ...user,
+          observedProducts: await getObservedProducts(
+            { ...req, user } as TGetObservedProductsParams[0],
+            { ...res, _OMIT_HTTP: true } as TGetObservedProductsParams[1],
+            next
+          ),
+        }),
+        token,
+      })
+    );
   } catch (exception) {
     return next(exception);
   }
@@ -547,7 +566,7 @@ async function addProductToObserved(req: Request & { user: IUser }, res: Respons
 
     await req.user.save();
 
-    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+    return next();
   } catch (exception) {
     return next(exception);
   }
@@ -571,7 +590,7 @@ async function removeProductFromObserved(req: Request & { user: IUser }, res: Re
 
     await req.user.save();
 
-    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+    return next();
   } catch (exception) {
     return next(exception);
   }
@@ -587,19 +606,34 @@ async function removeAllProductsFromObserved(req: Request & { user: IUser }, res
 
     await req.user.save();
 
-    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+    return next();
   } catch (exception) {
     return next(exception);
   }
 }
 
-async function getObservedProducts(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+type TGetObservedProductsParams = Parameters<typeof getObservedProducts>;
+async function getObservedProducts(
+  req: Request & { user: IUser },
+  res: Response & { _OMIT_HTTP?: boolean },
+  next: NextFunction
+) {
   try {
     if (!req.user.observedProducts) {
-      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: [] }));
+      const emptyObservedProductsResponse: unknown[] = [];
+
+      if (res._OMIT_HTTP) {
+        return emptyObservedProductsResponse;
+      }
+
+      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: emptyObservedProductsResponse }));
     }
 
     const observedProducts = await getFromDB({ _id: req.user.observedProducts }, 'Product');
+
+    if (res._OMIT_HTTP) {
+      return observedProducts;
+    }
 
     return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: observedProducts }));
   } catch (exception) {

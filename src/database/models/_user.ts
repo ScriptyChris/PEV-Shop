@@ -101,6 +101,7 @@ userSchema.methods.toJSON = function (): IUserPublic {
   return {
     login: user.login,
     email: user.email,
+    observedProducts: user.observedProducts,
   };
 };
 
@@ -214,7 +215,7 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
 
 const UserModel = model<IUser, IUserStatics>('User', userSchema);
 
-type IUserPublic = Pick<IUser, 'login' | 'email'>;
+type IUserPublic = Pick<IUser, 'login' | 'email' | 'observedProducts'>;
 
 interface IUserStatics extends Model<IUser> {
   validatePassword(password: any): string;
