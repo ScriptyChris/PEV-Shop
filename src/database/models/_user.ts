@@ -1,5 +1,5 @@
 import type { Document, Model } from 'mongoose';
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '../../middleware/features/auth';
 
@@ -127,32 +127,38 @@ userSchema.methods.confirmUser = function (): Promise<IUser> {
   return this.save();
 };
 
-userSchema.methods.addProductToObserved = function (productId: Schema.Types.ObjectId): boolean {
+userSchema.methods.addProductToObserved = function (productId: string): string {
   const user = this as IUser;
+  const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
 
   if (!user.observedProducts) {
-    user.observedProducts = [productId];
-  } else if (user.observedProducts.includes(productId)) {
-    return false;
+    user.observedProducts = [productObjectId];
+  } else if (user.observedProducts.includes(productObjectId)) {
+    return 'Product is already observed by user!';
   } else {
-    user.observedProducts.push(productId);
+    user.observedProducts.push(productObjectId);
   }
 
-  return true;
+  return '';
 };
 
-userSchema.methods.removeProductFromObserved = function (productId: Schema.Types.ObjectId): boolean {
+userSchema.methods.removeProductFromObserved = function (productId: string): string {
   const user = this as IUser;
+  const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
 
-  if (!user.observedProducts || !user.observedProducts.includes(productId)) {
-    return false;
-  } else {
-    user.observedProducts = user.observedProducts.filter((observedProductId) => observedProductId !== productId) as [
-      Schema.Types.ObjectId
-    ];
+  if (!user.observedProducts || !user.observedProducts.includes(productObjectId)) {
+    return 'Product was not observed by user!';
   }
 
-  return true;
+  const lengthBeforeRemoval = user.observedProducts.length;
+  user.observedProducts = user.observedProducts.filter(
+    (observedProductId) => observedProductId.toString() !== productObjectId.toString()
+  ) as [Schema.Types.ObjectId];
+
+  return lengthBeforeRemoval - 1 === user.observedProducts.length
+    ? ''
+    : `Product observation was either not removed or there were multiple observations for same product! 
+    Number of observed products before removing: ${lengthBeforeRemoval}; after: ${user.observedProducts.length}.`;
 };
 
 userSchema.statics.validatePassword = (password: any): string => {
@@ -214,8 +220,8 @@ export interface IUser extends Document {
   setSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   deleteSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   confirmUser(): Promise<IUser>;
-  addProductToObserved(productId: Schema.Types.ObjectId): boolean;
-  removeProductFromObserved(productId: Schema.Types.ObjectId): boolean;
+  addProductToObserved(productId: string): string;
+  removeProductFromObserved(productId: string): string;
 }
 
 export default UserModel;

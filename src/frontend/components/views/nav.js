@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import appStore, { USER_SESSION_STATES } from '../../features/appStore';
@@ -16,6 +16,8 @@ const translations = Object.freeze({
 });
 
 export default observer(function Nav() {
+  const history = useHistory();
+
   return (
     <nav className="nav">
       <ul>
@@ -33,7 +35,7 @@ export default observer(function Nav() {
         </li>
         <li>
           {appStore.userSessionState === USER_SESSION_STATES.LOGGED_IN ? (
-            <Link to="/" onClick={logOutUser}>
+            <Link to="/" onClick={() => logOutUser(history)}>
               {translations.logOut}
             </Link>
           ) : (

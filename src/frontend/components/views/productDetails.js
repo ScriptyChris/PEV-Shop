@@ -18,9 +18,10 @@ const productDetailsTranslations = Object.freeze({
   relatedProducts: 'Related products',
   editProduct: 'Edit',
   deleteProduct: 'Delete',
-  observeProduct: 'Add to observed',
-  observeProductSuccess: 'Product is observed!',
-  observeProductFailed: 'Failed adding product to observed!',
+  observeProduct: 'Observe',
+  unObserveProduct: 'Unobserve',
+  observingProductFailed: 'Failed adding product to observed!',
+  unObservingProductFailed: 'Failed removing product from observed!',
   addReview: 'Add review',
   anonymously: 'anonymously?',
   anonymous: 'Anonymous',
@@ -306,6 +307,7 @@ export default function ProductDetails({ product }) {
   const [productDetails, setProductDetails] = useState([]);
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
   const [popupData, setPopupData] = useState(null);
+  const [isProductObserved, setIsProductObserved] = useState(product?.isObserved);
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {
@@ -372,31 +374,34 @@ export default function ProductDetails({ product }) {
       });
   };
 
-  const observeProduct = () => {
-    console.log('(observeProduct) product:', product, ' /product._id:', product._id);
+  const toggleProductObserve = (shouldBeObserved) => {
+    console.log(
+      '(toggleProductObserve) product:',
+      product,
+      ' /product._id:',
+      product._id,
+      ' /shouldBeObserved:',
+      shouldBeObserved
+    );
 
-    /*
-      TODO: [UX] switch 'add' button to 'delete' afterwards.
-      This may require retrieving info about whether the product is already observed.
-    */
     apiService
-      .disableGenericErrorHandler()
-      .addProductToObserved(product._id)
+      .disableGenericErrorHandler() /* eslint-disable-next-line no-unexpected-multiline */
+      [shouldBeObserved ? 'addProductToObserved' : 'removeProductFromObserved'](product._id)
       .then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         } else if (res.__ERROR_TO_HANDLE) {
+          const message = shouldBeObserved
+            ? productDetailsTranslations.observingProductFailed
+            : productDetailsTranslations.unOservingProductFailed;
+
           setPopupData({
             type: POPUP_TYPES.FAILURE,
-            message: productDetailsTranslations.observeProductFailed,
+            message,
             buttons: [getClosePopupBtn(setPopupData)],
           });
         } else {
-          setPopupData({
-            type: POPUP_TYPES.SUCCESS,
-            message: productDetailsTranslations.observeProductSuccess,
-            buttons: [getClosePopupBtn(setPopupData)],
-          });
+          setIsProductObserved(shouldBeObserved);
         }
       });
   };
@@ -407,7 +412,11 @@ export default function ProductDetails({ product }) {
         [{productDetails.category}]: {productDetails.name}
         <button onClick={navigateToProductModify}>{productDetailsTranslations.editProduct}</button>
         <button onClick={deleteProduct}>{productDetailsTranslations.deleteProduct}</button>
-        <button onClick={observeProduct}>{productDetailsTranslations.observeProduct}</button>
+        {isProductObserved ? (
+          <button onClick={() => toggleProductObserve(false)}>{productDetailsTranslations.unObserveProduct}</button>
+        ) : (
+          <button onClick={() => toggleProductObserve(true)}>{productDetailsTranslations.observeProduct}</button>
+        )}
       </p>
 
       {getMainDetailsContent()}

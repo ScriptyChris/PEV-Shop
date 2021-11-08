@@ -22,6 +22,7 @@ const router: any = Router();
 
 // feature related
 router.post('/api/users/add-product-to-observed', authMiddlewareFn(getFromDB), addProductToObserved);
+router.post('/api/users/remove-product-from-observed', authMiddlewareFn(getFromDB), removeProductFromObserved);
 router.get('/api/users/observed-products', authMiddlewareFn(getFromDB), getObservedProducts);
 
 // auth related
@@ -56,6 +57,7 @@ router._logOutUserFromSessions = logOutUserFromSessions;
 router._setNewPassword = setNewPassword;
 router._getUser = getUser;
 router._addProductToObserved = addProductToObserved;
+router._removeProductFromObserved = removeProductFromObserved;
 router._getObservedProducts = getObservedProducts;
 
 export default router;
@@ -519,7 +521,7 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
 
 async function addProductToObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
   try {
-    logger.log('(addProductToObserved) req.body:', req.body, '/req.user:', req.user.observedProducts);
+    logger.log('(addProductToObserved) req.body:', req.body);
 
     if (!req.body || !req.body.productId) {
       return res
@@ -527,13 +529,34 @@ async function addProductToObserved(req: Request & { user: IUser }, res: Respons
         .json(embraceResponse({ error: 'Request body or `productId` param are empty or not attached!' }));
     }
 
-    const isProductAddedToObserved = req.user
-      .addProductToObserved(req.body.productId);
+    const observationAdditionError = req.user.addProductToObserved(req.body.productId);
 
-    if (!isProductAddedToObserved) {
+    if (observationAdditionError) {
+      return res.status(HTTP_STATUS_CODE.CONFLICT).json(embraceResponse({ error: observationAdditionError }));
+    }
+
+    await req.user.save();
+
+    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function removeProductFromObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    logger.log('(removeProductFromObserved) req.body:', req.body);
+
+    if (!req.body || !req.body.productId) {
       return res
-        .status(HTTP_STATUS_CODE.CONFLICT)
-        .json(embraceResponse({ error: 'Product is already observed by user!' }));
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body or `productId` param are empty or not attached!' }));
+    }
+
+    const observationRemovalError = req.user.removeProductFromObserved(req.body.productId);
+
+    if (observationRemovalError) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: observationRemovalError }));
     }
 
     await req.user.save();

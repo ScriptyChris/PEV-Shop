@@ -229,7 +229,7 @@ export default function Account() {
   );
 }
 
-export const logOutUser = () =>
+export const logOutUser = (history) =>
   apiService.logoutUser().then((res) => {
     if (res.__EXCEPTION_ALREADY_HANDLED) {
       return;
@@ -237,4 +237,5 @@ export const logOutUser = () =>
 
     appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_OUT);
     USER_ACCOUNT_STATE.removeFromStorage();
+    history.replace('/');
   });

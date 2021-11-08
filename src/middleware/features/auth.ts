@@ -45,15 +45,27 @@ const authMiddlewareFn = (
 ): ((...args: any) => Promise<Pick<Response, 'json'> | void>) => {
   return async (req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) => {
     try {
+      const BEARER_TOKEN_PREFIX = 'Bearer ';
       const authToken = req.header('Authorization');
 
       if (!authToken) {
         return res
           .status(HTTP_STATUS_CODE.BAD_REQUEST)
           .json(embraceResponse({ error: 'Authorization token header is empty or not attached!' }));
+      } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
+        return res
+          .status(HTTP_STATUS_CODE.BAD_REQUEST)
+          .json(embraceResponse({ error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!` }));
       }
 
-      const bearerToken = authToken.replace('Bearer ', '');
+      const bearerToken = authToken.replace(BEARER_TOKEN_PREFIX, '');
+
+      if (!bearerToken) {
+        return res
+          .status(HTTP_STATUS_CODE.BAD_REQUEST)
+          .json(embraceResponse({ error: 'Auth token does not contain bearer value!' }));
+      }
+
       const decodedToken = verifyToken(bearerToken);
       const user = (await getFromDB(
         { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
