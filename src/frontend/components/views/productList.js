@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 import ProductItem from './productItem';
 import Pagination from '../utils/pagination';
 import CategoriesTree from './categoriesTree';
@@ -49,7 +49,7 @@ export default function ProductList() {
         setProductsList(products);
       } else {
         setProductsList(
-          await apiService.getProducts({ productCategories, productsFilters }).then((res) => {
+          await httpService.getProducts({ productCategories, productsFilters }).then((res) => {
             if (res.__EXCEPTION_ALREADY_HANDLED) {
               return;
             }
@@ -64,7 +64,7 @@ export default function ProductList() {
       const pagination = { pageNumber, productsPerPage };
 
       if (!products) {
-        products = await apiService.getProducts({ pagination, productCategories, productsFilters }).then((res) => {
+        products = await httpService.getProducts({ pagination, productCategories, productsFilters }).then((res) => {
           if (res.__EXCEPTION_ALREADY_HANDLED) {
             return;
           }

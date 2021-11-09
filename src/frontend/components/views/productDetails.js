@@ -2,11 +2,11 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import ProductItem from './productItem';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import RatingWidget from '../utils/ratingWidget';
 import { getLocalizedDate } from '../../features/localization';
-import appStore from '../../features/appStore';
+import storeService from '../../features/storeService';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -48,7 +48,7 @@ function AddReview({ productName, updateReviews }) {
   };
 
   const onSubmitHandler = (values) => {
-    apiService
+    httpService
       .disableGenericErrorHandler()
       .addProductReview(productName, values)
       .then((res) => {
@@ -123,7 +123,7 @@ export function getProductDetailsHeaders() {
 }
 
 export function getProductDetailsData(product) {
-  return apiService.getProductsByNames(product.relatedProductsNames).then((res) => {
+  return httpService.getProductsByNames(product.relatedProductsNames).then((res) => {
     if (res.__EXCEPTION_ALREADY_HANDLED) {
       return;
     }
@@ -311,10 +311,20 @@ export default function ProductDetails({ product }) {
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
   const [popupData, setPopupData] = useState(null);
   const [isProductObserved, setIsProductObserved] = useState(
-    (appStore.userSessionState?.observedProductsIDs || []).some(
+    (storeService.userAccountState?.observedProductsIDs || []).some(
       (observedProductID) => observedProductID === product._id
     )
   );
+
+  console.log(
+    '??? isProductObserved:',
+    isProductObserved,
+    ' /storeService.userAccountState?.observedProductsIDs:',
+    storeService.userAccountState?.observedProductsIDs,
+    ' /product._id:',
+    product._id
+  );
+
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {
@@ -352,7 +362,7 @@ export default function ProductDetails({ product }) {
   };
 
   const deleteProduct = () => {
-    apiService
+    httpService
       .disableGenericErrorHandler()
       .deleteProduct(productDetails.name)
       .then((res) => {
@@ -382,7 +392,7 @@ export default function ProductDetails({ product }) {
   };
 
   const toggleProductObserve = () => {
-    if (!appStore.userSessionState) {
+    if (!storeService.userAccountState) {
       return setPopupData({
         type: POPUP_TYPES.NEUTRAL,
         message: productDetailsTranslations.promptToLoginBeforeProductObserveToggling,
@@ -396,7 +406,7 @@ export default function ProductDetails({ product }) {
       });
     }
 
-    apiService
+    httpService
       .disableGenericErrorHandler() /* eslint-disable-next-line no-unexpected-multiline */
       [isProductObserved ? 'removeProductFromObserved' : 'addProductToObserved'](product._id)
       .then((res) => {
@@ -404,7 +414,7 @@ export default function ProductDetails({ product }) {
           return;
         } else if (res.__ERROR_TO_HANDLE) {
           const message = isProductObserved
-            ? productDetailsTranslations.unOservingProductFailed
+            ? productDetailsTranslations.unObservingProductFailed
             : productDetailsTranslations.observingProductFailed;
 
           setPopupData({
@@ -413,8 +423,8 @@ export default function ProductDetails({ product }) {
             buttons: [getClosePopupBtn(setPopupData)],
           });
         } else {
-          appStore.updateUserSessionState({
-            ...appStore.userSessionState,
+          storeService.updateUserAccountState({
+            ...storeService.userAccountState,
             observedProductsIDs: res,
           });
           setIsProductObserved(!isProductObserved);

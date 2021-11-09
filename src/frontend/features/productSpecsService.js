@@ -1,4 +1,4 @@
-import apiService from './apiService';
+import httpService from './httpService';
 
 const productSpecsService = (() => {
   const FIELD_TYPES = Object.freeze({
@@ -21,7 +21,7 @@ const productSpecsService = (() => {
 
   async function getProductsSpecifications() {
     if (productSpecifications.length === 0) {
-      productSpecifications = await apiService.getProductsSpecifications().then((res) => {
+      productSpecifications = await httpService.getProductsSpecifications().then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         }

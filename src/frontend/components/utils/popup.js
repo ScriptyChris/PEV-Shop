@@ -1,5 +1,5 @@
 import React, { useCallback, memo, useState, useEffect, createRef } from 'react';
-import { apiServiceSubscriber } from '../../features/apiService';
+import { httpServiceSubscriber } from '../../features/httpService';
 
 const POPUP_TYPES = {
   NEUTRAL: 'NEUTRAL',
@@ -57,10 +57,10 @@ const GenericErrorPopup = memo(function GenericErrorPopup() {
   }, []);
 
   useEffect(() => {
-    apiServiceSubscriber.subscribe(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
+    httpServiceSubscriber.subscribe(httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
 
     return () => {
-      apiServiceSubscriber.unSubscribe(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
+      httpServiceSubscriber.unSubscribe(httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
     };
   }, []);
 

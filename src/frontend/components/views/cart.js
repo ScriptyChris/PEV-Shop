@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import { USER_CART_STATE } from '../../features/storageApi';
-import appStore from '../../features/appStore';
+import storageService from '../../features/storageService';
+import storeService from '../../features/storeService';
 
 export default observer(function Cart() {
   const [cartVisibility, updateCartVisibility] = useState(false);
@@ -20,12 +20,12 @@ export default observer(function Cart() {
   };
 
   useEffect(() => {
-    appStore.replaceUserCartState(USER_CART_STATE.getFromStorage());
+    storeService.replaceUserCartState(storageService.userCart.get());
 
     window.addEventListener(
       'beforeunload',
       () => {
-        USER_CART_STATE.updateStorage(appStore.userCartState);
+        storageService.userCart.update(storeService.userCartState);
       },
       { once: true }
     );
@@ -36,7 +36,7 @@ export default observer(function Cart() {
   };
 
   const handleCartCleanup = () => {
-    appStore.clearUserCartState();
+    storeService.clearUserCartState();
   };
 
   const handleCartSubmission = () => {
@@ -62,8 +62,8 @@ export default observer(function Cart() {
           </thead>
 
           <tbody>
-            {appStore.userCartProducts.length ? (
-              appStore.userCartProducts.map((productItem) => {
+            {storeService.userCartProducts.length ? (
+              storeService.userCartProducts.map((productItem) => {
                 return (
                   <tr key={productItem.name}>
                     <td>{productItem.name}</td>
@@ -82,8 +82,8 @@ export default observer(function Cart() {
           <tfoot>
             <tr>
               <th>{translations.productsTotals}</th>
-              <td>{appStore.userCartProductsCount}</td>
-              <td>{appStore.userCartTotalPrice}</td>
+              <td>{storeService.userCartProductsCount}</td>
+              <td>{storeService.userCartTotalPrice}</td>
             </tr>
           </tfoot>
         </table>

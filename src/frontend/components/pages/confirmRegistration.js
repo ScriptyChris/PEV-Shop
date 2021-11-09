@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 
 const translations = Object.freeze({
   header: 'Registration confirmation',
@@ -45,7 +45,7 @@ export default function ConfirmRegistration() {
     const token = new URLSearchParams(searchParam).get('token');
 
     if (token) {
-      apiService
+      httpService
         .disableGenericErrorHandler()
         .confirmRegistration(token)
         .then((res) =>

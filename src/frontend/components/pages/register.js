@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Formik, Field } from 'formik';
 import { useHistory } from 'react-router-dom';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import { PasswordField } from '../views/password';
 
@@ -51,7 +51,7 @@ export default function Register() {
   };
 
   const onSubmitHandler = (values) => {
-    apiService
+    httpService
       .disableGenericErrorHandler()
       .registerUser({ ...values, repeatedPassword: undefined })
       .then((res) => {
@@ -87,7 +87,7 @@ export default function Register() {
 
   // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time
   const resendConfirmRegistration = (email) => {
-    apiService.resendConfirmRegistration(email);
+    httpService.resendConfirmRegistration(email);
   };
 
   return (

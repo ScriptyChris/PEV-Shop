@@ -6,16 +6,16 @@ const USER_CART_STATE = Object.freeze({
   products: [],
 });
 
-class AppStore {
+class StoreService {
   constructor() {
-    // TODO: [CONSISTENCY] keep userSessionState structure in sync with backend's IUserPublic
-    this._userSessionState = null;
+    // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's IUserPublic
+    this._userAccountState = null;
     this._userCartState = { ...USER_CART_STATE };
     this._productComparisonState = [];
   }
 
-  updateUserSessionState(userSessionState) {
-    this._userSessionState = userSessionState;
+  updateUserAccountState(userAccountState) {
+    this._userAccountState = userAccountState;
   }
 
   updateUserCartState(userCartState) {
@@ -80,8 +80,8 @@ class AppStore {
     return this._userCartState.totalCount;
   }
 
-  get userSessionState() {
-    return this._userSessionState;
+  get userAccountState() {
+    return this._userAccountState;
   }
 
   get productComparisonState() {
@@ -89,9 +89,9 @@ class AppStore {
   }
 }
 
-decorate(AppStore, {
-  _userSessionState: observable,
-  updateUserSessionState: action,
+decorate(StoreService, {
+  _userAccountState: observable,
+  updateUserAccountState: action,
 
   _userCartState: observable,
   updateUserCartState: action,
@@ -102,6 +102,6 @@ decorate(AppStore, {
   clearProductComparisonState: action,
 });
 
-const appStore = new AppStore();
+const storeService = new StoreService();
 
-export default appStore;
+export default storeService;

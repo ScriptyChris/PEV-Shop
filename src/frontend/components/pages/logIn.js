@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import apiService from '../../features/apiService';
-import { startSession } from '../../features/userSessionAPI';
+import userSessionService from '../../features/userSessionService';
 
 const translations = Object.freeze({
   logInHeader: 'Login to shop',
@@ -28,12 +27,10 @@ export default function LogIn() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    apiService.loginUser({ login: userLogin, password: userPassword }).then((res) => {
+    userSessionService.logIn({ login: userLogin, password: userPassword }).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
-
-      startSession(res);
 
       /*
         TODO: [UX] redirect to the page where user was before logging in 

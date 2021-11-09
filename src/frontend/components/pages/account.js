@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useHistory, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
-import appStore from '../../features/appStore';
-import apiService from '../../features/apiService';
+import storeService from '../../features/storeService';
+import httpService from '../../features/httpService';
 import { SetNewPassword } from '../views/password';
-import { USER_ACCOUNT_STATE } from '../../features/storageApi';
-import { endSession } from '../../features/userSessionAPI';
+import storageService from '../../features/storageService';
+import userSessionService from '../../features/userSessionService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import ProductItem from '../views/productItem';
 
@@ -35,17 +35,17 @@ function UserProfile({ initialUserData }) {
     console.log('(UserData useEffect) initialUserData:', initialUserData);
 
     if (initialUserData) {
-      USER_ACCOUNT_STATE.updateStorage(initialUserData);
+      storageService.userAccount.update(initialUserData);
       setUserData(initialUserData);
-    } else if (USER_ACCOUNT_STATE.getFromStorage()) {
-      setUserData(USER_ACCOUNT_STATE.getFromStorage());
+    } else if (storageService.userAccount.get()) {
+      setUserData(storageService.userAccount.get());
     } else {
-      apiService.getUser().then((res) => {
+      httpService.getUser().then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         }
 
-        USER_ACCOUNT_STATE.updateStorage(res);
+        storageService.userAccount.update(res);
         setUserData(res);
       });
     }
@@ -105,27 +105,23 @@ function Security() {
 
   useEffect(() => {
     if (typeof logOutFromSessionsConfirmation === 'boolean' && typeof shouldPreserveCurrentSession === 'boolean') {
-      apiService
-        .disableGenericErrorHandler()
-        .logOutUserFromSessions(shouldPreserveCurrentSession)
-        .then((res) => {
-          if (res.__EXCEPTION_ALREADY_HANDLED) {
-            return;
-          } else if (shouldPreserveCurrentSession) {
-            setShouldPreserveCurrentSession(null);
-            setLogOutFromSessionsConfirmation(null);
-            setPopupData({
-              type: res.__ERROR_TO_HANDLE ? POPUP_TYPES.FAILURE : POPUP_TYPES.SUCCESS,
-              message: res.__ERROR_TO_HANDLE
-                ? translations.logOutFromOtherSessionsFailedMsg
-                : translations.logOutFromOtherSessionsSuccessMsg,
-              buttons: [getClosePopupBtn(setPopupData)],
-            });
-          } else {
-            endSession();
-            history.replace('/');
-          }
-        });
+      userSessionService.logOutFromMultipleSessions(shouldPreserveCurrentSession).then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (shouldPreserveCurrentSession) {
+          setShouldPreserveCurrentSession(null);
+          setLogOutFromSessionsConfirmation(null);
+          setPopupData({
+            type: res.__ERROR_TO_HANDLE ? POPUP_TYPES.FAILURE : POPUP_TYPES.SUCCESS,
+            message: res.__ERROR_TO_HANDLE
+              ? translations.logOutFromOtherSessionsFailedMsg
+              : translations.logOutFromOtherSessionsSuccessMsg,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        } else {
+          history.replace('/');
+        }
+      });
     }
   }, [logOutFromSessionsConfirmation, shouldPreserveCurrentSession]);
 
@@ -146,12 +142,12 @@ function Security() {
 function ObservedProducts() {
   const [observedProducts, setObservedProducts] = useState([]);
   const [canRemoveAllProducts, setCanRemoveAllProducts] = useState(
-    !!appStore.userSessionState?.observedProductsIDs?.length
+    !!storeService.userAccountState?.observedProductsIDs?.length
   );
   const [popupData, setPopupData] = useState(null);
 
   useEffect(() => {
-    apiService.getObservedProducts().then((res) => {
+    httpService.getObservedProducts().then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
@@ -161,7 +157,7 @@ function ObservedProducts() {
   }, []);
 
   const removeAll = () => {
-    apiService
+    httpService
       .disableGenericErrorHandler()
       .removeAllProductsFromObserved()
       .then((res) => {
@@ -176,8 +172,8 @@ function ObservedProducts() {
         } else {
           setCanRemoveAllProducts(false);
           setObservedProducts(res);
-          appStore.updateUserSessionState({
-            ...appStore.userSessionState,
+          storeService.updateUserAccountState({
+            ...storeService.userAccountState,
             observedProducts: res,
           });
         }
@@ -274,13 +270,3 @@ export default function Account() {
     </section>
   );
 }
-
-export const logOutUser = (history) =>
-  apiService.logoutUser().then((res) => {
-    if (res.__EXCEPTION_ALREADY_HANDLED) {
-      return;
-    }
-
-    endSession();
-    history.replace('/');
-  });

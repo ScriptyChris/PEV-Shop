@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import appStore from '../../features/appStore';
-import { restoreSession } from '../../features/userSessionAPI';
+import storeService from '../../features/storeService';
+import userSessionService from '../../features/userSessionService';
 
 import Home from '../pages/home';
 import Shop from '../pages/shop';
@@ -19,7 +19,7 @@ import { SetNewPassword, ResetPassword } from '../views/password';
 import { GenericErrorPopup } from '../utils/popup';
 
 export default observer(function Main() {
-  useEffect(restoreSession, []);
+  useEffect(userSessionService.restoreSession, []);
 
   return (
     <main className="main">
@@ -59,9 +59,9 @@ export default observer(function Main() {
         </Route>
         <Route path="/account">
           {
-            /* TODO: [BUG] show loader for the time `appStore.userSessionState` is updated by MobX 
+            /* TODO: [BUG] show loader for the time `storeService.userAccountState` is updated by MobX 
             to prevent redirecting when user indeed has session */
-            appStore.userSessionState ? <Account /> : <Redirect to="/not-logged-in" />
+            storeService.userAccountState ? <Account /> : <Redirect to="/not-logged-in" />
           }
         </Route>
         <Route path="/order">

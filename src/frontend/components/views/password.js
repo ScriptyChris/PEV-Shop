@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import FormFieldError from '../utils/formFieldError';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 
 const translations = Object.freeze({
@@ -69,11 +69,11 @@ function ResetPassword() {
 
   // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time
   const resendResetPassword = (email) => {
-    apiService.resendResetPassword(email);
+    httpService.resendResetPassword(email);
   };
 
   const onSubmitHandler = (values) => {
-    apiService
+    httpService
       .disableGenericErrorHandler()
       .resetPassword(values.email)
       .then((res) => {
@@ -163,7 +163,7 @@ function SetNewPassword({ contextType }) {
 
   const onSubmitHandler = (values) => {
     if (contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN) {
-      apiService
+      httpService
         .disableGenericErrorHandler()
         .changePassword(values.currentPassword, values.newPassword)
         .then((res) => {
@@ -185,7 +185,7 @@ function SetNewPassword({ contextType }) {
           }
         });
     } else if (urlToken) {
-      apiService
+      httpService
         .disableGenericErrorHandler()
         .setNewPassword(values.newPassword, urlToken)
         .then((res) => {

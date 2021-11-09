@@ -1,8 +1,8 @@
 import { Link, useHistory } from 'react-router-dom';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import appStore from '../../features/appStore';
-import { logOutUser } from '../pages/account';
+import storeService from '../../features/storeService';
+import userSessionService from '../../features/userSessionService';
 
 const translations = Object.freeze({
   start: 'Start',
@@ -17,6 +17,16 @@ const translations = Object.freeze({
 
 export default observer(function Nav() {
   const history = useHistory();
+
+  const logOutUser = () => {
+    userSessionService.logOut().then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
+
+      history.replace('/');
+    });
+  };
 
   return (
     <nav className="nav">
@@ -34,8 +44,8 @@ export default observer(function Nav() {
           <Link to="/modify-product">{translations.modifyProduct}</Link>
         </li>
         <li>
-          {appStore.userSessionState ? (
-            <Link to="/" onClick={() => logOutUser(history)}>
+          {storeService.userAccountState ? (
+            <Link to="/" onClick={logOutUser}>
               {translations.logOut}
             </Link>
           ) : (
@@ -43,7 +53,7 @@ export default observer(function Nav() {
           )}
         </li>
         <li>
-          {appStore.userSessionState ? (
+          {storeService.userAccountState ? (
             <Link to="/account">{translations.account}</Link>
           ) : (
             <Link to="/register">{translations.register}</Link>

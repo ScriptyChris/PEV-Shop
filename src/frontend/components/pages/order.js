@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect } from 'react';
-import appStore from '../../features/appStore';
-import apiService from '../../features/apiService';
+import storeService from '../../features/storeService';
+import httpService from '../../features/httpService';
 
 const translations = Object.freeze({
   payForOrder: 'Pay!',
@@ -34,12 +34,12 @@ const Shipment = memo(function Shipment({ updateChosenShipmentPoint }) {
 export default function Order() {
   const [chosenShipmentPoint, setChosenShipmentPoint] = useState(null);
   const payForOrder = () => {
-    apiService.submitCart(appStore.userCartProducts).then((res) => {
+    httpService.submitCart(storeService.userCartProducts).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      appStore.clearUserCartState();
+      storeService.clearUserCartState();
       window.location = res.redirectUri;
     });
   };

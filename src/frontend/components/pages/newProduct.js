@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Formik, Field, ErrorMessage } from 'formik';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 import productSpecsService from '../../features/productSpecsService';
 import { CategoriesTreeFormField } from '../views/categoriesTree';
 import FormFieldError from '../utils/formFieldError';
@@ -600,7 +600,7 @@ ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 
 
 const NewProduct = () => {
   const doSubmit = (newProductData) =>
-    apiService.addProduct(newProductData).then((res) => {
+    httpService.addProduct(newProductData).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
@@ -654,7 +654,7 @@ const ModifyProduct = () => {
 
   useEffect(() => {
     // TODO: implement `getProductByName` method instead of (or along with) `getProduct[ById]`
-    apiService.getProductsByNames([productName]).then((res) => {
+    httpService.getProductsByNames([productName]).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
@@ -682,7 +682,7 @@ const ModifyProduct = () => {
     if (changedFields.length) {
       setModificationError(false);
 
-      return apiService.modifyProduct(values.name, Object.fromEntries(changedFields)).then((res) => {
+      return httpService.modifyProduct(values.name, Object.fromEntries(changedFields)).then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         }

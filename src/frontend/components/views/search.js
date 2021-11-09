@@ -1,5 +1,5 @@
 import React, { memo, useRef, createRef, useState, useEffect } from 'react';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 
 const translations = {
   defaultLabel: 'Search for:',
@@ -71,7 +71,7 @@ function SearchProductsByName(props) {
         }
       : null;
 
-    apiService.getProductsByName(searchValue, isCaseSensitive, pagination).then((res) => {
+    httpService.getProductsByName(searchValue, isCaseSensitive, pagination).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
@@ -118,7 +118,7 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
         const products = (
           newSearchValueContainsOld
             ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
-            : (await apiService.getProductsByName(searchRecentValues.newValue, false, null))
+            : (await httpService.getProductsByName(searchRecentValues.newValue, false, null))
                 .then((res) => {
                   if (res.__EXCEPTION_ALREADY_HANDLED) {
                     return;

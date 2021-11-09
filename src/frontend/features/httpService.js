@@ -30,7 +30,7 @@ class Ajax {
   }
 
   _getAuthHeader() {
-    return `Bearer ${this.getAuthToken()}`;
+    return `Bearer ${this.getAuthToken() || ''}`;
   }
 
   getAuthToken() {
@@ -76,12 +76,12 @@ class Ajax {
           throw body.exception;
         }
 
-        return body.payload || body.message;
+        return body.payload || body.message || {};
       })
       .catch((exception) => {
         console.error('(_fetchBaseHandler) caught an error:', exception);
 
-        return apiServiceSubscriber.callSubscribers(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, exception);
+        return httpServiceSubscriber.callSubscribers(httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, exception);
       });
 
     this._enableGenericErrorHandler();
@@ -156,7 +156,7 @@ class Ajax {
   }
 }
 
-const apiService = new (class ApiService extends Ajax {
+const httpService = new (class HttpService extends Ajax {
   constructor() {
     super();
 
@@ -318,7 +318,7 @@ const apiService = new (class ApiService extends Ajax {
   }
 })();
 
-const apiServiceSubscriber = (() => {
+const httpServiceSubscriber = (() => {
   const _subscribers = {
     EXCEPTION: null,
   };
@@ -348,6 +348,6 @@ const apiServiceSubscriber = (() => {
   };
 })();
 
-export { apiServiceSubscriber };
+export { httpServiceSubscriber };
 
-export default apiService;
+export default httpService;
