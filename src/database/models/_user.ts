@@ -55,7 +55,7 @@ const userSchema = new Schema<IUser>({
     required: true,
     default: false,
   },
-  observedProducts: {
+  observedProductsIDs: {
     type: [Schema.Types.ObjectId],
     default: undefined,
   },
@@ -83,16 +83,16 @@ userSchema.virtual('roleName', {
 
 userSchema.methods.generateAuthToken = async function (): Promise<string> {
   const user = this as IUser;
-  const token = getToken({ _id: user._id });
+  const authToken = getToken({ _id: user._id });
 
   if (!user.tokens.auth) {
     user.tokens.auth = [];
   }
 
-  user.tokens.auth.push(token);
+  user.tokens.auth.push(authToken);
   await user.save();
 
-  return token;
+  return authToken;
 };
 
 userSchema.methods.toJSON = function (): IUserPublic {
@@ -101,7 +101,7 @@ userSchema.methods.toJSON = function (): IUserPublic {
   return {
     login: user.login,
     email: user.email,
-    observedProducts: user.observedProducts,
+    observedProductsIDs: user.observedProductsIDs || [],
   };
 };
 
@@ -132,12 +132,12 @@ userSchema.methods.addProductToObserved = function (productId: string): string {
   const user = this as IUser;
   const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
 
-  if (!user.observedProducts) {
-    user.observedProducts = [productObjectId];
-  } else if (user.observedProducts.includes(productObjectId)) {
+  if (!user.observedProductsIDs) {
+    user.observedProductsIDs = [productObjectId];
+  } else if (user.observedProductsIDs.includes(productObjectId)) {
     return 'Product is already observed by user!';
   } else {
-    user.observedProducts.push(productObjectId);
+    user.observedProductsIDs.push(productObjectId);
   }
 
   return '';
@@ -147,35 +147,35 @@ userSchema.methods.removeProductFromObserved = function (productId: string): str
   const user = this as IUser;
   const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
 
-  if (!user.observedProducts || !user.observedProducts.includes(productObjectId)) {
+  if (!user.observedProductsIDs || !user.observedProductsIDs.includes(productObjectId)) {
     return 'Product was not observed by user!';
   }
 
-  const lengthBeforeRemoval = user.observedProducts.length;
-  user.observedProducts = user.observedProducts.filter(
+  const lengthBeforeRemoval = user.observedProductsIDs.length;
+  user.observedProductsIDs = user.observedProductsIDs.filter(
     (observedProductId) => observedProductId.toString() !== productObjectId.toString()
   ) as [Schema.Types.ObjectId];
 
-  if (lengthBeforeRemoval - 1 === user.observedProducts.length) {
-    if (user.observedProducts.length === 0) {
-      user.observedProducts = undefined;
+  if (lengthBeforeRemoval - 1 === user.observedProductsIDs.length) {
+    if (user.observedProductsIDs.length === 0) {
+      user.observedProductsIDs = undefined;
     }
 
     return '';
   }
 
   return `Product observation was either not removed or there were multiple observations for same product! 
-  Number of observed products before removing: ${lengthBeforeRemoval}; after: ${user.observedProducts.length}.`;
+  Number of observed products before removing: ${lengthBeforeRemoval}; after: ${user.observedProductsIDs.length}.`;
 };
 
 userSchema.methods.removeAllProductsFromObserved = function (): string {
   const user = this as IUser;
 
-  if (!user.observedProducts) {
+  if (!user.observedProductsIDs) {
     return 'No product was observed by user!';
   }
 
-  user.observedProducts = undefined;
+  user.observedProductsIDs = undefined;
 
   return '';
 };
@@ -215,7 +215,7 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
 
 const UserModel = model<IUser, IUserStatics>('User', userSchema);
 
-type IUserPublic = Pick<IUser, 'login' | 'email' | 'observedProducts'>;
+type IUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>;
 
 interface IUserStatics extends Model<IUser> {
   validatePassword(password: any): string;
@@ -227,7 +227,7 @@ export interface IUser extends Document {
   email: string;
   accountType: typeof ACCOUNT_TYPES[number];
   isConfirmed: boolean;
-  observedProducts: Schema.Types.ObjectId[] | undefined;
+  observedProductsIDs: Schema.Types.ObjectId[] | undefined;
   tokens: {
     auth: string[] | undefined;
     confirmRegistration: string | undefined;

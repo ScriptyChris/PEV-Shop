@@ -311,7 +311,9 @@ export default function ProductDetails({ product }) {
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
   const [popupData, setPopupData] = useState(null);
   const [isProductObserved, setIsProductObserved] = useState(
-    !!appStore.userSessionState?.observedProducts.some((observedProduct) => observedProduct._id === product._id)
+    (appStore.userSessionState?.observedProductsIDs || []).some(
+      (observedProductID) => observedProductID === product._id
+    )
   );
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
@@ -356,7 +358,7 @@ export default function ProductDetails({ product }) {
       .then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
-        } else if (res.__IS_OK_WITHOUT_CONTENT) {
+        } else if (res.__NO_CONTENT) {
           setPopupData({
             type: POPUP_TYPES.SUCCESS,
             message: 'Product successfully deleted!',
@@ -413,7 +415,7 @@ export default function ProductDetails({ product }) {
         } else {
           appStore.updateUserSessionState({
             ...appStore.userSessionState,
-            observedProducts: res,
+            observedProductsIDs: res,
           });
           setIsProductObserved(!isProductObserved);
         }

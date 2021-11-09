@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Redirect, Link } from 'react-router-dom';
-import appStore from '../../features/appStore';
+import { Link, useHistory } from 'react-router-dom';
 import apiService from '../../features/apiService';
+import { startSession } from '../../features/userSessionAPI';
 
 const translations = Object.freeze({
   logInHeader: 'Login to shop',
@@ -15,7 +15,7 @@ const translations = Object.freeze({
 export default function LogIn() {
   const [userLogin, setUserLogin] = useState('');
   const [userPassword, setUserPassword] = useState('');
-  const [loggedInUserData, setLoggedInUserData] = useState(null);
+  const history = useHistory();
 
   const onInputChange = ({ target }) => {
     if (target.id === 'login') {
@@ -33,8 +33,13 @@ export default function LogIn() {
         return;
       }
 
-      appStore.updateUserSessionState(res /* USER_SESSION_STATES.LOGGED_IN */);
-      setLoggedInUserData(res);
+      startSession(res);
+
+      /*
+        TODO: [UX] redirect to the page where user was before logging in 
+        OR just close/fold the form, if it is presented as a aside/sticky panel
+      */
+      history.push('/');
     });
   };
 
@@ -77,15 +82,6 @@ export default function LogIn() {
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}
       {/* TODO: [UX] if User credentials are invalid, show regarding info instead of redirecting to /account  */}
-
-      {loggedInUserData && (
-        <Redirect
-          to={{
-            pathname: '/account',
-            state: { loggedInUserData },
-          }}
-        />
-      )}
     </section>
   );
 }

@@ -1,6 +1,6 @@
 interface IEmbracedResponse {
-  // TODO: [TS] 'token' could be restricted to only be paired with 'payload' prop
-  token: string;
+  // TODO: [REFACTOR] 'authToken' could be always paired with 'payload' prop or be contained by it
+  authToken: string | null;
   payload: Record<string, unknown> | unknown[];
   message: string;
   error: string;

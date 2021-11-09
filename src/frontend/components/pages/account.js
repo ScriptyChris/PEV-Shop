@@ -4,6 +4,7 @@ import appStore from '../../features/appStore';
 import apiService from '../../features/apiService';
 import { SetNewPassword } from '../views/password';
 import { USER_ACCOUNT_STATE } from '../../features/storageApi';
+import { endSession } from '../../features/userSessionAPI';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import ProductItem from '../views/productItem';
 
@@ -76,7 +77,7 @@ function UserProfile({ initialUserData }) {
 
 function Security() {
   const [popupData, setPopupData] = useState(null);
-  const [shouldPreseveCurrentSession, setShouldPreseveCurrentSession] = useState(null);
+  const [shouldPreserveCurrentSession, setShouldPreserveCurrentSession] = useState(null);
   const [logOutFromSessionsConfirmation, setLogOutFromSessionsConfirmation] = useState(null);
   const history = useHistory();
 
@@ -90,7 +91,7 @@ function Security() {
         {
           text: translations.confirm,
           onClick: () => {
-            setShouldPreseveCurrentSession(preseveCurrentSession);
+            setShouldPreserveCurrentSession(preseveCurrentSession);
             setLogOutFromSessionsConfirmation(true);
           },
         },
@@ -103,15 +104,15 @@ function Security() {
   };
 
   useEffect(() => {
-    if (typeof logOutFromSessionsConfirmation === 'boolean' && typeof shouldPreseveCurrentSession === 'boolean') {
+    if (typeof logOutFromSessionsConfirmation === 'boolean' && typeof shouldPreserveCurrentSession === 'boolean') {
       apiService
         .disableGenericErrorHandler()
-        .logOutUserFromSessions(shouldPreseveCurrentSession)
+        .logOutUserFromSessions(shouldPreserveCurrentSession)
         .then((res) => {
           if (res.__EXCEPTION_ALREADY_HANDLED) {
             return;
-          } else if (shouldPreseveCurrentSession) {
-            setShouldPreseveCurrentSession(null);
+          } else if (shouldPreserveCurrentSession) {
+            setShouldPreserveCurrentSession(null);
             setLogOutFromSessionsConfirmation(null);
             setPopupData({
               type: res.__ERROR_TO_HANDLE ? POPUP_TYPES.FAILURE : POPUP_TYPES.SUCCESS,
@@ -121,12 +122,12 @@ function Security() {
               buttons: [getClosePopupBtn(setPopupData)],
             });
           } else {
-            appStore.updateUserSessionState(null);
+            endSession();
             history.replace('/');
           }
         });
     }
-  }, [logOutFromSessionsConfirmation, shouldPreseveCurrentSession]);
+  }, [logOutFromSessionsConfirmation, shouldPreserveCurrentSession]);
 
   return (
     <div className="account__menu-tab">
@@ -143,11 +144,21 @@ function Security() {
 }
 
 function ObservedProducts() {
-  const [observedProducts, setObservedProducts] = useState(appStore.userSessionState?.observedProducts);
+  const [observedProducts, setObservedProducts] = useState([]);
   const [canRemoveAllProducts, setCanRemoveAllProducts] = useState(
-    !!appStore.userSessionState?.observedProducts.length
+    !!appStore.userSessionState?.observedProductsIDs?.length
   );
   const [popupData, setPopupData] = useState(null);
+
+  useEffect(() => {
+    apiService.getObservedProducts().then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
+
+      setObservedProducts(res);
+    });
+  }, []);
 
   const removeAll = () => {
     apiService
@@ -164,7 +175,7 @@ function ObservedProducts() {
           });
         } else {
           setCanRemoveAllProducts(false);
-          setObservedProducts(null);
+          setObservedProducts(res);
           appStore.updateUserSessionState({
             ...appStore.userSessionState,
             observedProducts: res,
@@ -183,7 +194,7 @@ function ObservedProducts() {
       </div>
 
       <ol className="account__menu-tab observed-products-list">
-        {observedProducts
+        {observedProducts.length
           ? observedProducts.map((product) => (
               <li key={product.name}>
                 <ProductItem product={product} />
@@ -270,7 +281,6 @@ export const logOutUser = (history) =>
       return;
     }
 
-    appStore.updateUserSessionState(null);
-    USER_ACCOUNT_STATE.removeFromStorage();
+    endSession();
     history.replace('/');
   });

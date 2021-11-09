@@ -21,23 +21,16 @@ const logger = getLogger(module.filename);
 const router: any = Router();
 
 // feature related
-router.post(
-  '/api/users/add-product-to-observed',
-  authMiddlewareFn(getFromDB),
-  addProductToObserved,
-  getObservedProducts
-);
+router.post('/api/users/add-product-to-observed', authMiddlewareFn(getFromDB), addProductToObserved);
 router.delete(
   '/api/users/remove-product-from-observed/:productId',
   authMiddlewareFn(getFromDB),
-  removeProductFromObserved,
-  getObservedProducts
+  removeProductFromObserved
 );
 router.delete(
   '/api/users/remove-all-products-from-observed',
   authMiddlewareFn(getFromDB),
-  removeAllProductsFromObserved,
-  getObservedProducts
+  removeAllProductsFromObserved
 );
 router.get('/api/users/observed-products', authMiddlewareFn(getFromDB), getObservedProducts);
 
@@ -369,19 +362,12 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
         .json(embraceResponse({ error: 'User registration is not confirmed!' }));
     }
 
-    const token = await user.generateAuthToken();
+    const authToken = await user.generateAuthToken();
 
     return res.status(HTTP_STATUS_CODE.OK).json(
       embraceResponse({
-        payload: normalizePayloadType({
-          ...user,
-          observedProducts: await getObservedProducts(
-            { ...req, user } as TGetObservedProductsParams[0],
-            { ...res, _OMIT_HTTP: true } as TGetObservedProductsParams[1],
-            next
-          ),
-        }),
-        token,
+        payload: normalizePayloadType(user),
+        authToken,
       })
     );
   } catch (exception) {
@@ -494,7 +480,7 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 
     await req.user.save();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ message: 'Logged out!' }));
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ authToken: null }));
   } catch (exception) {
     return next(exception);
   }
@@ -520,7 +506,7 @@ async function logOutUserFromSessions(
 
     await req.user.save();
 
-    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ authToken: null }));
   } catch (exception) {
     return next(exception);
   }
@@ -566,7 +552,9 @@ async function addProductToObserved(req: Request & { user: IUser }, res: Respons
 
     await req.user.save();
 
-    return next();
+    return res
+      .status(HTTP_STATUS_CODE.OK)
+      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
   } catch (exception) {
     return next(exception);
   }
@@ -590,7 +578,9 @@ async function removeProductFromObserved(req: Request & { user: IUser }, res: Re
 
     await req.user.save();
 
-    return next();
+    return res
+      .status(HTTP_STATUS_CODE.OK)
+      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
   } catch (exception) {
     return next(exception);
   }
@@ -606,20 +596,21 @@ async function removeAllProductsFromObserved(req: Request & { user: IUser }, res
 
     await req.user.save();
 
-    return next();
+    return res
+      .status(HTTP_STATUS_CODE.OK)
+      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
   } catch (exception) {
     return next(exception);
   }
 }
 
-type TGetObservedProductsParams = Parameters<typeof getObservedProducts>;
 async function getObservedProducts(
   req: Request & { user: IUser },
   res: Response & { _OMIT_HTTP?: boolean },
   next: NextFunction
 ) {
   try {
-    if (!req.user.observedProducts) {
+    if (!req.user.observedProductsIDs) {
       const emptyObservedProductsResponse: unknown[] = [];
 
       if (res._OMIT_HTTP) {
@@ -629,7 +620,7 @@ async function getObservedProducts(
       return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: emptyObservedProductsResponse }));
     }
 
-    const observedProducts = await getFromDB({ _id: req.user.observedProducts }, 'Product');
+    const observedProducts = await getFromDB({ _id: req.user.observedProductsIDs }, 'Product');
 
     if (res._OMIT_HTTP) {
       return observedProducts;

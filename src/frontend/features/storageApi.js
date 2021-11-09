@@ -53,4 +53,17 @@ const USER_ACCOUNT_STATE = Object.freeze({
   },
 });
 
-export { USER_CART_STATE, USER_ACCOUNT_STATE };
+const USER_SESSION_STATE = Object.freeze({
+  __KEY__: 'userSessionState',
+  updateStorage(sessionState) {
+    updateStorage({ key: this.__KEY__, value: sessionState }, () => !sessionState || typeof sessionState !== 'string');
+  },
+  getFromStorage() {
+    return getFromStorage(this.__KEY__);
+  },
+  removeFromStorage() {
+    removeFromStorage(this.__KEY__);
+  },
+});
+
+export { USER_CART_STATE, USER_ACCOUNT_STATE, USER_SESSION_STATE };

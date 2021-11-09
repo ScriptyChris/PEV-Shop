@@ -2,13 +2,14 @@ class Ajax {
   constructor() {
     this._API_PATH_NAME = 'api';
     this._BASE_API_URL = `${location.origin}/${this._API_PATH_NAME}`;
-    this._AUTH_TOKEN = '';
+    this._AUTH_TOKEN = null;
     this.HTTP_METHOD_NAME = Object.freeze({
       GET: 'GET',
       PATCH: 'PATCH',
       POST: 'POST',
       DELETE: 'DELETE',
     });
+    // TODO: [DX] make it consistent with backend's enum HTTP_STATUS_CODE
     this.HTTP_RESPONSE_STATUS = Object.freeze({
       NO_CONTENT: 204,
     });
@@ -29,7 +30,15 @@ class Ajax {
   }
 
   _getAuthHeader() {
-    return `Bearer ${this._AUTH_TOKEN}`;
+    return `Bearer ${this.getAuthToken()}`;
+  }
+
+  getAuthToken() {
+    return this._AUTH_TOKEN;
+  }
+
+  setAuthToken(authToken) {
+    this._AUTH_TOKEN = authToken;
   }
 
   disableGenericErrorHandler() {
@@ -49,23 +58,25 @@ class Ajax {
     const fetchPromise = fetchResult
       .then((response) => {
         if (response.status === this.HTTP_RESPONSE_STATUS.NO_CONTENT) {
-          return { __IS_OK_WITHOUT_CONTENT: true };
+          return { __NO_CONTENT: true };
         }
 
         return response.json();
       })
       .then((body) => {
-        if (body.__IS_OK_WITHOUT_CONTENT) {
+        if (!body || typeof body !== 'object') {
+          throw `Response body is empty! body: ${body}`;
+        } else if (body.__NO_CONTENT) {
           return body;
-        } else if (body.token) {
-          this._AUTH_TOKEN = body.token;
+        } else if ('authToken' in body) {
+          this.setAuthToken(body.authToken);
         } else if (body.error) {
           throw { error: body.error, isGenericErrorHandlerActive };
         } else if (body.exception) {
           throw body.exception;
         }
 
-        return (body && body.payload) || body.message;
+        return body.payload || body.message;
       })
       .catch((exception) => {
         console.error('(_fetchBaseHandler) caught an error:', exception);

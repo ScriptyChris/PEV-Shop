@@ -70,9 +70,9 @@ const authMiddlewareFn = (
       const user = (await getFromDB(
         { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
         'User'
-      )) as IUser;
+      )) as IUser | IUser[];
 
-      if (!user) {
+      if (!user || (user as IUser[]).length === 0) {
         return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to authorize not found!' }));
       }
 
