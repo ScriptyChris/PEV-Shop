@@ -4,17 +4,12 @@ import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { PAYU_DEFAULTS } from '../helpers/payu-api';
 import { IUser } from '../../database/models/_user';
 import { HTTP_STATUS_CODE } from '../../types';
 import { embraceResponse } from '../helpers/middleware-response-wrapper';
 
 // @ts-ignore
 dotenv.default.config();
-
-if (!process.env.SECRET_KEY) {
-  process.env.SECRET_KEY = 'VeRy-SeCrEt-KeY';
-}
 
 const {
   // @ts-ignore
@@ -38,30 +33,52 @@ const hashPassword = (password: string): Promise<string> => {
 };
 
 const getToken = (payloadObj: TToken): string => {
-  return sign(payloadObj, process.env.SECRET_KEY);
+  return sign(payloadObj, process.env.TOKEN_SECRET_KEY);
 };
 
 const verifyToken = (token: string): TToken => {
-  return verify(token, process.env.SECRET_KEY) as TToken;
+  return verify(token, process.env.TOKEN_SECRET_KEY) as TToken;
 };
 
 const authMiddlewareFn = (
   getFromDB: /* TODO: [DX] correct typing */ any
 ): ((...args: any) => Promise<Pick<Response, 'json'> | void>) => {
-  return async (req: Request & { authToken: string; user: IUser }, res: Response, next: NextFunction) => {
+  return async (req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) => {
     try {
-      const authToken: string = (req.header('Authorization') as string).replace('Bearer ', '');
-      const decodedToken: TToken = verifyToken(authToken);
-      const user = (await getFromDB(
-        { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: authToken } },
-        'User'
-      )) as IUser;
+      const BEARER_TOKEN_PREFIX = 'Bearer ';
+      const authToken = req.header('Authorization');
 
-      if (!user) {
+      if (!authToken) {
+        return res
+          .status(HTTP_STATUS_CODE.BAD_REQUEST)
+          .json(embraceResponse({ error: 'Authorization token header is empty or not attached!' }));
+      } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
+        return res
+          .status(HTTP_STATUS_CODE.BAD_REQUEST)
+          .json(embraceResponse({ error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!` }));
+      }
+
+      const bearerToken = authToken.replace(BEARER_TOKEN_PREFIX, '');
+
+      if (!bearerToken) {
+        return res
+          .status(HTTP_STATUS_CODE.BAD_REQUEST)
+          .json(embraceResponse({ error: 'Auth token does not contain bearer value!' }));
+      }
+
+      const decodedToken = verifyToken(bearerToken);
+      const user = (await getFromDB(
+        { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
+        'User'
+      )) as IUser | IUser[];
+
+      if (!user || (user as IUser[]).length === 0) {
         return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to authorize not found!' }));
       }
 
-      req.user = user;
+      // TODO: [REFACTOR] normalize data returned by `getFromDB`
+      req.user = Array.isArray(user) ? user[0] : user;
+      req.token = bearerToken;
 
       return next();
     } catch (exception) {
@@ -93,8 +110,8 @@ const userRoleMiddlewareFn = (roleName: string): any => {
 };
 
 const authToPayU: () => Promise<string | Error> = (() => {
-  const clientId: string = process.env.CLIENT_ID || PAYU_DEFAULTS.CLIENT_ID;
-  const clientSecret: string = process.env.CLIENT_SECRET || PAYU_DEFAULTS.CLIENT_SECRET;
+  const clientId = process.env.PAYU_CLIENT_ID as string;
+  const clientSecret = process.env.PAYU_CLIENT_SECRET as string;
   const PAYU_AUTH_URL = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
   const options: RequestInit = {
     method: 'POST',
@@ -115,7 +132,7 @@ const authToPayU: () => Promise<string | Error> = (() => {
 
   return function getToken(): Promise<string | Error> {
     if (isTokenValid()) {
-      return Promise.resolve(((token as unknown) as IPayUToken).access_token);
+      return Promise.resolve((token as unknown as IPayUToken).access_token);
     }
 
     logger.log('authToPayU /PAYU_AUTH_URL:', PAYU_AUTH_URL, ' /options:', options);

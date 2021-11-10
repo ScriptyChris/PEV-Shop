@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { reaction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import appStore from '../../features/appStore';
+import storeService from '../../features/storeService';
 import { Link } from 'react-router-dom';
 import Scroller from '../utils/scroller';
 
@@ -13,14 +13,14 @@ const List = observer(function CompareProducts() {
   };
 
   const handleRemoveComparableProduct = (productIndex) => {
-    appStore.updateProductComparisonState({ remove: { index: productIndex } });
+    storeService.updateProductComparisonState({ remove: { index: productIndex } });
   };
 
   const handleClearCompareProducts = () => {
-    appStore.clearProductComparisonState();
+    storeService.clearProductComparisonState();
   };
 
-  return appStore.productComparisonState.length ? (
+  return storeService.productComparisonState.length ? (
     /** TODO:
      * - shrink/collapse widget to an expandable button on mobile
      * - mobile should have full width widget probably sticked to viewport's top
@@ -31,7 +31,7 @@ const List = observer(function CompareProducts() {
           selector: '.compare-products-candidates, .compare-products',
           varName: '--product-list-item-width',
         }}
-        forwardProps={{ trackedChanges: toJS(appStore.productComparisonState) }}
+        forwardProps={{ trackedChanges: toJS(storeService.productComparisonState) }}
         render={({ elementRef, forwardProps: { trackedChanges: productComparisonState } }) => (
           <div>
             <ol ref={elementRef} className="compare-products-candidates__list">
@@ -67,7 +67,7 @@ const Toggler = observer(function ToggleProductComparable({ product }) {
 
   useEffect(() =>
     reaction(
-      () => appStore.productComparisonState.some((comparableProduct) => comparableProduct._id === product._id),
+      () => storeService.productComparisonState.some((comparableProduct) => comparableProduct._id === product._id),
       (isComparable) => {
         if (isProductComparable !== isComparable) {
           setIsProductComparable(isComparable);
@@ -79,9 +79,9 @@ const Toggler = observer(function ToggleProductComparable({ product }) {
 
   const handleComparableToggle = ({ target }) => {
     if (target.checked) {
-      appStore.updateProductComparisonState({ add: product });
+      storeService.updateProductComparisonState({ add: product });
     } else {
-      appStore.updateProductComparisonState({ remove: { _id: product._id } });
+      storeService.updateProductComparisonState({ remove: { _id: product._id } });
     }
   };
 

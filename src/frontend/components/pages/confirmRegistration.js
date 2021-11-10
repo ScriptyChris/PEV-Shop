@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 
 const translations = Object.freeze({
   header: 'Registration confirmation',
@@ -45,14 +45,12 @@ export default function ConfirmRegistration() {
     const token = new URLSearchParams(searchParam).get('token');
 
     if (token) {
-      apiService
+      httpService
         .disableGenericErrorHandler()
         .confirmRegistration(token)
-        .then((res) => {
-          console.log('(confirmRegistration) res?', res);
-
-          setRegConfirmStatus(res?.isUserConfirmed ? REG_CONFIRM_STATUS.SUCCEEDED : REG_CONFIRM_STATUS.FAILED);
-        });
+        .then((res) =>
+          setRegConfirmStatus(res?.isUserConfirmed ? REG_CONFIRM_STATUS.SUCCEEDED : REG_CONFIRM_STATUS.FAILED)
+        );
     } else {
       setRegConfirmStatus(REG_CONFIRM_STATUS.FAILED);
     }

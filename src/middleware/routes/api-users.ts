@@ -19,7 +19,22 @@ const {
 const logger = getLogger(module.filename);
 
 const router: any = Router();
-router.post('/api/users/', updateUser);
+
+// feature related
+router.post('/api/users/add-product-to-observed', authMiddlewareFn(getFromDB), addProductToObserved);
+router.delete(
+  '/api/users/remove-product-from-observed/:productId',
+  authMiddlewareFn(getFromDB),
+  removeProductFromObserved
+);
+router.delete(
+  '/api/users/remove-all-products-from-observed',
+  authMiddlewareFn(getFromDB),
+  removeAllProductsFromObserved
+);
+router.get('/api/users/observed-products', authMiddlewareFn(getFromDB), getObservedProducts);
+
+// auth related
 router.post('/api/users/register', registerUser);
 router.post('/api/users/confirm-registration', confirmRegistration);
 router.post('/api/users/resend-confirm-registration', resendConfirmRegistration);
@@ -27,8 +42,14 @@ router.post('/api/users/login', logInUser);
 router.post('/api/users/reset-password', resetPassword);
 router.post('/api/users/resend-reset-password', resendResetPassword);
 router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
+router.post('/api/users/logout-all', authMiddlewareFn(getFromDB), logOutUserFromSessions);
 router.patch('/api/users/set-new-password', setNewPassword);
+router.patch('/api/users/change-password', authMiddlewareFn(getFromDB), changePassword);
+
+// general
+router.post('/api/users/', updateUser);
 router.get('/api/users/:id', authMiddlewareFn(getFromDB), getUser);
+
 router.use(getMiddlewareErrorHandler(logger));
 
 // expose functions for unit tests
@@ -37,11 +58,17 @@ router._registerUser = registerUser;
 router._confirmRegistration = confirmRegistration;
 router._resendConfirmRegistration = resendConfirmRegistration;
 router._logInUser = logInUser;
+router._changePassword = changePassword;
 router._resetPassword = resetPassword;
 router._resendResetPassword = resendResetPassword;
 router._logOutUser = logOutUser;
+router._logOutUserFromSessions = logOutUserFromSessions;
 router._setNewPassword = setNewPassword;
 router._getUser = getUser;
+router._addProductToObserved = addProductToObserved;
+router._removeProductFromObserved = removeProductFromObserved;
+router._removeAllProductsFromObserved = removeAllProductsFromObserved;
+router._getObservedProducts = getObservedProducts;
 
 export default router;
 
@@ -169,6 +196,12 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
   logger.log('(setNewPassword) req.body:', req.body);
 
   try {
+    if (!req.body || !req.body.newPassword || !req.body.token) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body or "newPassword" or "token" fields are empty!' }));
+    }
+
     const validatedPasswordMsg = UserModel.validatePassword(req.body.newPassword);
 
     if (validatedPasswordMsg !== '') {
@@ -329,9 +362,39 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
         .json(embraceResponse({ error: 'User registration is not confirmed!' }));
     }
 
-    const token = await user.generateAuthToken();
+    const authToken = await user.generateAuthToken();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user), token }));
+    return res.status(HTTP_STATUS_CODE.OK).json(
+      embraceResponse({
+        payload: normalizePayloadType(user),
+        authToken,
+      })
+    );
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function changePassword(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    logger.log('(changePassword) req.body:', req.body);
+
+    if (!req.body || !req.body.password || !req.body.newPassword) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+    }
+
+    const isPasswordMatch = await req.user.matchPassword(req.body.password);
+
+    if (!isPasswordMatch) {
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
+    }
+
+    req.user.password = await hashPassword(req.body.newPassword);
+    req.user.save();
+
+    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }
@@ -412,12 +475,38 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
     req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
 
     if (req.user.tokens.auth.length === 0) {
-      delete req.user.tokens.auth;
+      req.user.tokens.auth = undefined;
     }
 
     await req.user.save();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ message: 'Logged out!' }));
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ authToken: null }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function logOutUserFromSessions(
+  req: Request & { user: IUser; token: string },
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    if (req.body.preseveCurrentSession) {
+      if ((req.user.tokens.auth as string[]).length === 1) {
+        return res
+          .status(HTTP_STATUS_CODE.NOT_FOUND)
+          .json(embraceResponse({ error: 'Current session is the only one, so there is no other sessions to end!' }));
+      }
+
+      req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((authToken) => authToken === req.token);
+    } else {
+      req.user.tokens.auth = undefined;
+    }
+
+    await req.user.save();
+
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ authToken: null }));
   } catch (exception) {
     return next(exception);
   }
@@ -440,6 +529,104 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
     }
 
     return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user) }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function addProductToObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    logger.log('(addProductToObserved) req.body:', req.body);
+
+    if (!req.body || !req.body.productId) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request body or `productId` param are empty or not attached!' }));
+    }
+
+    const observationAdditionError = req.user.addProductToObserved(req.body.productId);
+
+    if (observationAdditionError) {
+      return res.status(HTTP_STATUS_CODE.CONFLICT).json(embraceResponse({ error: observationAdditionError }));
+    }
+
+    await req.user.save();
+
+    return res
+      .status(HTTP_STATUS_CODE.OK)
+      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function removeProductFromObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    logger.log('(removeProductFromObserved) req.params:', req.params);
+
+    if (!req.params || !req.params.productId) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .json(embraceResponse({ error: 'Request params or `productId` param are empty or not attached!' }));
+    }
+
+    const observationRemovalError = req.user.removeProductFromObserved(req.params.productId);
+
+    if (observationRemovalError) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: observationRemovalError }));
+    }
+
+    await req.user.save();
+
+    return res
+      .status(HTTP_STATUS_CODE.OK)
+      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function removeAllProductsFromObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+  try {
+    const observationsRemovalError = req.user.removeAllProductsFromObserved();
+
+    if (observationsRemovalError) {
+      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: observationsRemovalError }));
+    }
+
+    await req.user.save();
+
+    return res
+      .status(HTTP_STATUS_CODE.OK)
+      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function getObservedProducts(
+  req: Request & { user: IUser },
+  res: Response & { _OMIT_HTTP?: boolean },
+  next: NextFunction
+) {
+  try {
+    if (!req.user.observedProductsIDs) {
+      const emptyObservedProductsResponse: unknown[] = [];
+
+      if (res._OMIT_HTTP) {
+        return emptyObservedProductsResponse;
+      }
+
+      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: emptyObservedProductsResponse }));
+    }
+
+    const observedProducts = await getFromDB({ _id: req.user.observedProductsIDs }, 'Product');
+
+    if (res._OMIT_HTTP) {
+      return observedProducts;
+    }
+
+    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: observedProducts }));
   } catch (exception) {
     return next(exception);
   }

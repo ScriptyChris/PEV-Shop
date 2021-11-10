@@ -2,10 +2,11 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import ProductItem from './productItem';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import RatingWidget from '../utils/ratingWidget';
 import { getLocalizedDate } from '../../features/localization';
+import storeService from '../../features/storeService';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -18,6 +19,12 @@ const productDetailsTranslations = Object.freeze({
   relatedProducts: 'Related products',
   editProduct: 'Edit',
   deleteProduct: 'Delete',
+  promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
+  goTologIn: 'Log in',
+  observeProduct: 'Observe',
+  unObserveProduct: 'Unobserve',
+  observingProductFailed: 'Failed adding product to observed!',
+  unObservingProductFailed: 'Failed removing product from observed!',
   addReview: 'Add review',
   anonymously: 'anonymously?',
   anonymous: 'Anonymous',
@@ -41,7 +48,7 @@ function AddReview({ productName, updateReviews }) {
   };
 
   const onSubmitHandler = (values) => {
-    apiService
+    httpService
       .disableGenericErrorHandler()
       .addProductReview(productName, values)
       .then((res) => {
@@ -116,7 +123,7 @@ export function getProductDetailsHeaders() {
 }
 
 export function getProductDetailsData(product) {
-  return apiService.getProductsByNames(product.relatedProductsNames).then((res) => {
+  return httpService.getProductsByNames(product.relatedProductsNames).then((res) => {
     if (res.__EXCEPTION_ALREADY_HANDLED) {
       return;
     }
@@ -303,6 +310,12 @@ export default function ProductDetails({ product }) {
   const [productDetails, setProductDetails] = useState([]);
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
   const [popupData, setPopupData] = useState(null);
+  const [isProductObserved, setIsProductObserved] = useState(
+    (storeService.userAccountState?.observedProductsIDs || []).some(
+      (observedProductID) => observedProductID === product._id
+    )
+  );
+
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {
@@ -340,13 +353,13 @@ export default function ProductDetails({ product }) {
   };
 
   const deleteProduct = () => {
-    apiService
+    httpService
       .disableGenericErrorHandler()
       .deleteProduct(productDetails.name)
       .then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
-        } else if (res.__IS_OK_WITHOUT_CONTENT) {
+        } else if (res.__NO_CONTENT) {
           setPopupData({
             type: POPUP_TYPES.SUCCESS,
             message: 'Product successfully deleted!',
@@ -369,12 +382,56 @@ export default function ProductDetails({ product }) {
       });
   };
 
+  const toggleProductObserve = () => {
+    if (!storeService.userAccountState) {
+      return setPopupData({
+        type: POPUP_TYPES.NEUTRAL,
+        message: productDetailsTranslations.promptToLoginBeforeProductObserveToggling,
+        buttons: [
+          {
+            text: productDetailsTranslations.goTologIn,
+            onClick: () => history.push(`/log-in`),
+          },
+          getClosePopupBtn(setPopupData),
+        ],
+      });
+    }
+
+    httpService
+      .disableGenericErrorHandler() /* eslint-disable-next-line no-unexpected-multiline */
+      [isProductObserved ? 'removeProductFromObserved' : 'addProductToObserved'](product._id)
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (res.__ERROR_TO_HANDLE) {
+          const message = isProductObserved
+            ? productDetailsTranslations.unObservingProductFailed
+            : productDetailsTranslations.observingProductFailed;
+
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        } else {
+          storeService.updateUserAccountState({
+            ...storeService.userAccountState,
+            observedProductsIDs: res,
+          });
+          setIsProductObserved(!isProductObserved);
+        }
+      });
+  };
+
   return (
     <section>
       <p>
         [{productDetails.category}]: {productDetails.name}
         <button onClick={navigateToProductModify}>{productDetailsTranslations.editProduct}</button>
         <button onClick={deleteProduct}>{productDetailsTranslations.deleteProduct}</button>
+        <button onClick={toggleProductObserve}>
+          {isProductObserved ? productDetailsTranslations.unObserveProduct : productDetailsTranslations.observeProduct}
+        </button>
       </p>
 
       {getMainDetailsContent()}

@@ -1,5 +1,5 @@
-import React, { useCallback, memo, useState, useEffect } from 'react';
-import { apiServiceSubscriber } from '../../features/apiService';
+import React, { useCallback, memo, useState, useEffect, createRef } from 'react';
+import { httpServiceSubscriber } from '../../features/httpService';
 
 const POPUP_TYPES = {
   NEUTRAL: 'NEUTRAL',
@@ -57,10 +57,10 @@ const GenericErrorPopup = memo(function GenericErrorPopup() {
   }, []);
 
   useEffect(() => {
-    apiServiceSubscriber.subscribe(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
+    httpServiceSubscriber.subscribe(httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
 
     return () => {
-      apiServiceSubscriber.unSubscribe(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
+      httpServiceSubscriber.unSubscribe(httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, subscriptionHandler);
     };
   }, []);
 
@@ -91,7 +91,12 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
     );
   }
 
+  const firstBtnRef = createRef();
   const baseClassName = `popup`;
+
+  useEffect(() => {
+    firstBtnRef.current.focus();
+  }, []);
 
   return (
     <div className="popup-container">
@@ -115,8 +120,8 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
         )}
 
         <div className={`${baseClassName}__buttons`}>
-          {buttons.map((btn) => (
-            <button onClick={btn.onClick} key={btn.text}>
+          {buttons.map((btn, index) => (
+            <button onClick={btn.onClick} key={btn.text} ref={index === 0 ? firstBtnRef : null}>
               {btn.text}
             </button>
           ))}

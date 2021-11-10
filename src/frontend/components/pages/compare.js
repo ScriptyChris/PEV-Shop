@@ -1,6 +1,6 @@
 import { toJS } from 'mobx';
 import React, { useState, useRef, createRef, useEffect, useCallback } from 'react';
-import appStore from '../../features/appStore';
+import storeService from '../../features/storeService';
 import { getProductDetailsData, prepareSpecificProductDetail, getProductDetailsHeaders } from '../views/productDetails';
 import Scroller from '../utils/scroller';
 import { ProductItemLink } from '../views/productItem';
@@ -62,7 +62,7 @@ export default function Compare() {
 
               {detailHeader === 'name' && (
                 <ProductItemLink
-                  productData={toJS(appStore.productComparisonState[dataIndex], { recurseEverything: true })}
+                  productData={toJS(storeService.productComparisonState[dataIndex], { recurseEverything: true })}
                 />
               )}
             </div>
@@ -127,7 +127,7 @@ export default function Compare() {
     );
     let nameHeaderIndex = productDetailsHeadersKeys.findIndex((headerName) => headerName.toLowerCase() === 'name');
     const comparableProductsData = await Promise.all(
-      appStore.productComparisonState.map((product) => getProductDetailsData(product))
+      storeService.productComparisonState.map((product) => getProductDetailsData(product))
     );
 
     const [nameHeader] = productDetailsHeadersKeys.splice(nameHeaderIndex, 1);

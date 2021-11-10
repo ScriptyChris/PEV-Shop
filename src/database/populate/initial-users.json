@@ -1,0 +1,16 @@
+[
+  {
+    "login": "test client",
+    "password": "password",
+    "email": "test_client@example.org",
+    "accountType": "client",
+    "isConfirmed": true
+  },
+  {
+    "login": "test retailer",
+    "password": "password",
+    "email": "test_retailer@example.org",
+    "accountType": "retailer",
+    "isConfirmed": true
+  }
+]

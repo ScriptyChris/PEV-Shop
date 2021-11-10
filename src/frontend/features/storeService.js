@@ -1,25 +1,27 @@
 import { observable, decorate, action } from 'mobx';
 
-const USER_SESSION_STATES = Object.freeze({
-  LOGGED_IN: 'LOGGED_IN',
-  LOGGED_OUT: 'LOGGED_OUT',
-});
-
 const USER_CART_STATE = Object.freeze({
   totalPrice: 0,
   totalCount: 0,
   products: [],
 });
 
-class AppStore {
+const INITIAL_USER_ACCOUNT_STATE = null;
+
+class StoreService {
   constructor() {
-    this._userSessionState = USER_SESSION_STATES.LOGGED_OUT;
+    // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's IUserPublic
+    this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
     this._userCartState = { ...USER_CART_STATE };
     this._productComparisonState = [];
   }
 
-  updateUserSessionState(userSessionState) {
-    this._userSessionState = userSessionState;
+  updateUserAccountState(userAccountState) {
+    this._userAccountState = userAccountState;
+  }
+
+  clearUserAccountState() {
+    this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
   }
 
   updateUserCartState(userCartState) {
@@ -52,7 +54,7 @@ class AppStore {
   }
 
   updateProductComparisonState({ add, remove }) {
-    console.log('updateProductComparisonState() /add:', add, ' /remove:', remove);
+    console.log('(updateProductComparisonState) /add:', add, ' /remove:', remove);
 
     if (add) {
       this._productComparisonState.push(add);
@@ -84,8 +86,8 @@ class AppStore {
     return this._userCartState.totalCount;
   }
 
-  get userSessionState() {
-    return this._userSessionState;
+  get userAccountState() {
+    return this._userAccountState;
   }
 
   get productComparisonState() {
@@ -93,9 +95,10 @@ class AppStore {
   }
 }
 
-decorate(AppStore, {
-  _userSessionState: observable,
-  updateUserSessionState: action,
+decorate(StoreService, {
+  _userAccountState: observable,
+  updateUserAccountState: action,
+  clearUserAccountState: action,
 
   _userCartState: observable,
   updateUserCartState: action,
@@ -106,8 +109,6 @@ decorate(AppStore, {
   clearProductComparisonState: action,
 });
 
-const appStore = new AppStore();
+const storeService = new StoreService();
 
-export { USER_SESSION_STATES };
-
-export default appStore;
+export default storeService;

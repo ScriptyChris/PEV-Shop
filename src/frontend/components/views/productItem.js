@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import appStore from '../../features/appStore';
+import storeService from '../../features/storeService';
 import CompareProduct from './compareProducts';
 
 const translations = {
@@ -31,7 +31,7 @@ export default function ProductItem({ product }) {
   const { name, price, _id } = product;
 
   const handleAddToCartClick = () => {
-    appStore.updateUserCartState({ name, price, _id });
+    storeService.updateUserCartState({ name, price, _id });
   };
 
   return (

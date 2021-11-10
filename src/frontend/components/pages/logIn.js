@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Redirect, Link } from 'react-router-dom';
-import appStore, { USER_SESSION_STATES } from '../../features/appStore';
-import apiService from '../../features/apiService';
+import { Link, useHistory } from 'react-router-dom';
+import userSessionService from '../../features/userSessionService';
 
 const translations = Object.freeze({
   logInHeader: 'Login to shop',
@@ -15,7 +14,7 @@ const translations = Object.freeze({
 export default function LogIn() {
   const [userLogin, setUserLogin] = useState('');
   const [userPassword, setUserPassword] = useState('');
-  const [loggedInUserData, setLoggedInUserData] = useState(null);
+  const history = useHistory();
 
   const onInputChange = ({ target }) => {
     if (target.id === 'login') {
@@ -28,22 +27,22 @@ export default function LogIn() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    console.warn('userLogin:', userLogin, ' /userPassword:', userPassword);
-
-    apiService.loginUser({ login: userLogin, password: userPassword }).then((res) => {
-      console.log('login res: ', res);
-
+    userSessionService.logIn({ login: userLogin, password: userPassword }).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      setLoggedInUserData(res);
-      appStore.updateUserSessionState(USER_SESSION_STATES.LOGGED_IN);
+      /*
+        TODO: [UX] redirect to the page where user was before logging in 
+        OR just close/fold the form, if it is presented as a aside/sticky panel
+      */
+      history.push('/');
     });
   };
 
   return (
     <section>
+      {/* TODO: [REFACTOR] use <Formik /> */}
       <form onSubmit={handleSubmit}>
         <fieldset>
           <legend>
@@ -55,6 +54,7 @@ export default function LogIn() {
             <input id="login" type="text" value={userLogin} onChange={onInputChange} required />
           </div>
 
+          {/* TODO: [REFACTOR] use `recoverAccount.PasswordField` component */}
           <div>
             <label htmlFor="password">{translations.passwordField}</label>
             <input
@@ -79,15 +79,6 @@ export default function LogIn() {
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}
       {/* TODO: [UX] if User credentials are invalid, show regarding info instead of redirecting to /account  */}
-
-      {loggedInUserData && (
-        <Redirect
-          to={{
-            pathname: '/account',
-            state: { data: loggedInUserData },
-          }}
-        />
-      )}
     </section>
   );
 }

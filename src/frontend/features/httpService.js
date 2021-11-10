@@ -2,13 +2,14 @@ class Ajax {
   constructor() {
     this._API_PATH_NAME = 'api';
     this._BASE_API_URL = `${location.origin}/${this._API_PATH_NAME}`;
-    this._AUTH_TOKEN = '';
+    this._AUTH_TOKEN = null;
     this.HTTP_METHOD_NAME = Object.freeze({
       GET: 'GET',
       PATCH: 'PATCH',
       POST: 'POST',
       DELETE: 'DELETE',
     });
+    // TODO: [DX] make it consistent with backend's enum HTTP_STATUS_CODE
     this.HTTP_RESPONSE_STATUS = Object.freeze({
       NO_CONTENT: 204,
     });
@@ -29,7 +30,15 @@ class Ajax {
   }
 
   _getAuthHeader() {
-    return `Bearer ${this._AUTH_TOKEN}`;
+    return `Bearer ${this.getAuthToken() || ''}`;
+  }
+
+  getAuthToken() {
+    return this._AUTH_TOKEN;
+  }
+
+  setAuthToken(authToken) {
+    this._AUTH_TOKEN = authToken;
   }
 
   disableGenericErrorHandler() {
@@ -49,26 +58,30 @@ class Ajax {
     const fetchPromise = fetchResult
       .then((response) => {
         if (response.status === this.HTTP_RESPONSE_STATUS.NO_CONTENT) {
-          return { __IS_OK_WITHOUT_CONTENT: true };
+          return { __NO_CONTENT: true };
         }
 
         return response.json();
       })
       .then((body) => {
-        if (body.token) {
-          this._AUTH_TOKEN = body.token;
+        if (!body || typeof body !== 'object') {
+          throw `Response body is empty! body: ${body}`;
+        } else if (body.__NO_CONTENT) {
+          return body;
+        } else if ('authToken' in body) {
+          this.setAuthToken(body.authToken);
         } else if (body.error) {
           throw { error: body.error, isGenericErrorHandlerActive };
         } else if (body.exception) {
           throw body.exception;
         }
 
-        return body && (body.payload || body.message);
+        return body.payload || body.message || {};
       })
       .catch((exception) => {
         console.error('(_fetchBaseHandler) caught an error:', exception);
 
-        return apiServiceSubscriber.callSubscribers(apiServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, exception);
+        return httpServiceSubscriber.callSubscribers(httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, exception);
       });
 
     this._enableGenericErrorHandler();
@@ -143,7 +156,7 @@ class Ajax {
   }
 }
 
-const apiService = new (class ApiService extends Ajax {
+const httpService = new (class HttpService extends Ajax {
   constructor() {
     super();
 
@@ -180,7 +193,6 @@ const apiService = new (class ApiService extends Ajax {
 
     if (productsFilters && productsFilters.length) {
       searchParams.append('productsFilters', productsFilters);
-      console.log('??? searchParams:', [...searchParams]);
     }
 
     return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
@@ -265,6 +277,10 @@ const apiService = new (class ApiService extends Ajax {
     return this.postRequest(`${this.USERS_URL}/logout`, null, true);
   }
 
+  logOutUserFromSessions(preseveCurrentSession = false) {
+    return this.postRequest(`${this.USERS_URL}/logout-all`, { preseveCurrentSession }, true);
+  }
+
   registerUser(registrationData) {
     return this.postRequest(`${this.USERS_URL}/register`, registrationData);
   }
@@ -280,9 +296,29 @@ const apiService = new (class ApiService extends Ajax {
   setNewPassword(newPassword, token) {
     return this.patchRequest(`${this.USERS_URL}/set-new-password`, { newPassword, token });
   }
+
+  changePassword(password, newPassword) {
+    return this.patchRequest(`${this.USERS_URL}/change-password`, { password, newPassword }, true);
+  }
+
+  addProductToObserved(productId) {
+    return this.postRequest(`${this.USERS_URL}/add-product-to-observed`, { productId }, true);
+  }
+
+  removeProductFromObserved(productId) {
+    return this.deleteRequest(`${this.USERS_URL}/remove-product-from-observed/${productId}`, true);
+  }
+
+  removeAllProductsFromObserved() {
+    return this.deleteRequest(`${this.USERS_URL}/remove-all-products-from-observed`, true);
+  }
+
+  getObservedProducts() {
+    return this.getRequest(`${this.USERS_URL}/observed-products`, true);
+  }
 })();
 
-const apiServiceSubscriber = (() => {
+const httpServiceSubscriber = (() => {
   const _subscribers = {
     EXCEPTION: null,
   };
@@ -312,6 +348,6 @@ const apiServiceSubscriber = (() => {
   };
 })();
 
-export { apiServiceSubscriber };
+export { httpServiceSubscriber };
 
-export default apiService;
+export default httpService;

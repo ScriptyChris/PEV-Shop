@@ -132,7 +132,7 @@ const productSchema: mongooseModule.Schema = new Schema({
 });
 productSchema.pre('validate', function (next: () => void) {
   // @ts-ignore: implicit this
-  const document = (this as unknown) as Document & Schema.methods;
+  const document = this as unknown as Document & Schema.methods;
   document.prepareUrlFieldBasedOnNameField();
 
   next();

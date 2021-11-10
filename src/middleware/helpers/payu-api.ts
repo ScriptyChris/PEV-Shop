@@ -31,11 +31,6 @@ function getTotalPrice(products: IProductInOrder[]) {
   return products.reduce((sum: number, { unitPrice, quantity }) => sum + unitPrice * quantity, 0);
 }
 
-export enum PAYU_DEFAULTS {
-  CLIENT_ID = '300746',
-  CLIENT_SECRET = '2ee86a66e5d97e3fadc400c9f19b065d',
-}
-
 export function getOrderBody(products: IProductInOrder[], payMethod: Partial<IPayByLinkMethod>) {
   const host: string = process.env.NODE_ENV === 'development' ? '127.0.0.1' : 'pev-demo.store';
 
@@ -43,7 +38,7 @@ export function getOrderBody(products: IProductInOrder[], payMethod: Partial<IPa
     // notifyUrl: 'http://127.0.0.1:3000',
     customerIp: '127.0.0.1',
     continueUrl: `http://${host}:${process.env.PORT}/`,
-    merchantPosId: process.env.CLIENT_ID || PAYU_DEFAULTS.CLIENT_ID,
+    merchantPosId: process.env.PAYU_CLIENT_ID,
     description: 'PEV-Shop order',
     // TODO: pass it dynamically by User's chosen currency in shop
     currencyCode: 'PLN',
@@ -93,14 +88,12 @@ export function getOrderPaymentMethod(
   })
     .then((response) => response.json())
     .then(getSinglePaymentMethod)
-    .catch(
-      (error: Error): Partial<IPayByLinkMethod> => {
-        logger.error('PayU order payment method error:', error);
+    .catch((error: Error): Partial<IPayByLinkMethod> => {
+      logger.error('PayU order payment method error:', error);
 
-        // fallback to default payment method
-        return { type: 'PAYMENT_WALL' };
-      }
-    );
+      // fallback to default payment method
+      return { type: 'PAYMENT_WALL' };
+    });
 
   function getSinglePaymentMethod(paymentMethods: { payByLinks: IPayByLinkMethod[] }): IPayByLinkMethod {
     logger.log('getSinglePaymentMethod() paymentMethods:', paymentMethods);

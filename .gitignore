@@ -2,3 +2,5 @@
 node_modules/
 src/database/data
 dist/
+.env
+src/database/populate/_modify-initial-data.js

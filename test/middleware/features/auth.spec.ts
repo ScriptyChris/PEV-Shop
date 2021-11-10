@@ -1,3 +1,4 @@
+import type { IUser } from '../../../src/database/models/_user';
 import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 // @ts-ignore
@@ -10,6 +11,9 @@ const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFr
 
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
 import { findAssociatedSrcModulePath } from '../../test-index';
+
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
 
 describe('#auth', () => {
   let comparePasswords: any,
@@ -70,10 +74,7 @@ describe('#auth', () => {
 
       getToken(payloadObj);
 
-      // this is auth's module private variable
-      const SECRET_KEY = 'VeRy-SeCrEt-KeY';
-
-      expect(mockedJwt.sign).toHaveBeenCalledWith(payloadObj, SECRET_KEY);
+      expect(mockedJwt.sign).toHaveBeenCalledWith(payloadObj, process.env.TOKEN_SECRET_KEY);
     });
 
     it('should return result returned by jwt.sign, cause this is its internal implementation', () => {
@@ -93,10 +94,7 @@ describe('#auth', () => {
 
       verifyToken(token);
 
-      // this is auth's module private variable
-      const SECRET_KEY = 'VeRy-SeCrEt-KeY';
-
-      expect(mockedJwt.verify).toHaveBeenCalledWith(token, SECRET_KEY);
+      expect(mockedJwt.verify).toHaveBeenCalledWith(token, process.env.TOKEN_SECRET_KEY);
     });
 
     it('should return result returned by jwt.verify, cause this is its internal implementation', () => {
@@ -112,9 +110,9 @@ describe('#auth', () => {
 
   describe('authMiddlewareFn()', () => {
     // TODO: consider moving below mocks to separate file/module
-    const getReqMock: () => { header: () => string; token?: string; user?: Record<string, unknown> } = () => ({
+    const getReqMock: () => { header: () => string; token?: string; user?: IUser } = () => ({
       header() {
-        return 'some token';
+        return 'Bearer test-token';
       },
     });
     const getNextMock = () => jest.fn();
@@ -156,7 +154,7 @@ describe('#auth', () => {
         expect(getFromDBSucceededMock).toHaveBeenCalledWith(
           {
             _id: expect.any(String),
-            'tokens.auth': { $exists: true, $eq: reqMock.header() },
+            'tokens.auth': { $exists: true, $eq: 'test-token' },
           },
           'User'
         );
@@ -172,6 +170,16 @@ describe('#auth', () => {
         await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
 
         expect(reqMock.user instanceof mockedSucceededGetFromDB._clazz).toBe(true);
+      });
+
+      it('should assign processed token prop to req object', async () => {
+        const reqMock = getReqMock();
+
+        const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+
+        await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+
+        expect(reqMock.token).toBe('test-token');
       });
 
       it('should call next() function', async () => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, createRef, useRef } from 'react';
-import apiService from '../../features/apiService';
+import httpService from '../../features/httpService';
 import TreeMenu from 'react-simple-tree-menu';
 
 const CATEGORIES_SEPARATOR = '|';
@@ -28,7 +28,7 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
   }, []);
 
   useEffect(() => {
-    apiService.getProductCategories().then((res) => {
+    httpService.getProductCategories().then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
