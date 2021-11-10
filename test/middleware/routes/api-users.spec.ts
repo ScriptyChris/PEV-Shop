@@ -30,9 +30,19 @@ describe('#api-users', () => {
   beforeAll(async () => {
     authMiddlewareFnMock
       .mockImplementationOnce(() => authMiddlewareReturnedFn)
+      .mockImplementationOnce(() => authMiddlewareReturnedFn)
+      .mockImplementationOnce(() => authMiddlewareReturnedFn)
+      .mockImplementationOnce(() => authMiddlewareReturnedFn)
+      .mockImplementationOnce(() => authMiddlewareReturnedFn)
+      .mockImplementationOnce(() => authMiddlewareReturnedFn)
+      .mockImplementationOnce(() => authMiddlewareReturnedFn)
       .mockImplementationOnce(() => authMiddlewareReturnedFn);
 
-    apiUsersRouter = (await import('../../../src/middleware/routes/api-users')).default;
+    try {
+      apiUsersRouter = (await import('../../../src/middleware/routes/api-users')).default;
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   afterAll(() => {
@@ -48,11 +58,31 @@ describe('#api-users', () => {
   });
 
   it('should call router.post(..) and router.get(..) specific amount of times with correct params', () => {
-    expect(apiUsersRouter.post).toHaveBeenCalledTimes(8);
-    expect(apiUsersRouter.patch).toHaveBeenCalledTimes(1);
-    expect(apiUsersRouter.get).toHaveBeenCalledTimes(1);
+    expect(apiUsersRouter.post).toHaveBeenCalledTimes(10);
+    expect(apiUsersRouter.patch).toHaveBeenCalledTimes(2);
+    expect(apiUsersRouter.get).toHaveBeenCalledTimes(2);
+    expect(apiUsersRouter.delete).toHaveBeenCalledTimes(2);
 
-    expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/', apiUsersRouter._updateUser);
+    expect(apiUsersRouter.post).toHaveBeenCalledWith(
+      '/api/users/add-product-to-observed',
+      authMiddlewareReturnedFn,
+      apiUsersRouter._addProductToObserved
+    );
+    expect(apiUsersRouter.delete).toHaveBeenCalledWith(
+      '/api/users/remove-product-from-observed/:productId',
+      authMiddlewareReturnedFn,
+      apiUsersRouter._removeProductFromObserved
+    );
+    expect(apiUsersRouter.delete).toHaveBeenCalledWith(
+      '/api/users/remove-all-products-from-observed',
+      authMiddlewareReturnedFn,
+      apiUsersRouter._removeAllProductsFromObserved
+    );
+    expect(apiUsersRouter.get).toHaveBeenCalledWith(
+      '/api/users/observed-products',
+      authMiddlewareReturnedFn,
+      apiUsersRouter._getObservedProducts
+    );
     expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/register', apiUsersRouter._registerUser);
     expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/confirm-registration',
@@ -73,13 +103,24 @@ describe('#api-users', () => {
       authMiddlewareReturnedFn,
       apiUsersRouter._logOutUser
     );
-
+    expect(apiUsersRouter.post).toHaveBeenCalledWith(
+      '/api/users/logout-all',
+      authMiddlewareReturnedFn,
+      apiUsersRouter._logOutUserFromSessions
+    );
     expect(apiUsersRouter.patch).toHaveBeenCalledWith('/api/users/set-new-password', apiUsersRouter._setNewPassword);
+    expect(apiUsersRouter.patch).toHaveBeenCalledWith(
+      '/api/users/change-password',
+      authMiddlewareReturnedFn,
+      apiUsersRouter._changePassword
+    );
+    expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/', apiUsersRouter._updateUser);
     expect(apiUsersRouter.get).toHaveBeenCalledWith(
       '/api/users/:id',
       authMiddlewareReturnedFn,
       apiUsersRouter._getUser
     );
+    expect(apiUsersRouter.use).toHaveBeenCalledWith(expect.any(Function));
   });
 
   describe('updateUser(..)', () => {
@@ -278,7 +319,7 @@ describe('#api-users', () => {
         await apiUsersRouter._logOutUser(getReqMock(), resMock);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ message: 'Logged out!' });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ authToken: null });
       });
     });
 

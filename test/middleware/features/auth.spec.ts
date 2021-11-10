@@ -1,3 +1,4 @@
+import type { IUser } from '../../../src/database/models/_user';
 import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock } from '../../mockUtils';
 // @ts-ignore
@@ -109,9 +110,9 @@ describe('#auth', () => {
 
   describe('authMiddlewareFn()', () => {
     // TODO: consider moving below mocks to separate file/module
-    const getReqMock: () => { header: () => string; token?: string; user?: Record<string, unknown> } = () => ({
+    const getReqMock: () => { header: () => string; token?: string; user?: IUser } = () => ({
       header() {
-        return 'some token';
+        return 'Bearer test-token';
       },
     });
     const getNextMock = () => jest.fn();
@@ -153,7 +154,7 @@ describe('#auth', () => {
         expect(getFromDBSucceededMock).toHaveBeenCalledWith(
           {
             _id: expect.any(String),
-            'tokens.auth': { $exists: true, $eq: reqMock.header() },
+            'tokens.auth': { $exists: true, $eq: 'test-token' },
           },
           'User'
         );
@@ -169,6 +170,16 @@ describe('#auth', () => {
         await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
 
         expect(reqMock.user instanceof mockedSucceededGetFromDB._clazz).toBe(true);
+      });
+
+      it('should assign processed token prop to req object', async () => {
+        const reqMock = getReqMock();
+
+        const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+
+        await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+
+        expect(reqMock.token).toBe('test-token');
       });
 
       it('should call next() function', async () => {
