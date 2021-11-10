@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useHistory, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useHistory, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import storeService from '../../features/storeService';
 import httpService from '../../features/httpService';
 import { SetNewPassword } from '../views/password';
-import storageService from '../../features/storageService';
 import userSessionService from '../../features/userSessionService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import ProductItem from '../views/productItem';
@@ -28,24 +27,20 @@ const translations = Object.freeze({
   lackOfData: 'No user data',
 });
 
-function UserProfile({ initialUserData }) {
-  const [userData, setUserData] = useState(null);
+function UserProfile() {
+  const [userData, setUserData] = useState(storeService.userAccountState);
 
   useEffect(() => {
-    console.log('(UserData useEffect) initialUserData:', initialUserData);
-
-    if (initialUserData) {
-      storageService.userAccount.update(initialUserData);
-      setUserData(initialUserData);
-    } else if (storageService.userAccount.get()) {
-      setUserData(storageService.userAccount.get());
-    } else {
+    // this should not happen, because user account state is ready either on app start or after logging in
+    if (!userData) {
       httpService.getUser().then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         }
 
-        storageService.userAccount.update(res);
+        storeService.updateUserAccountState(res);
+        // that probably won't be needed at this point
+        // storageService.userAccount.update(res);
         setUserData(res);
       });
     }
@@ -174,7 +169,7 @@ function ObservedProducts() {
           setObservedProducts(res);
           storeService.updateUserAccountState({
             ...storeService.userAccountState,
-            observedProducts: res,
+            observedProductsIDs: res,
           });
         }
       });
@@ -214,16 +209,13 @@ function Orders() {
 }
 
 export default function Account() {
-  // TODO: [PERFORMANCE] fix rendering component twice when redirected from LogIn page
-  const { state: locationState } = useLocation();
-  const initialUserData = useRef(null);
-
+  // TODO: [PERFORMANCE]? fix rendering component twice when redirected from LogIn page
   const { path, url } = useRouteMatch();
   const MENU_ITEMS = Object.freeze([
     {
       url: 'user-profile',
       translation: translations.goToUserProfile,
-      component: <UserProfile initialUserData={initialUserData.current} />,
+      component: <UserProfile />,
     },
     {
       url: 'security',
@@ -241,10 +233,6 @@ export default function Account() {
       component: <Orders />,
     },
   ]);
-
-  useEffect(() => {
-    initialUserData.current = locationState?.loggedInUserData;
-  }, []);
 
   return (
     <section className="account">

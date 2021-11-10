@@ -32,7 +32,7 @@ const userSessionService = Object.freeze({
         return res;
       }
 
-      storeService.updateUserAccountState(httpService.getAuthToken());
+      storeService.clearUserAccountState();
       storageService.userAccount.remove();
       storageService.userAuthToken.remove();
 
@@ -48,7 +48,7 @@ const userSessionService = Object.freeze({
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return res;
         } else if (!shouldPreserveCurrentSession) {
-          storeService.updateUserAccountState(httpService.getAuthToken());
+          storeService.clearUserAccountState();
           storageService.userAccount.remove();
           storageService.userAuthToken.remove();
         }
@@ -62,11 +62,12 @@ const userSessionService = Object.freeze({
     const userAccount = storageService.userAccount.get();
     const userAuthToken = storageService.userAuthToken.get();
 
-    console.log('(restoreSession) userAuthToken:', userAuthToken, ' /userAccount:', userAccount);
-
     if ((userAccount && !userAuthToken) || (!userAccount && userAuthToken)) {
+      // TODO: [UX] probably show User some info that session is corrupted(?) and there is need to log in again?
       throw Error(
-        `User account and session are not synced! userAccount: ${userAccount}; userAuthToken: ${userAuthToken}`
+        `User account and auth token states presence is diverged!\n
+        userAccount: ${JSON.stringify(userAccount) || userAccount}\n
+        userAuthToken: ${userAuthToken}`
       );
     } else if (userAccount && userAuthToken) {
       httpService.setAuthToken(userAuthToken);

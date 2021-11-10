@@ -6,16 +6,22 @@ const USER_CART_STATE = Object.freeze({
   products: [],
 });
 
+const INITIAL_USER_ACCOUNT_STATE = null;
+
 class StoreService {
   constructor() {
     // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's IUserPublic
-    this._userAccountState = null;
+    this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
     this._userCartState = { ...USER_CART_STATE };
     this._productComparisonState = [];
   }
 
   updateUserAccountState(userAccountState) {
     this._userAccountState = userAccountState;
+  }
+
+  clearUserAccountState() {
+    this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
   }
 
   updateUserCartState(userCartState) {
@@ -48,7 +54,7 @@ class StoreService {
   }
 
   updateProductComparisonState({ add, remove }) {
-    console.log('updateProductComparisonState() /add:', add, ' /remove:', remove);
+    console.log('(updateProductComparisonState) /add:', add, ' /remove:', remove);
 
     if (add) {
       this._productComparisonState.push(add);
@@ -92,6 +98,7 @@ class StoreService {
 decorate(StoreService, {
   _userAccountState: observable,
   updateUserAccountState: action,
+  clearUserAccountState: action,
 
   _userCartState: observable,
   updateUserCartState: action,

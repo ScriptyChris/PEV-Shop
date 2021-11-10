@@ -316,15 +316,6 @@ export default function ProductDetails({ product }) {
     )
   );
 
-  console.log(
-    '??? isProductObserved:',
-    isProductObserved,
-    ' /storeService.userAccountState?.observedProductsIDs:',
-    storeService.userAccountState?.observedProductsIDs,
-    ' /product._id:',
-    product._id
-  );
-
   const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
 
   useEffect(() => {

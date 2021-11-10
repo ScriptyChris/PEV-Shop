@@ -19,6 +19,11 @@ import { SetNewPassword, ResetPassword } from '../views/password';
 import { GenericErrorPopup } from '../utils/popup';
 
 export default observer(function Main() {
+  /*
+    TODO: [UX] save user session to storage when page is unloaded (like by reloading or closing it).
+    It may be done via window's 'beforeunload' event, but it's better to use Page Lifecycle (API)
+    https://developers.google.com/web/updates/2018/07/page-lifecycle-api#observing-page-lifecycle-states-in-code
+  */
   useEffect(userSessionService.restoreSession, []);
 
   return (
