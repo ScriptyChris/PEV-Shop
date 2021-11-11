@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import httpService from '../../features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import { PasswordField } from '../views/password';
+import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -70,7 +71,7 @@ export default function Register() {
             altMessage: translations.registrationSuccessAltMsg,
             buttons: [
               {
-                onClick: () => history.push('/log-in'),
+                onClick: () => history.push(ROUTES.LOG_IN),
                 text: translations.popupGoToLogin,
               },
             ],

@@ -4,6 +4,7 @@ import { Formik, Field } from 'formik';
 import FormFieldError from '../utils/formFieldError';
 import httpService from '../../features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
+import { ROUTES } from '../pages/_routes';
 
 const translations = Object.freeze({
   resetPasswordHeader: 'Reset password',
@@ -203,7 +204,7 @@ function SetNewPassword({ contextType }) {
               message: translations.setNewPasswordSuccessMsg,
               buttons: [
                 {
-                  onClick: () => history.push('/log-in'),
+                  onClick: () => history.push(ROUTES.LOG_IN),
                   text: translations.popupGoToLogIn,
                 },
               ],

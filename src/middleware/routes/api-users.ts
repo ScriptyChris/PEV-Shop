@@ -88,7 +88,8 @@ const sendRegistrationEmail = async ({
   return sendMail(
     email,
     EMAIL_TYPES.ACTIVATION,
-    `http://localhost:${process.env.PORT}/confirm-registration/?token=${token}`
+    /* TODO: [DX] take "pages" from _routeGroups.js module */
+    `http://localhost:${process.env.PORT}/pages/confirm-registration/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {
@@ -127,7 +128,8 @@ const sendResetPasswordEmail = async ({ email, token, res }: { email: string; to
   return sendMail(
     email,
     EMAIL_TYPES.RESET_PASSWORD,
-    `http://localhost:${process.env.PORT}/set-new-password/?token=${token}`
+    /* TODO: [DX] take "pages" from _routeGroups.js module */
+    `http://localhost:${process.env.PORT}/pages/set-new-password/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {

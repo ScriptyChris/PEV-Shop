@@ -7,6 +7,7 @@ import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import RatingWidget from '../utils/ratingWidget';
 import { getLocalizedDate } from '../../features/localization';
 import storeService from '../../features/storeService';
+import { ROUTES } from '../pages/_routes';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -310,6 +311,7 @@ export default function ProductDetails({ product }) {
   const [productDetails, setProductDetails] = useState([]);
   const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
   const [popupData, setPopupData] = useState(null);
+  // TODO: [BUG] update `isProductObserved` when component is re-rendered due to `product` prop param change
   const [isProductObserved, setIsProductObserved] = useState(
     (storeService.userAccountState?.observedProductsIDs || []).some(
       (observedProductID) => observedProductID === product._id
@@ -328,7 +330,7 @@ export default function ProductDetails({ product }) {
         }
       })
       .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
-  }, []);
+  }, [product]);
 
   const getMainDetailsContent = () =>
     Object.entries(productDetails)
@@ -349,7 +351,7 @@ export default function ProductDetails({ product }) {
       ));
 
   const navigateToProductModify = () => {
-    history.push('/modify-product', productDetails.name);
+    history.push(ROUTES.MODIFY_PRODUCT, productDetails.name);
   };
 
   const deleteProduct = () => {
@@ -365,7 +367,7 @@ export default function ProductDetails({ product }) {
             message: 'Product successfully deleted!',
             buttons: [
               {
-                onClick: () => history.push('/shop'),
+                onClick: () => history.push(ROUTES.SHOP),
                 text: 'Go back to shop',
               },
             ],
@@ -390,7 +392,7 @@ export default function ProductDetails({ product }) {
         buttons: [
           {
             text: productDetailsTranslations.goTologIn,
-            onClick: () => history.push(`/log-in`),
+            onClick: () => history.push(ROUTES.LOG_IN),
           },
           getClosePopupBtn(setPopupData),
         ],
@@ -414,6 +416,7 @@ export default function ProductDetails({ product }) {
             buttons: [getClosePopupBtn(setPopupData)],
           });
         } else {
+          // TODO: [BUG] update observed products IDs list in storage
           storeService.updateUserAccountState({
             ...storeService.userAccountState,
             observedProductsIDs: res,

@@ -2,8 +2,13 @@ import React, { memo /*, useState*/ } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 // import CategoriesTree from '../views/categoriesTree';
+import { ROUTES } from '../pages/_routes';
 import ProductList from '../views/productList';
 import ProductDetails from '../views/productDetails';
+import { NewProduct, ModifyProduct } from '../pages/newProduct';
+import Compare from '../pages/compare';
+import Order from '../pages/order';
+import NotFound from '../pages/notFound';
 
 // const ShopMenuChooser = memo(function ShopMenuChooser(props) {
 //   return (
@@ -61,12 +66,28 @@ function Shop() {
       {/*{showChooser()}*/}
 
       <Switch>
-        <Route path="/shop" exact>
+        <Route path={ROUTES.SHOP} exact>
           <ProductList />
           {/*{showChosenProductsView()}*/}
         </Route>
-        <Route path="/shop/:productName">
+        <Route path={`${ROUTES.PRODUCT}/:productName`}>
           <ProductDetails />
+        </Route>
+        <Route path={ROUTES.COMPARE}>
+          <Compare />
+        </Route>
+        <Route path={ROUTES.ADD_NEW_PRODUCT}>
+          <NewProduct />
+        </Route>
+        <Route path={ROUTES.MODIFY_PRODUCT}>
+          <ModifyProduct />
+        </Route>
+        <Route path={ROUTES.ORDER}>
+          <Order />
+        </Route>
+
+        <Route>
+          <NotFound />
         </Route>
       </Switch>
     </section>
