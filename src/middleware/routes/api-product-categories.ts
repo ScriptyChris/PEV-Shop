@@ -4,7 +4,7 @@ import * as expressModule from 'express';
 import { getFromDB } from '../../database/database-index';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { embraceResponse } from '../helpers/middleware-response-wrapper';
+import { wrapRes } from '../helpers/middleware-response-wrapper';
 
 const {
   // @ts-ignore
@@ -59,12 +59,12 @@ async function getProductCategoriesHierarchy(req: Request, res: Response, next: 
     const productCategories = (await getFromDB('category', 'Product', { isDistinct: true })) as string[];
 
     if (!productCategories) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Product categories not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product categories not found!' });
     }
 
     const categoriesHierarchy = createCategoriesHierarchy(productCategories);
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: categoriesHierarchy }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: categoriesHierarchy });
   } catch (exception) {
     return next(exception);
   }

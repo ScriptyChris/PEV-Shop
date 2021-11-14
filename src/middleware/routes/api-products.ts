@@ -17,7 +17,8 @@ import mapProductsTechnicalSpecs from '../helpers/api-products-specs-mapper';
 import { IProduct, IReviews } from '../../database/models/_product';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { embraceResponse, normalizePayloadType } from '../helpers/middleware-response-wrapper';
+import type { IModel } from '../../database/models/models-index';
+import { wrapRes } from '../helpers/middleware-response-wrapper';
 
 const {
   // @ts-ignore
@@ -66,10 +67,10 @@ async function getProductsSpecs(req: Request, res: Response, next: NextFunction)
     const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
 
     if (!productsSpec) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Products specs not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products specs not found!' });
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: productsSpec }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: productsSpec });
   } catch (exception) {
     return next(exception);
   }
@@ -87,9 +88,7 @@ async function getProducts(
     logger.log('[products GET] req.query', req.query);
 
     if (!req.query) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request query is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request query is empty or not attached!' });
     }
 
     // TODO: ... and really refactor this!
@@ -123,10 +122,10 @@ async function getProducts(
     const paginatedProducts = await getFromDB(query, 'Product', options);
 
     if (!paginatedProducts) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Products not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products not found!' });
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: paginatedProducts }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: paginatedProducts });
   } catch (exception) {
     return next(exception);
   }
@@ -137,18 +136,16 @@ async function getProductById(req: Request, res: Response, next: NextFunction) {
     logger.log('[products/:id GET] req.param', req.params);
 
     if (!req.params || !req.params._id) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Id params is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Id params is empty or not attached!' });
     }
 
     const product = await getFromDB(req.params._id, 'Product');
 
     if (!product) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Product not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product not found!' });
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: product }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: product });
   } catch (exception) {
     return next(exception);
   }
@@ -159,14 +156,12 @@ async function addProduct(req: Request, res: Response, next: NextFunction) {
     logger.log('[products POST] req.body', req.body);
 
     if (!req.body) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Product data is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Product data is empty or not attached!' });
     }
 
     await saveToDB(req.body, 'Product');
 
-    return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Success!' }));
+    return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Success!' });
   } catch (exception) {
     return next(exception);
   }
@@ -177,13 +172,9 @@ async function addReview(req: Request, res: Response, next: NextFunction) {
     logger.log('[addReview] req.params.name:', req.params.name, ' /req.body:', req.body);
 
     if (!req.params.name) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Name param is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Name param is empty or not attached!' });
     } else if (!req.body) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body is empty or not attached!' });
     }
 
     const RATING_MIN_VALUE = 0;
@@ -191,37 +182,33 @@ async function addReview(req: Request, res: Response, next: NextFunction) {
     const rating = req.body.rating;
 
     if (!addReview.isNumber(rating)) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Rating value must be a number!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Rating value must be a number!' });
     } else if (rating < RATING_MIN_VALUE) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: `Rating value must be greater than ${RATING_MIN_VALUE}!` }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: `Rating value must be greater than ${RATING_MIN_VALUE}!`,
+      });
     } else if (rating > RATING_MAX_VALUE) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: `Rating value must be less than ${RATING_MAX_VALUE}!` }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: `Rating value must be less than ${RATING_MAX_VALUE}!`,
+      });
     } else if (!addReview.isIntOrDecimalHalf(rating)) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: `Rating value must be either an integer or .5 (a half) of it!` }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: `Rating value must be either an integer or .5 (a half) of it!`,
+      });
     } else if (
       !req.body.author ||
       typeof req.body.author !== 'string' /* TODO: [AUTH] ensure author is a proper User or "Anonymous" */
     ) {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
-        embraceResponse({
-          error: 'Author value must be a non-empty string representing a proper User or "Anonymous"!',
-        })
-      );
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Author value must be a non-empty string representing a proper User or "Anonymous"!',
+      });
     } /* TODO: [DUP] check if review is not a duplicate */
 
     // TODO: [DX] refactor update process to use some Mongo (declarative) aggregation atomicly
     const productToUpdate: IProduct = (await getFromDB({ name: req.params.name }, 'Product', {}))[0];
 
     if (!productToUpdate) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Reviewed product not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Reviewed product not found!' });
     }
 
     const productReviews = productToUpdate.reviews;
@@ -238,11 +225,9 @@ async function addReview(req: Request, res: Response, next: NextFunction) {
 
     await productToUpdate.save();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(
-      embraceResponse({
-        payload: normalizePayloadType(productReviews) /* as Record<keyof IReviews, IReviews[keyof IReviews]> */,
-      })
-    );
+    return wrapRes(res, HTTP_STATUS_CODE.OK, {
+      payload: productReviews as Record<keyof IReviews, IReviews[keyof IReviews]>,
+    });
   } catch (exception) {
     return next(exception);
   }
@@ -260,11 +245,9 @@ async function modifyProduct(req: Request & { userPermissions: any }, res: Respo
     logger.log('(products PATCH) req.body:', req.body);
 
     if (!req.body) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body is empty or not attached!' });
     } else if (!req.userPermissions) {
-      return res.status(HTTP_STATUS_CODE.FORBIDDEN).json(embraceResponse({ error: 'User has no permissions!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: 'User has no permissions!' });
     }
 
     // TODO: prepare to be used with various product properties
@@ -275,10 +258,12 @@ async function modifyProduct(req: Request & { userPermissions: any }, res: Respo
     );
 
     if (!modifiedProduct) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'Product to modify not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product to modify not found!' });
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(modifiedProduct) }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, {
+      payload: modifiedProduct as Record<keyof IModel, IModel[keyof IModel]>,
+    });
   } catch (exception) {
     return next(exception);
   }
@@ -289,11 +274,9 @@ async function deleteProduct(req: Request & { userPermissions: any }, res: Respo
     logger.log('[products DELETE] req.params:', req.params);
 
     if (!req.params || !req.params.name) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Name param is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Name param is empty or not attached!' });
     } else if (!req.userPermissions) {
-      return res.status(HTTP_STATUS_CODE.FORBIDDEN).json(embraceResponse({ error: 'User has no permissions!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: 'User has no permissions!' });
     }
 
     const deletionResult = await deleteFromDB({ name: req.params.name }, 'Product');
@@ -301,26 +284,22 @@ async function deleteProduct(req: Request & { userPermissions: any }, res: Respo
     if (!deletionResult.ok) {
       logger.error('Deletion error occured...', deletionResult);
 
-      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
-        embraceResponse({
-          exception: {
-            message: `Failed to delete the product - 
+      return wrapRes(res, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR, {
+        exception: {
+          message: `Failed to delete the product - 
               ok: ${deletionResult.ok}; 
               n: ${deletionResult.n}; 
               deletedCount: ${deletionResult.deletedCount}.
             `.trim(),
-          },
-        })
-      );
+        },
+      });
     } else if (deletionResult.deletedCount === 0) {
       logger.error('Deleted nothing...', deletionResult);
 
-      return res
-        .status(HTTP_STATUS_CODE.NOT_FOUND)
-        .json(embraceResponse({ error: 'Could not find product to delete!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Could not find product to delete!' });
     }
 
-    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+    return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }

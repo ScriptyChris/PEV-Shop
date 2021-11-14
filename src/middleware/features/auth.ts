@@ -6,7 +6,7 @@ import * as dotenv from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { IUser } from '../../database/models/_user';
 import { HTTP_STATUS_CODE } from '../../types';
-import { embraceResponse } from '../helpers/middleware-response-wrapper';
+import { wrapRes } from '../helpers/middleware-response-wrapper';
 
 // @ts-ignore
 dotenv.default.config();
@@ -49,21 +49,21 @@ const authMiddlewareFn = (
       const authToken = req.header('Authorization');
 
       if (!authToken) {
-        return res
-          .status(HTTP_STATUS_CODE.BAD_REQUEST)
-          .json(embraceResponse({ error: 'Authorization token header is empty or not attached!' }));
+        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+          error: 'Authorization token header is empty or not attached!',
+        });
       } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
-        return res
-          .status(HTTP_STATUS_CODE.BAD_REQUEST)
-          .json(embraceResponse({ error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!` }));
+        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+          error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!`,
+        });
       }
 
       const bearerToken = authToken.replace(BEARER_TOKEN_PREFIX, '');
 
       if (!bearerToken) {
-        return res
-          .status(HTTP_STATUS_CODE.BAD_REQUEST)
-          .json(embraceResponse({ error: 'Auth token does not contain bearer value!' }));
+        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+          error: 'Auth token does not contain bearer value!',
+        });
       }
 
       const decodedToken = verifyToken(bearerToken);
@@ -73,7 +73,7 @@ const authMiddlewareFn = (
       )) as IUser | IUser[];
 
       if (!user || (user as IUser[]).length === 0) {
-        return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to authorize not found!' }));
+        return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to authorize not found!' });
       }
 
       // TODO: [REFACTOR] normalize data returned by `getFromDB`
@@ -91,7 +91,7 @@ const userRoleMiddlewareFn = (roleName: string): any => {
   return async (req: Request & { user: any; userPermissions: string[] }, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
-        return res.status(HTTP_STATUS_CODE.FORBIDDEN).json(embraceResponse({ error: `You don't have permissions!` }));
+        return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });
       }
 
       // TODO: improve selecting data while populating

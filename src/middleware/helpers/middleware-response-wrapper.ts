@@ -1,4 +1,5 @@
 import type { Response } from 'express';
+import { HTTP_STATUS_CODE } from '../../types';
 
 interface IEmbracedResponse {
   // TODO: [REFACTOR] 'authToken' could be always paired with 'payload' prop or be contained by it
@@ -9,7 +10,7 @@ interface IEmbracedResponse {
   exception: Error | { message: string; stack?: string };
 }
 
-const HTTP_STATUS_CODES = Object.freeze({
+const GROUPED_HTTP_STATUS_CODES = Object.freeze({
   SUCCESSFUL: {
     200: 200,
     201: 201,
@@ -26,9 +27,9 @@ const HTTP_STATUS_CODES = Object.freeze({
     500: 500,
     511: 511,
   },
-});
+} as const);
 
-type TypeOfHTTPStatusCodes = typeof HTTP_STATUS_CODES;
+export type TypeOfHTTPStatusCodes = typeof GROUPED_HTTP_STATUS_CODES;
 
 const mappedHTTPStatusCode = Object.freeze({
   200: 'SUCCESSFUL',
@@ -41,36 +42,57 @@ const mappedHTTPStatusCode = Object.freeze({
   409: 'CLIENT_ERROR',
   500: 'SERVER_ERROR',
   511: 'SERVER_ERROR',
-});
+} as const);
 
 type TSuccessfulHTTPStatusCodesToData = {
-  [SuccessfulStatus in keyof TypeOfHTTPStatusCodes['SUCCESSFUL']]: 'payload' | 'message';
+  [SuccessfulStatus in keyof TypeOfHTTPStatusCodes['SUCCESSFUL']]: Extract<
+    keyof IEmbracedResponse,
+    'payload' | 'message' | 'authToken'
+  >;
 };
 type TClientErrorHTTPStatusCodesToData = {
-  [ClientErrorStatus in keyof TypeOfHTTPStatusCodes['CLIENT_ERROR']]: 'error';
+  [ClientErrorStatus in keyof TypeOfHTTPStatusCodes['CLIENT_ERROR']]: Extract<keyof IEmbracedResponse, 'error'>;
 };
 type TServerErrorHTTPStatusCodesToData = {
-  [ServerErrorStatus in keyof TypeOfHTTPStatusCodes['SERVER_ERROR']]: 'exception';
+  [ServerErrorStatus in keyof TypeOfHTTPStatusCodes['SERVER_ERROR']]: Extract<keyof IEmbracedResponse, 'exception'>;
 };
 
 type THTTPStatusCodeToData = TSuccessfulHTTPStatusCodesToData &
   TClientErrorHTTPStatusCodesToData &
   TServerErrorHTTPStatusCodesToData;
 
-function responseWrapper<
-  Status extends keyof typeof mappedHTTPStatusCode,
-  DataKey extends keyof IEmbracedResponse extends infer K
-    ? K extends keyof IEmbracedResponse
-      ? K extends THTTPStatusCodeToData[Status]
-        ? K
-        : never
+type TKeyofMappedStatusCode = keyof typeof mappedHTTPStatusCode;
+// Discord's TypeScript Community: https://discord.com/channels/508357248330760243/753055735423827998/909189680388534312
+type TDataKeyExt<Status extends TKeyofMappedStatusCode> = keyof IEmbracedResponse extends infer K
+  ? K extends keyof IEmbracedResponse
+    ? K extends THTTPStatusCodeToData[Status]
+      ? K
       : never
     : never
->(res: Response, status: Status, data: Record<DataKey, IEmbracedResponse[DataKey]>) {
+  : never;
+
+function wrapRes(
+  res: Response,
+  status: typeof HTTP_STATUS_CODE.NO_CONTENT | typeof HTTP_STATUS_CODE.NOT_FOUND
+): Response;
+function wrapRes<
+  Status extends Exclude<TKeyofMappedStatusCode, typeof GROUPED_HTTP_STATUS_CODES.SUCCESSFUL[204]>,
+  DataKey extends TDataKeyExt<Status>
+>(res: Response, status: Status, data: Record<DataKey, IEmbracedResponse[DataKey]>): Response;
+function wrapRes<Status extends TKeyofMappedStatusCode, DataKey extends TDataKeyExt<Status>>(
+  res: Response,
+  status: Status,
+  data?: Record<DataKey, IEmbracedResponse[DataKey]>
+): Response {
+  if (data === undefined) {
+    if (status === HTTP_STATUS_CODE.NOT_FOUND) {
+      return res.status(status);
+    }
+
+    return res.sendStatus(status);
+  }
+
   return res.status(status).json(data);
 }
 
-export const embraceResponse = <Key extends keyof IEmbracedResponse>(response: Record<Key, IEmbracedResponse[Key]>) =>
-  response;
-
-export const normalizePayloadType = <Type>(payload: Type) => payload as Record<keyof Type, Type[keyof Type]>;
+export { wrapRes };
