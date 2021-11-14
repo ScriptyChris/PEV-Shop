@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { useHistory, NavLink, Route, Switch } from 'react-router-dom';
 import storeService from '../../features/storeService';
 import httpService from '../../features/httpService';
 import { SetNewPassword } from '../views/password';
 import userSessionService from '../../features/userSessionService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
 import ProductItem from '../views/productItem';
+import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
   accountHeader: 'Account',
@@ -114,7 +115,7 @@ function Security() {
             buttons: [getClosePopupBtn(setPopupData)],
           });
         } else {
-          history.replace('/');
+          history.replace(ROUTES.ROOT);
         }
       });
     }
@@ -210,7 +211,6 @@ function Orders() {
 
 export default function Account() {
   // TODO: [PERFORMANCE]? fix rendering component twice when redirected from LogIn page
-  const { path, url } = useRouteMatch();
   const MENU_ITEMS = Object.freeze([
     {
       url: 'user-profile',
@@ -242,14 +242,14 @@ export default function Account() {
         <ul className="account__menu-nav">
           {MENU_ITEMS.map((item) => (
             <li key={item.url}>
-              <NavLink to={`${url}/${item.url}`}>{item.translation}</NavLink>
+              <NavLink to={`${ROUTES.ACCOUNT}/${item.url}`}>{item.translation}</NavLink>
             </li>
           ))}
         </ul>
 
         <Switch>
           {MENU_ITEMS.map((item) => (
-            <Route path={`${path}/${item.url}`} key={item.url}>
+            <Route path={`${ROUTES.ACCOUNT}/${item.url}`} key={item.url}>
               {item.component}
             </Route>
           ))}

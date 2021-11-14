@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import userSessionService from '../../features/userSessionService';
+import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
   logInHeader: 'Login to shop',
@@ -36,7 +37,7 @@ export default function LogIn() {
         TODO: [UX] redirect to the page where user was before logging in 
         OR just close/fold the form, if it is presented as a aside/sticky panel
       */
-      history.push('/');
+      history.push(ROUTES.ROOT);
     });
   };
 
@@ -74,7 +75,7 @@ export default function LogIn() {
 
       <div>
         <p>{translations.resetPasswordHint}</p>
-        <Link to={'/reset-password'}>{translations.resetPasswordLink}</Link>
+        <Link to={ROUTES.RESET_PASSWORD}>{translations.resetPasswordLink}</Link>
       </div>
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}

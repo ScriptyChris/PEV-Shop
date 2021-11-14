@@ -6,7 +6,7 @@ import { getFromDB } from '../../database/database-index';
 import { authToPayU as getToken } from '../features/auth';
 import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '../../types';
 import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '../helpers/payu-api';
-import { embraceResponse } from '../helpers/middleware-response-wrapper';
+import { wrapRes, TypeOfHTTPStatusCodes } from '../helpers/middleware-response-wrapper';
 
 const {
   // @ts-ignore
@@ -48,9 +48,9 @@ router.post('/api/orders', async (req: Request, res: Response) => {
   const token: string | Error = await getToken();
   if (typeof token !== 'string') {
     // TODO: improve error handling
-    return res
-      .status(HTTP_STATUS_CODE.NETWORK_AUTH_REQUIRED)
-      .json(embraceResponse({ error: `Server failed to auth to PayU API due to: ${token?.message}` }));
+    return wrapRes(res, HTTP_STATUS_CODE.NETWORK_AUTH_REQUIRED, {
+      exception: Error(`Server failed to auth to PayU API due to: ${token?.message}`),
+    });
   }
 
   const [minPrice, maxPrice] = getMinAndMaxPrice(products);
@@ -73,12 +73,16 @@ router.post('/api/orders', async (req: Request, res: Response) => {
       logger.log('PayU order response:', resValue, ' /status:', response.status, ' /statusText:', response.statusText);
 
       // TODO: [REFACTOR] respond with either 'msg', 'payload' or 'error' depending or `response.status`
-      return res.status(response.status).json(embraceResponse({ payload: resValue }));
+      return wrapRes(
+        res,
+        response.status as Extract<TypeOfHTTPStatusCodes, 'SUCCESSFUL' | 'CLIENT_ERROR' | 'SERVER_ERROR'>,
+        { payload: resValue }
+      );
     })
     .catch((error: FetchError) => {
       logger.error('PayU order error:', error);
 
-      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(embraceResponse({ exception: error }));
+      return wrapRes(res, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR, { exception: error });
     });
 });
 

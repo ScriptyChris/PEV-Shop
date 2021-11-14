@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import storageService from '../../features/storageService';
 import storeService from '../../features/storeService';
+import { ROUTES } from '../pages/_routes';
 
 export default observer(function Cart() {
   const [cartVisibility, updateCartVisibility] = useState(false);
@@ -40,7 +41,7 @@ export default observer(function Cart() {
   };
 
   const handleCartSubmission = () => {
-    history.push('/order');
+    history.push(ROUTES.ORDER);
   };
 
   return (

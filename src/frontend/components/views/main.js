@@ -5,17 +5,16 @@ import { observer } from 'mobx-react-lite';
 import storeService from '../../features/storeService';
 import userSessionService from '../../features/userSessionService';
 
+import { ROUTES } from '../pages/_routes';
 import Home from '../pages/home';
 import Shop from '../pages/shop';
-import { NewProduct, ModifyProduct } from '../pages/newProduct';
 import Register from '../pages/register';
 import NotLoggedIn from '../pages/notLoggedIn';
 import LogIn from '../pages/logIn';
 import Account from '../pages/account';
-import Compare from '../pages/compare';
-import Order from '../pages/order';
 import ConfirmRegistration from '../pages/confirmRegistration';
 import { SetNewPassword, ResetPassword } from '../views/password';
+import NotFound from '../pages/notFound';
 import { GenericErrorPopup } from '../utils/popup';
 
 export default observer(function Main() {
@@ -29,48 +28,43 @@ export default observer(function Main() {
   return (
     <main className="main">
       <Switch>
-        <Route path="/" exact>
+        <Route path={ROUTES.ROOT} exact>
           <Home />
         </Route>
-        <Route path="/shop">
-          <Shop />
+
+        <Route path={ROUTES.PAGES}>
+          <Route path={ROUTES.SHOP}>
+            <Shop />
+          </Route>
+          <Route path={ROUTES.REGISTER}>
+            <Register />
+          </Route>
+          <Route path={ROUTES.CONFIRM_REGISTRATION}>
+            <ConfirmRegistration />
+          </Route>
+          <Route path={ROUTES.LOG_IN}>
+            <LogIn />
+          </Route>
+          <Route path={ROUTES.NOT_LOGGED_IN}>
+            <NotLoggedIn />
+          </Route>
+          <Route path={ROUTES.RESET_PASSWORD}>
+            <ResetPassword />
+          </Route>
+          <Route path={ROUTES.SET_NEW_PASSWORD}>
+            <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
+          </Route>
+          <Route path={ROUTES.ACCOUNT}>
+            {
+              /* TODO: [BUG] show loader for the time `storeService.userAccountState` is updated by MobX 
+              to prevent redirecting when user indeed has session */
+              storeService.userAccountState ? <Account /> : <Redirect to={ROUTES.NOT_LOGGED_IN} />
+            }
+          </Route>
         </Route>
-        <Route path="/compare">
-          <Compare />
-        </Route>
-        <Route path="/add-new-product">
-          <NewProduct />
-        </Route>
-        <Route path="/modify-product">
-          <ModifyProduct />
-        </Route>
-        <Route path="/not-logged-in">
-          <NotLoggedIn />
-        </Route>
-        <Route path="/register">
-          <Register />
-        </Route>
-        <Route path="/confirm-registration">
-          <ConfirmRegistration />
-        </Route>
-        <Route path="/log-in">
-          <LogIn />
-        </Route>
-        <Route path="/reset-password">
-          <ResetPassword />
-        </Route>
-        <Route path="/set-new-password">
-          <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
-        </Route>
-        <Route path="/account">
-          {
-            /* TODO: [BUG] show loader for the time `storeService.userAccountState` is updated by MobX 
-            to prevent redirecting when user indeed has session */
-            storeService.userAccountState ? <Account /> : <Redirect to="/not-logged-in" />
-          }
-        </Route>
-        <Route path="/order">
-          <Order />
+
+        <Route>
+          <NotFound />
         </Route>
       </Switch>
 

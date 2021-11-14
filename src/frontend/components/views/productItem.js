@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import storeService from '../../features/storeService';
+import { ROUTES } from '../pages/_routes';
 import CompareProduct from './compareProducts';
 
 const translations = {
@@ -18,7 +19,7 @@ export function ProductItemLink({ productData }) {
   return (
     <Link
       to={{
-        pathname: `/shop/${productData.url}`,
+        pathname: `${ROUTES.PRODUCT}/${productData.url}`,
         state: productData,
       }}
     >

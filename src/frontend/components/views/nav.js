@@ -3,6 +3,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import storeService from '../../features/storeService';
 import userSessionService from '../../features/userSessionService';
+import { ROUTES } from '../pages/_routes';
 
 const translations = Object.freeze({
   start: 'Start',
@@ -24,7 +25,7 @@ export default observer(function Nav() {
         return;
       }
 
-      history.replace('/');
+      history.replace(ROUTES.ROOT);
     });
   };
 
@@ -32,31 +33,31 @@ export default observer(function Nav() {
     <nav className="nav">
       <ul>
         <li>
-          <Link to="/">{translations.start}</Link>
+          <Link to={ROUTES.ROOT}>{translations.start}</Link>
         </li>
         <li>
-          <Link to="/shop">{translations.shop}</Link>
+          <Link to={ROUTES.SHOP}>{translations.shop}</Link>
         </li>
         <li>
-          <Link to="/add-new-product">{translations.addNewProduct}</Link>
+          <Link to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</Link>
         </li>
         <li>
-          <Link to="/modify-product">{translations.modifyProduct}</Link>
+          <Link to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</Link>
         </li>
         <li>
           {storeService.userAccountState ? (
-            <Link to="/" onClick={logOutUser}>
+            <Link to={ROUTES.ROOT} onClick={logOutUser}>
               {translations.logOut}
             </Link>
           ) : (
-            <Link to="/log-in">{translations.logIn}</Link>
+            <Link to={ROUTES.LOG_IN}>{translations.logIn}</Link>
           )}
         </li>
         <li>
           {storeService.userAccountState ? (
-            <Link to="/account">{translations.account}</Link>
+            <Link to={ROUTES.ACCOUNT}>{translations.account}</Link>
           ) : (
-            <Link to="/register">{translations.register}</Link>
+            <Link to={ROUTES.REGISTER}>{translations.register}</Link>
           )}
         </li>
       </ul>

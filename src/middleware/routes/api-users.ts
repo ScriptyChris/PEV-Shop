@@ -8,7 +8,7 @@ import UserModel, { IUser } from '../../database/models/_user';
 import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { embraceResponse, normalizePayloadType } from '../helpers/middleware-response-wrapper';
+import { wrapRes } from '../helpers/middleware-response-wrapper';
 
 dotenv.config();
 
@@ -88,7 +88,8 @@ const sendRegistrationEmail = async ({
   return sendMail(
     email,
     EMAIL_TYPES.ACTIVATION,
-    `http://localhost:${process.env.PORT}/confirm-registration/?token=${token}`
+    /* TODO: [DX] take "pages" from _routeGroups.js module */
+    `http://localhost:${process.env.PORT}/pages/confirm-registration/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {
@@ -96,16 +97,12 @@ const sendRegistrationEmail = async ({
 
         await deleteFromDB({ name: login }, 'User');
 
-        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
-          embraceResponse({
-            error: `Sending email rejected: ${emailSentInfo.rejected}!`,
-          })
-        );
+        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+          error: `Sending email rejected: ${emailSentInfo.rejected}!`,
+        });
       }
 
-      return res
-        .status(HTTP_STATUS_CODE.CREATED)
-        .json(embraceResponse({ message: 'User account created! Check your email.' }));
+      return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'User account created! Check your email.' });
     })
     .catch(async (emailSentError: Error) => {
       logger.error('emailSentError:', emailSentError);
@@ -113,13 +110,11 @@ const sendRegistrationEmail = async ({
       await deleteFromDB({ name: login }, 'User');
 
       // next(new Error())
-      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
-        embraceResponse({
-          exception: {
-            message: `Email sent error: '${emailSentError.message}'!`,
-          },
-        })
-      );
+      return wrapRes(res, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR, {
+        exception: {
+          message: `Email sent error: '${emailSentError.message}'!`,
+        },
+      });
     });
 };
 
@@ -127,35 +122,30 @@ const sendResetPasswordEmail = async ({ email, token, res }: { email: string; to
   return sendMail(
     email,
     EMAIL_TYPES.RESET_PASSWORD,
-    `http://localhost:${process.env.PORT}/set-new-password/?token=${token}`
+    /* TODO: [DX] take "pages" from _routeGroups.js module */
+    `http://localhost:${process.env.PORT}/pages/set-new-password/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {
         logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
 
-        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(
-          embraceResponse({
-            exception: {
-              message: `Sending email rejection: ${emailSentInfo.rejected}`,
-            },
-          })
-        );
+        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+          error: `Sending email rejection: ${emailSentInfo.rejected}`,
+        });
       }
 
-      return res
-        .status(HTTP_STATUS_CODE.OK)
-        .json(embraceResponse({ message: 'Password resetting process began! Check your email.' }));
+      return wrapRes(res, HTTP_STATUS_CODE.OK, {
+        message: 'Password resetting process began! Check your email.',
+      });
     })
     .catch(async (emailSentError) => {
       logger.error('emailSentError:', emailSentError);
 
-      return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json(
-        embraceResponse({
-          exception: {
-            message: `Email sent error: '${emailSentError.message}'!`,
-          },
-        })
-      );
+      return wrapRes(res, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR, {
+        exception: {
+          message: `Email sent error: '${emailSentError.message}'!`,
+        },
+      });
     });
 };
 
@@ -183,10 +173,10 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
     );
 
     if (!updatedUser) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User to update was not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to update was not found!' });
     }
 
-    return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Success!' }));
+    return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Success!' });
   } catch (exception) {
     return next(exception);
   }
@@ -197,15 +187,15 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
 
   try {
     if (!req.body || !req.body.newPassword || !req.body.token) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body or "newPassword" or "token" fields are empty!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Request body or "newPassword" or "token" fields are empty!',
+      });
     }
 
     const validatedPasswordMsg = UserModel.validatePassword(req.body.newPassword);
 
     if (validatedPasswordMsg !== '') {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(embraceResponse({ error: validatedPasswordMsg }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: validatedPasswordMsg });
     }
 
     const hashedPassword = await hashPassword(req.body.newPassword);
@@ -229,9 +219,9 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
 
       await userToSetNewPassword.deleteSingleToken('resetPassword');
 
-      return res.status(HTTP_STATUS_CODE.CREATED).json(embraceResponse({ message: 'Password updated!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Password updated!' });
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User not found!' });
     }
   } catch (exception) {
     return next(exception);
@@ -248,7 +238,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
     const validatedPasswordMsg = UserModel.validatePassword(req.body.password);
 
     if (validatedPasswordMsg !== '') {
-      return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json(embraceResponse({ error: validatedPasswordMsg }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: validatedPasswordMsg });
     }
 
     req.body.password = await hashPassword(req.body.password);
@@ -272,9 +262,7 @@ async function confirmRegistration(req: Request, res: Response, next: NextFuncti
 
   try {
     if (!req.body.token) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Token is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Token is empty or not attached!' });
     }
 
     const userToConfirm = (await getFromDB(
@@ -286,9 +274,9 @@ async function confirmRegistration(req: Request, res: Response, next: NextFuncti
       await userToConfirm.confirmUser();
       await userToConfirm.deleteSingleToken('confirmRegistration');
 
-      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: { isUserConfirmed: true } }));
+      return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: { isUserConfirmed: true } });
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ payload: { isUserConfirmed: false } }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User could not be confirmed!' });
     }
   } catch (exception) {
     return next(exception);
@@ -301,9 +289,7 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
 
   try {
     if (!req.body.email) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Email is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Email is empty or not attached!' });
     }
 
     const userToResendConfirmation = (await getFromDB(
@@ -323,7 +309,7 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
         res,
       });
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ payload: { isConfirmationReSend: false } }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Could not resend user confirmation!' });
     }
   } catch (exception) {
     return next(exception);
@@ -335,41 +321,33 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
     logger.log('(logInUser) req.body:', req.body);
 
     if (!req.body) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body is empty or not attached!' });
     } else if (!req.body.login) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'User login is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'User login is empty or not attached!' });
     }
 
     const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
 
     if (!user) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.UNAUTHORIZED, { error: 'Invalid credentials!' });
     }
 
     const isPasswordMatch = await user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.UNAUTHORIZED, { error: 'Invalid credentials!' });
     }
 
     if (!user.isConfirmed) {
-      return res
-        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
-        .json(embraceResponse({ error: 'User registration is not confirmed!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.UNAUTHORIZED, { error: 'User registration is not confirmed!' });
     }
 
     const authToken = await user.generateAuthToken();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(
-      embraceResponse({
-        payload: normalizePayloadType(user),
-        authToken,
-      })
-    );
+    return wrapRes(res, HTTP_STATUS_CODE.OK, {
+      payload: user as Record<keyof IUser, IUser[keyof IUser]>,
+      authToken,
+    });
   } catch (exception) {
     return next(exception);
   }
@@ -380,21 +358,19 @@ async function changePassword(req: Request & { user: IUser }, res: Response, nex
     logger.log('(changePassword) req.body:', req.body);
 
     if (!req.body || !req.body.password || !req.body.newPassword) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body is empty or not attached!' });
     }
 
     const isPasswordMatch = await req.user.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
-      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json(embraceResponse({ error: 'Invalid credentials!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.UNAUTHORIZED, { error: 'Invalid credentials!' });
     }
 
     req.user.password = await hashPassword(req.body.newPassword);
     req.user.save();
 
-    return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+    return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }
@@ -405,9 +381,7 @@ async function resetPassword(req: Request, res: Response, next: NextFunction) {
 
   try {
     if (!req.body.email) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Email is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Email is empty or not attached!' });
     }
 
     const userToResetPassword = (await getFromDB(
@@ -426,7 +400,7 @@ async function resetPassword(req: Request, res: Response, next: NextFunction) {
         res,
       });
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: 'User not found!' });
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User not found!' });
     }
   } catch (exception) {
     return next(exception);
@@ -439,13 +413,9 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
 
   try {
     if (!req.body) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body is empty or not attached!' });
     } else if (!req.body.email) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse(embraceResponse({ error: 'Email prop is empty or not attached!' })));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Email prop is empty or not attached!' });
     }
 
     const userToResendResetPassword = (await getFromDB(
@@ -463,7 +433,7 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
         res,
       });
     } else {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: 'User not found!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User not found!' });
     }
   } catch (exception) {
     return next(exception);
@@ -480,7 +450,7 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 
     await req.user.save();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ authToken: null }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { authToken: null });
   } catch (exception) {
     return next(exception);
   }
@@ -494,9 +464,9 @@ async function logOutUserFromSessions(
   try {
     if (req.body.preseveCurrentSession) {
       if ((req.user.tokens.auth as string[]).length === 1) {
-        return res
-          .status(HTTP_STATUS_CODE.NOT_FOUND)
-          .json(embraceResponse({ error: 'Current session is the only one, so there is no other sessions to end!' }));
+        return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, {
+          error: 'Current session is the only one, so there is no other sessions to end!',
+        });
       }
 
       req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((authToken) => authToken === req.token);
@@ -506,7 +476,7 @@ async function logOutUserFromSessions(
 
     await req.user.save();
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ authToken: null }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { authToken: null });
   } catch (exception) {
     return next(exception);
   }
@@ -517,18 +487,16 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
     logger.log('[GET] /:id', req.params.id);
 
     if (!req.params.id) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'User id is empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'User id is empty or not attached!' });
     }
 
     const user: IUser = await getFromDB(req.params.id, 'User');
 
     if (!user) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: `User not found!` }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: `User not found!` });
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: normalizePayloadType(user) }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: user as Record<keyof IUser, IUser[keyof IUser]> });
   } catch (exception) {
     return next(exception);
   }
@@ -539,22 +507,20 @@ async function addProductToObserved(req: Request & { user: IUser }, res: Respons
     logger.log('(addProductToObserved) req.body:', req.body);
 
     if (!req.body || !req.body.productId) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request body or `productId` param are empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Request body or `productId` param are empty or not attached!',
+      });
     }
 
     const observationAdditionError = req.user.addProductToObserved(req.body.productId);
 
     if (observationAdditionError) {
-      return res.status(HTTP_STATUS_CODE.CONFLICT).json(embraceResponse({ error: observationAdditionError }));
+      return wrapRes(res, HTTP_STATUS_CODE.CONFLICT, { error: observationAdditionError });
     }
 
     await req.user.save();
 
-    return res
-      .status(HTTP_STATUS_CODE.OK)
-      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user.observedProductsIDs || ([] as unknown[]) });
   } catch (exception) {
     return next(exception);
   }
@@ -565,22 +531,20 @@ async function removeProductFromObserved(req: Request & { user: IUser }, res: Re
     logger.log('(removeProductFromObserved) req.params:', req.params);
 
     if (!req.params || !req.params.productId) {
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .json(embraceResponse({ error: 'Request params or `productId` param are empty or not attached!' }));
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Request params or `productId` param are empty or not attached!',
+      });
     }
 
     const observationRemovalError = req.user.removeProductFromObserved(req.params.productId);
 
     if (observationRemovalError) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: observationRemovalError }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: observationRemovalError });
     }
 
     await req.user.save();
 
-    return res
-      .status(HTTP_STATUS_CODE.OK)
-      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user.observedProductsIDs || ([] as unknown[]) });
   } catch (exception) {
     return next(exception);
   }
@@ -591,14 +555,12 @@ async function removeAllProductsFromObserved(req: Request & { user: IUser }, res
     const observationsRemovalError = req.user.removeAllProductsFromObserved();
 
     if (observationsRemovalError) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).json(embraceResponse({ error: observationsRemovalError }));
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: observationsRemovalError });
     }
 
     await req.user.save();
 
-    return res
-      .status(HTTP_STATUS_CODE.OK)
-      .json(embraceResponse({ payload: req.user.observedProductsIDs || ([] as unknown[]) }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user.observedProductsIDs || ([] as unknown[]) });
   } catch (exception) {
     return next(exception);
   }
@@ -617,7 +579,7 @@ async function getObservedProducts(
         return emptyObservedProductsResponse;
       }
 
-      return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: emptyObservedProductsResponse }));
+      return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: emptyObservedProductsResponse });
     }
 
     const observedProducts = await getFromDB({ _id: req.user.observedProductsIDs }, 'Product');
@@ -626,7 +588,7 @@ async function getObservedProducts(
       return observedProducts;
     }
 
-    return res.status(HTTP_STATUS_CODE.OK).json(embraceResponse({ payload: observedProducts }));
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: observedProducts });
   } catch (exception) {
     return next(exception);
   }

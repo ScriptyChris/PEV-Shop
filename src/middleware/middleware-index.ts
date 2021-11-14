@@ -15,6 +15,7 @@ import apiUserRoles from './routes/api-user-roles';
 import apiOrders from './routes/api-orders';
 import * as dotenv from 'dotenv';
 import { HTTP_STATUS_CODE } from '../types';
+import { wrapRes } from '../middleware/helpers/middleware-response-wrapper';
 
 // @ts-ignore
 dotenv.default.config();
@@ -35,7 +36,7 @@ const middleware = (app: Application): void => {
       .catch((error) => {
         logger.log('Image searching error: ', error, ' /imagePath: ', imagePath);
 
-        return res.status(HTTP_STATUS_CODE.NOT_FOUND).end();
+        return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND).end();
       });
   });
 };

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import storeService from '../../features/storeService';
 import { Link } from 'react-router-dom';
 import Scroller from '../utils/scroller';
+import { ROUTES } from '../pages/_routes';
 
 const List = observer(function CompareProducts() {
   const translations = {
@@ -49,7 +50,7 @@ const List = observer(function CompareProducts() {
       />
 
       <div className="compare-products-candidates__actions">
-        <Link to={{ pathname: `/compare` }}> {translations.compareProducts}</Link>
+        <Link to={{ pathname: ROUTES.COMPARE }}> {translations.compareProducts}</Link>
         <button onClick={handleClearCompareProducts}>{translations.clearComparableProducts}</button>
       </div>
     </aside>

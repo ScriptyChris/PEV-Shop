@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import httpService from '../../features/httpService';
+import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
   header: 'Registration confirmation',
@@ -56,7 +57,7 @@ export default function ConfirmRegistration() {
     }
   }, []);
 
-  const logIn = () => history.push('/log-in');
+  const logIn = () => history.push(ROUTES.LOG_IN);
 
   return (
     <section>
