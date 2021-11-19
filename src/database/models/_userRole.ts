@@ -34,12 +34,10 @@ userRoleSchema.methods.toJSON = function () {
   return userRole;
 };
 
-const UserRoleModel = model<IUserRole>('User-Role', userRoleSchema);
+export const UserRoleModel = model<IUserRole>('User-Role', userRoleSchema);
 
 export interface IUserRole extends Document {
   roleName: string;
   permissions: string[];
   owners: Schema.Types.ObjectId[];
 }
-
-export default UserRoleModel;

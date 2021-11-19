@@ -152,7 +152,7 @@ productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
   this.url = this.name.toLowerCase().replace(/\s/g, '-');
 };
 
-const ProductModel = model<IProduct>('Product', productSchema);
+export const ProductModel = model<IProduct>('Product', productSchema);
 
 export interface IReviews extends Types.Subdocument {
   list: Record<string, string | number>[];
@@ -170,5 +170,3 @@ export interface IProduct extends Document {
   relatedProductsNames: Array<string>;
   reviews: IReviews;
 }
-
-export default ProductModel;

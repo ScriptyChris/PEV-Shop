@@ -17,7 +17,6 @@ import mapProductsTechnicalSpecs from '../helpers/api-products-specs-mapper';
 import { IProduct, IReviews } from '../../database/models/_product';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import type { IModel } from '../../database/models/models-index';
 import { wrapRes } from '../helpers/middleware-response-wrapper';
 
 const {
@@ -262,7 +261,7 @@ async function modifyProduct(req: Request & { userPermissions: any }, res: Respo
     }
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, {
-      payload: modifiedProduct as Record<keyof IModel, IModel[keyof IModel]>,
+      payload: modifiedProduct as Record<keyof IProduct, IProduct[keyof IProduct]>,
     });
   } catch (exception) {
     return next(exception);

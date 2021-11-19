@@ -48,7 +48,7 @@ const ModelClassMock: TJestMock & {
   }
 );
 
-const ModelModuleMock: TJestMock & {
+const getModel: TJestMock & {
   _ModelClassMock: typeof ModelClassMock;
   _ModelPrototypeSaveMock: typeof Model.prototype.save;
 } = Object.assign(
@@ -59,4 +59,4 @@ const ModelModuleMock: TJestMock & {
   }
 );
 
-export default ModelModuleMock;
+export { getModel };

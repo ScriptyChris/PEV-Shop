@@ -213,7 +213,7 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
   return user;
 };
 
-const UserModel = model<IUser, IUserStatics>('User', userSchema);
+export const UserModel = model<IUser, IUserStatics>('User', userSchema);
 
 type IUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>;
 
@@ -243,5 +243,3 @@ export interface IUser extends Document {
   removeProductFromObserved(productId: string): string;
   removeAllProductsFromObserved(): string;
 }
-
-export default UserModel;

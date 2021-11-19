@@ -1,6 +1,6 @@
-const ModelModuleMock = jest
+const { getModel: getModelMock } = jest
   .mock('../../src/database/models/models-index')
-  .requireMock('../../src/database/models/models-index').default;
+  .requireMock('../../src/database/models/models-index');
 const getPaginatedItemsMock = jest
   .mock('../../src/database/utils/paginateItemsFromDB')
   .requireMock('../../src/database/utils/paginateItemsFromDB').default;
@@ -13,23 +13,27 @@ describe('#database-index', () => {
   let saveToDB: any, getFromDB: any, updateOneModelInDB: any;
 
   beforeAll(async () => {
-    ({ saveToDB, getFromDB, updateOneModelInDB } = await import(findAssociatedSrcModulePath()));
+    try {
+      ({ saveToDB, getFromDB, updateOneModelInDB } = await import(findAssociatedSrcModulePath()));
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   afterEach(() => {
-    ModelModuleMock.mockClear();
-    ModelModuleMock._ModelClassMock.mockClear();
-    ModelModuleMock._ModelClassMock.distinct.mockClear();
-    ModelModuleMock._ModelClassMock.find.mockClear();
-    ModelModuleMock._ModelClassMock.findOne.mockClear();
-    ModelModuleMock._ModelClassMock.findOneAndUpdate.mockClear();
-    ModelModuleMock._ModelPrototypeSaveMock.mockClear();
+    getModelMock.mockClear();
+    getModelMock._ModelClassMock.mockClear();
+    getModelMock._ModelClassMock.distinct.mockClear();
+    getModelMock._ModelClassMock.find.mockClear();
+    getModelMock._ModelClassMock.findOne.mockClear();
+    getModelMock._ModelClassMock.findOneAndUpdate.mockClear();
+    getModelMock._ModelPrototypeSaveMock.mockClear();
     getPaginatedItemsMock.mockClear();
   });
 
   describe('saveToDB()', () => {
     const getModelPrototypeSaveMock = () =>
-      Object.getPrototypeOf(ModelModuleMock._ModelClassMock.getMockImplementation()()).save;
+      Object.getPrototypeOf(getModelMock._ModelClassMock.getMockImplementation()()).save;
 
     it('should call getModel(..) with modelType param', async () => {
       const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
@@ -37,7 +41,7 @@ describe('#database-index', () => {
 
       await saveToDB({}, MODEL_TYPE);
 
-      expect(ModelModuleMock).toHaveBeenCalledWith(MODEL_TYPE);
+      expect(getModelMock).toHaveBeenCalledWith(MODEL_TYPE);
     });
 
     it('should call Model constructor with itemData param', async () => {
@@ -47,7 +51,7 @@ describe('#database-index', () => {
 
       await saveToDB(itemData, MODEL_TYPE);
 
-      expect(ModelModuleMock._ModelClassMock).toHaveBeenCalledWith(itemData);
+      expect(getModelMock._ModelClassMock).toHaveBeenCalledWith(itemData);
     });
 
     it('should call item.save(..) once without callback param', async () => {
@@ -64,7 +68,7 @@ describe('#database-index', () => {
       const ModelPrototypeSaveMock = getModelPrototypeSaveMock();
       ModelPrototypeSaveMock.mockImplementationOnce(ModelPrototypeSaveMock._succeededCall);
 
-      expect(saveToDB({}, MODEL_TYPE)).resolves.toStrictEqual(new ModelModuleMock._ModelClassMock());
+      expect(saveToDB({}, MODEL_TYPE)).resolves.toStrictEqual(new getModelMock._ModelClassMock());
     });
 
     it('should return promise rejected to null when save operation failed', async () => {
@@ -79,7 +83,7 @@ describe('#database-index', () => {
     it('should call getModel(..) with modelType param', async () => {
       await getFromDB({}, MODEL_TYPE, {});
 
-      expect(ModelModuleMock).toHaveBeenCalledWith(MODEL_TYPE);
+      expect(getModelMock).toHaveBeenCalledWith(MODEL_TYPE);
     });
 
     it('should call getPaginatedItems(..) with appropriate params when provided options.pagination param is truthy', async () => {
@@ -88,11 +92,7 @@ describe('#database-index', () => {
 
       await getFromDB(itemQuery, MODEL_TYPE, options);
 
-      expect(getPaginatedItemsMock).toHaveBeenCalledWith(
-        ModelModuleMock._ModelClassMock,
-        itemQuery,
-        options.pagination
-      );
+      expect(getPaginatedItemsMock).toHaveBeenCalledWith(getModelMock._ModelClassMock, itemQuery, options.pagination);
     });
 
     it('should return result of calling getPaginatedItems(..) when provided options.pagination param is truthy', async () => {
@@ -109,13 +109,13 @@ describe('#database-index', () => {
 
       await getFromDB({}, MODEL_TYPE, options);
 
-      expect(ModelModuleMock._ModelClassMock.distinct).toHaveBeenCalledWith(itemQuery);
+      expect(getModelMock._ModelClassMock.distinct).toHaveBeenCalledWith(itemQuery);
     });
 
     it('should return result of calling Model.distinct(..) when provided options.isDistinct params is true', async () => {
       const options = { isDistinct: true };
       const getFromDBResult = await getFromDB({}, MODEL_TYPE, options);
-      const distinctMockResult = await ModelModuleMock._ModelClassMock.distinct();
+      const distinctMockResult = await getModelMock._ModelClassMock.distinct();
 
       expect(getFromDBResult).toStrictEqual(distinctMockResult);
     });
@@ -126,30 +126,30 @@ describe('#database-index', () => {
       const itemQueryEmpty = {};
       const getFromDBResult1 = getFromDB(itemQueryEmpty, MODEL_TYPE, {}, projectionParam);
       expect(getFromDBResult1).resolves.toBe('find result');
-      expect(ModelModuleMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryEmpty, projectionParam);
+      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryEmpty, projectionParam);
 
       const itemQueryIdObject = { _id: {} };
       const getFromDBResult2 = getFromDB(itemQueryIdObject, MODEL_TYPE, {}, projectionParam);
       expect(getFromDBResult2).resolves.toBe('find result');
-      expect(ModelModuleMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryIdObject, projectionParam);
+      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryIdObject, projectionParam);
 
       const itemQueryNumber = 123;
       const getFromDBResult3 = getFromDB(itemQueryNumber, MODEL_TYPE, {});
       expect(getFromDBResult3).resolves.toBe('findOne result');
-      expect(ModelModuleMock._ModelClassMock.findOne).toHaveBeenCalledWith(itemQueryNumber);
+      expect(getModelMock._ModelClassMock.findOne).toHaveBeenCalledWith(itemQueryNumber);
     });
   });
 
   describe('updateOneModelInDB()', () => {
     it('should call getModel(..) with modelType param', () => {
       const updateData = { action: 'addUnique' };
-      ModelModuleMock._ModelClassMock.findOneAndUpdate.mockImplementationOnce(
-        ModelModuleMock._ModelClassMock.findOneAndUpdate._succeededCall
+      getModelMock._ModelClassMock.findOneAndUpdate.mockImplementationOnce(
+        getModelMock._ModelClassMock.findOneAndUpdate._succeededCall
       );
 
       updateOneModelInDB({}, updateData, MODEL_TYPE);
 
-      expect(ModelModuleMock).toHaveBeenCalledWith(MODEL_TYPE);
+      expect(getModelMock).toHaveBeenCalledWith(MODEL_TYPE);
     });
 
     it('should call Model.findOneAndUpdate(..) with correct params', () => {
@@ -160,14 +160,14 @@ describe('#database-index', () => {
         { action: 'deleteAll', operator: '$pull' },
         { action: 'modify', operator: '$set' },
       ].forEach(({ action, operator }, index) => {
-        ModelModuleMock._ModelClassMock.findOneAndUpdate.mockImplementationOnce(
-          ModelModuleMock._ModelClassMock.findOneAndUpdate._succeededCall
+        getModelMock._ModelClassMock.findOneAndUpdate.mockImplementationOnce(
+          getModelMock._ModelClassMock.findOneAndUpdate._succeededCall
         );
         const updateData = { action, data: 'new value' };
 
         updateOneModelInDB(itemQuery, updateData, MODEL_TYPE);
 
-        const callToFindOneAndUpdateMock = ModelModuleMock._ModelClassMock.findOneAndUpdate.mock.calls[index];
+        const callToFindOneAndUpdateMock = getModelMock._ModelClassMock.findOneAndUpdate.mock.calls[index];
 
         expect(callToFindOneAndUpdateMock[0]).toBe(itemQuery);
         expect(callToFindOneAndUpdateMock[1]).toStrictEqual({ [operator]: updateData.data });
@@ -181,15 +181,15 @@ describe('#database-index', () => {
     });
 
     it('should return value or null depend on Model.findOneAndUpdate(..) result', () => {
-      ModelModuleMock._ModelClassMock.findOneAndUpdate
-        .mockImplementationOnce(ModelModuleMock._ModelClassMock.findOneAndUpdate._succeededCall)
-        .mockImplementationOnce(ModelModuleMock._ModelClassMock.findOneAndUpdate._failedCall);
+      getModelMock._ModelClassMock.findOneAndUpdate
+        .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._succeededCall)
+        .mockImplementationOnce(getModelMock._ModelClassMock.findOneAndUpdate._failedCall);
 
       const updateData = { action: 'addUnique' };
 
       expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toStrictEqual(
         // @ts-ignore
-        new ModelModuleMock._ModelClassMock.findOneAndUpdate._clazz()
+        new getModelMock._ModelClassMock.findOneAndUpdate._clazz()
       );
       expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toBeNull();
     });

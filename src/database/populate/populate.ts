@@ -2,10 +2,10 @@
 // -products=trialProducts.json categoryGroups=categoryGroups.json singleProduct cleanAll
 
 import getLogger from '../../../utils/logger';
-import { connect, connection } from 'mongoose';
-import { IProduct } from '../models/_product';
-import { IUser } from '../models/_user';
-import getModel, { TGenericModel, TModelType } from '../models/models-index';
+import { connect, connection, Model } from 'mongoose';
+import { ProductModel, IProduct } from '../models/_product';
+import { UserModel, IUser } from '../models/_user';
+import { TModelType } from '../models/models-index';
 import * as dotenv from 'dotenv';
 import { hashPassword } from '../../middleware/features/auth';
 
@@ -62,14 +62,11 @@ if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
 (async () => {
   await connectToDB();
 
-  const Product = getModel('Product');
-  const User = getModel('User');
-
   if (getScriptParamValue(PARAMS.CLEAN_ALL_BEFORE)) {
     const removedData = await Promise.all(
       [
-        { name: 'products', ctor: Product },
-        { name: 'users', ctor: User },
+        { name: 'products', ctor: ProductModel },
+        { name: 'users', ctor: UserModel },
       ].map(async ({ name, ctor }) => `\n-${name}: ${(await ctor.deleteMany({})).deletedCount}`)
     );
 
@@ -78,22 +75,22 @@ if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
 
   if (getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
     const productsSourceDataList = getSourceData('Product') as TPopulatedData[];
-    await populateProducts(Product, productsSourceDataList);
-    await updateRelatedProductsNames(Product, productsSourceDataList);
+    await populateProducts(ProductModel, productsSourceDataList);
+    await updateRelatedProductsNames(ProductModel, productsSourceDataList);
   }
 
   if (getScriptParamValue(PARAMS.JSON_FILE_PATH.USERS)) {
     const usersSourceDataList = getSourceData('User') as TPopulatedData[];
-    await populateUsers(User, usersSourceDataList);
+    await populateUsers(UserModel, usersSourceDataList);
   }
 
   logger.log(
     'Products amount after population:',
-    await Product.find({}).countDocuments(),
+    await ProductModel.find({}).countDocuments(),
     ' /relatedProductsErrors:',
     relatedProductsErrors,
     '\n Users amount after population:',
-    await User.find({}).countDocuments()
+    await UserModel.find({}).countDocuments()
   );
 
   await connection.close();
@@ -134,7 +131,10 @@ function getSourceData(modelType: TModelType): TPopulatedData[] | ReferenceError
   }
 }
 
-function populateProducts(ProductModel: TGenericModel, productsSourceDataList: TPopulatedData[]): Promise<IProduct[]> {
+function populateProducts(
+  ProductModel: Model<IProduct>,
+  productsSourceDataList: TPopulatedData[]
+): Promise<IProduct[]> {
   return Promise.all(
     productsSourceDataList.map((data: TPopulatedData) => {
       const product = new ProductModel(data) as IProduct;
@@ -149,7 +149,7 @@ function populateProducts(ProductModel: TGenericModel, productsSourceDataList: T
   );
 }
 
-function populateUsers(UserModel: TGenericModel, usersSourceDataList: TPopulatedData[]): Promise<IUser[]> {
+function populateUsers(UserModel: Model<IUser>, usersSourceDataList: TPopulatedData[]): Promise<IUser[]> {
   return Promise.all(
     usersSourceDataList.map(async (data: TPopulatedData) => {
       data.password = await hashPassword(data.password as string);
@@ -165,14 +165,14 @@ function populateUsers(UserModel: TGenericModel, usersSourceDataList: TPopulated
 }
 
 function updateRelatedProductsNames(
-  ProductModel: TGenericModel,
+  ProductModel: Model<IProduct>,
   sourceDataList: TPopulatedData[]
 ): Promise<Array<IProduct | void>> {
   return Promise.all(
     sourceDataList.map((data: TPopulatedData) => {
       return ProductModel.updateOne(
-        { name: data.name },
-        { relatedProductsNames: data.relatedProductsNames },
+        { name: data.name as string },
+        { relatedProductsNames: data.relatedProductsNames as string[] },
         { runValidators: true }
       ).catch((error) => {
         logger.error(error);

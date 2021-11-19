@@ -12,8 +12,12 @@ describe('#api-product-categories', () => {
   let routerGetCallback: any;
 
   beforeAll(async () => {
-    apiProductCategoriesRouterGet = (await import(findAssociatedSrcModulePath())).default.get;
-    routerGetCallback = apiProductCategoriesRouterGet.mock.calls[0][1];
+    try {
+      apiProductCategoriesRouterGet = (await import(findAssociatedSrcModulePath())).default.get;
+      routerGetCallback = apiProductCategoriesRouterGet.mock.calls[0][1];
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   afterAll(() => {

@@ -1,6 +1,16 @@
 import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 import { getResMock, getNextFnMock } from '../../mockUtils';
+import { findAssociatedSrcModulePath } from '../../test-index';
 
+const { ObjectId: ObjectIdMock } = jest
+  .mock('mongodb', () => {
+    return {
+      ObjectId: function () {
+        return 'test object id';
+      },
+    };
+  })
+  .requireMock('mongodb');
 const { Router, _router } = jest.mock('express').requireMock('express').default;
 const { authMiddlewareFn: authMiddlewareFnMock, hashPassword: hashPasswordMock } = jest
   .mock('../../../src/middleware/features/auth')
@@ -9,11 +19,8 @@ const {
   getFromDB: getFromDBMock,
   saveToDB: saveToDBMock,
   updateOneModelInDB: updateOneModelInDBMock,
-  ObjectId: ObjectIdMock,
 } = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
-const { validatePassword } = jest
-  .mock('../../../src/database/models/_user')
-  .requireMock('../../../src/database/models/_user').default;
+jest.mock('../../../src/database/models/_user').requireMock('../../../src/database/models/_user');
 
 describe('#api-users', () => {
   const authMiddlewareReturnedFn = () => undefined;
@@ -39,7 +46,7 @@ describe('#api-users', () => {
       .mockImplementationOnce(() => authMiddlewareReturnedFn);
 
     try {
-      apiUsersRouter = (await import('../../../src/middleware/routes/api-users')).default;
+      apiUsersRouter = (await import(findAssociatedSrcModulePath())).default;
     } catch (moduleImportException) {
       console.error('(beforeAll) moduleImportException:', moduleImportException);
     }
