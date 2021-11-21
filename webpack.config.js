@@ -1,20 +1,19 @@
 const { resolve } = require('path');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyPlugin = require("copy-webpack-plugin");
+const CopyPlugin = require('copy-webpack-plugin');
 
 require('dotenv').config();
 
 module.exports = (env) => {
   // TODO: handle it in better way
   process.env.NODE_ENV = env;
-  const middleware = env === 'development' ?
-      require('./dist/src/middleware/middleware-index').default :
-      () => {};
+  const middleware = env === 'development' ? require('./dist/src/middleware/middleware-index').default : () => {};
 
   return {
     mode: env,
-    entry: ['react-hot-loader/patch','./src/frontend/index.js'],
+    entry: ['react-hot-loader/patch', './src/frontend/index.js'],
     output: {
       filename: 'index.js',
       path: resolve(__dirname, './dist/src/frontend'),
@@ -22,8 +21,9 @@ module.exports = (env) => {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.(t|j)s(x?)$/,
           loader: ['babel-loader', 'eslint-loader', 'prettier-loader'],
+          resolve: { extensions: ['.ts', '.js', '.tsx', '.jsx'] },
         },
         {
           test: /\.scss$/,
@@ -35,15 +35,20 @@ module.exports = (env) => {
               },
             },
             'css-loader',
-            'sass-loader'
-          ]
+            'sass-loader',
+          ],
         },
-      ]
+      ],
     },
     plugins: [
+      new ForkTsCheckerWebpackPlugin({
+        typescript: {
+          configFile: 'tsconfig.frontend.json',
+        },
+      }),
       new MiniCssExtractPlugin({
         filename: 'styles.css',
-        chunkFilename: '[id].css'
+        chunkFilename: '[id].css',
       }),
       new HtmlWebpackPlugin({
         template: './src/frontend/index.html',
@@ -54,12 +59,9 @@ module.exports = (env) => {
         inject: false,
       }),
       new CopyPlugin({
-        patterns: [
-          'shipment-map-3rd-party.js', 'shipment-map-3rd-party.css',
-          'shipment-map.js',
-        ].map((fileName) => ({
+        patterns: ['shipment-map-3rd-party.js', 'shipment-map-3rd-party.css', 'shipment-map.js'].map((fileName) => ({
           from: `./src/frontend/assets/embedded/${fileName}`,
-          to: `./embedded/${fileName}`
+          to: `./embedded/${fileName}`,
         })),
       }),
     ],
@@ -74,9 +76,14 @@ module.exports = (env) => {
       liveReload: false,
       watchOptions: {
         ignored: [
-          'node_modules', 'dist', '.*', 'src/middleware',
-          'src/database', 'test/middleware', 'test/database'
-        ].map(path => resolve(__dirname, path)),
+          'node_modules',
+          'dist',
+          '.*',
+          'src/middleware',
+          'src/database',
+          'test/middleware',
+          'test/database',
+        ].map((path) => resolve(__dirname, path)),
       },
     },
   };

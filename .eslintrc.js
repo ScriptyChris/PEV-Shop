@@ -2,43 +2,58 @@ const isBackendOnly = process.env.BACKEND_ONLY === 'true';
 const isTestEnv = process.env.TEST_ENV === 'true';
 
 const config = {
-    browser: !isBackendOnly,
-    extends: isBackendOnly ? ['plugin:@typescript-eslint/recommended'] : ['plugin:react/recommended'],
-    jsx: !isBackendOnly,
-    plugins: isBackendOnly ? [] : ['react'],
-    rules: isBackendOnly ? {
-        '@typescript-eslint/ban-ts-comment': ['warn', {
+  browser: !isBackendOnly,
+  get extends() {
+    const extensions = ['eslint:recommended', 'plugin:@typescript-eslint/recommended'];
+
+    if (!isBackendOnly) {
+      extensions.push('plugin:react/recommended');
+    }
+
+    return extensions;
+  },
+  jsx: true,
+  plugins: isBackendOnly ? [] : ['react', '@typescript-eslint'],
+  rules: isBackendOnly
+    ? {
+        '@typescript-eslint/ban-ts-comment': [
+          'warn',
+          {
             'ts-ignore': true,
-        }]
-    } : { 'react/prop-types': 'off' },
-    ignorePatterns: ['src/database/data', 'test/**/*.js'],
+          },
+        ],
+      }
+    : { 'react/prop-types': 'off' },
+  ignorePatterns: ['src/database/data', 'test/**/*.js'],
 };
-// espree is ESLint default parser -> https://eslint.org/docs/user-guide/configuring/plugins#specifying-parser
-const DEFAULT_PARSER = 'espree';
 
 if (!isTestEnv && isBackendOnly) {
-    config.ignorePatterns.push('test/', '__mocks__/', '**/__mocks__', 'src/**/*.js');
+  config.ignorePatterns.push('test/', '__mocks__/', '**/__mocks__', 'src/**/*.js');
 }
 
 module.exports = {
-    'env': {
-        'browser': config.browser,
-        'node': !config.browser,
-        'es2020': true
+  env: {
+    browser: config.browser,
+    node: !config.browser,
+    es2020: true,
+  },
+  extends: config.extends,
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: config.jsx,
     },
-    'extends': [
-        'eslint:recommended',
-        ...config.extends
-    ],
-    'parser': isBackendOnly ? '@typescript-eslint/parser' : DEFAULT_PARSER,
-    'parserOptions': {
-        'ecmaFeatures': {
-            'jsx': config.jsx
+    ecmaVersion: 2020,
+    sourceType: 'module',
+  },
+  plugins: config.plugins,
+  rules: config.rules,
+  ignorePatterns: config.ignorePatterns,
+  settings: isBackendOnly
+    ? undefined
+    : {
+        react: {
+          version: 'detect',
         },
-        'ecmaVersion': 2020,
-        'sourceType': 'module'
-    },
-    'plugins': config.plugins,
-    'rules': config.rules,
-    ignorePatterns: config.ignorePatterns,
+      },
 };
