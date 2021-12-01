@@ -1,15 +1,18 @@
 import storeService from './storeService';
 import storageService from './storageService';
-import httpService from './httpService';
+import httpService, { CUSTOM_RES_EXT_DICT } from './httpService';
+import type { IUser, IUserPublic } from '../../database/models/_user';
+
+type TLogInCredentials = Pick<IUser, 'login' | 'password'>;
 
 const userSessionService = Object.freeze({
-  logIn(credentials) {
-    return httpService.loginUser(credentials).then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
+  async logIn(logInCredentials: TLogInCredentials) {
+    return httpService.loginUser(logInCredentials).then((res) => {
+      if (CUSTOM_RES_EXT_DICT.__EXCEPTION_ALREADY_HANDLED in res) {
         return res;
       }
 
-      const userAccount = res;
+      const userAccount = res as IUserPublic;
       const authToken = httpService.getAuthToken();
 
       if (!userAccount || !authToken) {
@@ -26,9 +29,9 @@ const userSessionService = Object.freeze({
     });
   },
 
-  logOut() {
+  async logOut() {
     return httpService.logoutUser().then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
+      if (CUSTOM_RES_EXT_DICT.__EXCEPTION_ALREADY_HANDLED in res) {
         return res;
       }
 
@@ -40,12 +43,12 @@ const userSessionService = Object.freeze({
     });
   },
 
-  logOutFromMultipleSessions(shouldPreserveCurrentSession) {
+  async logOutFromMultipleSessions(shouldPreserveCurrentSession: boolean) {
     return httpService
       .disableGenericErrorHandler()
       .logOutUserFromSessions(shouldPreserveCurrentSession)
       .then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
+        if (CUSTOM_RES_EXT_DICT.__EXCEPTION_ALREADY_HANDLED in res) {
           return res;
         } else if (!shouldPreserveCurrentSession) {
           storeService.clearUserAccountState();
@@ -74,6 +77,6 @@ const userSessionService = Object.freeze({
       storeService.updateUserAccountState(userAccount);
     }
   },
-});
+} as const);
 
 export default userSessionService;

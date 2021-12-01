@@ -1,6 +1,6 @@
 const LANGUAGE = 'en'; /* TODO: [UX] that value should be set based on user-browser settings */
 
-function getLocalizedDate(date) {
+function getLocalizedDate(date: Date) {
   if (!(date instanceof Date)) {
     date = new Date(date);
   }

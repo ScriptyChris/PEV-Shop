@@ -12,3 +12,18 @@ declare module 'mongoose' {
         deleteMany(conditions: FilterQuery<unknown>): Query<DeleteWriteOpResultObject['result'] & { deletedCount?: number }> & QueryHelpers;
     }
 }
+
+declare global {
+    namespace Intl {
+        // https://github.com/microsoft/TypeScript/blob/main/lib/lib.es2020.intl.d.ts#L300
+        interface DateTimeFormatOptions {
+            dateStyle?: "full" | "long" | "medium" | "short";
+            timeStyle?: "full" | "long" | "medium" | "short";
+            calendar?: string;
+            dayPeriod?: "narrow" | "short" | "long";
+            numberingSystem?: string;
+            hourCycle?: "h11" | "h12" | "h23" | "h24";
+            fractionalSecondDigits?: 0 | 1 | 2 | 3;
+        }
+    }
+}

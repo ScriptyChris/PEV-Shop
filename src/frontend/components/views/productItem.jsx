@@ -32,7 +32,7 @@ export default function ProductItem({ product }) {
   const { name, price, _id } = product;
 
   const handleAddToCartClick = () => {
-    storeService.updateUserCartState({ name, price, _id });
+    storeService.updateUserCartState({ name, price, _id } /* TODO: [TS] `as IUserCart['products']` */);
   };
 
   return (

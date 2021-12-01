@@ -1,18 +1,32 @@
+import type { IUser, IUserPublic, TUserRegistrationCredentials } from '../../database/models/_user';
+import type { IProduct } from '../../database/models/_product';
+import type {
+  IEmbracedResponse,
+  TSuccessfulHTTPStatusCodesToData,
+  TClientErrorHTTPStatusCodesToData,
+  TServerErrorHTTPStatusCodesToData,
+} from '../../middleware/helpers/middleware-response-wrapper';
+import type { TProductTechnicalSpecs } from '../../middleware/helpers/api-products-specs-mapper';
+import { HTTP_STATUS_CODE, IUserCart, TPagination } from '../../types';
+
+type TResDataType<T> = T[keyof T];
+
 class Ajax {
+  _API_PATH_NAME: string;
+  _BASE_API_URL: string;
+  _AUTH_TOKEN: string | null;
+  HTTP_METHOD_NAME = {
+    GET: 'GET',
+    PATCH: 'PATCH',
+    POST: 'POST',
+    DELETE: 'DELETE',
+  } as const;
+  _isGenericErrorHandlerActive: boolean;
+
   constructor() {
     this._API_PATH_NAME = 'api';
     this._BASE_API_URL = `${location.origin}/${this._API_PATH_NAME}`;
     this._AUTH_TOKEN = null;
-    this.HTTP_METHOD_NAME = Object.freeze({
-      GET: 'GET',
-      PATCH: 'PATCH',
-      POST: 'POST',
-      DELETE: 'DELETE',
-    });
-    // TODO: [DX] make it consistent with backend's enum HTTP_STATUS_CODE
-    this.HTTP_RESPONSE_STATUS = Object.freeze({
-      NO_CONTENT: 204,
-    });
     this._isGenericErrorHandlerActive = true;
   }
 
@@ -37,7 +51,7 @@ class Ajax {
     return this._AUTH_TOKEN;
   }
 
-  setAuthToken(authToken) {
+  setAuthToken(authToken: this['_AUTH_TOKEN']) {
     this._AUTH_TOKEN = authToken;
   }
 
@@ -53,11 +67,11 @@ class Ajax {
     return this;
   }
 
-  _fetchBaseHandler(fetchResult) {
+  _fetchBaseHandler(fetchResult: ReturnType<typeof fetch>) {
     const isGenericErrorHandlerActive = this._isGenericErrorHandlerActive;
     const fetchPromise = fetchResult
       .then((response) => {
-        if (response.status === this.HTTP_RESPONSE_STATUS.NO_CONTENT) {
+        if (response.status === HTTP_STATUS_CODE.NO_CONTENT) {
           return { __NO_CONTENT: true };
         }
 
@@ -67,7 +81,7 @@ class Ajax {
         if (!body || typeof body !== 'object') {
           throw `Response body is empty! body: ${body}`;
         } else if (body.__NO_CONTENT) {
-          return body;
+          return body as Pick<ICustomResExt, '__NO_CONTENT'>;
         } else if ('authToken' in body) {
           this.setAuthToken(body.authToken);
         } else if (body.error) {
@@ -76,20 +90,33 @@ class Ajax {
           throw body.exception;
         }
 
-        return body.payload || body.message || {};
+        return (body.payload || body.message || {}) as Pick<
+          IEmbracedResponse,
+          TResDataType<TSuccessfulHTTPStatusCodesToData>
+        >;
       })
-      .catch((exception) => {
-        console.error('(_fetchBaseHandler) caught an error:', exception);
+      .catch(
+        (
+          exception: Pick<
+            IEmbracedResponse,
+            TResDataType<TClientErrorHTTPStatusCodesToData> | TResDataType<TServerErrorHTTPStatusCodesToData>
+          >
+        ) => {
+          console.error('(_fetchBaseHandler) caught an error:', exception);
 
-        return httpServiceSubscriber.callSubscribers(httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION, exception);
-      });
+          return httpServiceSubscriber.callSubscribers(
+            httpServiceSubscriber.SUBSCRIPTION_TYPE.EXCEPTION,
+            exception
+          ) as Pick<ICustomResExt, '__ERROR_TO_HANDLE' | '__EXCEPTION_ALREADY_HANDLED'>;
+        }
+      );
 
     this._enableGenericErrorHandler();
 
     return fetchPromise;
   }
 
-  _sendRequestWithPayload(methodName, apiEndpoint, data, useToken) {
+  _sendRequestWithPayload(methodName: string, apiEndpoint: string, data: unknown, useToken: boolean) {
     const headers = new Headers(this._getContentTypeHeader());
 
     if (useToken) {
@@ -106,7 +133,7 @@ class Ajax {
   }
 
   // TODO: fix creating URL by apiEndpoint
-  getRequest(apiEndpoint, useToken) {
+  getRequest(apiEndpoint: { url: string; searchParams: URLSearchParams } | string, useToken = false) {
     const url = this._BASE_API_URL_OBJECT;
 
     if (typeof apiEndpoint === 'object') {
@@ -119,7 +146,7 @@ class Ajax {
       url.pathname += apiEndpoint;
     }
 
-    const options = {};
+    const options = {} as RequestInit;
 
     if (useToken) {
       options.headers = {
@@ -130,21 +157,21 @@ class Ajax {
     return this._fetchBaseHandler(fetch(url.toString(), options));
   }
 
-  postRequest(apiEndpoint, data, useToken) {
+  postRequest(apiEndpoint: string, data: unknown, useToken = false) {
     return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.POST, apiEndpoint, data, useToken);
   }
 
-  patchRequest(apiEndpoint, data, useToken) {
+  patchRequest(apiEndpoint: string, data: unknown, useToken = false) {
     return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.PATCH, apiEndpoint, data, useToken);
   }
 
-  deleteRequest(apiEndpoint, useToken) {
+  deleteRequest(apiEndpoint: string, useToken = false) {
     const url = this._BASE_API_URL_OBJECT;
     url.pathname += apiEndpoint;
 
     const options = {
       method: this.HTTP_METHOD_NAME.DELETE,
-    };
+    } as RequestInit;
 
     if (useToken) {
       options.headers = {
@@ -157,6 +184,12 @@ class Ajax {
 }
 
 const httpService = new (class HttpService extends Ajax {
+  PRODUCTS_URL: string;
+  PRODUCT_CATEGORIES_URL: string;
+  PRODUCTS_SPECS_URL: string;
+  USERS_URL: string;
+  ORDERS_URL: string;
+
   constructor() {
     super();
 
@@ -167,22 +200,30 @@ const httpService = new (class HttpService extends Ajax {
     this.ORDERS_URL = 'orders';
   }
 
-  _preparePaginationParams(searchParams, pagination) {
+  _preparePaginationParams(searchParams: URLSearchParams, pagination?: TPagination) {
     if (!pagination || !Object.keys(pagination).length) {
       return;
     } else if (!searchParams || !(searchParams instanceof URLSearchParams)) {
       throw ReferenceError('searchParams as an instance of URLSearchParams must be provided!');
     }
 
-    searchParams.append('page', pagination.pageNumber);
-    searchParams.append('limit', pagination.productsPerPage);
+    searchParams.append('page', String(pagination.pageNumber));
+    searchParams.append('limit', String(pagination.productsPerPage));
   }
 
-  addProduct(product) {
+  addProduct(product: IProduct) {
     return this.postRequest(this.PRODUCTS_URL, product);
   }
 
-  getProducts({ pagination, productCategories, productsFilters } = {}) {
+  getProducts({
+    pagination,
+    productCategories,
+    productsFilters,
+  }: Partial<{
+    pagination: TPagination;
+    productCategories: string;
+    productsFilters: string[];
+  }> = {}) {
     const searchParams = new URLSearchParams();
 
     this._preparePaginationParams(searchParams, pagination);
@@ -192,17 +233,17 @@ const httpService = new (class HttpService extends Ajax {
     }
 
     if (productsFilters && productsFilters.length) {
-      searchParams.append('productsFilters', productsFilters);
+      searchParams.append('productsFilters', productsFilters as unknown as string);
     }
 
     return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
   }
 
-  getProductsById(idList) {
+  getProductsById(idList: string[]) {
     return this.getRequest(`${this.PRODUCTS_URL}?idList=${idList}`);
   }
 
-  getProductsByNames(nameList) {
+  getProductsByNames(nameList: string[]) {
     const searchParams = new URLSearchParams({ nameList: JSON.stringify(nameList) });
 
     return this.getRequest({
@@ -211,7 +252,7 @@ const httpService = new (class HttpService extends Ajax {
     });
   }
 
-  getProductsByName(name, caseSensitive = 'false', pagination) {
+  getProductsByName(name: string, caseSensitive = 'false', pagination: TPagination) {
     const searchParams = new URLSearchParams();
     searchParams.append('name', name);
     searchParams.append('caseSensitive', caseSensitive);
@@ -230,10 +271,12 @@ const httpService = new (class HttpService extends Ajax {
   }
 
   getProductsSpecifications() {
-    return this.getRequest(this.PRODUCTS_SPECS_URL);
+    return this.getRequest(this.PRODUCTS_SPECS_URL) as Promise<
+      TProductTechnicalSpecs | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
+    >;
   }
 
-  modifyProduct(productName, productModifications) {
+  modifyProduct(productName: IProduct['name'], productModifications: Partial<IProduct>) {
     const modifiedProductData = {
       name: productName,
       modifications: {
@@ -244,11 +287,11 @@ const httpService = new (class HttpService extends Ajax {
     return this.patchRequest(this.PRODUCTS_URL, modifiedProductData);
   }
 
-  addProductReview(productName, productReview) {
+  addProductReview(productName: IProduct['name'], productReview: IProduct['reviews']) {
     return this.patchRequest(`${this.PRODUCTS_URL}/${productName}/add-review`, productReview);
   }
 
-  deleteProduct(productName) {
+  deleteProduct(productName: IProduct['name']) {
     return this.deleteRequest(`${this.PRODUCTS_URL}/${productName}`);
   }
 
@@ -257,19 +300,21 @@ const httpService = new (class HttpService extends Ajax {
     return this.getRequest(`${this.USERS_URL}/${userId}`, true);
   }
 
-  submitCart(cart) {
+  makeOrder(cart: IUserCart['products']) {
     return this.postRequest(this.ORDERS_URL, { products: cart });
   }
 
-  loginUser(credentials) {
-    return this.postRequest(`${this.USERS_URL}/login`, credentials);
+  loginUser(loginCredentials: { login: IUser['login']; password: IUser['password'] }) {
+    return this.postRequest(`${this.USERS_URL}/login`, loginCredentials) as Promise<
+      IUserPublic | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
+    >;
   }
 
-  resetPassword(email) {
+  resetPassword(email: IUser['email']) {
     return this.postRequest(`${this.USERS_URL}/reset-password`, { email });
   }
 
-  resendResetPassword(email) {
+  resendResetPassword(email: IUser['email']) {
     return this.postRequest(`${this.USERS_URL}/resend-reset-password`, { email });
   }
 
@@ -281,31 +326,31 @@ const httpService = new (class HttpService extends Ajax {
     return this.postRequest(`${this.USERS_URL}/logout-all`, { preseveCurrentSession }, true);
   }
 
-  registerUser(registrationData) {
-    return this.postRequest(`${this.USERS_URL}/register`, registrationData);
+  registerUser(registrationCredentials: TUserRegistrationCredentials) {
+    return this.postRequest(`${this.USERS_URL}/register`, registrationCredentials);
   }
 
-  confirmRegistration(token) {
+  confirmRegistration(token: NonNullable<IUser['tokens']['confirmRegistration']>) {
     return this.postRequest(`${this.USERS_URL}/confirm-registration`, { token });
   }
 
-  resendConfirmRegistration(email) {
+  resendConfirmRegistration(email: IUser['email']) {
     return this.postRequest(`${this.USERS_URL}/resend-confirm-registration`, { email });
   }
 
-  setNewPassword(newPassword, token) {
+  setNewPassword(newPassword: IUser['password'], token: NonNullable<IUser['tokens']['auth']>[number]) {
     return this.patchRequest(`${this.USERS_URL}/set-new-password`, { newPassword, token });
   }
 
-  changePassword(password, newPassword) {
+  changePassword(password: IUser['password'], newPassword: IUser['password']) {
     return this.patchRequest(`${this.USERS_URL}/change-password`, { password, newPassword }, true);
   }
 
-  addProductToObserved(productId) {
+  addProductToObserved(productId: string) {
     return this.postRequest(`${this.USERS_URL}/add-product-to-observed`, { productId }, true);
   }
 
-  removeProductFromObserved(productId) {
+  removeProductFromObserved(productId: string) {
     return this.deleteRequest(`${this.USERS_URL}/remove-product-from-observed/${productId}`, true);
   }
 
@@ -319,27 +364,30 @@ const httpService = new (class HttpService extends Ajax {
 })();
 
 const httpServiceSubscriber = (() => {
-  const _subscribers = {
+  const _subscribers: Record<string, TSubCallback | null> = {
     EXCEPTION: null,
   };
+
+  type TSubCallback = (...args: unknown[]) => unknown;
+  type TSubKey = keyof typeof _subscribers;
 
   return {
     SUBSCRIPTION_TYPE: Object.freeze(Object.fromEntries(Object.keys(_subscribers).map((key) => [key, key]))),
 
-    callSubscribers(type, value) {
-      return _subscribers[type](value);
+    callSubscribers(type: TSubKey, value: unknown) {
+      return (_subscribers[type] as TSubCallback)(value);
     },
 
-    subscribe(type, callback) {
-      if (_subscribers[type] === 'function') {
+    subscribe(type: TSubKey, callback: TSubCallback) {
+      if (typeof _subscribers[type] === 'function') {
         throw Error(`'${type}' is already subscribing!`);
       }
 
       _subscribers[type] = callback;
     },
 
-    unSubscribe(type) {
-      if (_subscribers[type] !== 'function') {
+    unSubscribe(type: TSubKey) {
+      if (typeof _subscribers[type] !== 'function') {
         throw ReferenceError(`'${type}' is not subscribing!`);
       }
 
@@ -348,6 +396,18 @@ const httpServiceSubscriber = (() => {
   };
 })();
 
-export { httpServiceSubscriber };
+const CUSTOM_RES_EXT_DICT = Object.freeze({
+  __NO_CONTENT: '__NO_CONTENT',
+  __ERROR_TO_HANDLE: '__ERROR_TO_HANDLE',
+  __EXCEPTION_ALREADY_HANDLED: '__EXCEPTION_ALREADY_HANDLED',
+} as const);
+
+interface ICustomResExt {
+  [CUSTOM_RES_EXT_DICT.__NO_CONTENT]: true;
+  [CUSTOM_RES_EXT_DICT.__ERROR_TO_HANDLE]: Pick<IEmbracedResponse, TResDataType<TClientErrorHTTPStatusCodesToData>>;
+  [CUSTOM_RES_EXT_DICT.__EXCEPTION_ALREADY_HANDLED]: true;
+}
+
+export { httpServiceSubscriber, CUSTOM_RES_EXT_DICT };
 
 export default httpService;
