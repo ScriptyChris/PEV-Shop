@@ -29,7 +29,11 @@ describe('#api-products', () => {
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
 
-    apiProductsRouter = (await import('../../../src/middleware/routes/api-products')).default;
+    try {
+      apiProductsRouter = (await import('../../../src/middleware/routes/api-products')).default;
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   afterAll(() => {

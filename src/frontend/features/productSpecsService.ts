@@ -1,4 +1,5 @@
-import httpService from './httpService';
+import type { TProductTechnicalSpecs } from '../../middleware/helpers/api-products-specs-mapper';
+import httpService, { CUSTOM_RES_EXT_DICT } from './httpService';
 
 const productSpecsService = (() => {
   const FIELD_TYPES = Object.freeze({
@@ -17,27 +18,27 @@ const productSpecsService = (() => {
     colour: FIELD_TYPES.CHOICE,
   });
 
-  let productSpecifications = [];
+  let productSpecifications: TProductTechnicalSpecs | undefined;
 
   async function getProductsSpecifications() {
-    if (productSpecifications.length === 0) {
+    if (!productSpecifications) {
       productSpecifications = await httpService.getProductsSpecifications().then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
+        if (CUSTOM_RES_EXT_DICT.__EXCEPTION_ALREADY_HANDLED in res) {
           return;
         }
 
-        return res;
+        return res as TProductTechnicalSpecs;
       });
     }
 
     return productSpecifications;
   }
 
-  function structureProductsSpecifications({ categoryToSpecs, specs }) {
+  function structureProductsSpecifications({ categoryToSpecs, specs }: TProductTechnicalSpecs) {
     return {
       specs: specs.map((specObj) => ({
         ...specObj,
-        type: productSpecsService.SPEC_TO_FIELD_TYPE[specObj.name],
+        type: SPEC_TO_FIELD_TYPE[specObj.name as keyof typeof SPEC_TO_FIELD_TYPE],
         values: Array.isArray(specObj.values) ? [specObj.values] : Object.values(specObj.values),
         descriptions: Array.isArray(specObj.values) ? null : Object.keys(specObj.values),
       })),

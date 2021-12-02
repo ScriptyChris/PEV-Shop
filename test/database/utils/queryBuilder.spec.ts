@@ -9,15 +9,19 @@ describe('#queryBuilder', () => {
     getSearchByNameConfig: any;
 
   beforeAll(async () => {
-    ({
-      queryBuilder: {
-        isEmptyQueryObject,
-        getPaginationConfig,
-        getIdListConfig,
-        getProductsWithChosenCategories,
-        getSearchByNameConfig,
-      },
-    } = await import(findAssociatedSrcModulePath()));
+    try {
+      ({
+        queryBuilder: {
+          isEmptyQueryObject,
+          getPaginationConfig,
+          getIdListConfig,
+          getProductsWithChosenCategories,
+          getSearchByNameConfig,
+        },
+      } = await import(findAssociatedSrcModulePath()));
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   describe('isEmptyQueryObject()', () => {

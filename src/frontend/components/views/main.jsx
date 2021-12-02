@@ -13,7 +13,7 @@ import NotLoggedIn from '../pages/notLoggedIn';
 import LogIn from '../pages/logIn';
 import Account from '../pages/account';
 import ConfirmRegistration from '../pages/confirmRegistration';
-import { SetNewPassword, ResetPassword } from '../views/password';
+import { SetNewPassword, ResetPassword } from './password';
 import NotFound from '../pages/notFound';
 import { GenericErrorPopup } from '../utils/popup';
 

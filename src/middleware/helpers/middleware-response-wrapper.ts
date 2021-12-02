@@ -1,10 +1,10 @@
 import type { Response } from 'express';
 import { HTTP_STATUS_CODE } from '../../types';
 
-interface IEmbracedResponse {
+export interface IEmbracedResponse<PayloadType = never> {
   // TODO: [REFACTOR] 'authToken' could be always paired with 'payload' prop or be contained by it
   authToken: string | null;
-  payload: Record<string, unknown> | unknown[];
+  payload: PayloadType | Record<string, unknown> | unknown[];
   message: string;
   error: string;
   exception: Error | { message: string; stack?: string };
@@ -44,16 +44,16 @@ const mappedHTTPStatusCode = Object.freeze({
   511: 'SERVER_ERROR',
 } as const);
 
-type TSuccessfulHTTPStatusCodesToData = {
+export type TSuccessfulHTTPStatusCodesToData = {
   [SuccessfulStatus in keyof TypeOfHTTPStatusCodes['SUCCESSFUL']]: Extract<
     keyof IEmbracedResponse,
     'payload' | 'message' | 'authToken'
   >;
 };
-type TClientErrorHTTPStatusCodesToData = {
+export type TClientErrorHTTPStatusCodesToData = {
   [ClientErrorStatus in keyof TypeOfHTTPStatusCodes['CLIENT_ERROR']]: Extract<keyof IEmbracedResponse, 'error'>;
 };
-type TServerErrorHTTPStatusCodesToData = {
+export type TServerErrorHTTPStatusCodesToData = {
   [ServerErrorStatus in keyof TypeOfHTTPStatusCodes['SERVER_ERROR']]: Extract<keyof IEmbracedResponse, 'exception'>;
 };
 
@@ -76,10 +76,11 @@ function wrapRes(
   status: typeof HTTP_STATUS_CODE.NO_CONTENT | typeof HTTP_STATUS_CODE.NOT_FOUND
 ): Response;
 function wrapRes<
+  Payload,
   Status extends Exclude<TKeyofMappedStatusCode, typeof GROUPED_HTTP_STATUS_CODES.SUCCESSFUL[204]>,
   DataKey extends TDataKeyExt<Status>
 >(res: Response, status: Status, data: Record<DataKey, IEmbracedResponse[DataKey]>): Response;
-function wrapRes<Status extends TKeyofMappedStatusCode, DataKey extends TDataKeyExt<Status>>(
+function wrapRes<Payload, Status extends TKeyofMappedStatusCode, DataKey extends TDataKeyExt<Status>>(
   res: Response,
   status: Status,
   data?: Record<DataKey, IEmbracedResponse[DataKey]>

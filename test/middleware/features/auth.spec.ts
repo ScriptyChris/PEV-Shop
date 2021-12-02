@@ -24,9 +24,13 @@ describe('#auth', () => {
     userRoleMiddlewareFn: any;
 
   beforeAll(async () => {
-    ({ comparePasswords, hashPassword, getToken, verifyToken, authMiddlewareFn, userRoleMiddlewareFn } = await import(
-      findAssociatedSrcModulePath()
-    ));
+    try {
+      ({ comparePasswords, hashPassword, getToken, verifyToken, authMiddlewareFn, userRoleMiddlewareFn } = await import(
+        findAssociatedSrcModulePath()
+      ));
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   describe('comparePasswords()', () => {

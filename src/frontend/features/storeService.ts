@@ -1,14 +1,22 @@
 import { observable, decorate, action } from 'mobx';
+import { IUserPublic } from '../../database/models/_user';
+import type { IUserCart } from '../../types';
 
-const USER_CART_STATE = Object.freeze({
+const USER_CART_STATE: IUserCart = {
   totalPrice: 0,
   totalCount: 0,
   products: [],
-});
+};
 
 const INITIAL_USER_ACCOUNT_STATE = null;
 
+type TUserCartProducts = IUserCart['products'][number] & { count: number };
+
 class StoreService {
+  _userAccountState: IUserPublic | null;
+  _userCartState: IUserCart;
+  _productComparisonState: TUserCartProducts[];
+
   constructor() {
     // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's IUserPublic
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
@@ -16,7 +24,7 @@ class StoreService {
     this._productComparisonState = [];
   }
 
-  updateUserAccountState(userAccountState) {
+  updateUserAccountState(userAccountState: IUserPublic) {
     this._userAccountState = userAccountState;
   }
 
@@ -24,14 +32,14 @@ class StoreService {
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
   }
 
-  updateUserCartState(userCartState) {
+  updateUserCartState(userCartState: TUserCartProducts) {
     this._userCartState.totalPrice += userCartState.price;
 
     const productIndexInCart = this._userCartState.products.findIndex(
       (productItem) => productItem.name === userCartState.name
     );
     if (productIndexInCart !== -1) {
-      this._userCartState.products[productIndexInCart].count++;
+      (this._userCartState.products[productIndexInCart] as TUserCartProducts).count++;
     } else {
       userCartState.count = 1;
       this._userCartState.products.push(userCartState);
@@ -47,13 +55,19 @@ class StoreService {
     this._userCartState.totalCount = 0;
   }
 
-  replaceUserCartState(newState) {
-    if (newState) {
-      this._userCartState = observable(newState);
+  replaceUserCartState(newUserCartState: IUserCart) {
+    if (newUserCartState) {
+      this._userCartState = observable(newUserCartState);
     }
   }
 
-  updateProductComparisonState({ add, remove }) {
+  updateProductComparisonState({
+    add,
+    remove,
+  }: {
+    add: TUserCartProducts;
+    remove: Partial<{ index: number; _id: TUserCartProducts['_id'] }>;
+  }) {
     console.log('(updateProductComparisonState) /add:', add, ' /remove:', remove);
 
     if (add) {

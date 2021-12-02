@@ -15,4 +15,4 @@ const UserModel: {
 UserModel.validatePassword._succeededCall = jest.fn(() => '');
 UserModel.validatePassword._failedCall = jest.fn(() => 'invalid');
 
-export default UserModel;
+export { UserModel };

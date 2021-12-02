@@ -2,13 +2,13 @@ import React, { memo /*, useState*/ } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 // import CategoriesTree from '../views/categoriesTree';
-import { ROUTES } from '../pages/_routes';
+import { ROUTES } from './_routes';
 import ProductList from '../views/productList';
 import ProductDetails from '../views/productDetails';
-import { NewProduct, ModifyProduct } from '../pages/newProduct';
-import Compare from '../pages/compare';
-import Order from '../pages/order';
-import NotFound from '../pages/notFound';
+import { NewProduct, ModifyProduct } from './newProduct';
+import Compare from './compare';
+import Order from './order';
+import NotFound from './notFound';
 
 // const ShopMenuChooser = memo(function ShopMenuChooser(props) {
 //   return (

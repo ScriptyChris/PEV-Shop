@@ -34,7 +34,7 @@ const Shipment = memo(function Shipment({ updateChosenShipmentPoint }) {
 export default function Order() {
   const [chosenShipmentPoint, setChosenShipmentPoint] = useState(null);
   const payForOrder = () => {
-    httpService.submitCart(storeService.userCartProducts).then((res) => {
+    httpService.makeOrder(storeService.userCartProducts).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }

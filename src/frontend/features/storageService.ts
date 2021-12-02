@@ -1,10 +1,17 @@
+import type { IUserCart } from '../../types';
+import type { IUser, IUserPublic } from '../../database/models/_user';
+
+type TStorageValue = IUserCart | IUserPublic | NonNullable<IUser['tokens']['auth']>[number] | null;
+
 const storageService = (() => {
   class StorageService {
-    constructor(key) {
+    key: string;
+
+    constructor(key: string) {
       this.key = key;
     }
 
-    update(value, checkIfShouldRemove) {
+    update(value: TStorageValue, checkIfShouldRemove: () => boolean) {
       try {
         if (checkIfShouldRemove()) {
           window.localStorage.removeItem(this.key);
@@ -19,7 +26,7 @@ const storageService = (() => {
 
     get() {
       try {
-        return JSON.parse(window.localStorage.getItem(this.key));
+        return JSON.parse(String(window.localStorage.getItem(this.key)));
       } catch (error) {
         console.error('getFromStorage error:', error, ' /this.key:', this.key);
         return null;
@@ -32,31 +39,31 @@ const storageService = (() => {
   }
 
   class UserCart extends StorageService {
-    constructor(key) {
+    constructor(key: string) {
       super(key);
     }
 
-    update(cartState) {
+    update(cartState: IUserCart) {
       super.update(cartState, () => !cartState || typeof cartState !== 'object' || cartState.totalCount === 0);
     }
   }
 
   class UserAccount extends StorageService {
-    constructor(key) {
+    constructor(key: string) {
       super(key);
     }
 
-    update(accountState) {
+    update(accountState: IUserPublic) {
       super.update(accountState, () => !accountState || typeof accountState !== 'object');
     }
   }
 
   class UserAuthToken extends StorageService {
-    constructor(key) {
+    constructor(key: string) {
       super(key);
     }
 
-    update(authToken) {
+    update(authToken: NonNullable<IUser['tokens']['auth']>[number]) {
       super.update(authToken, () => !authToken || typeof authToken !== 'string');
     }
   }

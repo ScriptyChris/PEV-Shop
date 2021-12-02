@@ -8,7 +8,7 @@ type TOutputSpecs = {
   values: TIntermediateSpecsValues;
   defaultUnit: string;
 };
-type TOutputMapping = {
+export type TProductTechnicalSpecs = {
   specs: TOutputSpecs[];
   categoryToSpecs: Record<string, string[]>;
 };
@@ -95,7 +95,7 @@ function mapMinMax(mappingSpecs: IUniqueSpecs): TIntermediateSpecs[] {
   });
 }
 
-export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TOutputMapping {
+export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TProductTechnicalSpecs {
   const defaultUnits: Record<string, string> = {};
   const headingToDataType: Record<string, 'primitive' | 'object' | 'array'> = {};
 
@@ -112,7 +112,7 @@ export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTech
     { specs: {}, categoryToSpecs: {} }
   );
 
-  const outputMapping: TOutputMapping = {
+  const mappedTechnicalSpecs: TProductTechnicalSpecs = {
     specs: mapMinMax(mapping.specs).map(([key, value]) => ({
       name: key,
       values: value,
@@ -125,5 +125,5 @@ export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTech
     ),
   };
 
-  return outputMapping;
+  return mappedTechnicalSpecs;
 }

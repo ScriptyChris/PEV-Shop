@@ -1,10 +1,11 @@
 import * as dotenv from 'dotenv';
-import getLogger from '../../../utils/logger';
 import * as expressModule from 'express';
 import { Request, Response, NextFunction } from 'express';
-import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, ObjectId } from '../../database/database-index';
+import { ObjectId } from 'mongodb';
+import getLogger from '../../../utils/logger';
+import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '../../database/database-index';
 import { authMiddlewareFn, hashPassword } from '../features/auth';
-import UserModel, { IUser } from '../../database/models/_user';
+import { UserModel, IUser } from '../../database/models/_user';
 import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';

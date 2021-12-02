@@ -7,7 +7,6 @@ import type { IUserRole } from '../../database/models/_userRole';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
 import { wrapRes } from '../helpers/middleware-response-wrapper';
-import { IModel } from '../../database/models/models-index';
 
 type TMiddlewareFn = (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
 
@@ -101,7 +100,7 @@ async function updateUserRole(req: Request, res: Response, next: NextFunction) {
     }
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, {
-      payload: updatedUserRole as Record<keyof IModel, IModel[keyof IModel]>,
+      payload: updatedUserRole as Record<keyof IUserRole, IUserRole[keyof IUserRole]>,
     });
   } catch (exception) {
     return next(exception);

@@ -1,6 +1,5 @@
-import { ObjectId } from 'mongodb';
 import * as mongoose from 'mongoose';
-import getModel, { TModelType, IModel, TGenericModel } from './models/models-index';
+import { getModel, IModel, TModelType } from './models/models-index';
 import { queryBuilder } from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
 import * as dotenv from 'dotenv';
@@ -44,10 +43,9 @@ function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string
     return Promise.reject('itemData must be an object!');
   }
 
-  const Model: TGenericModel = getModel(modelType);
-  const item: IModel = new Model(itemData);
+  const Model = getModel(modelType);
+  const item = new Model(itemData);
 
-  // @ts-ignore
   return item.save();
 }
 
@@ -132,4 +130,4 @@ async function deleteFromDB(itemQuery: { name: string }, modelType: TModelType) 
   return await Model.deleteOne(itemQuery);
 }
 
-export { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB, queryBuilder, ObjectId };
+export { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB };

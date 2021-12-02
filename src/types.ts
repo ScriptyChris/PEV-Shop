@@ -27,3 +27,15 @@ export enum HTTP_STATUS_CODE {
   INTERNAL_SERVER_ERROR = 500,
   NETWORK_AUTH_REQUIRED = 511,
 }
+
+export interface IUserCart {
+  products: {
+    name: string;
+    price: number;
+    _id: string;
+  }[];
+  totalCount: number;
+  totalPrice: number;
+}
+
+export type TPagination = { pageNumber: number; productsPerPage: number };

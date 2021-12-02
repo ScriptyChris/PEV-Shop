@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "include": ["./src/frontend/**/*.ts"],
+    "compilerOptions": {
+      "module": "ES2020",
+      "allowJs": true,
+      "jsx": "react",
+    }
+  }
+  

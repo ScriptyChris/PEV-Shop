@@ -5,7 +5,11 @@ describe('#paginateItemsFromDB', () => {
   let getPaginatedItems: (...args: any[]) => void;
 
   beforeAll(async () => {
-    getPaginatedItems = (await import(findAssociatedSrcModulePath())).default;
+    try {
+      getPaginatedItems = (await import(findAssociatedSrcModulePath())).default;
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   describe('getPaginatedItems()', () => {

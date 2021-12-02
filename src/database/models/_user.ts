@@ -213,9 +213,9 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
   return user;
 };
 
-const UserModel = model<IUser, IUserStatics>('User', userSchema);
+export const UserModel = model<IUser, IUserStatics>('User', userSchema);
 
-type IUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>;
+export type IUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>;
 
 interface IUserStatics extends Model<IUser> {
   validatePassword(password: any): string;
@@ -244,4 +244,6 @@ export interface IUser extends Document {
   removeAllProductsFromObserved(): string;
 }
 
-export default UserModel;
+export type TUserRegistrationCredentials = Pick<IUser, 'login' | 'password' | 'email' | 'accountType'> & {
+  repeatedPassword: IUser['password'];
+};

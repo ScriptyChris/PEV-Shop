@@ -62,10 +62,4 @@ deleteFromDB._failedCall = {
   nothingFound: () => ({ ok: true, deletedCount: 0 }),
 };
 
-class ObjectId {
-  constructor(id = 'test') {
-    return { _id: id };
-  }
-}
-
-export { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB, ObjectId };
+export { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB };

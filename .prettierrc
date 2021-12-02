@@ -11,6 +11,12 @@
       "options": {
         "parser": "babel"
       }
+    },
+    {
+      "files": "*.ts",
+      "options": {
+        "parser": "babel-ts"
+      }
     }
   ]
 }
