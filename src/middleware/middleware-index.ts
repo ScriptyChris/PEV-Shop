@@ -65,8 +65,8 @@ function wrappedMiddleware(): void {
 
     return res.sendFile(`${frontendPath}/index.html`);
   });
-  app.listen(process.env.PORT, () => {
-    logger.log(`Server is listening on port ${process.env.PORT}`);
+  app.listen(process.env.APP_PORT, () => {
+    logger.log(`Server is listening on port ${process.env.APP_PORT}`);
   });
 }
 

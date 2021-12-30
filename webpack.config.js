@@ -71,7 +71,7 @@ module.exports = (env) => {
       watchContentBase: true,
       historyApiFallback: true,
       before: middleware,
-      port: process.env.PORT,
+      port: process.env.APP_PORT,
       hotOnly: true,
       liveReload: false,
       watchOptions: {

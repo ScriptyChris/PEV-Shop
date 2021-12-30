@@ -2,12 +2,13 @@
 // -products=trialProducts.json categoryGroups=categoryGroups.json singleProduct cleanAll
 
 import getLogger from '../../../utils/logger';
-import { connect, connection, Model } from 'mongoose';
+import { connection, Model } from 'mongoose';
 import { ProductModel, IProduct } from '../models/_product';
 import { UserModel, IUser } from '../models/_user';
 import { TModelType } from '../models/models-index';
 import * as dotenv from 'dotenv';
 import { hashPassword } from '../../middleware/features/auth';
+import { tryToConnectWithDB } from '../connector';
 
 // @ts-ignore
 const envVar = dotenv.default.config({ path: '../../../.env' }); // ../
@@ -60,14 +61,18 @@ if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
 }
 
 (async () => {
-  await connectToDB();
+  tryToConnectWithDB();
 
   if (getScriptParamValue(PARAMS.CLEAN_ALL_BEFORE)) {
     const removedData = await Promise.all(
       [
         { name: 'products', ctor: ProductModel },
         { name: 'users', ctor: UserModel },
-      ].map(async ({ name, ctor }) => `\n-${name}: ${(await ctor.deleteMany({})).deletedCount}`)
+      ].map(async ({ name, ctor }) => {
+        // @ts-ignore
+        const deletionRes = await ctor.deleteMany({});
+        return `\n-${name}: ${deletionRes.deletedCount}`;
+      })
     );
 
     logger.log(`Cleaning done. Removed: ${removedData}`);
@@ -95,13 +100,6 @@ if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
 
   await connection.close();
 })();
-
-function connectToDB(): ReturnType<typeof connect> {
-  return connect(process.env.DATABASE_URL as string, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-}
 
 function getSourceData(modelType: TModelType): TPopulatedData[] | ReferenceError {
   const normalizedModelType = `${modelType.toUpperCase()}S` as `${Uppercase<Exclude<TModelType, 'User-Role'>>}S`;

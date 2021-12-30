@@ -35,9 +35,9 @@ export function getOrderBody(products: IProductInOrder[], payMethod: Partial<IPa
   const host: string = process.env.NODE_ENV === 'development' ? '127.0.0.1' : 'pev-demo.store';
 
   return {
-    // notifyUrl: 'http://127.0.0.1:3000',
+    // notifyUrl: `http://127.0.0.1:${process.env.APP_PORT}`,
     customerIp: '127.0.0.1',
-    continueUrl: `http://${host}:${process.env.PORT}/`,
+    continueUrl: `http://${host}:${process.env.APP_PORT}/`,
     merchantPosId: process.env.PAYU_CLIENT_ID,
     description: 'PEV-Shop order',
     // TODO: pass it dynamically by User's chosen currency in shop

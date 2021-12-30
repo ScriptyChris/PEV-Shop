@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.13
+FROM node:fermium-alpine3.13
 
 WORKDIR /app
 
@@ -7,7 +7,15 @@ RUN npm ci
 
 COPY ./src ./src
 COPY ./utils ./utils
-COPY .env .babelrc tsconfig* webpack.config.js ./
+COPY \
+    .env \
+    .babelrc \
+    .eslintrc.js \
+    .prettierrc \
+    tsconfig* \
+    webpack.config.js \
+    ./
+
 RUN npm run build
 
 # TODO: automate database population process on Docker image build. 
@@ -15,6 +23,6 @@ RUN npm run build
 #WORKDIR /app/dist/src/database/populate
 #RUN node populate.js --categoriesGroupPath=categoryGroups.json trialProducts.json
 
-EXPOSE 3000
+EXPOSE ${APP_PORT}
 
 CMD ["npm", "run", "serve"]

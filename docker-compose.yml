@@ -3,13 +3,36 @@ version: "3"
 services:
   mongo:
     image: mongo:4.2.13-bionic
-    ports:
-      - 27017:27017
+    container_name: pev-db
+    volumes:
+      - /src/database/data:/data/db
   
   node:
     build: ./
     image: fake-pev-shopping
+    container_name: pev-app
     ports:
-      - 3000:3000
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - ./:/app
+      - pev-storage:/app/src/frontend/components/pages/
     depends_on:
       - mongo
+  
+  cypress:
+    image: "cypress/included:9.1.1"
+    container_name: pev-cypress
+    depends_on:
+      - node
+    entrypoint: cypress run --headed --no-exit
+    network_mode: "host"
+    environment:
+      - DISPLAY ## `xhost +local:` command needs to be ran beforehand
+      - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
+    working_dir: /e2e
+    volumes:
+      - ./test/e2e/:/e2e
+      - pev-storage:/e2e/cypress/fixtures
+  
+volumes:
+  pev-storage:
