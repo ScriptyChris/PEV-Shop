@@ -1,0 +1,11 @@
+FROM mongo:4.2.13-bionic
+# This 3rd-party (official, though) Docker image doesn't have `curl` available out of the box 
+# nor it's possible to install it from a bash script (not enough permissions). 
+# A new image is built here, which is going to have `curl` installed, 
+# which is used to send HTTP request to trigger database population.
+#
+# For more details, have a look at:
+# - `trigger-population.sh`
+# - `npm run populate-db`
+RUN apt-get update && \
+    apt-get install curl -y

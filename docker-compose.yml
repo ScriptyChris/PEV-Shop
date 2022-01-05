@@ -2,10 +2,18 @@ version: "3"
 
 services:
   mongo:
-    image: mongo:4.2.13-bionic
+    build:
+      context: ./
+      dockerfile: custom-mongodb-dockerfile
     container_name: pev-db
+    environment:
+      - APP_PORT=${APP_PORT}
     volumes:
-      - /src/database/data:/data/db
+      # Sends HTTP request to the app's API, which then runs population via npm
+      - ./src/database/populate/trigger-population.sh:/home/bin/trigger-population.sh
+      # Runs above `trigger-population.sh` in detached and background way. It is called automatically by MongoDB container
+      - ./src/database/populate/init-trigger-population.sh:/docker-entrypoint-initdb.d/init-trigger-population.sh
+      - pev-storage:/data/db
   
   node:
     build: ./

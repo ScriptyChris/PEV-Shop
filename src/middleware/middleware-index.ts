@@ -8,6 +8,7 @@ import glob from 'glob';
 import bodyParser from 'body-parser';
 import { resolve, sep } from 'path';
 import { existsSync } from 'fs';
+import apiConfig from './routes/api-config';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
@@ -26,7 +27,7 @@ const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 // TODO: [SECURITY] https://expressjs.com/en/advanced/best-practice-security.html
 const middleware = (app: Application): void => {
   app.use(bodyParser.json());
-  app.use(apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
+  app.use(apiConfig, apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
 
   app.get('/images/*', (req, res) => {
     const imagePath = req.url.split('/').pop() as string;
