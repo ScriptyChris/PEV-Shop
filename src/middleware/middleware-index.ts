@@ -1,5 +1,6 @@
 // @ts-ignore
 import Express from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Application } from 'express';
 import getLogger from '../../utils/logger';
 // @ts-ignore
@@ -17,6 +18,7 @@ import apiOrders from './routes/api-orders';
 import * as dotenv from 'dotenv';
 import { HTTP_STATUS_CODE } from '../types';
 import { wrapRes } from '../middleware/helpers/middleware-response-wrapper';
+import { getPopulationState } from '../database/connector';
 
 // @ts-ignore
 dotenv.default.config();
@@ -29,7 +31,7 @@ const middleware = (app: Application): void => {
   app.use(bodyParser.json());
   app.use(apiConfig, apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
 
-  app.get('/images/*', (req, res) => {
+  app.get('/images/*', (req: Request, res: Response) => {
     const imagePath = req.url.split('/').pop() as string;
 
     getImage(imagePath)
@@ -56,12 +58,26 @@ function wrappedMiddleware(): void {
   const frontendPath = getFrontendPath();
 
   const app: Application = Express();
-  app.use(Express.static(frontendPath));
+  app.use(function handleDatabaseReadiness(req: Request, res: Response, next: NextFunction) {
+    const isDatabaseReady = getPopulationState();
+
+    if (!isDatabaseReady && req.url !== '/api/populate-db') {
+      return res.status(HTTP_STATUS_CODE.SERVICE_UNAVAILABLE).send(
+        `
+          <p><strong>Database is not ready yet!</strong></p>
+          <p>Data population process should happen automatically at app's first startup (if you launch it via Docker) and lasts just a moment.</p>
+          <p>If you still see this error after a longer while, perhaps you need to run population manually? Check for <code>populate-db</code> npm script.</p>
+        `.trim()
+      );
+    }
+
+    next();
+  }, Express.static(frontendPath));
 
   middleware(app);
 
   // TODO: [REFACTOR] this probably should detect what resource the URL wants and maybe not always return index.html
-  app.use('/', (req, res) => {
+  app.use('/', (req: Request, res: Response) => {
     console.log('global (404?) req.url:', req.url);
 
     return res.sendFile(`${frontendPath}/index.html`);

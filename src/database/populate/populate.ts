@@ -42,19 +42,7 @@ let relatedProductsErrors = 0;
 
 type TPopulatedData = Record<string, unknown>;
 
-logger.log(
-  'process.argv:',
-  process.argv,
-  '\n/envVar:',
-  envVar,
-  '\n/__dirname:',
-  __dirname,
-  '\n/INIT_CWD:',
-  process.env.INIT_CWD,
-  '\n/require.main.filename:',
-  require && require.main && require.main.filename,
-  '\n'
-);
+logger.log('process.argv:', process.argv, '\n/envVar:', envVar);
 
 if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
   throw ReferenceError(`CLI argument ${PARAMS.JSON_FILE_PATH.PRODUCTS} must be provided as non empty string`);

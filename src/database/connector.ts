@@ -1,9 +1,30 @@
 import { connect, Connection } from 'mongoose';
+import { readdirSync } from 'fs';
 import getLogger from '../../utils/logger';
 
 const logger = getLogger(module.filename);
 const MAX_DB_CONNECTION_ATTEMPTS = 5;
 const CONNECTION_ATTEMPT_TIMEOUT = 2000;
+const populationState = (() => {
+  const requiredCollectionNames = readdirSync(`${__dirname}/populate`)
+    .filter((file) => /^initial-.*\.json$/.test(file))
+    .map((file) => file.match(/^initial-(?<collectionName>.*).json$/)?.groups?.collectionName);
+  let _state = false;
+
+  return {
+    async set(connection: Connection) {
+      const collections = await connection.db.listCollections().toArray();
+      const requiredCollectionsReady = requiredCollectionNames.every((reqColName) =>
+        collections.find(({ name }) => reqColName === name)
+      );
+
+      _state = requiredCollectionsReady;
+    },
+    get() {
+      return _state;
+    },
+  };
+})();
 
 function defaultCallbackHandler(error: Error | null, connection?: Connection) {
   if (error) {
@@ -36,7 +57,11 @@ export function tryToConnectWithDB(callback = defaultCallbackHandler, attempts =
       }
 
       logger.log('Connected to MongoDB.');
+
+      populationState.set(connection!);
       callback(null, connection);
     }
   );
 }
+
+export const getPopulationState = () => populationState.get();

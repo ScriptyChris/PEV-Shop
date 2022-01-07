@@ -10,6 +10,7 @@ export interface IEmbracedResponse<PayloadType = never> {
   exception: Error | { message: string; stack?: string };
 }
 
+// TODO: [REFACTOR] automate each code group creation
 const GROUPED_HTTP_STATUS_CODES = Object.freeze({
   SUCCESSFUL: {
     200: 200,
@@ -25,12 +26,14 @@ const GROUPED_HTTP_STATUS_CODES = Object.freeze({
   },
   SERVER_ERROR: {
     500: 500,
+    503: 503,
     511: 511,
   },
 } as const);
 
 export type TypeOfHTTPStatusCodes = typeof GROUPED_HTTP_STATUS_CODES;
 
+// TODO: [REFACTOR] automate each code creation
 const mappedHTTPStatusCode = Object.freeze({
   200: 'SUCCESSFUL',
   201: 'SUCCESSFUL',
@@ -41,6 +44,7 @@ const mappedHTTPStatusCode = Object.freeze({
   404: 'CLIENT_ERROR',
   409: 'CLIENT_ERROR',
   500: 'SERVER_ERROR',
+  503: 'SERVER_ERROR',
   511: 'SERVER_ERROR',
 } as const);
 

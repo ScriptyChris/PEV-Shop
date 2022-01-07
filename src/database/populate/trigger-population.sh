@@ -3,11 +3,11 @@
 echo "[<>] preparing to trigger population"
 
 call_api() {
-  return $(curl -sw '%{http_code}' http://pev-app:$APP_PORT/api/populate-db)
+  return $(curl -sw '%{http_code}' -o /dev/null http://pev-app:$APP_PORT/api/populate-db)
 }
 
-readonly max_attempts=5
-readonly sleep_time=3
+readonly max_attempts=15
+readonly sleep_time=1
 attempt=1
 
 while [ $attempt -le $max_attempts ]

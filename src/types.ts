@@ -15,6 +15,8 @@ export interface IPayByLinkMethod {
   maxAmount: number;
 }
 
+// remember to update `middleware-response-wrapper.ts` accordingly
+// TODO: [REFACTOR] automate synchronization
 export enum HTTP_STATUS_CODE {
   OK = 200,
   CREATED = 201,
@@ -25,6 +27,7 @@ export enum HTTP_STATUS_CODE {
   NOT_FOUND = 404,
   CONFLICT = 409,
   INTERNAL_SERVER_ERROR = 500,
+  SERVICE_UNAVAILABLE = 503,
   NETWORK_AUTH_REQUIRED = 511,
 }
 
