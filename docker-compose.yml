@@ -36,10 +36,13 @@ services:
     environment:
       - DISPLAY ## `xhost +local:` command must first be run on the host computer
       - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
-    entrypoint: "bash -c 'npx wait-on $${CYPRESS_BASE_URL} && cypress run --headed --no-exit'"
+    entrypoint: "bash -c 'npx wait-on $${CYPRESS_BASE_URL} && npx nodemon --watch cypress/integration --exec \"prettier --write cypress/integration && cypress run --headed --no-exit\"'"
     volumes:
       - ./test/e2e/:/e2e
+      - ./test/e2e/node_modules:/e2e/node_modules
+      - .prettierrc:/e2e/.prettierrc
       - ./src/frontend/components/pages/_routes.js:/e2e/cypress/fixtures/_routes.js
+      - ./dist/src/types.js:/e2e/cypress/fixtures/types.js
       - ./src/database/populate/initial-users.json:/e2e/cypress/fixtures/initial-users.json
   
 volumes:

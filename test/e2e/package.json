@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "wait-on": "^6.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "prettier": "^2.4.1"
+  }
+}
