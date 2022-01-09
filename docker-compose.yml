@@ -15,6 +15,13 @@ services:
       - ./src/database/populate/init-trigger-population.sh:/docker-entrypoint-initdb.d/init-trigger-population.sh
       - pev-storage:/data/db
   
+  mail:
+    image: mailhog/mailhog:v1.0.1
+    container_name: pev-mail
+    ports:
+      - ${EMAIL_SMTP_PORT}:${EMAIL_SMTP_PORT}
+      - ${EMAIL_HTTP_PORT}:${EMAIL_HTTP_PORT}
+
   node:
     build: ./
     image: fake-pev-shopping
@@ -25,6 +32,7 @@ services:
       - ./:/app
     depends_on:
       - mongo
+      - mail
   
   cypress:
     image: "cypress/included:9.1.1"
@@ -36,7 +44,8 @@ services:
     environment:
       - DISPLAY ## `xhost +local:` command must first be run on the host computer
       - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
-    entrypoint: "bash -c 'npx wait-on $${CYPRESS_BASE_URL} && npx nodemon --watch cypress/integration --exec \"prettier --write cypress/integration && cypress run --headed --no-exit\"'"
+      - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
+    entrypoint: "bash -c 'npx wait-on $${CYPRESS_BASE_URL} && npx nodemon --watch cypress/integration --watch cypress/support --exec \"prettier --write cypress/integration cypress/support && cypress run --headed\"'"
     volumes:
       - ./test/e2e/:/e2e
       - ./test/e2e/node_modules:/e2e/node_modules

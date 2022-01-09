@@ -6,7 +6,7 @@ const exampleUser = users[0];
 
 describe('#login', () => {
   it('should login to default user account', () => {
-    cy.visit('/');
+    cy.visit(ROUTES.ROOT);
 
     cy.get(`a[href="${ROUTES.LOG_IN}"]`).should('exist').click();
 
