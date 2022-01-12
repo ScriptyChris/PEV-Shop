@@ -3,7 +3,7 @@ import { mockAndRequireModule, findAssociatedSrcModulePath, mockAndRequireDBMode
 mockAndRequireDBModelsModules();
 
 import { getResMock, TJestMock } from '@unitTests/inline-mocks';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import { COLLECTION_NAMES } from '@database/models';
 
 const { getFromDB } = mockAndRequireModule('src/database/api');

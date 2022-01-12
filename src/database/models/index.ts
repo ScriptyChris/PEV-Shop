@@ -1,3 +1,8 @@
+/**
+ * Groups and re-exports lower level types and values related to working with database'es models.
+ * @module
+ */
+
 import { ProductModel, IProduct } from './_product';
 import { UserModel, IUser } from './_user';
 import { UserRoleModel, IUserRole } from './_userRole';
@@ -13,6 +18,9 @@ export const getModel = <T extends TCOLLECTION_NAMES>(modelName: T) => MODELS[mo
 export type TDocuments = IProduct | IUser | IUserRole;
 export type TSort = { [key: string]: 1 | -1 };
 
+/**
+ * @group Re-export of database models and their related entities.
+ */
 export * from './_product';
 export * from './_user';
 export * from './_userRole';

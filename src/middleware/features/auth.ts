@@ -1,10 +1,14 @@
+/**
+ * @module
+ */
+
 import getLogger from '@commons/logger';
 import { compare, hash } from 'bcrypt';
 import { sign, verify } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { IUser, TUserRoleName, COLLECTION_NAMES } from '@database/models';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getFromDB } from '@database/api';
 import { dotEnv } from '@commons/dotEnvLoader';
@@ -12,6 +16,7 @@ import { dotEnv } from '@commons/dotEnvLoader';
 const logger = getLogger(module.filename);
 const SALT_ROUNDS = 8;
 
+/** @internal */
 type TToken = { _id: number };
 
 const comparePasswords = (password: string, passwordPattern: string) => {

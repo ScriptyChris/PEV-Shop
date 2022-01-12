@@ -1,3 +1,7 @@
+/**
+ * @module
+ */
+
 import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '@middleware/features/auth';
@@ -5,7 +9,7 @@ import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '@database
 import { queryBuilder } from '@database/utils/queryBuilder';
 import mapProductsTechnicalSpecs from '@middleware/helpers/api-products-specs-mapper';
 import { IProduct, IReviews, COLLECTION_NAMES, USER_ROLES_MAP } from '@database/models';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 

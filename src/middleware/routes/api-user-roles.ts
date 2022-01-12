@@ -1,8 +1,12 @@
+/**
+ * @module
+ */
+
 import { Router, Request, Response, NextFunction } from 'express';
 import getLogger from '@commons/logger';
 import { getFromDB } from '@database/api';
 import { IUserRole, COLLECTION_NAMES } from '@database/models';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 

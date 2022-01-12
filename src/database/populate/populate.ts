@@ -1,13 +1,16 @@
 /**
  * Populates database with indicated initial data, optionally doing a cleanup beforehand.
- * @module Populate
+ * @module
  * @example <caption>npm usage</caption>
- * > npm run populate-db
+ * ```sh
+ * npm run populate-db
+ * ```
  * @example <caption>Manual CLI usage</caption>
- * > cd path/to/this/module
- * > ts-node populate.ts \
+ * ```sh
+ * ts-node src/database/populate/populate.tspopulate.ts \
  *    executedFromCLI=true \
  *    products__InputPath=path/to/JSON/with/initial/products/data
+ * ```
  */
 
 // TODO: [DX] activate `moduleAliasesResolvers.js` beforehand, so module alias can be used here
@@ -27,8 +30,7 @@ const CAPITALIZED_PLURAL_COLLECTION_NAMES = Object.fromEntries(
 
 /**
  * Maps supported params passed via CLI.
- * @readonly
- * @enum {string}
+ * @notExported
  */
 const PARAMS = {
   EXECUTED_FROM_CLI: 'executedFromCLI',
@@ -41,8 +43,7 @@ const PARAMS = {
 } as const;
 /**
  * Maps default params, which are applied when regarding individual params are not provided via CLI.
- * @readonly
- * @enum {string}
+ * @notExported
  */
 const DEFAULT_PARAMS = {
   [PARAMS.CLEAN_ALL_BEFORE]: 'true',
@@ -111,8 +112,7 @@ if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
 
 /**
  * Executes database population. May be called from other module or it's automatically called when this script is run from CLI.
- * @async
- * @param {boolean} shouldCleanupAll - Decides whether do database cleanup. Passing `PARAMS.CLEAN_ALL_BEFORE` via CLI is an alternative way to do cleanup.
+ * @param shouldCleanupAll - Decides whether do database cleanup. Passing `PARAMS.CLEAN_ALL_BEFORE` via CLI is an alternative way to do cleanup.
  */
 const executeDBPopulation = async (shouldCleanupAll = false) => {
   logger.log('executeDBPopulation() called.');

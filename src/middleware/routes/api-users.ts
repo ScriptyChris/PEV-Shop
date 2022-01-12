@@ -1,10 +1,14 @@
+/**
+ * @module
+ */
+
 import { Router, Request, Response, NextFunction } from 'express';
 import getLogger from '@commons/logger';
 import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '@database/api';
 import { authMiddlewareFn, hashPassword } from '@middleware/features/auth';
 import { UserModel, IUser, IProduct, UserRoleModel, IUserRole, COLLECTION_NAMES, Schema } from '@database/models';
 import sendMail, { EMAIL_TYPES } from '@middleware/helpers/mailer';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { dotEnv } from '@commons/dotEnvLoader';

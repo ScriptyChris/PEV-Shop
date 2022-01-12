@@ -1,6 +1,10 @@
+/**
+ * @module
+ */
+
 import { observable, decorate, action } from 'mobx';
 import type { TUserPublic } from '@database/models';
-import type { IUserCart } from '@src/types';
+import type { IUserCart } from '@commons/types';
 
 const USER_CART_STATE: IUserCart = {
   totalPrice: 0,
@@ -13,8 +17,11 @@ const INITIAL_USER_ACCOUNT_STATE = null;
 type TUserCartProduct = IUserCart['products'][number] & { count: number };
 
 class StoreService {
+  /** @internal */
   _userAccountState: TUserPublic | null;
+  /** @internal */
   _userCartState: IUserCart;
+  /** @internal */
   _productComparisonState: TUserCartProduct[];
 
   constructor() {
@@ -24,6 +31,7 @@ class StoreService {
     this._productComparisonState = [];
   }
 
+  /** @internal */
   _getProductIndex(newUserCartStateName: TUserCartProduct['name']) {
     return this._userCartState.products.findIndex((productItem) => productItem.name === newUserCartStateName);
   }
@@ -138,15 +146,18 @@ class StoreService {
 }
 
 decorate(StoreService, {
+  /** @internal */
   _userAccountState: observable,
   updateUserAccountState: action,
   clearUserAccountState: action,
 
+  /** @internal */
   _userCartState: observable,
   addProductToUserCartState: action,
   removeProductFromUserCartState: action,
   clearUserCartState: action,
 
+  /** @internal */
   _productComparisonState: observable,
   updateProductComparisonState: action,
   clearProductComparisonState: action,

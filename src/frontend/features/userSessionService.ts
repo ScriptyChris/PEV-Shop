@@ -1,3 +1,7 @@
+/**
+ * @module
+ */
+
 import storeService from './storeService';
 import storageService from './storageService';
 import httpService, { CUSTOM_RES_EXT_DICT } from './httpService';
@@ -5,7 +9,7 @@ import type { IUser, TUserPublic } from '@database/models';
 
 type TLogInCredentials = Pick<IUser, 'login' | 'password'>;
 
-const userSessionService = Object.freeze({
+const userSessionService = {
   async logIn(logInCredentials: TLogInCredentials) {
     return httpService.loginUser(logInCredentials).then((res) => {
       if (CUSTOM_RES_EXT_DICT.__EXCEPTION_ALREADY_HANDLED in res) {
@@ -77,7 +81,7 @@ const userSessionService = Object.freeze({
       storeService.updateUserAccountState(userAccount);
     }
   },
-});
+} as const;
 
 if (window.Cypress) {
   window.__E2E__.userSessionService = userSessionService;

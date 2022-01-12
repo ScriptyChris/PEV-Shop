@@ -1,3 +1,7 @@
+/**
+ * @module
+ */
+
 import React, { useCallback, memo, useState, useEffect, useRef } from 'react';
 
 import Dialog from '@material-ui/core/Dialog';
@@ -15,6 +19,9 @@ const POPUP_TYPES = {
   FAILURE: 'FAILURE',
 };
 
+/**
+ * Factory for popup's default closing button.
+ */
 const getClosePopupBtn = (setPopupData) => {
   if (typeof setPopupData !== 'function') {
     throw TypeError(`setPopupData should be a function! Received: ${setPopupData}`);
@@ -44,6 +51,9 @@ const getClosePopupBtn = (setPopupData) => {
 //   }
 // };
 
+/**
+ * Generic error popup component is hooked on {@link HttpService} to present user any errors in more friendly way.
+ */
 const GenericErrorPopup = memo(function GenericErrorPopup() {
   const [popupData, setPopupData] = useState(null);
   const subscriptionHandler = useCallback((exceptionValue) => {

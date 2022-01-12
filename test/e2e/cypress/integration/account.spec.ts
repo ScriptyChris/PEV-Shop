@@ -1,7 +1,7 @@
 import { cy, Cypress, it, describe, context, beforeEach, expect } from 'local-cypress';
 import type { TUserPublic } from '@database/models';
 import { ROUTES } from '@frontend/components/pages/_routes';
-import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
+import { HTTP_STATUS_CODE, TE2EUser } from '@commons/types';
 import { makeCyDataSelector } from '../synchronous-helpers';
 
 const ACCOUNT_TEST_USER: TE2EUser = Object.freeze({

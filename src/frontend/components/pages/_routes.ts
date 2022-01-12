@@ -1,17 +1,14 @@
 /**
  * Encapsulates routing paths and methods (such as helpers and guards).
- * @module Routes
+ * @module
  */
 
 import queryString from 'query-string';
 import type { useHistory } from 'react-router-dom';
+/** @internal */
 import type { TStoreService } from '@frontend/features/storeService';
 import { ARRAY_FORMAT_SEPARATOR } from '@commons/consts';
 
-/**
- * @readonly
- * @enum {string}
- */
 const ROUTE_GROUPS = {
   ROOT: '/',
   PAGES: '/pages',
@@ -23,11 +20,6 @@ const ROUTE_GROUPS = {
   },
 } as const;
 
-/**
- * @readonly
- * @enum {string}
- * @extends {Routes~ROUTE_GROUPS}
- */
 export const ROUTES = {
   ROOT: ROUTE_GROUPS.ROOT,
   PAGES: ROUTE_GROUPS.PAGES,
@@ -69,30 +61,15 @@ const QUERY_PARAMS_CONFIG = {
   arrayFormatSeparator: ARRAY_FORMAT_SEPARATOR,
 } as const;
 
-/**
- * @readonly
- */
 export const routeHelpers = {
-  /**
-   * @method
-   * @param {string} productName
-   */
   createModifyProductUrl(productName: string) {
     return ROUTES.PRODUCTS__MODIFY_PRODUCT.replace(/:\w+/, productName);
   },
-  /**
-   * @method
-   * @param {string} pathname
-   */
   extractProductUrlFromPathname(pathname: string) {
     const productUrlRegExpSource = ROUTES.PRODUCTS__PRODUCT.replace(/:.*?(?=\/|$)/, '(?<productUrl>[^/]*)');
 
     return (pathname.match(new RegExp(productUrlRegExpSource)) || { groups: { productUrl: '' } }).groups!.productUrl;
   },
-  /**
-   * @method
-   * @param {string} search
-   */
   parseSearchParams(search: string) {
     return queryString.parse(search, {
       parseNumbers: true,
@@ -100,19 +77,9 @@ export const routeHelpers = {
       ...QUERY_PARAMS_CONFIG,
     });
   },
-  /**
-   * @method
-   * @param {Object} payload
-   */
   stringifySearchParams(payload: Record<string, unknown>) {
     return queryString.stringify(payload, QUERY_PARAMS_CONFIG);
   },
-  /**
-   * @method
-   * @param {Object} currentQueryParams
-   * @param {string} pathname
-   * @param {Object} history
-   */
   createProductsDashboardQueryUpdater(
     currentQueryParams: ReturnType<typeof queryString.parse>,
     pathname: string,
@@ -129,10 +96,6 @@ export const routeHelpers = {
   },
 } as const;
 
-/**
- * @function
- * @param {TStoreService} storeService
- */
 export const useRoutesGuards = (storeService: TStoreService) => {
   return {
     isGuest() {
