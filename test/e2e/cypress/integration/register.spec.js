@@ -27,7 +27,10 @@ describe('#register', () => {
 
   beforeEach(() => {
     cy.visit(ROUTES.ROOT);
-    cy.deleteEmails();
+    cy.deleteEmails().as('deleteEmails');
+    cy.removeTestUsers().as('removeTestUsers');
+    cy.get('@deleteEmails');
+    cy.get('@removeTestUsers');
   });
 
   it('should register a new user', () => {

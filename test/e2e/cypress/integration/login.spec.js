@@ -7,7 +7,10 @@ const exampleUser = users[0];
 describe('#login', () => {
   beforeEach(() => {
     cy.visit(ROUTES.ROOT);
-    cy.deleteEmails();
+    cy.deleteEmails().as('deleteEmails');
+    cy.removeTestUsers().as('removeTestUsers');
+    cy.get('@deleteEmails');
+    cy.get('@removeTestUsers');
   });
 
   it('should login to default user account', () => {
@@ -43,6 +46,30 @@ describe('#login', () => {
     cy.contains('.popup__message', 'Sorry, but an unexpected error occured :(');
   });
 
+  it('should handle non-confirmed user account', () => {
+    const testUser = {
+      login: 'non confirmed test user',
+      password: 'password',
+      email: 'non_confirmed_test_user@example.org',
+      accountType: 'client',
+    };
+
+    cy.registerTestUser(testUser).as('registerNonConfirmedUser');
+    cy.get('@registerNonConfirmedUser');
+
+    cy.visit(ROUTES.LOG_IN);
+    cy.get('#login').type(testUser.login);
+    cy.get('#password').type(testUser.password);
+    cy.intercept('/api/users/login', (req) => {
+      req.continue((res) => {
+        expect(res.statusCode).to.be.eq(HTTP_STATUS_CODE.UNAUTHORIZED);
+        expect(res.body.error).to.be.eq('User registration is not confirmed!');
+      });
+    }).as('loginNonConfirmedUser');
+    cy.get('button[type="submit"]').click();
+    cy.wait('@loginNonConfirmedUser');
+  });
+
   it('should reset user password', () => {
     const testUser = {
       login: 'reset password test user',
@@ -51,32 +78,8 @@ describe('#login', () => {
       accountType: 'client',
     };
     const TEST_USER_NEW_PASSWORD = 'new test password';
-    const registerUser = () => {
-      return cy.request({
-        url: '/api/users/register',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(testUser),
-      });
-    };
-    const loginUser = (thePassword) => {
-      return cy.request({
-        failOnStatusCode: false,
-        url: '/api/users/login',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          login: testUser.login,
-          password: thePassword,
-        }),
-      });
-    };
 
-    registerUser().then(() => {
+    cy.registerTestUser(testUser).then(() => {
       // TODO: [DEV] refactor this to a reusable command (`register.spec.js` should also use it)
       cy.getLinkFromEmail(testUser.email, 'Account activation', '/pages/confirm-registration').then((url) => {
         cy.intercept('/api/users/confirm-registration', (req) => {
@@ -89,7 +92,10 @@ describe('#login', () => {
     });
 
     cy.visit(ROUTES.LOG_IN);
-    loginUser(testUser.password).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.OK));
+    cy.loginTestUser({
+      login: testUser.login,
+      password: testUser.password,
+    }).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.OK));
 
     cy.get('a[href="/pages/reset-password"]').click();
     cy.get('#resettingEmail').type(testUser.email);
@@ -117,7 +123,16 @@ describe('#login', () => {
 
     cy.contains('button', 'Go to log in').click();
     cy.location('pathname').should('eq', ROUTES.LOG_IN);
-    loginUser(TEST_USER_NEW_PASSWORD).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.OK));
-    loginUser(testUser.password).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.UNAUTHORIZED));
+    cy.loginTestUser({
+      login: testUser.login,
+      password: TEST_USER_NEW_PASSWORD,
+    }).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.OK));
+    cy.loginTestUser(
+      {
+        login: testUser.login,
+        password: testUser.password,
+      },
+      false
+    ).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.UNAUTHORIZED));
   });
 });
