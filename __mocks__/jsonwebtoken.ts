@@ -7,4 +7,4 @@ const jwt: TJestMock & {
 jwt.verify.mockImplementation(() => ({ _id: '' }));
 jwt.sign.mockImplementation(() => 'example token');
 
-export default jwt;
+module.exports = jwt;

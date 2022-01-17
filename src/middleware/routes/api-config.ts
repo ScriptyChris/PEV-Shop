@@ -1,18 +1,13 @@
 import getLogger from '../../../utils/logger';
-import * as expressModule from 'express';
+import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
 import { wrapRes } from '../helpers/middleware-response-wrapper';
 import { execSync } from 'child_process';
 
-const {
-  // @ts-ignore
-  default: { Router },
-} = expressModule;
-
 const logger = getLogger(module.filename);
-const router: any = Router();
+const router: Router & Partial<{ _populateDB: typeof populateDB }> = Router();
 
 router.get('/api/populate-db', populateDB);
 router.use(getMiddlewareErrorHandler(logger));

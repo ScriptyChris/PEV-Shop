@@ -1,16 +1,20 @@
-import type { IUser } from '../../../src/database/models/_user';
-import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
+import { mockAndRequireModule, findAssociatedSrcModulePath } from '../../test-index';
+import type { IUser } from '../../../../src/database/models/_user';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
 import { getResMock } from '../../mockUtils';
-// @ts-ignore
-import getType from '../../../node_modules/jest-get-type/build/index';
-import mockedBcrypt from '../../../__mocks__/bcrypt';
-import { default as mockedJwt } from '../../../__mocks__/jsonwebtoken';
-import { getFromDB } from '../../../src/database/__mocks__/database-index';
+import getType from 'jest-get-type';
+import { getFromDB } from '../../../../src/database/__mocks__/database-index';
+
+// rename exported variable
+const { bcrypt: mockedBcrypt } = {
+  bcrypt: mockAndRequireModule('__mocks__/bcrypt'),
+};
+// rename exported variable
+const { jwt: mockedJwt } = {
+  jwt: mockAndRequireModule('__mocks__/jsonwebtoken'),
+};
 
 const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFromDB } = getFromDB;
-
-// TODO: create kind of symlinks to test/ folder to avoid using relative paths
-import { findAssociatedSrcModulePath } from '../../test-index';
 
 import { config as dotenvConfig } from 'dotenv';
 dotenvConfig();

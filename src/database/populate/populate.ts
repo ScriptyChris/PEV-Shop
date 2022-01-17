@@ -6,12 +6,11 @@ import { connection, Model } from 'mongoose';
 import { ProductModel, IProduct } from '../models/_product';
 import { UserModel, IUser } from '../models/_user';
 import { TModelType } from '../models/models-index';
-import * as dotenv from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import { hashPassword } from '../../middleware/features/auth';
 import { tryToConnectWithDB } from '../connector';
 
-// @ts-ignore
-const envVar = dotenv.default.config({ path: '../../../.env' }); // ../
+const envVar = dotenvConfig({ path: '../../../.env' }); // ../
 const logger = getLogger(module.filename);
 const PARAMS = Object.freeze({
   CLEAN_ALL_BEFORE: 'cleanAllBefore',

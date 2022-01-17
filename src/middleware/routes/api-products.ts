@@ -1,6 +1,5 @@
 import getLogger from '../../../utils/logger';
-import * as expressModule from 'express';
-import { Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
 import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '../../database/database-index';
 import {
@@ -19,14 +18,17 @@ import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
 import { wrapRes } from '../helpers/middleware-response-wrapper';
 
-const {
-  // @ts-ignore
-  default: { Router },
-} = expressModule;
-
 // import { readFileSync } from 'fs';
 const logger = getLogger(module.filename);
-const router: any = Router();
+const router: Router &
+  Partial<{
+    _getProducts: typeof getProducts;
+    _getProductById: typeof getProductById;
+    _addProduct: typeof addProduct;
+    _modifyProduct: typeof modifyProduct;
+    _addReview: typeof addReview;
+    _deleteProduct: typeof deleteProduct;
+  }> = Router();
 // const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 // const productList =  getProductList();
 
@@ -239,7 +241,7 @@ addReview.isIntOrDecimalHalf = (value: number): boolean => {
   return isInt || isDecimalHalf;
 };
 
-async function modifyProduct(req: Request & { userPermissions: any }, res: Response, next: NextFunction) {
+async function modifyProduct(req: Request & { userPermissions?: any }, res: Response, next: NextFunction) {
   try {
     logger.log('(products PATCH) req.body:', req.body);
 
@@ -268,7 +270,7 @@ async function modifyProduct(req: Request & { userPermissions: any }, res: Respo
   }
 }
 
-async function deleteProduct(req: Request & { userPermissions: any }, res: Response, next: NextFunction) {
+async function deleteProduct(req: Request & { userPermissions?: any }, res: Response, next: NextFunction) {
   try {
     logger.log('[products DELETE] req.params:', req.params);
 
@@ -278,7 +280,7 @@ async function deleteProduct(req: Request & { userPermissions: any }, res: Respo
       return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: 'User has no permissions!' });
     }
 
-    const deletionResult = await deleteFromDB({ name: req.params.name }, 'Product');
+    const deletionResult = await deleteFromDB(req.params.name, 'Product');
 
     if (!deletionResult.ok) {
       logger.error('Deletion error occured...', deletionResult);

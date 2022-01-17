@@ -26,8 +26,9 @@ const router: Partial<{ get: TJestMock; post: TJestMock; patch: TJestMock }> = O
   }
 );
 
-const express: TJestMock & { Router?: TJestMock; _router?: typeof router } = jest.fn();
+const express: TJestMock & Partial<{ Router: TJestMock; _router: typeof router; json: typeof jest.fn }> = jest.fn();
 express.Router = jest.fn(() => router);
 express._router = router;
+express.json = jest.fn();
 
-export default express;
+module.exports = express;

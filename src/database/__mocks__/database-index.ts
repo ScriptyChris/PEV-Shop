@@ -1,5 +1,5 @@
 import { TJestMock } from '../../types';
-import { getMockImplementationError } from '../../../test/mockUtils';
+import { getMockImplementationError } from '../../../test/unit/mockUtils';
 
 type TMockWithProps = TJestMock & Partial<{ _succeededCall: any; _failedCall: any }>;
 

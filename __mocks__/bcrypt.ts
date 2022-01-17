@@ -1,5 +1,5 @@
-import { TJestMock } from '../src/types';
+import type { TJestMock } from '../src/types';
 
-const mockedBcrypt: TJestMock & { compare: TJestMock; hash: TJestMock } = jest.createMockFromModule('bcrypt');
+const bcrypt: TJestMock & { compare: TJestMock; hash: TJestMock } = jest.createMockFromModule('bcrypt');
 
-export default mockedBcrypt;
+module.exports = bcrypt;

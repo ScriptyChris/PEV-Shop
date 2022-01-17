@@ -1,26 +1,19 @@
-import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
+import { mockAndRequireModule, findAssociatedSrcModulePath } from '../../test-index';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
 import { getResMock, getNextFnMock } from '../../mockUtils';
-import { findAssociatedSrcModulePath } from '../../test-index';
 
-const { ObjectId: ObjectIdMock } = jest
-  .mock('mongodb', () => {
-    return {
-      ObjectId: function () {
-        return 'test object id';
-      },
-    };
-  })
-  .requireMock('mongodb');
-const { Router, _router } = jest.mock('express').requireMock('express').default;
-const { authMiddlewareFn: authMiddlewareFnMock, hashPassword: hashPasswordMock } = jest
-  .mock('../../../src/middleware/features/auth')
-  .requireMock('../../../src/middleware/features/auth');
+const { ObjectId: ObjectIdMock } = mockAndRequireModule('mongodb');
+const { Router, _router } = mockAndRequireModule('express');
+const { authMiddlewareFn: authMiddlewareFnMock, hashPassword: hashPasswordMock } =
+  mockAndRequireModule('src/middleware/features/auth');
 const {
   getFromDB: getFromDBMock,
   saveToDB: saveToDBMock,
   updateOneModelInDB: updateOneModelInDBMock,
-} = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
-jest.mock('../../../src/database/models/_user').requireMock('../../../src/database/models/_user');
+} = mockAndRequireModule('src/database/database-index');
+
+// this should not be required?
+mockAndRequireModule('src/database/models/_user');
 
 describe('#api-users', () => {
   const authMiddlewareReturnedFn = () => undefined;
@@ -68,7 +61,7 @@ describe('#api-users', () => {
     expect(apiUsersRouter.post).toHaveBeenCalledTimes(10);
     expect(apiUsersRouter.patch).toHaveBeenCalledTimes(2);
     expect(apiUsersRouter.get).toHaveBeenCalledTimes(2);
-    expect(apiUsersRouter.delete).toHaveBeenCalledTimes(2);
+    expect(apiUsersRouter.delete).toHaveBeenCalledTimes(3);
 
     expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/add-product-to-observed',

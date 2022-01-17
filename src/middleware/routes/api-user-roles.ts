@@ -1,5 +1,4 @@
-import * as express from 'express';
-import { Router as IRouter, Request, Response, NextFunction } from 'express-serve-static-core';
+import { Router, Request, Response, NextFunction } from 'express';
 import getLogger from '../../../utils/logger';
 import { authMiddlewareFn as authMiddleware } from '../features/auth';
 import { saveToDB, getFromDB, updateOneModelInDB } from '../../database/database-index';
@@ -10,21 +9,16 @@ import { wrapRes } from '../helpers/middleware-response-wrapper';
 
 type TMiddlewareFn = (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
 
-// @ts-ignore
-const { Router } = express.default;
 const logger = getLogger(module.filename);
-const router: IRouter &
+const router: Router &
   Partial<{
     _saveUserRole: TMiddlewareFn;
     _updateUserRole: TMiddlewareFn;
     _getUserRole: TMiddlewareFn;
   }> = Router();
 
-// @ts-ignore
 router.post('/api/user-roles', authMiddleware(getFromDB), saveUserRole);
-// @ts-ignore
 router.patch('/api/user-roles', authMiddleware(getFromDB), updateUserRole);
-// @ts-ignore
 router.get('/api/user-roles/:roleName', authMiddleware(getFromDB), getUserRole);
 router.use(getMiddlewareErrorHandler(logger));
 

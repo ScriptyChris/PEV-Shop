@@ -1,12 +1,6 @@
-// @ts-ignore
-import Express from 'express';
-import type { Request, Response, NextFunction } from 'express';
-import { Application } from 'express';
+import Express, { Request, Response, NextFunction, Application, json } from 'express';
 import getLogger from '../../utils/logger';
-// @ts-ignore
 import glob from 'glob';
-// @ts-ignore
-import bodyParser from 'body-parser';
 import { resolve, sep } from 'path';
 import { existsSync } from 'fs';
 import apiConfig from './routes/api-config';
@@ -15,20 +9,19 @@ import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
 import apiOrders from './routes/api-orders';
-import * as dotenv from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import { HTTP_STATUS_CODE } from '../types';
 import { wrapRes } from '../middleware/helpers/middleware-response-wrapper';
 import { getPopulationState } from '../database/connector';
 
-// @ts-ignore
-dotenv.default.config();
+dotenvConfig();
 
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
 // TODO: [SECURITY] https://expressjs.com/en/advanced/best-practice-security.html
 const middleware = (app: Application): void => {
-  app.use(bodyParser.json());
+  app.use(json());
   app.use(apiConfig, apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
 
   app.get('/images/*', (req: Request, res: Response) => {
@@ -96,11 +89,10 @@ function getFrontendPath(): string {
 const getImage = (() => {
   const imageCache: { [prop: string]: string } = {};
 
-  return (fileName: string): Promise<string> => {
-    const cachedImage: any = imageCache[fileName];
+  return (fileName: string) => {
+    const cachedImage = imageCache[fileName];
 
     if (!cachedImage) {
-      // @ts-ignore
       return findFileRecursively(fileName).then(([image]) => {
         imageCache[fileName] = image;
 
@@ -112,9 +104,9 @@ const getImage = (() => {
   };
 })();
 
-function findFileRecursively(fileName: string): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    // TODO: wrap it with util.promisify
+function findFileRecursively(fileName: string) {
+  return new Promise<string[]>((resolve, reject) => {
+    // TODO: wrap it with util.promisify and handle error case typing
     glob(`${databaseDirname}/web-scraped/images/**/${fileName}`, (err: Error | null, files: string[]) => {
       if (err || !files.length) {
         reject(err || 'No files found!');

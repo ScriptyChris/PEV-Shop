@@ -1,4 +1,4 @@
-import { getMockImplementationError } from '../../../../test/mockUtils';
+import { getMockImplementationError } from '../../../../test/unit/mockUtils';
 
 export const queryBuilder = (() => {
   const _queryBuilder: any = {

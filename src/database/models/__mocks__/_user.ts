@@ -1,4 +1,4 @@
-import { getMockImplementationError } from '../../../../test/mockUtils';
+import { getMockImplementationError } from '../../../../test/unit/mockUtils';
 import { TJestMock } from '../../../types';
 
 const UserModel: {

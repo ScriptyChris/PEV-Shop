@@ -1,20 +1,18 @@
-import { HTTP_STATUS_CODE, TJestMock } from '../../src/types';
-import globMock from '../../__mocks__/glob';
-import bodyParserMock from '../../__mocks__/body-parser';
+import { getRootRelativePath, mockAndRequireModule } from '../test-index';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
 
-const [
-  { default: apiProductsMock },
-  { default: apiProductsCategoriesMock },
-  { default: apiUsersMock },
-  { default: apiUserRolesMock },
-  { default: apiOrdersMock },
-] = ['api-products', 'api-product-categories', 'api-users', 'api-user-roles', 'api-orders'].map((apiFileName) => {
-  const apiFilePath = `../../src/middleware/routes/${apiFileName}`;
+const globMock = jest.requireActual(getRootRelativePath('__mocks__/glob'));
+const { json: expressJSONMock } = jest.requireActual(getRootRelativePath('__mocks__/express'));
+const [apiConfigMock, apiProductsMock, apiProductsCategoriesMock, apiUsersMock, apiUserRolesMock, apiOrdersMock] = [
+  'api-config',
+  'api-products',
+  'api-product-categories',
+  'api-users',
+  'api-user-roles',
+  'api-orders',
+].map((apiFileName) => mockAndRequireModule(`src/middleware/routes/${apiFileName}`).default);
 
-  return jest.mock(apiFilePath).requireMock(apiFilePath);
-});
-
-import middleware from '../../src/middleware/middleware-index';
+import middleware from '../../../src/middleware/middleware-index';
 
 describe('#middleware-index', () => {
   const appMock: any = Object.freeze({
@@ -38,7 +36,7 @@ describe('#middleware-index', () => {
 
   afterEach(() => {
     (globMock as TJestMock).mockClear();
-    bodyParserMock.json.mockClear();
+    expressJSONMock.mockClear();
     appMock.use.mockClear();
     appMock.get.mockClear();
     reqUrlMock.mockClear();
@@ -50,8 +48,9 @@ describe('#middleware-index', () => {
   it('should call app.use(..) and app.get(..) methods with correct params', () => {
     middleware(appMock);
 
-    expect(appMock.use).toHaveBeenCalledWith(bodyParserMock.json());
+    expect(appMock.use).toHaveBeenCalledWith(expressJSONMock());
     expect(appMock.use).toHaveBeenCalledWith(
+      apiConfigMock,
       apiProductsMock,
       apiProductsCategoriesMock,
       apiUsersMock,

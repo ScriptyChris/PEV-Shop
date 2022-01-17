@@ -1,15 +1,10 @@
 import getLogger from '../../../utils/logger';
-import { Request, Response, NextFunction } from 'express';
-import * as expressModule from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { getFromDB } from '../../database/database-index';
 import { HTTP_STATUS_CODE } from '../../types';
 import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
 import { wrapRes } from '../helpers/middleware-response-wrapper';
 
-const {
-  // @ts-ignore
-  default: { Router },
-} = expressModule;
 const router = Router();
 const logger = getLogger(module.filename);
 

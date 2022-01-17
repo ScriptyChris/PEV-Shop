@@ -1,10 +1,9 @@
-import * as dotenv from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import { createTransport } from 'nodemailer';
 import SMTPTransport = require('nodemailer/lib/smtp-transport');
 import SendmailTransport = require('nodemailer/lib/sendmail-transport');
 
-// @ts-ignore
-dotenv.config();
+dotenvConfig();
 
 const translations = Object.freeze({
   activationSubject: 'Account activation',

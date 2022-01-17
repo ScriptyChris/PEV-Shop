@@ -1,4 +1,5 @@
-import { TJestMock } from '../src/types';
+import { TJestMock } from '../../src/types';
+
 const getMockImplementationError = (fnName: string): Error =>
   Error(`Need to mock the ${fnName}(..) implementation for unit test first!`);
 

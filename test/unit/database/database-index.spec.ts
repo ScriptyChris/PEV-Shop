@@ -1,12 +1,8 @@
-const { getModel: getModelMock } = jest
-  .mock('../../src/database/models/models-index')
-  .requireMock('../../src/database/models/models-index');
-const getPaginatedItemsMock = jest
-  .mock('../../src/database/utils/paginateItemsFromDB')
-  .requireMock('../../src/database/utils/paginateItemsFromDB').default;
-
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-import { findAssociatedSrcModulePath } from '../test-index';
+import { findAssociatedSrcModulePath, mockAndRequireModule } from '../test-index';
+
+const { getModel: getModelMock } = mockAndRequireModule('src/database/models/models-index');
+const getPaginatedItemsMock = mockAndRequireModule('src/database/utils/paginateItemsFromDB').default;
 
 describe('#database-index', () => {
   const MODEL_TYPE = 'Test';
@@ -188,7 +184,6 @@ describe('#database-index', () => {
       const updateData = { action: 'addUnique' };
 
       expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toStrictEqual(
-        // @ts-ignore
         new getModelMock._ModelClassMock.findOneAndUpdate._clazz()
       );
       expect(updateOneModelInDB({}, updateData, MODEL_TYPE)).resolves.toBeNull();

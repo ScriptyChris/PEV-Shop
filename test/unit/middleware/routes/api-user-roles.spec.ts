@@ -1,17 +1,14 @@
-import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
+import { findAssociatedSrcModulePath, mockAndRequireModule } from '../../test-index';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
 import { getResMock } from '../../mockUtils';
 
-const {
-  default: { Router, _router },
-} = jest.mock('express').requireMock('express');
-const { authMiddlewareFn: authMiddlewareFnMock } = jest
-  .mock('../../../src/middleware/features/auth')
-  .requireMock('../../../src/middleware/features/auth');
+const { Router, _router } = mockAndRequireModule('express');
+const { authMiddlewareFn: authMiddlewareFnMock } = mockAndRequireModule('src/middleware/features/auth');
 const {
   getFromDB: getFromDBMock,
   saveToDB: saveToDBMock,
   updateOneModelInDB: updateOneModelInDBMock,
-} = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
+} = mockAndRequireModule('src/database/database-index');
 
 describe('#api-user-roles', () => {
   const authMiddlewareReturnedFn = () => undefined;
@@ -36,9 +33,11 @@ describe('#api-user-roles', () => {
       .mockImplementationOnce(() => authMiddlewareReturnedFn)
       .mockName('getFirstCallback');
 
-    apiUserRolesRouter = jest
-      .mock('../../../src/middleware/routes/api-user-roles')
-      .requireActual('../../../src/middleware/routes/api-user-roles').default;
+    try {
+      apiUserRolesRouter = (await import(findAssociatedSrcModulePath())).default;
+    } catch (moduleImportException) {
+      console.error('(beforeAll) moduleImportException:', moduleImportException);
+    }
   });
 
   afterAll(() => {

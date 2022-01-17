@@ -1,20 +1,17 @@
-import getMiddlewareErrorHandler from '../../../src/middleware/helpers/middleware-error-handler';
-import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
+import { findAssociatedSrcModulePath, mockAndRequireModule } from '../../test-index';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
 import { getNextFnMock, getResMock } from '../../mockUtils';
 
-const { Router, _router } = jest.mock('express').requireMock('express').default;
-const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMiddlewareMock } = jest
-  .mock('../../../src/middleware/features/auth')
-  .requireMock('../../../src/middleware/features/auth');
-const { queryBuilder: queryBuilderMock } = jest
-  .mock('../../../src/database/utils/queryBuilder')
-  .requireMock('../../../src/database/utils/queryBuilder');
+const { Router, _router } = mockAndRequireModule('express');
+const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMiddlewareMock } =
+  mockAndRequireModule('src/middleware/features/auth');
+const { queryBuilder: queryBuilderMock } = mockAndRequireModule('src/database/utils/queryBuilder');
 const {
   getFromDB: getFromDBMock,
   saveToDB: saveToDBMock,
   updateOneModelInDB: updateOneModelInDBMock,
   deleteFromDB: deleteFromDBMock,
-} = jest.mock('../../../src/database/database-index').requireMock('../../../src/database/database-index');
+} = mockAndRequireModule('src/database/database-index');
 
 describe('#api-products', () => {
   let apiProductsRouter: any = null;
@@ -30,7 +27,7 @@ describe('#api-products', () => {
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
 
     try {
-      apiProductsRouter = (await import('../../../src/middleware/routes/api-products')).default;
+      apiProductsRouter = (await import(findAssociatedSrcModulePath())).default;
     } catch (moduleImportException) {
       console.error('(beforeAll) moduleImportException:', moduleImportException);
     }
@@ -538,12 +535,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._deleteProduct(reqMock, getResMock());
 
-        expect(deleteFromDBMock).toBeCalledWith(
-          {
-            name: reqMock.params.name,
-          },
-          'Product'
-        );
+        expect(deleteFromDBMock).toBeCalledWith(reqMock.params.name, 'Product');
       });
 
       it('should call res.sendStatus(..) with correct params', async () => {

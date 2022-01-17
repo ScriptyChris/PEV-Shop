@@ -1,1 +1,1 @@
-export default jest.createMockFromModule('glob');
+module.exports = jest.createMockFromModule('glob');

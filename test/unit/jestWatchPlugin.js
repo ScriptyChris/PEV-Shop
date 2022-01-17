@@ -6,7 +6,7 @@ const PRETTIER_FORMAT_CLI = Object.freeze({
   args: [
     normalize('node_modules/prettier/bin-prettier.js'),
     '--write',
-    'test/',
+    'test/unit',
     '__mocks__/',
     '**/__mocks__/*',
     '--check',

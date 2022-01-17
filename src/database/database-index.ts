@@ -1,12 +1,11 @@
 import { getModel, IModel, TModelType } from './models/models-index';
 import { queryBuilder } from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
-import * as dotenv from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import getLogger from '../../utils/logger';
 import { tryToConnectWithDB } from './connector';
 
-// @ts-ignore
-dotenv.default.config();
+dotenvConfig();
 
 const logger = getLogger(module.filename);
 
@@ -99,10 +98,31 @@ async function updateOneModelInDB(
   return await Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 }
 
-async function deleteFromDB(itemQuery: { name: string }, modelType: TModelType) {
-  const Model = getModel(modelType);
+async function deleteFromDB(fieldValue: string | RegExp, modelType: TModelType) {
+  let fieldName = '';
 
-  return await Model.deleteOne(itemQuery);
+  switch (modelType) {
+    case 'User': {
+      fieldName = 'login';
+      break;
+    }
+    case 'Product': {
+      fieldName = 'name';
+      break;
+    }
+    default: {
+      throw TypeError(`Unrecognized 'modelType': ${modelType}`);
+    }
+  }
+
+  const Model = getModel(modelType);
+  const query = { [fieldName]: fieldValue };
+
+  if (typeof fieldValue === 'string') {
+    return await Model.deleteOne(query);
+  }
+
+  return await Model.deleteMany(query);
 }
 
 export { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB };

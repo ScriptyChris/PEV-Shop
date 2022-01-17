@@ -1,43 +1,35 @@
 import getLogger from '../../../utils/logger';
-import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
+import { compare, hash } from 'bcrypt';
+import { sign, verify, Secret } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import * as dotenv from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { IUser } from '../../database/models/_user';
 import { HTTP_STATUS_CODE } from '../../types';
 import { wrapRes } from '../helpers/middleware-response-wrapper';
 
-// @ts-ignore
-dotenv.default.config();
+dotenvConfig();
 
-const {
-  // @ts-ignore
-  default: { compare, hash },
-} = bcrypt;
-const {
-  // @ts-ignore
-  default: { sign, verify },
-} = jwt;
 const logger = getLogger(module.filename);
 const SALT_ROUNDS = 8;
+const TOKEN_SECRET_KEY = process.env.TOKEN_SECRET_KEY as Secret;
 
 type TToken = { _id: number };
 
-const comparePasswords = (password: string, passwordPattern: string): Promise<boolean> => {
+const comparePasswords = (password: string, passwordPattern: string) => {
   return compare(password, passwordPattern);
 };
 
-const hashPassword = (password: string): Promise<string> => {
+const hashPassword = (password: string) => {
   return hash(password, SALT_ROUNDS);
 };
 
-const getToken = (payloadObj: TToken): string => {
-  return sign(payloadObj, process.env.TOKEN_SECRET_KEY);
+const getToken = (payloadObj: TToken) => {
+  return sign(payloadObj, TOKEN_SECRET_KEY);
 };
 
-const verifyToken = (token: string): TToken => {
-  return verify(token, process.env.TOKEN_SECRET_KEY) as TToken;
+const verifyToken = (token: string) => {
+  return verify(token, TOKEN_SECRET_KEY) as TToken;
 };
 
 const authMiddlewareFn = (

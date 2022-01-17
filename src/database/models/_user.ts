@@ -1,5 +1,4 @@
-import type { Document, Model } from 'mongoose';
-import { model, Schema, Types } from 'mongoose';
+import { model, Schema, Types, Document, Model } from 'mongoose';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '../../middleware/features/auth';
 

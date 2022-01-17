@@ -1,11 +1,9 @@
-import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
+import { mockAndRequireModule, findAssociatedSrcModulePath } from '../../test-index';
+import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
 import { getResMock } from '../../mockUtils';
-import { findAssociatedSrcModulePath } from '../../test-index';
 
-const { getFromDB } = jest
-  .mock('../../../src/database/database-index')
-  .requireMock('../../../src/database/database-index');
-const { Router } = jest.mock('express').requireMock('express').default;
+const { getFromDB } = mockAndRequireModule('src/database/database-index');
+const { Router } = mockAndRequireModule('express');
 
 describe('#api-product-categories', () => {
   let apiProductCategoriesRouterGet: any;
