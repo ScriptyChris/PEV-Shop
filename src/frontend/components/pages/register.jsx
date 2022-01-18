@@ -73,12 +73,14 @@ export default function Register() {
               {
                 onClick: () => history.push(ROUTES.LOG_IN),
                 text: translations.popupGoToLogin,
+                dataCy: 'button:go-to-login-from-register',
               },
             ],
             altButtons: [
               {
                 onClick: () => resendConfirmRegistration(values.email),
                 text: translations.popupReSendEmail,
+                dataCy: 'button:resend-register-email',
               },
             ],
           });
@@ -103,24 +105,26 @@ export default function Register() {
 
               <div>
                 <label htmlFor="registrationLogin">{translations.logInField}</label>
-                <Field name="login" id="registrationLogin" required />
+                <Field name="login" id="registrationLogin" required data-cy="input:register-login" />
               </div>
 
               <PasswordField
                 identity="password"
                 translation={translations.passwordField}
                 error={formikRestProps.errors.password}
+                dataCy="input:register-password"
               />
 
               <PasswordField
                 identity="repeatedPassword"
                 translation={translations.repeatedPasswordField}
                 error={formikRestProps.errors.repeatedPassword}
+                dataCy="input:register-repeated-password"
               />
 
               <div>
                 <label htmlFor="registrationEmail">{translations.email}</label>
-                <Field name="email" id="registrationEmail" type="email" required />
+                <Field name="email" id="registrationEmail" type="email" required data-cy="input:register-email" />
               </div>
 
               <div id="accountTypesGroup">{translations.accountType}</div>
@@ -132,6 +136,7 @@ export default function Register() {
                   type="radio"
                   value={translations.clientType.toLowerCase()}
                   required
+                  data-cy="input:register-account-client-type"
                 />
 
                 <label htmlFor="registrationAccountRetailerType">{translations.retailerType}</label>
@@ -144,7 +149,9 @@ export default function Register() {
                 />
               </div>
 
-              <button type="submit">{translations.submitRegistration}</button>
+              <button type="submit" data-cy="button:submit-register">
+                {translations.submitRegistration}
+              </button>
             </fieldset>
           </form>
         )}

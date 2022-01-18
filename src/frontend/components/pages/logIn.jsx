@@ -52,7 +52,7 @@ export default function LogIn() {
 
           <div>
             <label htmlFor="login">{translations.logInField}</label>
-            <input id="login" type="text" value={userLogin} onChange={onInputChange} required />
+            <input id="login" type="text" value={userLogin} onChange={onInputChange} required data-cy="input:login" />
           </div>
 
           {/* TODO: [REFACTOR] use `recoverAccount.PasswordField` component */}
@@ -66,16 +66,21 @@ export default function LogIn() {
               minLength="8"
               maxLength="20"
               required
+              data-cy="input:password"
             />
           </div>
 
-          <button type="submit">{translations.submitLogIn}</button>
+          <button type="submit" data-cy="button:submit-login">
+            {translations.submitLogIn}
+          </button>
         </fieldset>
       </form>
 
       <div>
         <p>{translations.resetPasswordHint}</p>
-        <Link to={ROUTES.RESET_PASSWORD}>{translations.resetPasswordLink}</Link>
+        <Link to={ROUTES.RESET_PASSWORD} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
+          {translations.resetPasswordLink}
+        </Link>
       </div>
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}

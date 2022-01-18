@@ -17,12 +17,12 @@ describe('#register', () => {
     },
   ];
   const fillAndSendRegisterForm = ({ login, email }) => {
-    cy.get('#registrationLogin').type(login);
-    cy.get('#password').type('test password');
-    cy.get('#repeatedPassword').type('test password');
-    cy.get('#registrationEmail').type(email);
-    cy.get('#registrationAccountClientType').check();
-    cy.get('[type="submit"]').click();
+    cy.get('[data-cy="input:register-login"]').type(login);
+    cy.get('[data-cy="input:register-password"]').type('test password');
+    cy.get('[data-cy="input:register-repeated-password"]').type('test password');
+    cy.get('[data-cy="input:register-email"]').type(email);
+    cy.get('[data-cy="input:register-account-client-type"]').check();
+    cy.get('[data-cy="button:submit-register"]').click();
   };
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('#register', () => {
   });
 
   it('should register a new user', () => {
-    cy.get(`a[href="${ROUTES.REGISTER}"]`).should('exist').click();
+    cy.get(`[data-cy="link:${ROUTES.REGISTER}"]`).should('exist').click();
     fillAndSendRegisterForm(testUsers[0]);
 
     cy.getLinkFromEmail(testUsers[0].email, 'Account activation', '/pages/confirm-registration').then((url) => {
@@ -54,7 +54,7 @@ describe('#register', () => {
       });
     };
 
-    cy.get(`a[href="${ROUTES.REGISTER}"]`).click();
+    cy.get(`[data-cy="link:${ROUTES.REGISTER}"]`).click();
     fillAndSendRegisterForm(testUsers[1]);
 
     expectMatchingEmailsCount(1);
@@ -64,7 +64,7 @@ describe('#register', () => {
         expect(res.body.message).to.be.eq('User account created! Check your email.');
       });
     }).as('reSendConfirmation');
-    cy.contains('button', 'Re-send email').click();
+    cy.get('[data-cy="button:resend-register-email"]').should('have.text', 'Re-send email').click();
     cy.wait('@reSendConfirmation');
     expectMatchingEmailsCount(2);
   });
@@ -72,7 +72,7 @@ describe('#register', () => {
   it('should redirect to login page from registration popup', () => {
     cy.visit(ROUTES.REGISTER);
     fillAndSendRegisterForm(testUsers[2]);
-    cy.contains('button', 'Go to login').click();
+    cy.get(`[data-cy="button:go-to-login-from-register"]`).should('have.text', 'Go to login').click();
     cy.location('pathname').should('eq', ROUTES.LOG_IN);
   });
 });

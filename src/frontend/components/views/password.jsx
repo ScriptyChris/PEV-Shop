@@ -34,7 +34,7 @@ const translations = Object.freeze({
   popupGoToLogIn: 'Go to log in',
 });
 
-function PasswordField({ identity, translation, error }) {
+function PasswordField({ identity, translation, error, dataCy }) {
   if (!identity || !translation) {
     throw ReferenceError(
       `'identity' and 'translation' props must be non-empty! Received subsequently: '${identity}' and '${translation}'`
@@ -55,6 +55,7 @@ function PasswordField({ identity, translation, error }) {
         minLength={passwordMinLength}
         maxLength={passwordMaxLength}
         required
+        data-cy={dataCy}
       />
 
       {error && <FormFieldError>{error}</FormFieldError>}
@@ -114,10 +115,10 @@ function ResetPassword() {
 
               <div>
                 <label htmlFor="resettingEmail">{translations.resettingEmailField}</label>
-                <Field name="email" id="resettingEmail" type="email" required />
+                <Field name="email" id="resettingEmail" type="email" required data-cy="input:reset-email" />
               </div>
 
-              <button>{translations.submitReset}</button>
+              <button data-cy="button:submit-reset">{translations.submitReset}</button>
             </fieldset>
           </form>
         )}
@@ -206,6 +207,7 @@ function SetNewPassword({ contextType }) {
                 {
                   onClick: () => history.push(ROUTES.LOG_IN),
                   text: translations.popupGoToLogIn,
+                  dataCy: 'button:go-to-login-from-new-password',
                 },
               ],
             });
@@ -242,15 +244,17 @@ function SetNewPassword({ contextType }) {
                 identity="newPassword"
                 translation={translations.newPasswordField}
                 error={formikRestProps.errors.newPassword}
+                dataCy="input:new-password"
               />
 
               <PasswordField
                 identity="repeatedNewPassword"
                 translation={translations.repeatedNewPasswordField}
                 error={formikRestProps.errors.repeatedNewPassword}
+                dataCy="input:repeated-new-password"
               />
 
-              <button>{translations.submitNewPassword}</button>
+              <button data-cy="button:submit-new-password">{translations.submitNewPassword}</button>
             </fieldset>
           </form>
         )}

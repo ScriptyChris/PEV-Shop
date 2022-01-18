@@ -50,14 +50,18 @@ export default observer(function Nav() {
               {translations.logOut}
             </Link>
           ) : (
-            <Link to={ROUTES.LOG_IN}>{translations.logIn}</Link>
+            <Link to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
+              {translations.logIn}
+            </Link>
           )}
         </li>
         <li>
           {storeService.userAccountState ? (
             <Link to={ROUTES.ACCOUNT}>{translations.account}</Link>
           ) : (
-            <Link to={ROUTES.REGISTER}>{translations.register}</Link>
+            <Link to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
+              {translations.register}
+            </Link>
           )}
         </li>
       </ul>
