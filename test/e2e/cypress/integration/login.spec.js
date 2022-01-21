@@ -47,19 +47,19 @@ describe('#login', () => {
   });
 
   it('should handle non-confirmed user account', () => {
-    const testUser = {
+    const TEST_USER = Object.freeze({
       login: 'non confirmed test user',
       password: 'password',
       email: 'non_confirmed_test_user@example.org',
       accountType: 'client',
-    };
+    });
 
-    cy.registerTestUser(testUser).as('registerNonConfirmedUser');
+    cy.registerTestUser(TEST_USER).as('registerNonConfirmedUser');
     cy.get('@registerNonConfirmedUser');
 
     cy.visit(ROUTES.LOG_IN);
-    cy.get('[data-cy="input:login"]').type(testUser.login);
-    cy.get('[data-cy="input:password"]').type(testUser.password);
+    cy.get('[data-cy="input:login"]').type(TEST_USER.login);
+    cy.get('[data-cy="input:password"]').type(TEST_USER.password);
     cy.intercept('/api/users/login', (req) => {
       req.continue((res) => {
         expect(res.statusCode).to.be.eq(HTTP_STATUS_CODE.UNAUTHORIZED);
@@ -71,34 +71,24 @@ describe('#login', () => {
   });
 
   it('should reset user password', () => {
-    const testUser = {
+    const TEST_USER = Object.freeze({
       login: 'reset password test user',
       email: 'reset_password_test_user@example.org',
       password: 'test password',
       accountType: 'client',
-    };
+    });
     const TEST_USER_NEW_PASSWORD = 'new test password';
 
-    cy.registerTestUser(testUser).then(() => {
-      // TODO: [DEV] refactor this to a reusable command (`register.spec.js` should also use it)
-      cy.getLinkFromEmail(testUser.email, 'Account activation', '/pages/confirm-registration').then((url) => {
-        cy.intercept('/api/users/confirm-registration', (req) => {
-          req.continue((res) => expect(res.body.payload.isUserConfirmed).to.be.true);
-        }).as('confirmRegistration');
-
-        cy.visit(url);
-        cy.wait('@confirmRegistration');
-      });
-    });
+    cy.registerTestUser(TEST_USER).then(() => cy.confirmTestUserRegistration(TEST_USER.email));
 
     cy.visit(ROUTES.LOG_IN);
     cy.loginTestUser({
-      login: testUser.login,
-      password: testUser.password,
+      login: TEST_USER.login,
+      password: TEST_USER.password,
     }).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.OK));
 
     cy.get(`[data-cy="link:${ROUTES.RESET_PASSWORD}"]`).click();
-    cy.get('[data-cy="input:reset-email"]').type(testUser.email);
+    cy.get('[data-cy="input:reset-email"]').type(TEST_USER.email);
     cy.intercept('/api/users/reset-password', (req) => {
       req.continue((res) => {
         expect(res.body.message).to.be.eq('Password resetting process began! Check your email.');
@@ -107,7 +97,7 @@ describe('#login', () => {
     cy.get('[data-cy="button:submit-reset"]').should('have.text', 'Reset').click();
     cy.wait('@resetPassword');
 
-    cy.getLinkFromEmail(testUser.email, 'Reset password', '/pages/set-new-password').then((url) => {
+    cy.getLinkFromEmail(TEST_USER.email, 'Reset password', '/pages/set-new-password').then((url) => {
       cy.intercept('/api/users/set-new-password', (req) => {
         req.continue((res) => {
           expect(res.statusCode).to.be.eq(HTTP_STATUS_CODE.CREATED);
@@ -124,13 +114,13 @@ describe('#login', () => {
     cy.get('[data-cy="button:go-to-login-from-new-password"]').should('have.text', 'Go to log in').click();
     cy.location('pathname').should('eq', ROUTES.LOG_IN);
     cy.loginTestUser({
-      login: testUser.login,
+      login: TEST_USER.login,
       password: TEST_USER_NEW_PASSWORD,
     }).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.OK));
     cy.loginTestUser(
       {
-        login: testUser.login,
-        password: testUser.password,
+        login: TEST_USER.login,
+        password: TEST_USER.password,
       },
       false
     ).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.UNAUTHORIZED));

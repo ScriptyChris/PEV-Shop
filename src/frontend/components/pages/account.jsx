@@ -52,7 +52,7 @@ function UserProfile() {
   };
 
   return userData ? (
-    <div>
+    <section className="account__menu-tab" data-cy="section:user-profile">
       <button onClick={edit}>{translations.editUserData}</button>
 
       <table>
@@ -65,7 +65,7 @@ function UserProfile() {
           ))}
         </tbody>
       </table>
-    </div>
+    </section>
   ) : (
     translations.lackOfData
   );
@@ -122,7 +122,7 @@ function Security() {
   }, [logOutFromSessionsConfirmation, shouldPreserveCurrentSession]);
 
   return (
-    <div className="account__menu-tab">
+    <section className="account__menu-tab" data-cy="section:security">
       <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
       <div className="account__menu-tab logout-from-sessions">
@@ -131,7 +131,7 @@ function Security() {
 
         {popupData && <Popup {...popupData} />}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -177,7 +177,7 @@ function ObservedProducts() {
   };
 
   return (
-    <div className="account__menu-tab">
+    <section className="account__menu-tab" data-cy="section:observed-products">
       <div>
         {/* TODO: [UX] add searching and filtering for observed products */}
         <button onClick={removeAll} disabled={!canRemoveAllProducts}>
@@ -196,16 +196,16 @@ function ObservedProducts() {
       </ol>
 
       {popupData && <Popup {...popupData} />}
-    </div>
+    </section>
   );
 }
 
 function Orders() {
   return (
-    <div>
+    <section className="account__menu-tab" data-cy="section:orders">
       <input placeholder="TODO: [FEATURE] implement searching orders via name and date(?)" type="search" />
       <p>TODO: [FEATURE] implement listing orders with options such as: status, invoice, review, refund</p>
-    </div>
+    </section>
   );
 }
 
@@ -242,7 +242,9 @@ export default function Account() {
         <ul className="account__menu-nav">
           {MENU_ITEMS.map((item) => (
             <li key={item.url}>
-              <NavLink to={`${ROUTES.ACCOUNT}/${item.url}`}>{item.translation}</NavLink>
+              <NavLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
+                {item.translation}
+              </NavLink>
             </li>
           ))}
         </ul>

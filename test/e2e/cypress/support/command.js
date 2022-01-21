@@ -1,3 +1,5 @@
+import { ROUTES } from '../fixtures/_routes';
+
 (function EmailCommands() {
   const getEmailAPIURL = (version) => {
     if (typeof version !== 'number') {
@@ -38,6 +40,9 @@
   };
 
   Cypress.Commands.add('getAllEmails', () => {
+    // give Mailhog some time to process it's email queue
+    cy.wait(Cypress.env('WAIT_TIME_IN_MS'));
+
     return cy.request(getEmailAPIURL(2)).then((res) => res.body.items);
   });
 
@@ -82,12 +87,64 @@
     });
   };
 
+  Cypress.Commands.add('fillAndSendRegisterForm', ({ login, email, password = 'test password' }) => {
+    cy.visit(ROUTES.REGISTER);
+    cy.get('[data-cy="input:register-login"]').type(login);
+    cy.get('[data-cy="input:register-password"]').type(password);
+    cy.get('[data-cy="input:register-repeated-password"]').type(password);
+    cy.get('[data-cy="input:register-email"]').type(email);
+    cy.get('[data-cy="input:register-account-client-type"]').check();
+    cy.get('[data-cy="button:submit-register"]').click();
+    cy.contains(`[data-cy="button:go-to-login-from-register"]`, 'Go to login');
+  });
+
+  Cypress.Commands.add('confirmTestUserRegistration', (email) => {
+    return cy.getLinkFromEmail(email, 'Account activation', '/pages/confirm-registration').then((url) => {
+      cy.intercept('/api/users/confirm-registration', (req) => {
+        req.continue((res) => {
+          // TODO: [issue] sometimes `res.body.payload` is undefined due to 401 response code
+          expect(res.body.payload.isUserConfirmed).to.be.true;
+        });
+      }).as('confirmRegistration');
+
+      cy.visit(url);
+      cy.wait('@confirmRegistration');
+      cy.contains(
+        '[data-cy="message:registration-confirmation-succeeded-hint"]',
+        'You can now log in to your new account.'
+      );
+    });
+  });
+
   Cypress.Commands.add('registerTestUser', (testUser, canFail) => {
     return userAPIReq('register', 'POST', testUser, canFail);
   });
 
+  Cypress.Commands.add('registerAndLoginTestUserByUI', (testUser) => {
+    cy.fillAndSendRegisterForm(testUser);
+    cy.confirmTestUserRegistration(testUser.email);
+    cy.get('[data-cy="button:log-in-after-confirmed-registration"]').click();
+
+    return cy.loginTestUserByUI(testUser);
+  });
+
   Cypress.Commands.add('loginTestUser', (testUser, canFail) => {
     return userAPIReq('login', 'POST', testUser, canFail);
+  });
+
+  Cypress.Commands.add('loginTestUserByUI', (testUser) => {
+    cy.get('[data-cy="input:login"]').type(testUser.login);
+    cy.get('[data-cy="input:password"]').type(testUser.password);
+    cy.intercept('/api/users/login', (req) => {
+      req.continue((res) => {
+        expect(res.body.payload).to.include({
+          login: testUser.login,
+          email: testUser.email,
+        });
+      });
+    }).as('loginUser');
+    cy.get('[data-cy="button:submit-login"]').click();
+    cy.wait('@loginUser');
   });
 
   Cypress.Commands.add('removeTestUsers', (canFail) => {
@@ -100,5 +157,11 @@
       },
       canFail
     );
+  });
+})();
+
+(function MiscCommands() {
+  Cypress.Commands.add('getFromStorage', (key) => {
+    return cy.window().then((window) => JSON.parse(window.localStorage.getItem(key)));
   });
 })();

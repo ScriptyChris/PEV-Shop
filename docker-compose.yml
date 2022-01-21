@@ -45,6 +45,7 @@ services:
       - DISPLAY ## `xhost +local:` command must first be run on the host computer
       - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
       - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
+      - CYPRESS_WAIT_TIME_IN_MS=3000
     entrypoint: "bash /e2e/run-tests.sh"
     volumes:
       - ./test/e2e/:/e2e
