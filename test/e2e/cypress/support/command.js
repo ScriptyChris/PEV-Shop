@@ -36,7 +36,7 @@ import { ROUTES } from '../fixtures/_routes';
 
     // escape quoted-printable
     // https://github.com/mailhog/MailHog-UI/blob/master/assets/js/controllers.js#L425
-    return latestMessageContent.replace(/=[\r\n]+/gm, '').replace(/3D/gm, '');
+    return latestMessageContent.replace(/=[\r\n]+/g, '').replaceAll('=3D', '=');
   };
 
   Cypress.Commands.add('getAllEmails', () => {
@@ -153,7 +153,7 @@ import { ROUTES } from '../fixtures/_routes';
       'DELETE',
       {
         queryType: 'regex',
-        query: 'test user',
+        rawQuery: 'test user',
       },
       canFail
     );

@@ -616,18 +616,18 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
 
     if (typeof req.body !== 'object') {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body must be an object!' });
-    } else if (!req.body.query) {
-      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request `query` must not be empty!' });
+    } else if (!req.body.rawQuery) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request `rawQuery` must not be empty!' });
     }
 
-    let query = req.body.query;
+    let query = req.body.rawQuery;
 
     switch (req.body.queryType) {
       case 'string': {
         break;
       }
       case 'regex': {
-        query = new RegExp(req.body.query);
+        query = new RegExp(req.body.rawQuery);
         break;
       }
       default: {
