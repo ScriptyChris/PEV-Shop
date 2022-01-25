@@ -25,9 +25,8 @@ import { ROUTES } from '../fixtures/_routes';
   const getLinkFromEmailContent = (content, linkSelectorMatcher) => {
     const document = new DOMParser().parseFromString(content, 'text/html');
     const link = document.querySelector(`a[href*="${linkSelectorMatcher}"]`);
-    const slicedLink = link.href.slice(link.href.indexOf(linkSelectorMatcher));
 
-    return slicedLink;
+    return new URL(link.href);
   };
 
   const getLatestMessageContent = (messages, receiver, subject) => {
@@ -40,8 +39,11 @@ import { ROUTES } from '../fixtures/_routes';
   };
 
   Cypress.Commands.add('getAllEmails', () => {
-    // give Mailhog some time to process it's email queue
-    cy.wait(Cypress.env('WAIT_TIME_IN_MS'));
+    /*
+      TODO: [race condition] give Mailhog some time to process it's email queue.
+      This seems to no longer be the issue, but if it will happen, then uncomment below line or implement re-sending request.
+    */
+    // cy.wait(Cypress.env('WAIT_TIME_IN_MS'));
 
     return cy.request(getEmailAPIURL(2)).then((res) => res.body.items);
   });
@@ -87,7 +89,7 @@ import { ROUTES } from '../fixtures/_routes';
     });
   };
 
-  Cypress.Commands.add('fillAndSendRegisterForm', ({ login, email, password = 'test password' }) => {
+  Cypress.Commands.add('registerTestUserByUI', ({ login, email, password = 'test password' }) => {
     cy.visit(ROUTES.REGISTER);
     cy.get('[data-cy="input:register-login"]').type(login);
     cy.get('[data-cy="input:register-password"]').type(password);
@@ -98,16 +100,15 @@ import { ROUTES } from '../fixtures/_routes';
     cy.contains(`[data-cy="button:go-to-login-from-register"]`, 'Go to login');
   });
 
-  Cypress.Commands.add('confirmTestUserRegistration', (email) => {
-    return cy.getLinkFromEmail(email, 'Account activation', '/pages/confirm-registration').then((url) => {
+  Cypress.Commands.add('confirmTestUserRegistrationByUI', (email) => {
+    return cy.getLinkFromEmail(email, 'Account activation', '/pages/confirm-registration').then((link) => {
       cy.intercept('/api/users/confirm-registration', (req) => {
         req.continue((res) => {
-          // TODO: [issue] sometimes `res.body.payload` is undefined due to 401 response code
           expect(res.body.payload.isUserConfirmed).to.be.true;
         });
       }).as('confirmRegistration');
 
-      cy.visit(url);
+      cy.visit(`${link.pathname}${link.search}`);
       cy.wait('@confirmRegistration');
       cy.contains(
         '[data-cy="message:registration-confirmation-succeeded-hint"]',
@@ -120,9 +121,36 @@ import { ROUTES } from '../fixtures/_routes';
     return userAPIReq('register', 'POST', testUser, canFail);
   });
 
+  Cypress.Commands.add('confirmTestUserRegistration', (email) => {
+    return cy
+      .getLinkFromEmail(email, 'Account activation', '/pages/confirm-registration')
+      .then((link) => {
+        const token = new URLSearchParams(link.search).get('token').replaceAll(' ', '+');
+
+        return userAPIReq('confirm-registration', 'POST', { token });
+      })
+      .then((res) => expect(res.body.payload.isUserConfirmed).to.be.true);
+  });
+
+  Cypress.Commands.add('registerAndLoginTestUser', (testUser) => {
+    return cy
+      .registerTestUser(testUser)
+      .then(() => cy.confirmTestUserRegistration(testUser.email))
+      .then(() => cy.window())
+      .then((win) => win.__E2E__.userSessionService.logIn(testUser))
+      .then((res) => {
+        expect(res).to.include({
+          login: testUser.login,
+          email: testUser.email,
+        });
+
+        return res;
+      });
+  });
+
   Cypress.Commands.add('registerAndLoginTestUserByUI', (testUser) => {
-    cy.fillAndSendRegisterForm(testUser);
-    cy.confirmTestUserRegistration(testUser.email);
+    cy.registerTestUserByUI(testUser);
+    cy.confirmTestUserRegistrationByUI(testUser.email);
     cy.get('[data-cy="button:log-in-after-confirmed-registration"]').click();
 
     return cy.loginTestUserByUI(testUser);

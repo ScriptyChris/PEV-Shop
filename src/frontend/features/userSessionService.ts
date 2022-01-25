@@ -77,6 +77,10 @@ const userSessionService = Object.freeze({
       storeService.updateUserAccountState(userAccount);
     }
   },
-} as const);
+});
+
+if (window.Cypress) {
+  window.__E2E__.userSessionService = userSessionService;
+}
 
 export default userSessionService;

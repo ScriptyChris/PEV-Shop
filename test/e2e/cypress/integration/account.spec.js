@@ -15,7 +15,7 @@ describe('#account', () => {
     ORDERS: `${ROUTES.ACCOUNT}/orders`,
   });
   const goToNewUserAccount = () => {
-    cy.registerAndLoginTestUserByUI(ACCOUNT_TEST_USER);
+    cy.registerAndLoginTestUser(ACCOUNT_TEST_USER);
 
     // TODO: [UI/AUTH] check why direct navigation to the URL (via address bar) after user has been logged in returns 401
     cy.get(`a[href="${ROUTES.ACCOUNT}"]`).click();

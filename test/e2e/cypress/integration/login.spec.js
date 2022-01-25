@@ -79,7 +79,7 @@ describe('#login', () => {
     });
     const TEST_USER_NEW_PASSWORD = 'new test password';
 
-    cy.registerTestUser(TEST_USER).then(() => cy.confirmTestUserRegistration(TEST_USER.email));
+    cy.registerTestUser(TEST_USER).then(() => cy.confirmTestUserRegistrationByUI(TEST_USER.email));
 
     cy.visit(ROUTES.LOG_IN);
     cy.loginTestUser({
@@ -97,14 +97,14 @@ describe('#login', () => {
     cy.get('[data-cy="button:submit-reset"]').should('have.text', 'Reset').click();
     cy.wait('@resetPassword');
 
-    cy.getLinkFromEmail(TEST_USER.email, 'Reset password', '/pages/set-new-password').then((url) => {
+    cy.getLinkFromEmail(TEST_USER.email, 'Reset password', '/pages/set-new-password').then((link) => {
       cy.intercept('/api/users/set-new-password', (req) => {
         req.continue((res) => {
           expect(res.statusCode).to.be.eq(HTTP_STATUS_CODE.CREATED);
           expect(res.body.message).to.be.eq('Password updated!');
         });
       }).as('setNewPassword');
-      cy.visit(url);
+      cy.visit(`${link.pathname}${link.search}`);
     });
     cy.get('[data-cy="input:new-password"]').type(TEST_USER_NEW_PASSWORD);
     cy.get('[data-cy="input:repeated-new-password"]').type(TEST_USER_NEW_PASSWORD);

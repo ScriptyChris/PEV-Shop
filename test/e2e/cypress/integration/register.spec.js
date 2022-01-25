@@ -27,8 +27,8 @@ describe('#register', () => {
 
   it('should register a new user', () => {
     cy.get(`[data-cy="link:${ROUTES.REGISTER}"]`).should('exist').click();
-    cy.fillAndSendRegisterForm(testUsers[0]);
-    cy.confirmTestUserRegistration(testUsers[0].email);
+    cy.registerTestUserByUI(testUsers[0]);
+    cy.confirmTestUserRegistrationByUI(testUsers[0].email);
   });
 
   it('should re-send registration confirmation email', () => {
@@ -39,7 +39,7 @@ describe('#register', () => {
     };
 
     cy.get(`[data-cy="link:${ROUTES.REGISTER}"]`).click();
-    cy.fillAndSendRegisterForm(testUsers[1]);
+    cy.registerTestUserByUI(testUsers[1]);
 
     expectMatchingEmailsCount(1);
     cy.intercept('/api/users/resend-confirm-registration', (req) => {
@@ -55,7 +55,7 @@ describe('#register', () => {
 
   it('should redirect to login page from registration popup', () => {
     cy.visit(ROUTES.REGISTER);
-    cy.fillAndSendRegisterForm(testUsers[2]);
+    cy.registerTestUserByUI(testUsers[2]);
     cy.get(`[data-cy="button:go-to-login-from-register"]`).click();
     cy.location('pathname').should('eq', ROUTES.LOG_IN);
   });

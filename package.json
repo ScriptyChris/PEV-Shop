@@ -18,7 +18,7 @@
     "url": "https://github.com/ScriptyChris/Fake-PEV-Shopping/issues"
   },
   "scripts": {
-    "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data",
+    "prettier:backend": "prettier --write src/middleware/ src/database/ !src/database/data src/augmentations.d.ts",
     "prettier:test:unit": "prettier --write test/unit __mocks__/** **/__mocks__/**",
     "eslint:backend": "cross-env BACKEND_ONLY=true eslint \"src/middleware/**\" \"src/database/**\"",
     "eslint:test:unit": "cross-env BACKEND_ONLY=true TEST_ENV=true eslint \"test/unit/**\" \"__mocks__/*\" \"src/**/__mocks__/*\"",

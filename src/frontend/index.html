@@ -14,5 +14,12 @@
     <!-- TODO: add <noscript> tag with multi-lang information -->
 
     <div id="app" class="app-root"></div>
+
+    <!-- TODO: that script might be injected only in E2E "mode" -->
+    <script>
+      if (window.Cypress) {
+        window.__E2E__ = {};
+      }
+    </script>
   </body>
 </html>
