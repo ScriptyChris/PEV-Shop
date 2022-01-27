@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  mongo:
+    build:
+      context: ./
+      dockerfile: custom-mongodb-dockerfile
+    container_name: pev-db
+    environment:
+      - APP_PORT=${APP_PORT}
+    volumes:
+      # Sends HTTP request to the app's API, which then runs population via npm
+      - ../src/database/populate/trigger-population.sh:/home/bin/trigger-population.sh
+      # Runs above `trigger-population.sh` in detached and background way. It is called automatically by MongoDB container
+      - ../src/database/populate/init-trigger-population.sh:/docker-entrypoint-initdb.d/init-trigger-population.sh
+      - pev-storage:/data/db
+  
+  mail:
+    image: mailhog/mailhog:v1.0.1
+    container_name: pev-mail
+    ports:
+      - ${EMAIL_SMTP_PORT}:${EMAIL_SMTP_PORT}
+      - ${EMAIL_HTTP_PORT}:${EMAIL_HTTP_PORT}
+    logging:
+      driver: "none"
+
+  node:
+    build: 
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: fake-pev-shopping
+    container_name: pev-app
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - ../:/app
+    depends_on:
+      - mongo
+      - mail
+  
+volumes:
+  pev-storage:

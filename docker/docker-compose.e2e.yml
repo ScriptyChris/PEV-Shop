@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  cypress:
+    image: "cypress/included:9.1.1"
+    container_name: pev-cypress
+    depends_on:
+      - node
+    network_mode: "host"
+    working_dir: /e2e
+    environment:
+      - DISPLAY ## `xhost +local:` command must first be run on the host computer
+      - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
+      - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
+      - CYPRESS_WAIT_TIME_IN_MS=3000
+      - CYPRESS_TEST_MODE=${CYPRESS_TEST_MODE}
+    entrypoint: "bash /e2e/run-tests.sh"
+    volumes:
+      - ../test/e2e/:/e2e
+      - ../.prettierrc:/e2e/.prettierrc
+      - ../src/frontend/components/pages/_routes.js:/e2e/cypress/fixtures/_routes.js
+      - ../dist/src/types.js:/e2e/cypress/fixtures/types.js
+      - ../src/database/populate/initial-users.json:/e2e/cypress/fixtures/initial-users.json
