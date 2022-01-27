@@ -22,9 +22,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: >
-          docker-compose 
-            -f docker/docker-compose.yml 
-            -f docker/docker-compose.e2e.yml 
-            up
-            --abort-on-container-exit
+      - run: "docker-compose \
+          -f docker/docker-compose.yml \
+          -f docker/docker-compose.e2e.yml \
+          up \
+          --abort-on-container-exit"
