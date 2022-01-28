@@ -8,13 +8,15 @@ RUN npm ci
 COPY ./src ./src
 COPY ./utils ./utils
 COPY \
-    .env \
+    .env* \
     .babelrc \
     .eslintrc.js \
     .prettierrc \
     tsconfig* \
     webpack.config.js \
     ./
+# if `.env` file doesn't exist, create it based on `.env.example`
+RUN test -e .env || cp .env.example .env
 
 RUN npm run build
 
