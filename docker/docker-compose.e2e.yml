@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   cypress:
@@ -13,7 +13,7 @@ services:
       - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
       - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
       - CYPRESS_WAIT_TIME_IN_MS=3000
-      - CYPRESS_TEST_MODE=${CYPRESS_TEST_MODE}
+      - CYPRESS_TEST_MODE
     entrypoint: "bash /e2e/run-tests.sh"
     volumes:
       - ../test/e2e/:/e2e

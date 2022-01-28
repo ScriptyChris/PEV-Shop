@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   mongo:
@@ -7,7 +7,7 @@ services:
       dockerfile: custom-mongodb-dockerfile
     container_name: pev-db
     environment:
-      - APP_PORT=${APP_PORT}
+      - APP_PORT
     volumes:
       # Sends HTTP request to the app's API, which then runs population via npm
       - ../src/database/populate/trigger-population.sh:/home/bin/trigger-population.sh
