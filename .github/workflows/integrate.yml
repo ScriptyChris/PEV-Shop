@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: "docker-compose \
+      - run: "sudo docker-compose \
             -f docker/docker-compose.yml \
             -f docker/docker-compose.e2e.yml \
             --env-file .env.example \
