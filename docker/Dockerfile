@@ -16,7 +16,7 @@ COPY \
     webpack.config.js \
     ./
 # if `.env` file doesn't exist, create it based on `.env.example`
-RUN cp --no-clobber .env.example .env
+RUN test -e .env || cp .env.example .env
 
 RUN npm run build
 
