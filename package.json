@@ -34,7 +34,7 @@
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend",
     "debug": "cross-env BACKEND_ONLY=true node --inspect-brk dist/src/middleware/middleware-index.js",
-    "serve": "node_modules/.bin/cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"
+    "serve": "test -e node_modules/ && ls node_modules/.bin && node_modules/.bin/cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.0",
