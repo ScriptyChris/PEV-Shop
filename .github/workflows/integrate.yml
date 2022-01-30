@@ -22,9 +22,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - working-directory: docker
       - run: "sudo docker-compose \
-            -f docker/docker-compose.yml \
-            -f docker/docker-compose.e2e.yml \
-            --env-file .env.example \
+            -f docker-compose.yml \
+            -f docker-compose.e2e.yml \
+            --env-file ../.env.example \
             up \
             --abort-on-container-exit"

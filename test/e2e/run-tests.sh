@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo ".....run-tests.sh....: $CYPRESS_BASE_URL"
+
 npx wait-on "${CYPRESS_BASE_URL}"
 
 if [[ "$CYPRESS_TEST_MODE" == "development" ]]
