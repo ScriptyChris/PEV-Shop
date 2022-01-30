@@ -34,8 +34,7 @@ services:
       - ${APP_PORT}:${APP_PORT}
     volumes:
       - ../:/app
-      - /app/node_modules
-      - /app/dist
+      - /app
     depends_on:
       - mongo
       - mail
