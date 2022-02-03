@@ -1,7 +1,7 @@
-import { getRootRelativePath, mockAndRequireModule } from '../test-index';
-import { HTTP_STATUS_CODE, TJestMock } from '../../../src/types';
+import { getRootRelativePath, mockAndRequireModule, TJestMock } from '../test-index';
+import { HTTP_STATUS_CODE } from '../../../src/types';
 
-const globMock = jest.requireActual(getRootRelativePath('__mocks__/glob'));
+const globMock: TJestMock = jest.requireActual(getRootRelativePath('__mocks__/glob'));
 const { json: expressJSONMock } = jest.requireActual(getRootRelativePath('__mocks__/express'));
 const [apiConfigMock, apiProductsMock, apiProductsCategoriesMock, apiUsersMock, apiUserRolesMock, apiOrdersMock] = [
   'api-config',
@@ -35,7 +35,7 @@ describe('#middleware-index', () => {
   });
 
   afterEach(() => {
-    (globMock as TJestMock).mockClear();
+    globMock.mockClear();
     expressJSONMock.mockClear();
     appMock.use.mockClear();
     appMock.get.mockClear();

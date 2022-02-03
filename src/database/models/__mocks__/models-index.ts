@@ -1,4 +1,4 @@
-import { TJestMock } from '../../../types';
+import { TJestMock } from '../../../../test/unit/test-index';
 import { getMockImplementationError } from '../../../../test/unit/mockUtils';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function

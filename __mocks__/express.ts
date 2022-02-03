@@ -1,4 +1,4 @@
-import { TJestMock } from '../src/types';
+import { TJestMock } from '../test/unit/test-index';
 
 const router: Partial<{ get: TJestMock; post: TJestMock; patch: TJestMock }> = Object.defineProperties(
   {},

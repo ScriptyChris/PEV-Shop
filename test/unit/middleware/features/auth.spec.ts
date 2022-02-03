@@ -1,6 +1,6 @@
-import { mockAndRequireModule, findAssociatedSrcModulePath } from '../../test-index';
+import { mockAndRequireModule, findAssociatedSrcModulePath, TJestMock } from '../../test-index';
 import type { IUser } from '../../../../src/database/models/_user';
-import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
+import { HTTP_STATUS_CODE } from '../../../../src/types';
 import { getResMock } from '../../mockUtils';
 import getType from 'jest-get-type';
 import { getFromDB } from '../../../../src/database/__mocks__/database-index';

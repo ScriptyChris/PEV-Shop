@@ -1,5 +1,5 @@
 import { getMockImplementationError } from '../../../../test/unit/mockUtils';
-import { TJestMock } from '../../../types';
+import { TJestMock } from '../../../../test/unit/test-index';
 
 const UserModel: {
   validatePassword: TJestMock &

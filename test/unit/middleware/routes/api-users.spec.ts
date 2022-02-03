@@ -1,5 +1,5 @@
-import { mockAndRequireModule, findAssociatedSrcModulePath } from '../../test-index';
-import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
+import { mockAndRequireModule, findAssociatedSrcModulePath, TJestMock } from '../../test-index';
+import { HTTP_STATUS_CODE } from '../../../../src/types';
 import { getResMock, getNextFnMock } from '../../mockUtils';
 
 const { ObjectId: ObjectIdMock } = mockAndRequireModule('mongodb');

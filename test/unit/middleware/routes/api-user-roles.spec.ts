@@ -1,5 +1,5 @@
-import { findAssociatedSrcModulePath, mockAndRequireModule } from '../../test-index';
-import { HTTP_STATUS_CODE, TJestMock } from '../../../../src/types';
+import { findAssociatedSrcModulePath, mockAndRequireModule, TJestMock } from '../../test-index';
+import { HTTP_STATUS_CODE } from '../../../../src/types';
 import { getResMock } from '../../mockUtils';
 
 const { Router, _router } = mockAndRequireModule('express');
