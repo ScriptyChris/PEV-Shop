@@ -262,6 +262,8 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
     const newUser = (await saveToDB(req.body, 'User')) as IUser;
     await newUser.setSingleToken('confirmRegistration');
 
+    logger.log('_E2E_ [registerUser()] /newUser.tokens.confirmRegistration:', newUser.tokens.confirmRegistration);
+
     return await sendRegistrationEmail({
       login: req.body.login,
       email: req.body.email,
@@ -285,6 +287,13 @@ async function confirmRegistration(req: Request, res: Response, next: NextFuncti
       { 'tokens.confirmRegistration': req.body.token.replace(/\s/g, '+') },
       'User'
     )) as IUser;
+
+    logger.log(
+      '_E2E_ [confirmRegistration()] \n/userToConfirm:',
+      !!userToConfirm,
+      '\n/users:',
+      await UserModel.find({}, { login: 1, email: 1, 'tokens.confirmRegistration': 1 })
+    );
 
     if (userToConfirm) {
       await userToConfirm.confirmUser();

@@ -53,6 +53,7 @@ function wrappedMiddleware(): void {
   const app: Application = Express();
   app.use(function handleDatabaseReadiness(req: Request, res: Response, next: NextFunction) {
     const isDatabaseReady = getPopulationState();
+    console.log('-------isDatabaseReady:', isDatabaseReady);
 
     if (!isDatabaseReady && req.url !== '/api/populate-db') {
       return res.status(HTTP_STATUS_CODE.SERVICE_UNAVAILABLE).send(

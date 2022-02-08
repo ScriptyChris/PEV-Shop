@@ -1,23 +1,24 @@
-// cross-env TS_NODE_PROJECT=../../../tsconfig.backend.json node --inspect-brk -r ts-node/register populate.ts -
-// -products=trialProducts.json categoryGroups=categoryGroups.json singleProduct cleanAll
-
 import getLogger from '../../../utils/logger';
 import { connection, Model } from 'mongoose';
 import { ProductModel, IProduct } from '../models/_product';
 import { UserModel, IUser } from '../models/_user';
 import { TModelType } from '../models/models-index';
-import { config as dotenvConfig } from 'dotenv';
 import { hashPassword } from '../../middleware/features/auth';
 import { tryToConnectWithDB } from '../connector';
 
-const envVar = dotenvConfig({ path: '../../../.env' }); // ../
 const logger = getLogger(module.filename);
 const PARAMS = Object.freeze({
+  EXECUTED_FROM_CLI: 'executedFromCLI',
   CLEAN_ALL_BEFORE: 'cleanAllBefore',
   JSON_FILE_PATH: {
-    PRODUCTS: 'productsInputPath=',
-    USERS: 'usersInputPath=',
+    PRODUCTS: 'productsInputPath',
+    USERS: 'usersInputPath',
   },
+});
+const DEFAULT_PARAMS = Object.freeze({
+  [PARAMS.CLEAN_ALL_BEFORE]: 'true',
+  [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initial-products.json',
+  [PARAMS.JSON_FILE_PATH.USERS]: './initial-users.json',
 });
 
 let relatedProductsErrors = 0;
@@ -41,16 +42,16 @@ let relatedProductsErrors = 0;
 
 type TPopulatedData = Record<string, unknown>;
 
-logger.log('process.argv:', process.argv, '\n/envVar:', envVar);
+logger.log('process.argv:', process.argv);
 
-if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-  throw ReferenceError(`CLI argument ${PARAMS.JSON_FILE_PATH.PRODUCTS} must be provided as non empty string`);
+if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
+  throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string`);
 }
 
-(async () => {
-  tryToConnectWithDB();
+const doPopulate = async () => {
+  await tryToConnectWithDB();
 
-  if (getScriptParamValue(PARAMS.CLEAN_ALL_BEFORE)) {
+  if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true') {
     const removedData = await Promise.all(
       [
         { name: 'products', ctor: ProductModel },
@@ -65,14 +66,14 @@ if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
     logger.log(`Cleaning done. Removed: ${removedData}`);
   }
 
-  if (getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-    const productsSourceDataList = getSourceData('Product') as TPopulatedData[];
+  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
+    const productsSourceDataList = getSourceData('Product');
     await populateProducts(ProductModel, productsSourceDataList);
     await updateRelatedProductsNames(ProductModel, productsSourceDataList);
   }
 
-  if (getScriptParamValue(PARAMS.JSON_FILE_PATH.USERS)) {
-    const usersSourceDataList = getSourceData('User') as TPopulatedData[];
+  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USERS)) {
+    const usersSourceDataList = getSourceData('User');
     await populateUsers(UserModel, usersSourceDataList);
   }
 
@@ -86,11 +87,15 @@ if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
   );
 
   await connection.close();
-})();
+};
 
-function getSourceData(modelType: TModelType): TPopulatedData[] | ReferenceError {
+if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
+  doPopulate();
+}
+
+function getSourceData(modelType: TModelType): TPopulatedData[] {
   const normalizedModelType = `${modelType.toUpperCase()}S` as `${Uppercase<Exclude<TModelType, 'User-Role'>>}S`;
-  const sourceDataPath: string = getScriptParamValue(PARAMS.JSON_FILE_PATH[normalizedModelType]);
+  const sourceDataPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH[normalizedModelType]);
 
   if (!sourceDataPath) {
     throw ReferenceError(
@@ -98,6 +103,7 @@ function getSourceData(modelType: TModelType): TPopulatedData[] | ReferenceError
     );
   }
 
+  console.log('[getSourceData()] /sourceDataPath:', sourceDataPath);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const sourceDataFiles = require(sourceDataPath);
 
@@ -167,8 +173,12 @@ function updateRelatedProductsNames(
   );
 }
 
-function getScriptParamValue(param: string): string {
-  const paramValue = process.argv.find((arg: string) => arg.includes(param));
+function getScriptParamStringValue(paramName: string) {
+  const paramValue = process.argv.find((arg: string) => arg.includes(paramName)) ?? DEFAULT_PARAMS[paramName];
 
-  return paramValue ? (paramValue.split('=').pop() as string) : '';
+  console.log('[getScriptParamValue()] /paramName:', paramName, '/paramValue:', paramValue);
+
+  return paramValue ? paramValue.split('=').pop() : '';
 }
+
+export { doPopulate };
