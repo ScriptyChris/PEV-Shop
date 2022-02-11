@@ -1,5 +1,3 @@
-export type TJestMock<T = void> = jest.Mock<any, T | any>;
-
 export interface IProductInOrder {
   name: number;
   unitPrice: number;
@@ -42,3 +40,17 @@ export interface IUserCart {
 }
 
 export type TPagination = { pageNumber: number; productsPerPage: number };
+
+export type TE2E = {
+  [key: string]: {
+    [key: string]: (...args: any[]) => void;
+  };
+};
+
+export type TE2EUser = {
+  login: string;
+  password: string;
+  email: string;
+  accountType?: string;
+  isConfirmed?: boolean;
+};

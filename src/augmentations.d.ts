@@ -1,4 +1,6 @@
 import type { DeleteWriteOpResultObject } from 'mongodb';
+import type { TE2E } from './types';
+import type { Cypress } from 'local-cypress';
 
 declare module 'mongoose' {
   interface Document {
@@ -32,12 +34,7 @@ declare global {
   }
 
   interface Window {
-    // TODO: [TS] add proper typing
-    Cypress: Object;
-    __E2E__: {
-      [key: string]: {
-        [key: string]: (...args: any[]) => void;
-      };
-    };
+    Cypress: typeof Cypress;
+    __E2E__: TE2E;
   }
 }

@@ -1,4 +1,2 @@
-require('./command.js');
-
-// npm i -D cypress-dark &&
-// require('cypress-dark');
+/// <reference types="cypress" />
+import './command.js';
