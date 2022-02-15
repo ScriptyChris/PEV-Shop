@@ -23,8 +23,8 @@ RUN npm run build
 
 EXPOSE ${APP_PORT}
 
-RUN ["/bin/bash", "-c", "ls -las"]
-RUN ["/bin/bash", "-c", "cat .env.example"]
-RUN ["/bin/bash", "-c", "cat .env"]
+RUN ["sh", "-c", "ls -las"]
+RUN ["sh", "-c", "cat .env.example"]
+RUN ["sh", "-c", "cat .env"]
 
 CMD ["npm", "run", "serve"]
