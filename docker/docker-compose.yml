@@ -23,7 +23,7 @@ services:
       driver: "none"
 
   node:
-    build: 
+    build:
       context: ../
       dockerfile: ./docker/Dockerfile
     image: fake-pev-shopping
