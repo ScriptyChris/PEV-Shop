@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: "echo \"[[ Docker E2E run() ]] i am: $(whoami)\" && echo \"xhost: $(xhost)\" && \
+      - run: "echo \"[[ Docker E2E run() ]] i am: $(whoami)\" && echo \"sudo xhost: $(sudo xhost)\" && \
           sudo docker-compose \
             -f docker-compose.yml \
             -f docker-compose.node-service-override.yml \
