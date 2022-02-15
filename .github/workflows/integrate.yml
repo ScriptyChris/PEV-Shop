@@ -23,7 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: "echo \"[[ Docker E2E run() ]] i am: $(whoami)\" && echo \"sudo xhost: $(sudo xhost)\" && \
-          # if `.env` file doesn't exist, create it based on `.env.example`
           RUN test -e .env || cp .env.example .env; \
           sudo docker-compose \
             -f docker-compose.yml \
