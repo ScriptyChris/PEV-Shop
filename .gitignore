@@ -6,5 +6,4 @@ dist/
 src/database/populate/_modify-initial-data.js
 test/e2e/cypress/screenshots
 test/e2e/cypress/fixtures
-test/e2e/.prettierrc
 test/e2e/node_modules

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   cypress:
     image: "cypress/included:9.1.1"
@@ -17,7 +15,4 @@ services:
     entrypoint: "bash /e2e/run-tests.sh"
     volumes:
       - ../test/e2e/:/e2e
-      - ../.prettierrc:/e2e/.prettierrc
-      - ../src/frontend/components/pages/_routes.js:/e2e/cypress/fixtures/_routes.js
-      - ../dist/src/types.js:/e2e/cypress/fixtures/types.js
       - ../src/database/populate/initial-users.json:/e2e/cypress/fixtures/initial-users.json

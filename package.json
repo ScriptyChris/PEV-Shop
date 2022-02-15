@@ -25,11 +25,11 @@
     "eslint:test:unit": "cross-env BACKEND_ONLY=true TEST_ENV=true eslint \"test/unit/**\" \"__mocks__/*\" \"src/**/__mocks__/*\"",
     "eslint:test:e2e": "cross-env BACKEND_ONLY=true TEST_ENV=true eslint \"test/e2e/cypress/**/*.ts\" \"test/e2e/generate-spec-deps-files.mjs\"",
     "pretest:unit": "npm run eslint:test:unit && npm run prettier:test:unit",
-    "pretest:e2e": "npm run eslint:test:e2e && npm run prettier:test:e2e",
+    "pretest:e2e": "npm run eslint:test:e2e && npm run prettier:test:e2e && tsc --project tsconfig.cypress.json | node test/e2e/generate-spec-deps-files.mjs",
     "test:unit": "jest --env=node test/unit",
     "test:unit:dev": "jest --watch --env=node test/unit",
     "test:unit:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
-    "test:e2e": "cd test/e2e && npm run build:e2e && cd ../../ && xhost +local: && sudo docker-compose -f docker/docker-compose.yml -f docker/docker-compose.node-service-override.yml -f docker/docker-compose.e2e.yml --env-file .env up",
+    "test:e2e": "xhost +local: && sudo docker-compose -f docker/docker-compose.yml -f docker/docker-compose.node-service-override.yml -f docker/docker-compose.e2e.yml --env-file .env up",
     "populate-db": "cd dist/src/database/populate && node populate.js executedFromCLI=true",
     "dev:frontend": "webpack-dev-server --env development",
     "dev:backend": "cross-env BACKEND_ONLY=true nodemon --exec \"npm run prebuild:backend && ts-node --files --project tsconfig.backend.json src/middleware/middleware-index.ts\" --watch src/middlware --watch src/database",
@@ -38,7 +38,7 @@
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend",
     "debug": "cross-env BACKEND_ONLY=true node --inspect-brk dist/src/middleware/middleware-index.js",
-    "serve": "echo '--> ::' && ls ./ && echo '--> UP::' && ls ../ && echo '--> dist/::' && ls dist/ && cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"
+    "serve": "echo '--> ::' && ls ./ && echo '--> UP::' && ls ../ && echo '--> dist/::' && ls dist/ && node_modules/.bin/cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.0",

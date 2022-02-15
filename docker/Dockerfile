@@ -15,6 +15,7 @@ COPY \
     tsconfig* \
     webpack.config.js \
     ./
+
 # if `.env` file doesn't exist, create it based on `.env.example`
 RUN test -e .env || cp .env.example .env
 

@@ -22,8 +22,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: "sudo docker-compose \
+      - run: "xhost +local: && \
+          sudo docker-compose \
             -f docker-compose.yml \
+            -f docker-compose.node-service-override.yml \
             -f docker-compose.e2e.yml \
             --env-file ../.env.example \
             up \

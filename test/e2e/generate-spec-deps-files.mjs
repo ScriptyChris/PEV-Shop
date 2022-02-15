@@ -6,35 +6,40 @@
   This will eliminate the need to put compiled `.js` files to the repo for CI/CD to run them during E2E tests.
 */
 
-import { resolve, parse } from 'path';
+import { parse } from 'path';
 import { mkdirSync, renameSync } from 'fs';
 
-const ROOT_PATH = resolve(process.cwd(), '..', '..');
-console.log('ROOT_PATH?', ROOT_PATH);
+const ROOT_PATH = process.cwd();
+console.log('[TS deps gen] ROOT_PATH?', ROOT_PATH, '\n/cwd:', process.cwd());
 
 const inputData = (await getInputPath()).toString().trim();
+const dataIsEmpty = inputData.trim() === '';
+// console.log('[TS deps gen] inputData:',inputData)
 
-if (inputData.includes('error')) {
+if (inputData.includes('error') || dataIsEmpty) {
+  const inputErrorMsg = dataIsEmpty ? 'input data is empty...' : `\n${inputData}`;
+
   // log assumed error
   console.error(
     '\n------------------------------',
     '\n------------------------------\n',
-    'TypeScript compilation might encountered an error:\n',
-    inputData,
+    'TypeScript compilation might encountered an error:',
+    inputErrorMsg,
     '\n------------------------------',
     '\n------------------------------\n'
   );
 
-  // exit process if the error comes from TypeScript
-  if (inputData.includes('error TS')) {
+  // exit process if the error comes from TypeScript or input is empty
+  if (inputData.includes('error TS') || dataIsEmpty) {
     process.exit(1);
   }
 }
 
 const LINE_APPENDIX = 'TSFILE: ';
 const EXCLUDED_PATH_FRAGMENTS = ['/test/', '/dist/'];
-const TARGET_PATH_START = './cypress/fixtures/generatedDependencies';
+const TARGET_PATH_START = './test/e2e/cypress/fixtures/generatedDependencies';
 const filteredPaths = inputData.split('\n').filter(excludePaths);
+console.log('[TS deps gen] filteredPaths:', filteredPaths);
 
 if (!filteredPaths.length) {
   console.error(
