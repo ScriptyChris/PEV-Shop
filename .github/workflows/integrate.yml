@@ -23,12 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: "echo \"[[ Docker E2E run() ]] i am: $(whoami)\" && echo \"sudo xhost: $(sudo xhost)\" && \
-          RUN test -e .env || cp .env.example .env; \
+          RUN test -e ../.env || cp ../.env.example ../.env; \
           sudo docker-compose \
             -f docker-compose.yml \
             -f docker-compose.node-service-override.yml \
             -f docker-compose.e2e.yml \
-            --env-file ../.env.example \
+            --env-file ../.env \
             up \
             --abort-on-container-exit"
         working-directory: ./docker
