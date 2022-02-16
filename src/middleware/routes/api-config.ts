@@ -20,8 +20,10 @@ async function populateDB(req: Request, res: Response, next: NextFunction) {
     // TODO: [SECURITY] restrict access to localhost and probably require a password
 
     logger.log('[<>] Starting the population');
-    const populationResult = await doPopulate();
-    logger.log('[<>] populationResult:', populationResult);
+    
+    const isPopulated = await doPopulate();
+    
+    logger.log('[<>] isPopulated:', isPopulated);
 
     return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {

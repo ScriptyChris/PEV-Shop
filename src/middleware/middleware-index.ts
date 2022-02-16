@@ -51,22 +51,7 @@ function wrappedMiddleware(): void {
   const frontendPath = getFrontendPath();
 
   const app: Application = Express();
-  app.use(function handleDatabaseReadiness(req: Request, res: Response, next: NextFunction) {
-    const isDatabaseReady = getPopulationState();
-    console.log('-------isDatabaseReady:', isDatabaseReady);
-
-    if (!isDatabaseReady && req.url !== '/api/populate-db') {
-      return res.status(HTTP_STATUS_CODE.SERVICE_UNAVAILABLE).send(
-        `
-          <p><strong>Database is not ready yet!</strong></p>
-          <p>Data population process should happen automatically at app's first startup (if you launch it via Docker) and lasts just a moment.</p>
-          <p>If you still see this error after a longer while, perhaps you need to run population manually? Check for <code>populate-db</code> npm script.</p>
-        `.trim()
-      );
-    }
-
-    next();
-  }, Express.static(frontendPath));
+  app.use(getDatabaseReadinessHandler(), Express.static(frontendPath));
 
   middleware(app);
 
@@ -79,6 +64,35 @@ function wrappedMiddleware(): void {
   app.listen(process.env.APP_PORT, () => {
     logger.log(`Server is listening on port ${process.env.APP_PORT}`);
   });
+}
+
+function getDatabaseReadinessHandler() {
+  let isDatabaseReady = false;
+
+  console.log('[getDatabaseReadinessHandler()] ???');
+
+  return async function handleDatabaseReadiness(req: Request, res: Response, next: NextFunction) {
+    if (!isDatabaseReady) {
+      isDatabaseReady = await getPopulationState();
+      console.log('[handleDatabaseReadiness()] isDatabaseReady:', isDatabaseReady);
+
+      if (isDatabaseReady) {
+        return next();
+      }
+
+      if (req.url !== '/api/populate-db') {
+        return res.status(HTTP_STATUS_CODE.SERVICE_UNAVAILABLE).send(
+          `
+            <p><strong>Database is not ready yet!</strong></p>
+            <p>Data population process should happen automatically at app's first startup (if you launch it via Docker) and lasts just a moment.</p>
+            <p>If you still see this error after a longer while, perhaps you need to run population manually? Check for <code>populate-db</code> npm script.</p>
+          `.trim()
+        );
+      }
+    }
+
+    return next();
+  };
 }
 
 function getFrontendPath(): string {

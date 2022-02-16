@@ -1,12 +1,12 @@
 #!/bin/bash
 
-echo ".....run-tests.sh....: $CYPRESS_BASE_URL"
+npm install -g local-cypress
+
+echo "[run-tests.sh] CYPRESS_BASE_URL: $CYPRESS_BASE_URL"
 
 npx wait-on "${CYPRESS_BASE_URL}"
 
-echo "...now debug the Cypress..."
-
-npm install -g local-cypress
+echo "[run-tests.sh] Cypress connected to app"
 
 #npm install @types/mocha @types/chai
 

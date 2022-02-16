@@ -1,10 +1,10 @@
 import getLogger from '../../../utils/logger';
-import { connection, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { ProductModel, IProduct } from '../models/_product';
 import { UserModel, IUser } from '../models/_user';
 import { TModelType } from '../models/models-index';
 import { hashPassword } from '../../middleware/features/auth';
-import { tryToConnectWithDB } from '../connector';
+import { getDBConnection } from '../connector';
 
 const logger = getLogger(module.filename);
 const PARAMS = Object.freeze({
@@ -49,7 +49,11 @@ if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
 }
 
 const doPopulate = async () => {
-  await tryToConnectWithDB();
+  const dbConnection = await getDBConnection();
+
+  if (!dbConnection || dbConnection instanceof Error) {
+    throw TypeError(`Database Population is not possible due to a problem with connection: \n${dbConnection}\n.`);
+  }
 
   if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true') {
     const removedData = await Promise.all(
@@ -77,16 +81,30 @@ const doPopulate = async () => {
     await populateUsers(UserModel, usersSourceDataList);
   }
 
+  const populationResults = {
+    productsAmount: await ProductModel.find({}).countDocuments(),
+    usersAmount: await UserModel.find({}).countDocuments(),
+  };
+
   logger.log(
-    'Products amount after population:',
-    await ProductModel.find({}).countDocuments(),
-    ' /relatedProductsErrors:',
+    'Population results:',
+    '\n\t- products amount:',
+    populationResults.productsAmount,
+    '\n\t\t- relatedProductsErrors:',
     relatedProductsErrors,
-    '\n Users amount after population:',
-    await UserModel.find({}).countDocuments()
+    '\n\t- users amount:',
+    populationResults.usersAmount
   );
 
-  await connection.close();
+  /*
+    TODO: [DataBase - optimalization] ensure if it's necessary to close a connection after data population.
+    If closure is done on the same connection instance as the app relies on, 
+    then at least connection initiator should be checked before deciding whether to close it, 
+    to avoid closing connection for the entire app.
+  */
+  // await dbConnection.close();
+
+  return Object.values(populationResults).every(Boolean);
 };
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {

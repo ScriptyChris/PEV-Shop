@@ -3,13 +3,13 @@ import { queryBuilder } from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
 import { config as dotenvConfig } from 'dotenv';
 import getLogger from '../../utils/logger';
-import { tryToConnectWithDB } from './connector';
+import { getDBConnection } from './connector';
 
 dotenvConfig();
 
 const logger = getLogger(module.filename);
 
-tryToConnectWithDB();
+getDBConnection();
 
 function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string> {
   // TODO: improve validation

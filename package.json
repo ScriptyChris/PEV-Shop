@@ -29,7 +29,7 @@
     "test:unit": "jest --env=node test/unit",
     "test:unit:dev": "jest --watch --env=node test/unit",
     "test:unit:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
-    "test:e2e": "xhost +local: && sudo docker-compose -f docker/docker-compose.yml -f docker/docker-compose.node-service-override.yml -f docker/docker-compose.e2e.yml --env-file .env up",
+    "test:e2e": "xhost +local: && sudo docker-compose -f docker/docker-compose.yml -f docker/docker-compose.e2e.yml --env-file .env up",
     "populate-db": "cd dist/src/database/populate && node populate.js executedFromCLI=true",
     "dev:frontend": "webpack-dev-server --env development",
     "dev:backend": "cross-env BACKEND_ONLY=true nodemon --exec \"npm run prebuild:backend && ts-node --files --project tsconfig.backend.json src/middleware/middleware-index.ts\" --watch src/middlware --watch src/database",
