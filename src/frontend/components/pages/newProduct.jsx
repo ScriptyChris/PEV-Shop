@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Formik, Field, ErrorMessage } from 'formik';
-import httpService from '../../features/httpService';
-import productSpecsService from '../../features/productSpecsService';
-import { CategoriesTreeFormField } from '../views/categoriesTree';
-import FormFieldError from '../utils/formFieldError';
-import { SearchSingleProductByName } from '../views/search';
-import FlexibleList from '../utils/flexibleList';
+import httpService from '@frontend/features/httpService';
+import productSpecsService from '@frontend/features/productSpecsService';
+import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
+import FormFieldError from '@frontend/components/utils/formFieldError';
+import { SearchSingleProductByName } from '@frontend/components/views/search';
+import FlexibleList from '@frontend/components/utils/flexibleList';
 
 const translations = {
   intro: 'Fill new product details',

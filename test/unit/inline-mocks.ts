@@ -1,4 +1,4 @@
-import { TJestMock } from '../../test/unit/test-index';
+import { TJestMock } from '@unitTests/inline-mocks';
 
 const getMockImplementationError = (fnName: string): Error =>
   Error(`Need to mock the ${fnName}(..) implementation for unit test first!`);
@@ -18,3 +18,5 @@ const getResMock = (): { status: TJestMock; _jsonMethod: TJestMock; sendStatus: 
 const getNextFnMock = () => jest.fn(() => undefined);
 
 export { getResMock, getMockImplementationError, getNextFnMock };
+
+export type TJestMock<T = void> = jest.Mock<any, T | any>;

@@ -1,6 +1,6 @@
 import { cy, Cypress, expect } from 'local-cypress';
-import { ROUTES } from '@srcForE2E/frontend/components/pages/_routes';
-import type { TE2E } from '@srcForE2E/types';
+import { ROUTES } from '@frontend/components/pages/_routes';
+import type { TE2E } from '@src/types';
 
 (function EmailCommands() {
   const getEmailAPIURL = (version: number) => {

@@ -1,6 +1,6 @@
-import { findAssociatedSrcModulePath, mockAndRequireModule, TJestMock } from '../../test-index';
-import { HTTP_STATUS_CODE } from '../../../../src/types';
-import { getResMock } from '../../mockUtils';
+import { findAssociatedSrcModulePath, mockAndRequireModule } from '@unitTests/utils';
+import { getResMock, TJestMock } from '@unitTests/inline-mocks';
+import { HTTP_STATUS_CODE } from '@src/types';
 
 const { Router, _router } = mockAndRequireModule('express');
 const { authMiddlewareFn: authMiddlewareFnMock } = mockAndRequireModule('src/middleware/features/auth');

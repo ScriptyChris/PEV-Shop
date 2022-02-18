@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import storeService from '../../features/storeService';
-import { ROUTES } from '../pages/_routes';
+import storeService from '@frontend/features/storeService';
+import { ROUTES } from '@frontend/components/pages/_routes';
 import CompareProduct from './compareProducts';
 
 const translations = {

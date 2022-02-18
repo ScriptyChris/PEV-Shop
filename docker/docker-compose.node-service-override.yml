@@ -1,9 +1,0 @@
-services:
-  node:
-    volumes:
-      - private_node_modules:/app/node_modules
-      - private_dist:/app/dist
-
-volumes:
-  private_node_modules:
-  private_dist:

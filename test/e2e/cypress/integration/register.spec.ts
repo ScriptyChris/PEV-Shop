@@ -1,6 +1,6 @@
 import { cy, describe, it, beforeEach, expect } from 'local-cypress';
-import { ROUTES } from '@srcForE2E/frontend/components/pages/_routes';
-import { HTTP_STATUS_CODE, TE2EUser } from '@srcForE2E/types';
+import { ROUTES } from '@frontend/components/pages/_routes';
+import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
 
 describe('#register', () => {
   const testUsers: Pick<TE2EUser, 'login' | 'email'>[] = [

@@ -1,6 +1,6 @@
 import { model, Schema, Types, Document, Model } from 'mongoose';
 import { randomBytes } from 'crypto';
-import { getToken, comparePasswords } from '../../middleware/features/auth';
+import { getToken, comparePasswords } from '@middleware/features/auth';
 
 require('mongoose-type-email');
 

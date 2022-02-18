@@ -1,10 +1,10 @@
-import getLogger from '../../../utils/logger';
+import getLogger from '@commons/logger';
 import { Model } from 'mongoose';
-import { ProductModel, IProduct } from '../models/_product';
-import { UserModel, IUser } from '../models/_user';
-import { TModelType } from '../models/models-index';
-import { hashPassword } from '../../middleware/features/auth';
-import { getDBConnection } from '../connector';
+import { ProductModel, IProduct } from '@database/models/_product';
+import { UserModel, IUser } from '@database/models/_user';
+import { TModelType } from '@database/models/models-index';
+import { hashPassword } from '@middleware/features/auth';
+import { connectWithDB } from '@database/connector';
 
 const logger = getLogger(module.filename);
 const PARAMS = Object.freeze({
@@ -48,8 +48,8 @@ if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
   throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string`);
 }
 
-const doPopulate = async () => {
-  const dbConnection = await getDBConnection();
+const executeDBPopulation = async () => {
+  const dbConnection = await connectWithDB();
 
   if (!dbConnection || dbConnection instanceof Error) {
     throw TypeError(`Database Population is not possible due to a problem with connection: \n${dbConnection}\n.`);
@@ -63,7 +63,7 @@ const doPopulate = async () => {
       ].map(async ({ name, ctor }) => {
         // @ts-ignore
         const deletionRes = await ctor.deleteMany({});
-        return `\n-${name}: ${deletionRes.deletedCount}`;
+        return `\n\t-${name}: ${deletionRes.deletedCount}`;
       })
     );
 
@@ -108,7 +108,7 @@ const doPopulate = async () => {
 };
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
-  doPopulate();
+  executeDBPopulation();
 }
 
 function getSourceData(modelType: TModelType): TPopulatedData[] {
@@ -199,4 +199,4 @@ function getScriptParamStringValue(paramName: string) {
   return paramValue ? paramValue.split('=').pop() : '';
 }
 
-export { doPopulate };
+export { executeDBPopulation };

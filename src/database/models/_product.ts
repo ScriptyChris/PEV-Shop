@@ -1,6 +1,6 @@
 import { Document, Types, Schema, model } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import getLogger from '../../../utils/logger';
+import getLogger from '@commons/logger';
 
 const logger = getLogger(module.filename);
 

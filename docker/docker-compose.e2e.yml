@@ -5,14 +5,13 @@ services:
     depends_on:
       - node
     network_mode: "host"
-    working_dir: /e2e
+    working_dir: /app/test/e2e
     environment:
       - DISPLAY ## `xhost +local:` command must first be run on the host computer
       - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
       - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
       - CYPRESS_WAIT_TIME_IN_MS=3000
       - CYPRESS_TEST_MODE
-    entrypoint: "bash /e2e/run-tests.sh"
+    entrypoint: "bash /app/test/e2e/run-tests.sh"
     volumes:
-      - ../test/e2e/:/e2e
-      - ../src/database/populate/initial-users.json:/e2e/cypress/fixtures/initial-users.json
+      - ../:/app

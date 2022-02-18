@@ -1,12 +1,12 @@
-import getLogger from '../../../utils/logger';
+import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { getFromDB } from '../../database/database-index';
-import { authToPayU as getToken } from '../features/auth';
-import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '../../types';
-import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '../helpers/payu-api';
-import { wrapRes, TypeOfHTTPStatusCodes } from '../helpers/middleware-response-wrapper';
-import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
+import { getFromDB } from '@database/database-index';
+import { authToPayU as getToken } from '@middleware/features/auth';
+import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '@src/types';
+import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '@middleware/helpers/payu-api';
+import { wrapRes, TypeOfHTTPStatusCodes } from '@middleware/helpers/middleware-response-wrapper';
+import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 
 const router: Router &
   Partial<{

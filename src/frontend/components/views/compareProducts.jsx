@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { reaction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import storeService from '../../features/storeService';
+import storeService from '@frontend/features/storeService';
 import { Link } from 'react-router-dom';
-import Scroller from '../utils/scroller';
-import { ROUTES } from '../pages/_routes';
+import Scroller from '@frontend/components/utils/scroller';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 const List = observer(function CompareProducts() {
   const translations = {

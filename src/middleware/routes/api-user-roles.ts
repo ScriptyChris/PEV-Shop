@@ -1,11 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import getLogger from '../../../utils/logger';
-import { authMiddlewareFn as authMiddleware } from '../features/auth';
-import { saveToDB, getFromDB, updateOneModelInDB } from '../../database/database-index';
-import type { IUserRole } from '../../database/models/_userRole';
-import { HTTP_STATUS_CODE } from '../../types';
-import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { wrapRes } from '../helpers/middleware-response-wrapper';
+import getLogger from '@commons/logger';
+import { authMiddlewareFn as authMiddleware } from '@middleware/features/auth';
+import { saveToDB, getFromDB, updateOneModelInDB } from '@database/database-index';
+import type { IUserRole } from '@database/models/_userRole';
+import { HTTP_STATUS_CODE } from '@src/types';
+import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 
 type TMiddlewareFn = (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
 

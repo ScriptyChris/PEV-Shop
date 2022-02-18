@@ -1,5 +1,6 @@
-import { getRootRelativePath, mockAndRequireModule, TJestMock } from '../test-index';
-import { HTTP_STATUS_CODE } from '../../../src/types';
+import { getRootRelativePath, mockAndRequireModule } from '@unitTests/utils';
+import type { TJestMock } from '@unitTests/inline-mocks';
+import { HTTP_STATUS_CODE } from '@src/types';
 
 const globMock: TJestMock = jest.requireActual(getRootRelativePath('__mocks__/glob'));
 const { json: expressJSONMock } = jest.requireActual(getRootRelativePath('__mocks__/express'));
@@ -12,7 +13,7 @@ const [apiConfigMock, apiProductsMock, apiProductsCategoriesMock, apiUsersMock, 
   'api-orders',
 ].map((apiFileName) => mockAndRequireModule(`src/middleware/routes/${apiFileName}`).default);
 
-import middleware from '../../../src/middleware/middleware-index';
+import middleware from '@middleware/middleware-index';
 
 describe('#middleware-index', () => {
   const appMock: any = Object.freeze({

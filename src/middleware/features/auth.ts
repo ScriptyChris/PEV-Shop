@@ -1,12 +1,12 @@
-import getLogger from '../../../utils/logger';
+import getLogger from '@root/commons/logger';
 import { compare, hash } from 'bcrypt';
 import { sign, verify, Secret } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { config as dotenvConfig } from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { IUser } from '../../database/models/_user';
-import { HTTP_STATUS_CODE } from '../../types';
-import { wrapRes } from '../helpers/middleware-response-wrapper';
+import { IUser } from '@database/models/_user';
+import { HTTP_STATUS_CODE } from '@src/types';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 
 dotenvConfig();
 

@@ -1,5 +1,5 @@
 import React, { useCallback, memo, useState, useEffect, createRef } from 'react';
-import { httpServiceSubscriber } from '../../features/httpService';
+import { httpServiceSubscriber } from '@frontend/features/httpService';
 
 const POPUP_TYPES = {
   NEUTRAL: 'NEUTRAL',

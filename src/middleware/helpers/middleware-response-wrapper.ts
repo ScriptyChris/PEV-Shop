@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import { HTTP_STATUS_CODE } from '../../types';
+import { HTTP_STATUS_CODE } from '@src/types';
 
 export interface IEmbracedResponse<PayloadType = never> {
   // TODO: [REFACTOR] 'authToken' could be always paired with 'payload' prop or be contained by it

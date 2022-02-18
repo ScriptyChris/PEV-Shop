@@ -1,5 +1,17 @@
+/*
+  This module is located under `/dist` folder at runtime, but at "author time" (TypeScript compilation) 
+  no `/dist` wrapper is up there - during unit tests, this module is ran as TypeScript by Jest. 
+  Thus, two possible "root climbs" occur and such root relative path needs to be dynamically calculated. 
+  Because ESM doesn't support synchronous static paths from variables, CJS `require(..)` is used. 
+  Root relative path is calculated using `path.relative(..)`.
+*/
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const rootRelativePath = require('path').relative(__dirname, process.env.INIT_CWD);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require(`${rootRelativePath}/commons/moduleAliasesResolvers`).backend();
+
 import Express, { Request, Response, NextFunction, Application, json } from 'express';
-import getLogger from '../../utils/logger';
+import getLogger from '@commons/logger';
 import glob from 'glob';
 import { resolve, sep } from 'path';
 import { existsSync } from 'fs';
@@ -10,9 +22,9 @@ import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
 import apiOrders from './routes/api-orders';
 import { config as dotenvConfig } from 'dotenv';
-import { HTTP_STATUS_CODE } from '../types';
-import { wrapRes } from '../middleware/helpers/middleware-response-wrapper';
-import { getPopulationState } from '../database/connector';
+import { HTTP_STATUS_CODE } from '@src/types';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
+import { getPopulationState } from '@database/connector';
 
 dotenvConfig();
 

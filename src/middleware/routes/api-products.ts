@@ -1,7 +1,7 @@
-import getLogger from '../../../utils/logger';
+import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
-import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '../features/auth';
-import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '../../database/database-index';
+import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '@middleware/features/auth';
+import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '@database/database-index';
 import {
   queryBuilder,
   TIdListReq,
@@ -10,13 +10,13 @@ import {
   TProductFiltersReq,
   TProductNameReq,
   TProductsCategoriesReq,
-} from '../../database/utils/queryBuilder';
-import { TPaginationConfig } from '../../database/utils/paginateItemsFromDB';
-import mapProductsTechnicalSpecs from '../helpers/api-products-specs-mapper';
-import { IProduct, IReviews } from '../../database/models/_product';
-import { HTTP_STATUS_CODE } from '../../types';
-import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { wrapRes } from '../helpers/middleware-response-wrapper';
+} from '@database/utils/queryBuilder';
+import { TPaginationConfig } from '@database/utils/paginateItemsFromDB';
+import mapProductsTechnicalSpecs from '@middleware/helpers/api-products-specs-mapper';
+import { IProduct, IReviews } from '@database/models/_product';
+import { HTTP_STATUS_CODE } from '@src/types';
+import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 
 // import { readFileSync } from 'fs';
 const logger = getLogger(module.filename);

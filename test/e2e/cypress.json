@@ -1,5 +1,6 @@
 {
-  "ignoreTestFiles": "*.ts",
+  "fixturesFolder": false,
+  "pluginsFile": false,
   "video": false,
   "viewportWidth": 1366,
   "viewportHeight": 768

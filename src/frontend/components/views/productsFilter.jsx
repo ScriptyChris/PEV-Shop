@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
 import { Formik, ErrorMessage } from 'formik';
-import productSpecsService from '../../features/productSpecsService';
-import FormFieldError from '../utils/formFieldError';
+import productSpecsService from '@frontend/features/productSpecsService';
+import FormFieldError from '@frontend/components/utils/formFieldError';
 
 const translations = {
   filterUnavailable: 'Filters are not available',

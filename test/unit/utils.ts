@@ -32,5 +32,3 @@ const mockAndRequireModule = (path: string) => {
 };
 
 export { findAssociatedSrcModulePath, getRootRelativePath, mockAndRequireModule };
-
-export type TJestMock<T = void> = jest.Mock<any, T | any>;

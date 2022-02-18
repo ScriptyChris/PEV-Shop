@@ -1,9 +1,9 @@
-import { mockAndRequireModule, findAssociatedSrcModulePath, TJestMock } from '../../test-index';
-import type { IUser } from '../../../../src/database/models/_user';
-import { HTTP_STATUS_CODE } from '../../../../src/types';
-import { getResMock } from '../../mockUtils';
+import { mockAndRequireModule, findAssociatedSrcModulePath } from '@unitTests/utils';
+import { getResMock, TJestMock } from '@unitTests/inline-mocks';
+import type { IUser } from '@database/models/_user';
+import { HTTP_STATUS_CODE } from '@src/types';
 import getType from 'jest-get-type';
-import { getFromDB } from '../../../../src/database/__mocks__/database-index';
+import { getFromDB } from '@database/__mocks__/database-index';
 
 // rename exported variable
 const { bcrypt: mockedBcrypt } = {

@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import type { TE2EUser } from '@srcForE2E/types';
+import type { TE2EUser } from '@src/types';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -28,4 +28,4 @@ declare global {
   }
 }
 
-import './command.js';
+import './command';

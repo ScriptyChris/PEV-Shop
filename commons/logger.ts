@@ -1,10 +1,13 @@
 import { basename } from 'path';
 
+// TODO: improve typing to avoid repeating method declarations
 abstract class Log {
-  // TODO: improve typing to avoid repeating method declarations
-  public log(...args: any[]): void {};
-  public warn(...args: any[]): void {};
-  public error(...args: any[]): void {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public log(...args: any[]): void {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public warn(...args: any[]): void {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public error(...args: any[]): void {}
 }
 
 class Logger extends Log {

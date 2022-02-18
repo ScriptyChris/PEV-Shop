@@ -1,10 +1,10 @@
-import getLogger from '../../../utils/logger';
+import getLogger from '@commons/logger';
 import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
-import { HTTP_STATUS_CODE } from '../../types';
-import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { wrapRes } from '../helpers/middleware-response-wrapper';
-import { doPopulate } from '../../database/populate/populate';
+import { HTTP_STATUS_CODE } from '@src/types';
+import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
+import { executeDBPopulation } from '@database/populate/populate';
 
 const logger = getLogger(module.filename);
 const router: Router & Partial<{ _populateDB: typeof populateDB }> = Router();
@@ -19,11 +19,7 @@ async function populateDB(req: Request, res: Response, next: NextFunction) {
   try {
     // TODO: [SECURITY] restrict access to localhost and probably require a password
 
-    logger.log('[<>] Starting the population');
-    
-    const isPopulated = await doPopulate();
-    
-    logger.log('[<>] isPopulated:', isPopulated);
+    await executeDBPopulation();
 
     return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {

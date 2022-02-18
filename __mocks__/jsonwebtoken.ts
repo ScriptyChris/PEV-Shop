@@ -1,4 +1,4 @@
-import { TJestMock } from '../test/unit/test-index';
+import { TJestMock } from '@unitTests/inline-mocks';
 
 const jwt: TJestMock & {
   verify: TJestMock;

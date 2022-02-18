@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Formik, Field } from 'formik';
 import { useHistory } from 'react-router-dom';
-import httpService from '../../features/httpService';
-import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
-import { PasswordField } from '../views/password';
+import httpService from '@frontend/features/httpService';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import { PasswordField } from '@frontend/components/views/password';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({

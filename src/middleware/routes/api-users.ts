@@ -1,14 +1,14 @@
 import { config as dotenvConfig } from 'dotenv';
 import { Router, Request, Response, NextFunction } from 'express';
 import { ObjectId } from 'mongodb';
-import getLogger from '../../../utils/logger';
-import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '../../database/database-index';
-import { authMiddlewareFn, hashPassword } from '../features/auth';
-import { UserModel, IUser } from '../../database/models/_user';
-import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
-import { HTTP_STATUS_CODE } from '../../types';
-import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { wrapRes } from '../helpers/middleware-response-wrapper';
+import getLogger from '@commons/logger';
+import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '@database/database-index';
+import { authMiddlewareFn, hashPassword } from '@middleware/features/auth';
+import { UserModel, IUser } from '@database/models/_user';
+import sendMail, { EMAIL_TYPES } from '@middleware/helpers/mailer';
+import { HTTP_STATUS_CODE } from '@src/types';
+import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 
 dotenvConfig();
 

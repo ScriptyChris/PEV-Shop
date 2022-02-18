@@ -2,20 +2,20 @@ import React, { useEffect } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import storeService from '../../features/storeService';
-import userSessionService from '../../features/userSessionService';
+import storeService from '@frontend/features/storeService';
+import userSessionService from '@frontend/features/userSessionService';
 
-import { ROUTES } from '../pages/_routes';
-import Home from '../pages/home';
-import Shop from '../pages/shop';
-import Register from '../pages/register';
-import NotLoggedIn from '../pages/notLoggedIn';
-import LogIn from '../pages/logIn';
-import Account from '../pages/account';
-import ConfirmRegistration from '../pages/confirmRegistration';
+import { ROUTES } from '@frontend/components/pages/_routes';
+import Home from '@frontend/components/pages/home';
+import Shop from '@frontend/components/pages/shop';
+import Register from '@frontend/components/pages/register';
+import NotLoggedIn from '@frontend/components/pages/notLoggedIn';
+import LogIn from '@frontend/components/pages/logIn';
+import Account from '@frontend/components/pages/account';
+import ConfirmRegistration from '@frontend/components/pages/confirmRegistration';
 import { SetNewPassword, ResetPassword } from './password';
-import NotFound from '../pages/notFound';
-import { GenericErrorPopup } from '../utils/popup';
+import NotFound from '@frontend/components/pages/notFound';
+import { GenericErrorPopup } from '@frontend/components/utils/popup';
 
 export default observer(function Main() {
   /*

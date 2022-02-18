@@ -1,5 +1,5 @@
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-import { findAssociatedSrcModulePath, mockAndRequireModule } from '../test-index';
+import { findAssociatedSrcModulePath, mockAndRequireModule } from '@unitTests/utils';
 
 const { getModel: getModelMock } = mockAndRequireModule('src/database/models/models-index');
 const getPaginatedItemsMock = mockAndRequireModule('src/database/utils/paginateItemsFromDB').default;

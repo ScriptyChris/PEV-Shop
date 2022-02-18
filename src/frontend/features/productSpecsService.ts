@@ -1,4 +1,4 @@
-import type { TProductTechnicalSpecs } from '../../middleware/helpers/api-products-specs-mapper';
+import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
 import httpService, { CUSTOM_RES_EXT_DICT } from './httpService';
 
 const productSpecsService = (() => {

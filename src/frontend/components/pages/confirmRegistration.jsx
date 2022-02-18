@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import httpService from '../../features/httpService';
+import httpService from '@frontend/features/httpService';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({

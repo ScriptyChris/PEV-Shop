@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import storageService from '../../features/storageService';
-import storeService from '../../features/storeService';
-import { ROUTES } from '../pages/_routes';
+import storageService from '@frontend/features/storageService';
+import storeService from '@frontend/features/storeService';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 export default observer(function Cart() {
   const [cartVisibility, updateCartVisibility] = useState(false);

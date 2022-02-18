@@ -1,6 +1,6 @@
-import { mockAndRequireModule, findAssociatedSrcModulePath, TJestMock } from '../../test-index';
-import { HTTP_STATUS_CODE } from '../../../../src/types';
-import { getResMock } from '../../mockUtils';
+import { mockAndRequireModule, findAssociatedSrcModulePath } from '@unitTests/utils';
+import { getResMock, TJestMock } from '@unitTests/inline-mocks';
+import { HTTP_STATUS_CODE } from '@src/types';
 
 const { getFromDB } = mockAndRequireModule('src/database/database-index');
 const { Router } = mockAndRequireModule('express');

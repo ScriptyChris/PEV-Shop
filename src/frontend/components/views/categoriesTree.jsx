@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, createRef, useRef } from 'react';
-import httpService from '../../features/httpService';
+import httpService from '@frontend/features/httpService';
 import TreeMenu from 'react-simple-tree-menu';
 
 const CATEGORIES_SEPARATOR = '|';

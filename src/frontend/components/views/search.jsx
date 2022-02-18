@@ -1,5 +1,5 @@
 import React, { memo, useRef, createRef, useState, useEffect } from 'react';
-import httpService from '../../features/httpService';
+import httpService from '@frontend/features/httpService';
 
 const translations = {
   defaultLabel: 'Search for:',

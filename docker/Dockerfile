@@ -6,7 +6,7 @@ COPY ./package*.json ./
 RUN npm ci
 
 COPY ./src ./src
-COPY ./utils ./utils
+COPY ./commons ./commons
 COPY \
     .env \
     .babelrc \
@@ -15,9 +15,6 @@ COPY \
     tsconfig* \
     webpack.config.js \
     ./
-
-# # if `.env` file doesn't exist, create it based on `.env.example`
-# RUN test -e .env || cp .env.example .env
 
 RUN npm run build
 

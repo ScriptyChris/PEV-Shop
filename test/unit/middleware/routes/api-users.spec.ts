@@ -1,6 +1,6 @@
-import { mockAndRequireModule, findAssociatedSrcModulePath, TJestMock } from '../../test-index';
-import { HTTP_STATUS_CODE } from '../../../../src/types';
-import { getResMock, getNextFnMock } from '../../mockUtils';
+import { mockAndRequireModule, findAssociatedSrcModulePath } from '@unitTests/utils';
+import { HTTP_STATUS_CODE } from '@src/types';
+import { getResMock, getNextFnMock, TJestMock } from '@unitTests/inline-mocks';
 
 const { ObjectId: ObjectIdMock } = mockAndRequireModule('mongodb');
 const { Router, _router } = mockAndRequireModule('express');

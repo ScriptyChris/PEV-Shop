@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, NavLink, Route, Switch } from 'react-router-dom';
-import storeService from '../../features/storeService';
-import httpService from '../../features/httpService';
-import { SetNewPassword } from '../views/password';
-import userSessionService from '../../features/userSessionService';
-import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
-import ProductItem from '../views/productItem';
+import storeService from '@frontend/features/storeService';
+import httpService from '@frontend/features/httpService';
+import { SetNewPassword } from '@frontend/components/views/password';
+import userSessionService from '@frontend/features/userSessionService';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import ProductItem from '@frontend/components/views/productItem';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({

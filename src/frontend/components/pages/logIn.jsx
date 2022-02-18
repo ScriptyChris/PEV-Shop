@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import userSessionService from '../../features/userSessionService';
+import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({

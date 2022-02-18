@@ -1,10 +1,11 @@
+require('dotenv').config();
+
 const { resolve } = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-
-require('dotenv').config();
+const preparedModulePathsAliases = require('./commons/moduleAliasesResolvers').frontend();
 
 module.exports = (env) => {
   // TODO: handle it in better way
@@ -17,6 +18,9 @@ module.exports = (env) => {
     output: {
       filename: 'index.js',
       path: resolve(__dirname, './dist/src/frontend'),
+    },
+    resolve: {
+      alias: preparedModulePathsAliases,
     },
     module: {
       rules: [

@@ -1,7 +1,7 @@
 import { cy, it, describe, beforeEach } from 'local-cypress';
-import type { IUserPublic } from '@srcForE2E/database/models/_user';
-import { ROUTES } from '@srcForE2E/frontend/components/pages/_routes';
-import type { TE2EUser } from '@srcForE2E/types';
+import type { IUserPublic } from '@database/models/_user';
+import { ROUTES } from '@frontend/components/pages/_routes';
+import type { TE2EUser } from '@src/types';
 
 const ACCOUNT_TEST_USER: TE2EUser = Object.freeze({
   login: 'account test user',

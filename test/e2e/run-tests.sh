@@ -1,17 +1,22 @@
 #!/bin/bash
 
+# exit the script if any command exits with a non-zero status (like a `tsc` compilation error)
+set -e
+
+cd ../../ # go to app root to use it's package.json
+
 npm install -g local-cypress
+npm install -g typescript
 
-echo "[run-tests.sh] CYPRESS_BASE_URL: $CYPRESS_BASE_URL"
+cd - # go back to E2E folder
 
+tsc --noEmit
+
+echo "[run-tests.sh] connecting to '$CYPRESS_BASE_URL'..."
 npx wait-on "${CYPRESS_BASE_URL}"
+echo "[run-tests.sh] connection succeeded!"
 
-echo "[run-tests.sh] Cypress connected to app"
-
-#npm install @types/mocha @types/chai
-
-#DEBUG=cypress:* 
-cypress run #--spec "cypress/integration/account.spec.js"
+cypress run #--spec "cypress/integration/account.spec.ts" --no-exit
 
 #sleep 1200
 
@@ -20,7 +25,8 @@ cypress run #--spec "cypress/integration/account.spec.js"
 #   npx nodemon \
 #     --watch cypress/integration \
 #     --watch cypress/support \
-#     --exec "NODE_PATH=\"/usr/local/lib/node_modules\" tsc --project cypress/tsconfig.cypress.json && prettier --write cypress/integration cypress/support && cypress run"
+#     --exec "NODE_PATH=\"/usr/local/lib/node_modules\" tsc && prettier --write cypress/integration cypress/support && cypress run"
 # else
+#  tsc --noEmit
 #  cypress run
 # fi

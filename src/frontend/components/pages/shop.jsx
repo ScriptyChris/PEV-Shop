@@ -1,10 +1,10 @@
 import React, { memo /*, useState*/ } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-// import CategoriesTree from '../views/categoriesTree';
+// import CategoriesTree from '@frontend/components/views/categoriesTree';
 import { ROUTES } from './_routes';
-import ProductList from '../views/productList';
-import ProductDetails from '../views/productDetails';
+import ProductList from '@frontend/components/views/productList';
+import ProductDetails from '@frontend/components/views/productDetails';
 import { NewProduct, ModifyProduct } from './newProduct';
 import Compare from './compare';
 import Order from './order';

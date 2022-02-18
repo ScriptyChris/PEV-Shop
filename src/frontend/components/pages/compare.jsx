@@ -1,9 +1,13 @@
 import { toJS } from 'mobx';
 import React, { useState, useRef, createRef, useEffect, useCallback } from 'react';
-import storeService from '../../features/storeService';
-import { getProductDetailsData, prepareSpecificProductDetail, getProductDetailsHeaders } from '../views/productDetails';
-import Scroller from '../utils/scroller';
-import { ProductItemLink } from '../views/productItem';
+import storeService from '@frontend/features/storeService';
+import {
+  getProductDetailsData,
+  prepareSpecificProductDetail,
+  getProductDetailsHeaders,
+} from '@frontend/components/views/productDetails';
+import Scroller from '@frontend/components/utils/scroller';
+import { ProductItemLink } from '@frontend/components/views/productItem';
 
 const translations = {
   productsAmount: 'produktów',

@@ -1,9 +1,9 @@
 import { Link, useHistory } from 'react-router-dom';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import storeService from '../../features/storeService';
-import userSessionService from '../../features/userSessionService';
-import { ROUTES } from '../pages/_routes';
+import storeService from '@frontend/features/storeService';
+import userSessionService from '@frontend/features/userSessionService';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 const translations = Object.freeze({
   start: 'Start',

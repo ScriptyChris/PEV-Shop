@@ -1,7 +1,7 @@
 import { cy, describe, beforeEach, it, expect } from 'local-cypress';
-import { ROUTES } from '@srcForE2E/frontend/components/pages/_routes';
-import { HTTP_STATUS_CODE, TE2EUser } from '@srcForE2E/types';
-import * as users from '../fixtures/initial-users.json';
+import { ROUTES } from '@frontend/components/pages/_routes';
+import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
+import * as users from '@database/populate/initial-users.json';
 
 const exampleUser = (users as TE2EUser[])[0];
 

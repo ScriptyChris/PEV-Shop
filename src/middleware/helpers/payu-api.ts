@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
-import { IPayByLinkMethod, IProductInOrder } from '../../types';
-import getLogger from '../../../utils/logger';
+import { IPayByLinkMethod, IProductInOrder } from '@src/types';
+import getLogger from '@commons/logger';
 
 const logger = getLogger(module.filename);
 

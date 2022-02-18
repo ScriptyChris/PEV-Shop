@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Formik, Field } from 'formik';
-import FormFieldError from '../utils/formFieldError';
-import httpService from '../../features/httpService';
-import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
-import { ROUTES } from '../pages/_routes';
+import FormFieldError from '@frontend/components/utils/formFieldError';
+import httpService from '@frontend/features/httpService';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 const translations = Object.freeze({
   resetPasswordHeader: 'Reset password',

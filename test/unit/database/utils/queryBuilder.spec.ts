@@ -1,5 +1,5 @@
 // TODO: create kind of symlinks to test/ folder to avoid using relative paths
-import { findAssociatedSrcModulePath } from '../../test-index';
+import { findAssociatedSrcModulePath } from '@unitTests/utils';
 
 describe('#queryBuilder', () => {
   let isEmptyQueryObject: any,

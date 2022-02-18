@@ -2,8 +2,8 @@
 import Express, { Request, Response } from 'express';
 import { Application } from 'express';
 // @ts-ignore
-import proxy from '../../../../node_modules/webpack-dev-server/node_modules/http-proxy-middleware';
-import getLogger from '../../../utils/logger';
+import proxy from '@root/node_modules/webpack-dev-server/node_modules/http-proxy-middleware';
+import getLogger from '@commons/logger';
 import { ClientRequest, IncomingMessage } from 'http';
 
 const logger = getLogger(module.filename);

@@ -1,4 +1,4 @@
-import type { TJestMock } from '../test/unit/test-index';
+import type { TJestMock } from '@unitTests/inline-mocks';
 
 const bcrypt: TJestMock & { compare: TJestMock; hash: TJestMock } = jest.createMockFromModule('bcrypt');
 

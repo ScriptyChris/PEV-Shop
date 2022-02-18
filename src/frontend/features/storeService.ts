@@ -1,6 +1,6 @@
 import { observable, decorate, action } from 'mobx';
-import { IUserPublic } from '../../database/models/_user';
-import type { IUserCart } from '../../types';
+import { IUserPublic } from '@database/models/_user';
+import type { IUserCart } from '@src/types';
 
 const USER_CART_STATE: IUserCart = {
   totalPrice: 0,
