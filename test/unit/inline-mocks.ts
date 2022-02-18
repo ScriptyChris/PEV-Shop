@@ -1,5 +1,3 @@
-import { TJestMock } from '@unitTests/inline-mocks';
-
 const getMockImplementationError = (fnName: string): Error =>
   Error(`Need to mock the ${fnName}(..) implementation for unit test first!`);
 
