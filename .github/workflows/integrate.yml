@@ -22,4 +22,4 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: npm run test:e2e:ci_cd
+      - run: npm run test:e2e:CI_CD

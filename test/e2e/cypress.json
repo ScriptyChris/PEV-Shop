@@ -2,6 +2,8 @@
   "fixturesFolder": false,
   "pluginsFile": false,
   "video": false,
+  "integrationFolder": "test/e2e/cypress/integration",
+  "supportFile": "test/e2e/cypress/support/index.ts",
   "viewportWidth": 1366,
   "viewportHeight": 768
 }

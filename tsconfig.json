@@ -1,7 +1,5 @@
 {
-  "exclude": [
-    "./node_modules", "./dist", "./src/**/__mocks__", "./src/database/data"
-  ],
+  "exclude": ["./node_modules", "./dist", "./src/**/__mocks__", "./src/database/data"],
   "files": ["./src/augmentations.d.ts"],
   "compilerOptions": {
     "strict": true,

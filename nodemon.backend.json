@@ -1,0 +1,5 @@
+{
+  "exec": "tsc --project tsconfig.backend.json --noEmit && npm run prebuild:backend && npm run prepare-commons && ts-node --transpile-only --files --project tsconfig.backend.json src/middleware/middleware-index.ts",
+  "watch": ["src/middleware", "src/database", "commons/"],
+  "ext": "ts"
+}

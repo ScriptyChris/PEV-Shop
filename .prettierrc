@@ -17,6 +17,12 @@
       "options": {
         "parser": "babel-ts"
       }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "trailingComma": "none"
+      }
     }
   ]
 }

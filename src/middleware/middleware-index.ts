@@ -81,8 +81,6 @@ function wrappedMiddleware(): void {
 function getDatabaseReadinessHandler() {
   let isDatabaseReady = false;
 
-  console.log('[getDatabaseReadinessHandler()] ???');
-
   return async function handleDatabaseReadiness(req: Request, res: Response, next: NextFunction) {
     if (!isDatabaseReady) {
       isDatabaseReady = await getPopulationState();

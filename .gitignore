@@ -1,4 +1,6 @@
 .idea/
+.vscode/
+.history/
 node_modules/
 src/database/data
 dist/
