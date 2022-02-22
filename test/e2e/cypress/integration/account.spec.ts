@@ -1,7 +1,7 @@
-import { cy, it, describe, beforeEach } from 'local-cypress';
+import { cy, Cypress, it, describe, context, beforeEach, expect } from 'local-cypress';
 import type { IUserPublic } from '@database/models/_user';
 import { ROUTES } from '@frontend/components/pages/_routes';
-import type { TE2EUser } from '@src/types';
+import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
 
 const ACCOUNT_TEST_USER: TE2EUser = Object.freeze({
   login: 'account test user',
@@ -76,5 +76,48 @@ describe('#account', () => {
   it('should handle unathorized access', () => {
     cy.visit(ROUTES.ACCOUNT);
     cy.location('pathname').should('eq', ROUTES.NOT_LOGGED_IN);
+  });
+
+  context('multiple sessions', () => {
+    it('should logout from all sessions', () => {
+      goToNewUserAccount();
+
+      // wait a bit, so backend may create different JWT token, because time will be different
+      cy.wait(Cypress.env('WAIT_TIME_IN_MS'));
+
+      cy.task<{ authToken: string }>('startAlternativeSession', {
+        login: ACCOUNT_TEST_USER.login,
+        password: ACCOUNT_TEST_USER.password,
+      })
+        .then((alternativeSessionRes) => {
+          expect(alternativeSessionRes).to.have.property('authToken').which.is.a('string').that.is.not.empty;
+
+          const alternativeAuthToken = alternativeSessionRes.authToken;
+          cy.wrap(alternativeAuthToken).as('alternativeAuthToken');
+
+          return cy.task<{ payload: [] }>('checkAlternativeSession', alternativeAuthToken);
+        })
+        .then(({ payload: observedProducts }) => expect(observedProducts).to.be.an('array').that.is.empty);
+
+      cy.getFromStorage('userAuthToken').then((authToken) => {
+        cy.get('@alternativeAuthToken').then((alternativeAuthToken) => {
+          expect(alternativeAuthToken).to.be.a('string').that.is.not.empty;
+          expect(authToken).not.to.be.equal(alternativeAuthToken);
+        });
+      });
+
+      cy.contains('Security').click();
+      cy.contains('Log out from all sessions').click();
+      cy.contains('Confirm').click();
+
+      cy.location('pathname').should('eq', ROUTES.ROOT);
+      cy.getFromStorage('userAuthToken').should('eq', null);
+      cy.get('@alternativeAuthToken')
+        .then((alternativeAuthToken) => cy.task('checkAlternativeSession', alternativeAuthToken))
+        .then((unAuthorizedRes) => {
+          expect(unAuthorizedRes).to.have.property('status').to.eq(HTTP_STATUS_CODE.NOT_FOUND);
+          expect(unAuthorizedRes).to.have.property('error').to.eq('User to authorize not found!');
+        });
+    });
   });
 });

@@ -7,6 +7,7 @@ cd ../../; # go to app root to use it's package.json
 
 npm install -g local-cypress;
 npm install -g typescript;
+npm install -g node-fetch;
 
 echo "[run-tests.sh] connecting to '$CYPRESS_BASE_URL'...";
 npx wait-on "${CYPRESS_BASE_URL}";

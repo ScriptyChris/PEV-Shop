@@ -88,6 +88,7 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
     user.tokens.auth = [];
   }
 
+  // TODO: [duplication] check for possible duplication
   user.tokens.auth.push(authToken);
   await user.save();
 

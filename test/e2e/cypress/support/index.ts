@@ -28,4 +28,6 @@ declare global {
   }
 }
 
-import './command';
+import './email-commands';
+import './user-commands';
+import './misc-commands';

@@ -29,7 +29,7 @@ describe('#login', () => {
     });
     cy.get('[data-cy="button:submit-login"]').click();
 
-    cy.location('pathname').should('eq', '/');
+    cy.location('pathname').should('eq', ROUTES.ROOT);
     cy.get(`[data-cy="link:${ROUTES.LOG_IN}"]`).should('not.exist');
   });
 
