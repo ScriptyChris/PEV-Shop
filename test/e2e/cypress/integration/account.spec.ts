@@ -55,7 +55,7 @@ describe('#account', () => {
     goToNewUserAccount();
 
     cy.get(`[data-cy="link:account-feature"][href="${ACCOUNT_URLS.USER_PROFILE}"]`).click();
-    cy.getFromStorage('userAccount').then((user: IUserPublic) => {
+    cy.getFromStorage<IUserPublic>('userAccount').then((user) => {
       const profileDetails = [
         { header: 'login', data: user.login },
         { header: 'email', data: user.email },

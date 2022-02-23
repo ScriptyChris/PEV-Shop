@@ -25,7 +25,7 @@ const checkUserSessionByAPI = (authToken: string) =>
     },
   });
 const fetchErrorHandler = (errorLogMessage: string) => {
-  return (error: any) => {
+  return (error: unknown) => {
     console.log(`${errorLogMessage}:`, error);
 
     return null;

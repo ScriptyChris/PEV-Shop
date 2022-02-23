@@ -43,7 +43,7 @@ export type TPagination = { pageNumber: number; productsPerPage: number };
 
 export type TE2E = {
   [key: string]: {
-    [key: string]: (...args: any[]) => void;
+    [key: string]: (...args: any[]) => any;
   };
 };
 

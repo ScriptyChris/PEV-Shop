@@ -8,7 +8,7 @@ const getEmailAPIURL = (version: number) => {
   return `http://localhost:${Cypress.env('MAIL_PORT')}/api/v${version}/messages`;
 };
 
-const getMatchingEmails = (messages: any[], receiver: string, subject: string | null = null) => {
+const getMatchingEmails = (messages: TMessage[], receiver: string, subject: string | null = null) => {
   if (typeof receiver !== 'string') {
     throw TypeError('`receiver` must be a string!');
   }
@@ -28,7 +28,7 @@ const getLinkFromEmailContent = (content: string, linkSelectorMatcher: string) =
   return new URL(link.href);
 };
 
-const getLatestMessageContent = (messages: any[], receiver: string, subject: string) => {
+const getLatestMessageContent = (messages: TMessage[], receiver: string, subject: string) => {
   const matchingEmails = getMatchingEmails(messages, receiver, subject);
   const latestMessageContent = matchingEmails[0].Content.Body;
 
@@ -66,3 +66,13 @@ Cypress.Commands.add('getLinkFromEmail', (receiver, subject, linkSelectorMatcher
     .getEmailContent(receiver, subject)
     .then((emailContent) => getLinkFromEmailContent(emailContent, linkSelectorMatcher));
 });
+
+export type TMessage = {
+  Content: {
+    Headers: {
+      Subject: string;
+      To: string[];
+    };
+    Body: string;
+  };
+};

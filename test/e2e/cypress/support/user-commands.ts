@@ -1,8 +1,9 @@
 import { cy, Cypress, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import type { TE2E } from '@src/types';
+import type { IUserPublic } from '@database/models/_user';
 
-const userAPIReq = (urlSuffix: string, method: string, payload: any, canFail = true) => {
+const userAPIReq = (urlSuffix: string, method: string, payload: unknown, canFail = true) => {
   if (!urlSuffix || !method || !payload) {
     throw ReferenceError(
       `'urlSuffix', 'method' and 'payload' must be defined! 
@@ -71,7 +72,7 @@ Cypress.Commands.add('registerAndLoginTestUser', (testUser) => {
     .registerTestUser(testUser)
     .then(() => cy.confirmTestUserRegistration(testUser.email))
     .then(() => cy.window())
-    .then((win: Cypress.AUTWindow & { __E2E__: TE2E }) => win.__E2E__.userSessionService.logIn(testUser))
+    .then((win: Cypress.AUTWindow & { __E2E__: TE2E }): IUserPublic => win.__E2E__.userSessionService.logIn(testUser))
     .then((res) => {
       expect(res).to.include({
         login: testUser.login,
