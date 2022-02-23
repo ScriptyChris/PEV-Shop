@@ -86,6 +86,7 @@ function Security() {
       buttons: [
         {
           text: translations.confirm,
+          dataCy: 'button:confirm-logging-out-from-multiple-sessions',
           onClick: () => {
             setShouldPreserveCurrentSession(preseveCurrentSession);
             setLogOutFromSessionsConfirmation(true);
@@ -112,7 +113,12 @@ function Security() {
             message: res.__ERROR_TO_HANDLE
               ? translations.logOutFromOtherSessionsFailedMsg
               : translations.logOutFromOtherSessionsSuccessMsg,
-            buttons: [getClosePopupBtn(setPopupData)],
+            buttons: [
+              {
+                ...getClosePopupBtn(setPopupData),
+                dataCy: 'button:close-ended-other-sessions-confirmation',
+              },
+            ],
           });
         } else {
           history.replace(ROUTES.ROOT);
@@ -126,8 +132,12 @@ function Security() {
       <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
       <div className="account__menu-tab logout-from-sessions">
-        <button onClick={() => logOutFromSessions(false)}>{translations.logOutFromAllSessions}</button>
-        <button onClick={() => logOutFromSessions(true)}>{translations.logOutFromOtherSessions}</button>
+        <button onClick={() => logOutFromSessions(false)} data-cy="button:logout-from-all-sessions">
+          {translations.logOutFromAllSessions}
+        </button>
+        <button onClick={() => logOutFromSessions(true)} data-cy="button:logout-from-other-sessions">
+          {translations.logOutFromOtherSessions}
+        </button>
 
         {popupData && <Popup {...popupData} />}
       </div>

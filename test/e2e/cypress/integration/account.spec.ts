@@ -79,11 +79,11 @@ describe('#account', () => {
   });
 
   context('multiple sessions', () => {
-    it('should logout from all sessions', () => {
+    const createAndConfirmMultipleSessions = () => {
       goToNewUserAccount();
 
       // wait a bit, so backend may create different JWT token, because time will be different
-      cy.wait(Cypress.env('WAIT_TIME_IN_MS'));
+      cy.wait(Cypress.env('WAIT_1_SEC'));
 
       cy.task<{ authToken: string }>('startAlternativeSession', {
         login: ACCOUNT_TEST_USER.login,
@@ -101,23 +101,52 @@ describe('#account', () => {
 
       cy.getFromStorage('userAuthToken').then((authToken) => {
         cy.get('@alternativeAuthToken').then((alternativeAuthToken) => {
+          expect(authToken).to.be.a('string').that.is.not.empty;
           expect(alternativeAuthToken).to.be.a('string').that.is.not.empty;
           expect(authToken).not.to.be.equal(alternativeAuthToken);
         });
       });
+    };
 
-      cy.contains('Security').click();
-      cy.contains('Log out from all sessions').click();
-      cy.contains('Confirm').click();
-
-      cy.location('pathname').should('eq', ROUTES.ROOT);
-      cy.getFromStorage('userAuthToken').should('eq', null);
+    const confirmEndedAlternativeSession = () => {
       cy.get('@alternativeAuthToken')
         .then((alternativeAuthToken) => cy.task('checkAlternativeSession', alternativeAuthToken))
         .then((unAuthorizedRes) => {
           expect(unAuthorizedRes).to.have.property('status').to.eq(HTTP_STATUS_CODE.NOT_FOUND);
           expect(unAuthorizedRes).to.have.property('error').to.eq('User to authorize not found!');
         });
+    };
+
+    it('should logout user from all sessions', () => {
+      createAndConfirmMultipleSessions();
+
+      cy.contains('Security').click();
+      // end all sessions
+      cy.get('[data-cy="button:logout-from-all-sessions"]').click();
+      cy.get('[data-cy="button:confirm-logging-out-from-multiple-sessions"]').click();
+
+      cy.location('pathname').should('eq', ROUTES.ROOT);
+      cy.getFromStorage('userAuthToken').should('eq', null);
+      confirmEndedAlternativeSession();
+    });
+
+    it('should logout user from other sessions', () => {
+      createAndConfirmMultipleSessions();
+
+      cy.contains('Security').click();
+      // end other sessions
+      cy.get('[data-cy="button:logout-from-other-sessions"]').click();
+      cy.get('[data-cy="button:confirm-logging-out-from-multiple-sessions"]').click();
+
+      cy.location('pathname').should('eq', `${ROUTES.ACCOUNT}/security`);
+      cy.getFromStorage('userAuthToken').should('have.length.gte', 0);
+      confirmEndedAlternativeSession();
+
+      cy.get('[data-cy="popup:message"]')
+        .as('loggedOutConfirmationPopup')
+        .should('have.text', 'Logged out from other sessions!');
+      cy.get('[data-cy="button:close-ended-other-sessions-confirmation"]').click();
+      cy.get('@loggedOutConfirmationPopup').should('not.exist');
     });
   });
 });

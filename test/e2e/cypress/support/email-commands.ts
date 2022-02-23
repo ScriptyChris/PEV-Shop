@@ -42,7 +42,7 @@ Cypress.Commands.add('getAllEmails', () => {
     TODO: [race condition] give Mailhog some time to process it's email queue.
     This seems to no longer be the issue, but if it will happen, then uncomment below line or implement re-sending request.
     */
-  // cy.wait(Cypress.env('WAIT_TIME_IN_MS'));
+  // cy.wait(Cypress.env('WAIT_3_SEC'));
 
   return cy.request(getEmailAPIURL(2)).then((res) => res.body.items);
 });

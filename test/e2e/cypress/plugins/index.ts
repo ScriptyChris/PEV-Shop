@@ -52,11 +52,6 @@ const plugin: Cypress.PluginConfig = (on) => {
             ...(await res.json()),
             status: res.status,
           }))
-          .then((res) => {
-            console.log('[check alt session] res:', res);
-
-            return res;
-          })
           .catch(fetchErrorHandler('checkAltSessionError'))
       );
     },
