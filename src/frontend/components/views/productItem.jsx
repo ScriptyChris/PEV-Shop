@@ -36,22 +36,24 @@ export default function ProductItem({ product }) {
   };
 
   return (
-    <div className="product-list-item">
+    <div className="product-list-item" data-cy="container:product-item">
       {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-list-item__image" />*/}
 
       <dl>
         <div className="product-list-item__metadata">
           <dt>{translations.productName}:</dt>
-          <dd>{name}</dd>
+          <dd data-cy="label:product-name">{name}</dd>
         </div>
 
         <div className="product-list-item__metadata">
           <dt>{translations.price}:</dt>
-          <dd>{price}</dd>
+          <dd data-cy="label:product-price">{price}</dd>
         </div>
       </dl>
 
-      <button onClick={handleAddToCartClick}>{translations.addToCart}</button>
+      <button onClick={handleAddToCartClick} data-cy="button:add-product-to-cart">
+        {translations.addToCart}
+      </button>
 
       <ProductItemLink productData={product} />
 

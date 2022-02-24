@@ -46,11 +46,11 @@ export default observer(function Cart() {
 
   return (
     <>
-      <button className="cart-toggle-button" onClick={handleTogglingCart}>
+      <button className="cart-toggle-button" onClick={handleTogglingCart} data-cy="button:toggle-cart">
         $$$
       </button>
 
-      <section className={`cart-container ${cartVisibility ? 'cart-container--visible' : ''}`}>
+      <section className={`cart-container ${cartVisibility ? 'cart-container--visible' : ''}`} data-cy="container:cart">
         {translations.header}
 
         <table>
@@ -67,9 +67,9 @@ export default observer(function Cart() {
               storeService.userCartProducts.map((productItem) => {
                 return (
                   <tr key={productItem.name}>
-                    <td>{productItem.name}</td>
+                    <td data-cy="label:cart-product-name">{productItem.name}</td>
                     <td>{productItem.count}</td>
-                    <td>{productItem.price}</td>
+                    <td data-cy="label:cart-product-price">{productItem.price}</td>
                   </tr>
                 );
               })

@@ -26,6 +26,7 @@ declare global {
       loginTestUserByUI(testUser: Pick<TE2EUser, 'login' | 'password' | 'email'>): void;
       removeTestUsers(canFail?: boolean): Cypress.Chainable<Cypress.Response<void>>;
       getFromStorage<T = any>(key: string): Cypress.Chainable<T>;
+      cleanupTestUsersAndEmails(): void;
     }
   }
 }

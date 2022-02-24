@@ -25,11 +25,7 @@ describe('#account', () => {
   };
 
   beforeEach(() => {
-    cy.visit(ROUTES.ROOT);
-    cy.deleteEmails().as('deleteEmails');
-    cy.removeTestUsers().as('removeTestUsers');
-    cy.get('@deleteEmails');
-    cy.get('@removeTestUsers');
+    cy.cleanupTestUsersAndEmails();
   });
 
   it('should give access to listed user account features', () => {
