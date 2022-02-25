@@ -1,5 +1,4 @@
-import { getMockImplementationError } from '../../../../test/mockUtils';
-import { TJestMock } from '../../../types';
+import { getMockImplementationError, TJestMock } from '@unitTests/inline-mocks';
 
 const UserModel: {
   validatePassword: TJestMock &

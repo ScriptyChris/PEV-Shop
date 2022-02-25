@@ -1,41 +1,15 @@
-import * as mongoose from 'mongoose';
 import { getModel, IModel, TModelType } from './models/models-index';
 import { queryBuilder } from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
-import * as dotenv from 'dotenv';
-import getLogger from '../../utils/logger';
+import { config as dotenvConfig } from 'dotenv';
+import getLogger from '@commons/logger';
+import { connectWithDB } from './connector';
 
-// @ts-ignore
-dotenv.default.config();
+dotenvConfig();
 
-const {
-  // @ts-ignore
-  default: { connect },
-} = mongoose;
 const logger = getLogger(module.filename);
 
-(function tryToConnect(attempts) {
-  logger.log('Connection attemps:', attempts);
-
-  // @ts-ignore
-  connect(
-    process.env.DATABASE_URL,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    },
-    function (err: unknown) {
-      if (err && attempts < 5) {
-        // @ts-ignore
-        logger.error('Failed to connect to MongoDB by URL:', process.env.DATABASE_URL);
-        setTimeout(() => tryToConnect(attempts + 1), 2000);
-      } else if (!err) {
-        logger.log('Connected to MongoDB!');
-      }
-    }
-  );
-})(1);
+connectWithDB();
 
 function saveToDB(itemData: any, modelType: TModelType): Promise<IModel | string> {
   // TODO: improve validation
@@ -124,10 +98,31 @@ async function updateOneModelInDB(
   return await Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 }
 
-async function deleteFromDB(itemQuery: { name: string }, modelType: TModelType) {
-  const Model = getModel(modelType);
+async function deleteFromDB(fieldValue: string | RegExp, modelType: TModelType) {
+  let fieldName = '';
 
-  return await Model.deleteOne(itemQuery);
+  switch (modelType) {
+    case 'User': {
+      fieldName = 'login';
+      break;
+    }
+    case 'Product': {
+      fieldName = 'name';
+      break;
+    }
+    default: {
+      throw TypeError(`Unrecognized 'modelType': ${modelType}`);
+    }
+  }
+
+  const Model = getModel(modelType);
+  const query = { [fieldName]: fieldValue };
+
+  if (typeof fieldValue === 'string') {
+    return await Model.deleteOne(query);
+  }
+
+  return await Model.deleteMany(query);
 }
 
 export { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB };

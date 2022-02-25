@@ -1,17 +1,10 @@
-import { model } from 'mongoose';
-import * as mongooseModule from 'mongoose';
-import { Document, Types } from 'mongoose';
-import * as mongoosePaginate from 'mongoose-paginate-v2';
-import getLogger from '../../../utils/logger';
+import { Document, Types, Schema, model } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
+import getLogger from '@commons/logger';
 
 const logger = getLogger(module.filename);
 
-const {
-  // @ts-ignore
-  default: { Schema },
-} = mongooseModule;
-
-const reviewsItemSchema: mongooseModule.Schema = new Schema({
+const reviewsItemSchema = new Schema<IReviews['list'][number]>({
   content: String,
   timestamp: {
     type: Number,
@@ -27,7 +20,7 @@ const reviewsItemSchema: mongooseModule.Schema = new Schema({
   },
 });
 
-const reviewsSchema: mongooseModule.Schema = new Schema({
+const reviewsSchema = new Schema<IReviews>({
   list: {
     type: [reviewsItemSchema],
     required: true,
@@ -38,7 +31,7 @@ const reviewsSchema: mongooseModule.Schema = new Schema({
   },
 });
 
-const technicalSpecs: mongooseModule.Schema = new Schema({
+const technicalSpecs = new Schema<IProduct['technicalSpecs']>({
   // TODO: restrict that to predefined (and extendable) values
   heading: String,
   data: {
@@ -60,7 +53,7 @@ const technicalSpecs: mongooseModule.Schema = new Schema({
   specFromImage: String,
 });
 
-const productSchema: mongooseModule.Schema = new Schema({
+const productSchema = new Schema<IProduct>({
   name: {
     type: String,
     unique: true /* TODO: handle case when some product tries to be set with duplicated name */,
@@ -99,14 +92,14 @@ const productSchema: mongooseModule.Schema = new Schema({
   relatedProductsNames: {
     type: [String],
     required: false,
-    async validate(relatedProductsNames: Array<string>) {
+    async validate(relatedProductsNames: string[]) {
       if (!Array.isArray(relatedProductsNames) || !relatedProductsNames.every((value) => typeof value === 'string')) {
         return false;
       }
 
-      const matchedRelatedProductsNames = (await ProductModel.find({ name: { $in: relatedProductsNames } }).lean()).map(
-        (product) => (product as IProduct).name
-      );
+      const matchedRelatedProductsNames: string[] = (
+        await ProductModel.find({ name: { $in: relatedProductsNames } }).lean()
+      ).map((product) => (product as IProduct).name);
       const foundAllMatchedProductsNames = relatedProductsNames.length === matchedRelatedProductsNames.length;
 
       if (!foundAllMatchedProductsNames) {
@@ -131,15 +124,12 @@ const productSchema: mongooseModule.Schema = new Schema({
   },
 });
 productSchema.pre('validate', function (next: () => void) {
-  // @ts-ignore: implicit this
-  const document = this as unknown as Document & Schema.methods;
-  document.prepareUrlFieldBasedOnNameField();
+  const product = this as IProduct;
+  product.prepareUrlFieldBasedOnNameField();
 
   next();
 });
-
-// @ts-ignore
-productSchema.plugin(mongoosePaginate.default);
+productSchema.plugin(mongoosePaginate);
 
 productSchema.methods.toJSON = function () {
   const product = this.toObject();
@@ -169,4 +159,6 @@ export interface IProduct extends Document {
   images: Record<string, unknown>[];
   relatedProductsNames: Array<string>;
   reviews: IReviews;
+
+  prepareUrlFieldBasedOnNameField(): void;
 }

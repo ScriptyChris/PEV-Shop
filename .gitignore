@@ -1,6 +1,10 @@
 .idea/
+.vscode/
+.history/
 node_modules/
 src/database/data
 dist/
 .env
 src/database/populate/_modify-initial-data.js
+test/e2e/cypress/screenshots
+test/e2e/node_modules

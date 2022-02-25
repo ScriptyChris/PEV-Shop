@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect } from 'react';
-import storeService from '../../features/storeService';
-import httpService from '../../features/httpService';
+import storeService from '@frontend/features/storeService';
+import httpService from '@frontend/features/httpService';
 
 const translations = Object.freeze({
   payForOrder: 'Pay!',

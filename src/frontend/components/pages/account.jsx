@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, NavLink, Route, Switch } from 'react-router-dom';
-import storeService from '../../features/storeService';
-import httpService from '../../features/httpService';
-import { SetNewPassword } from '../views/password';
-import userSessionService from '../../features/userSessionService';
-import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
-import ProductItem from '../views/productItem';
+import storeService from '@frontend/features/storeService';
+import httpService from '@frontend/features/httpService';
+import { SetNewPassword } from '@frontend/components/views/password';
+import userSessionService from '@frontend/features/userSessionService';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import ProductItem from '@frontend/components/views/productItem';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
@@ -52,7 +52,7 @@ function UserProfile() {
   };
 
   return userData ? (
-    <div>
+    <section className="account__menu-tab" data-cy="section:user-profile">
       <button onClick={edit}>{translations.editUserData}</button>
 
       <table>
@@ -65,7 +65,7 @@ function UserProfile() {
           ))}
         </tbody>
       </table>
-    </div>
+    </section>
   ) : (
     translations.lackOfData
   );
@@ -86,6 +86,7 @@ function Security() {
       buttons: [
         {
           text: translations.confirm,
+          dataCy: 'button:confirm-logging-out-from-multiple-sessions',
           onClick: () => {
             setShouldPreserveCurrentSession(preseveCurrentSession);
             setLogOutFromSessionsConfirmation(true);
@@ -112,7 +113,12 @@ function Security() {
             message: res.__ERROR_TO_HANDLE
               ? translations.logOutFromOtherSessionsFailedMsg
               : translations.logOutFromOtherSessionsSuccessMsg,
-            buttons: [getClosePopupBtn(setPopupData)],
+            buttons: [
+              {
+                ...getClosePopupBtn(setPopupData),
+                dataCy: 'button:close-ended-other-sessions-confirmation',
+              },
+            ],
           });
         } else {
           history.replace(ROUTES.ROOT);
@@ -122,16 +128,20 @@ function Security() {
   }, [logOutFromSessionsConfirmation, shouldPreserveCurrentSession]);
 
   return (
-    <div className="account__menu-tab">
+    <section className="account__menu-tab" data-cy="section:security">
       <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
       <div className="account__menu-tab logout-from-sessions">
-        <button onClick={() => logOutFromSessions(false)}>{translations.logOutFromAllSessions}</button>
-        <button onClick={() => logOutFromSessions(true)}>{translations.logOutFromOtherSessions}</button>
+        <button onClick={() => logOutFromSessions(false)} data-cy="button:logout-from-all-sessions">
+          {translations.logOutFromAllSessions}
+        </button>
+        <button onClick={() => logOutFromSessions(true)} data-cy="button:logout-from-other-sessions">
+          {translations.logOutFromOtherSessions}
+        </button>
 
         {popupData && <Popup {...popupData} />}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -177,7 +187,7 @@ function ObservedProducts() {
   };
 
   return (
-    <div className="account__menu-tab">
+    <section className="account__menu-tab" data-cy="section:observed-products">
       <div>
         {/* TODO: [UX] add searching and filtering for observed products */}
         <button onClick={removeAll} disabled={!canRemoveAllProducts}>
@@ -196,16 +206,16 @@ function ObservedProducts() {
       </ol>
 
       {popupData && <Popup {...popupData} />}
-    </div>
+    </section>
   );
 }
 
 function Orders() {
   return (
-    <div>
+    <section className="account__menu-tab" data-cy="section:orders">
       <input placeholder="TODO: [FEATURE] implement searching orders via name and date(?)" type="search" />
       <p>TODO: [FEATURE] implement listing orders with options such as: status, invoice, review, refund</p>
-    </div>
+    </section>
   );
 }
 
@@ -242,7 +252,9 @@ export default function Account() {
         <ul className="account__menu-nav">
           {MENU_ITEMS.map((item) => (
             <li key={item.url}>
-              <NavLink to={`${ROUTES.ACCOUNT}/${item.url}`}>{item.translation}</NavLink>
+              <NavLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
+                {item.translation}
+              </NavLink>
             </li>
           ))}
         </ul>

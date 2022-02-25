@@ -1,7 +1,6 @@
-import type { Document, Model } from 'mongoose';
-import { model, Schema, Types } from 'mongoose';
+import { model, Schema, Types, Document, Model } from 'mongoose';
 import { randomBytes } from 'crypto';
-import { getToken, comparePasswords } from '../../middleware/features/auth';
+import { getToken, comparePasswords } from '@middleware/features/auth';
 
 require('mongoose-type-email');
 
@@ -89,6 +88,7 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
     user.tokens.auth = [];
   }
 
+  // TODO: [duplication] check for possible duplication
   user.tokens.auth.push(authToken);
   await user.save();
 

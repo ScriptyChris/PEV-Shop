@@ -2,12 +2,12 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import ProductItem from './productItem';
-import httpService from '../../features/httpService';
-import Popup, { POPUP_TYPES, getClosePopupBtn } from '../utils/popup';
-import RatingWidget from '../utils/ratingWidget';
-import { getLocalizedDate } from '../../features/localization';
-import storeService from '../../features/storeService';
-import { ROUTES } from '../pages/_routes';
+import httpService from '@frontend/features/httpService';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import RatingWidget from '@frontend/components/utils/ratingWidget';
+import { getLocalizedDate } from '@frontend/features/localization';
+import storeService from '@frontend/features/storeService';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',

@@ -1,7 +1,6 @@
-import { model } from 'mongoose';
-import { Schema, Document } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 
-const userRoleSchema = new Schema({
+const userRoleSchema = new Schema<IUserRole>({
   roleName: {
     type: String,
     required: true,
@@ -26,8 +25,7 @@ userRoleSchema.methods.toJSON = function () {
   delete userRole._id;
   delete userRole.__v;
 
-  // TODO: use optional chaining
-  if (userRole.owners && userRole.owners.login) {
+  if (userRole.owners?.login) {
     userRole.owners = userRole.owners.login;
   }
 

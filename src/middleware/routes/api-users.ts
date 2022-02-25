@@ -1,25 +1,38 @@
-import * as dotenv from 'dotenv';
-import * as expressModule from 'express';
-import { Request, Response, NextFunction } from 'express';
+import { config as dotenvConfig } from 'dotenv';
+import { Router, Request, Response, NextFunction } from 'express';
 import { ObjectId } from 'mongodb';
-import getLogger from '../../../utils/logger';
-import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '../../database/database-index';
-import { authMiddlewareFn, hashPassword } from '../features/auth';
-import { UserModel, IUser } from '../../database/models/_user';
-import sendMail, { EMAIL_TYPES } from '../helpers/mailer';
-import { HTTP_STATUS_CODE } from '../../types';
-import getMiddlewareErrorHandler from '../helpers/middleware-error-handler';
-import { wrapRes } from '../helpers/middleware-response-wrapper';
+import getLogger from '@commons/logger';
+import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '@database/database-index';
+import { authMiddlewareFn, hashPassword } from '@middleware/features/auth';
+import { UserModel, IUser } from '@database/models/_user';
+import sendMail, { EMAIL_TYPES } from '@middleware/helpers/mailer';
+import { HTTP_STATUS_CODE } from '@src/types';
+import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 
-dotenv.config();
+dotenvConfig();
 
-const {
-  // @ts-ignore
-  default: { Router },
-} = expressModule;
 const logger = getLogger(module.filename);
-
-const router: any = Router();
+const router: Router &
+  Partial<{
+    _updateUser: typeof updateUser;
+    _registerUser: typeof registerUser;
+    _confirmRegistration: typeof confirmRegistration;
+    _resendConfirmRegistration: typeof resendConfirmRegistration;
+    _logInUser: typeof logInUser;
+    _changePassword: typeof changePassword;
+    _resetPassword: typeof resetPassword;
+    _resendResetPassword: typeof resendResetPassword;
+    _logOutUser: typeof logOutUser;
+    _logOutUserFromSessions: typeof logOutUserFromSessions;
+    _setNewPassword: typeof setNewPassword;
+    _getUser: typeof getUser;
+    _addProductToObserved: typeof addProductToObserved;
+    _removeProductFromObserved: typeof removeProductFromObserved;
+    _removeAllProductsFromObserved: typeof removeAllProductsFromObserved;
+    _getObservedProducts: typeof getObservedProducts;
+    _deleteUser: typeof deleteUser;
+  }> = Router();
 
 // feature related
 router.post('/api/users/add-product-to-observed', authMiddlewareFn(getFromDB), addProductToObserved);
@@ -46,6 +59,7 @@ router.post('/api/users/logout', authMiddlewareFn(getFromDB), logOutUser);
 router.post('/api/users/logout-all', authMiddlewareFn(getFromDB), logOutUserFromSessions);
 router.patch('/api/users/set-new-password', setNewPassword);
 router.patch('/api/users/change-password', authMiddlewareFn(getFromDB), changePassword);
+router.delete('/api/users/delete', /* TODO: [SECURITY] add auth here */ deleteUser);
 
 // general
 router.post('/api/users/', updateUser);
@@ -70,6 +84,7 @@ router._addProductToObserved = addProductToObserved;
 router._removeProductFromObserved = removeProductFromObserved;
 router._removeAllProductsFromObserved = removeAllProductsFromObserved;
 router._getObservedProducts = getObservedProducts;
+router._deleteUser = deleteUser;
 
 export default router;
 
@@ -90,13 +105,13 @@ const sendRegistrationEmail = async ({
     email,
     EMAIL_TYPES.ACTIVATION,
     /* TODO: [DX] take "pages" from _routeGroups.js module */
-    `http://localhost:${process.env.PORT}/pages/confirm-registration/?token=${token}`
+    `http://localhost:${process.env.APP_PORT}/pages/confirm-registration/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {
         logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
 
-        await deleteFromDB({ name: login }, 'User');
+        await deleteFromDB(login, 'User');
 
         return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
           error: `Sending email rejected: ${emailSentInfo.rejected}!`,
@@ -108,7 +123,7 @@ const sendRegistrationEmail = async ({
     .catch(async (emailSentError: Error) => {
       logger.error('emailSentError:', emailSentError);
 
-      await deleteFromDB({ name: login }, 'User');
+      await deleteFromDB(login, 'User');
 
       // next(new Error())
       return wrapRes(res, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR, {
@@ -124,7 +139,7 @@ const sendResetPasswordEmail = async ({ email, token, res }: { email: string; to
     email,
     EMAIL_TYPES.RESET_PASSWORD,
     /* TODO: [DX] take "pages" from _routeGroups.js module */
-    `http://localhost:${process.env.PORT}/pages/set-new-password/?token=${token}`
+    `http://localhost:${process.env.APP_PORT}/pages/set-new-password/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {
@@ -354,7 +369,7 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function changePassword(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+async function changePassword(req: Request & { user?: IUser }, res: Response, next: NextFunction) {
   try {
     logger.log('(changePassword) req.body:', req.body);
 
@@ -362,14 +377,14 @@ async function changePassword(req: Request & { user: IUser }, res: Response, nex
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body is empty or not attached!' });
     }
 
-    const isPasswordMatch = await req.user.matchPassword(req.body.password);
+    const isPasswordMatch = await req.user!.matchPassword(req.body.password);
 
     if (!isPasswordMatch) {
       return wrapRes(res, HTTP_STATUS_CODE.UNAUTHORIZED, { error: 'Invalid credentials!' });
     }
 
-    req.user.password = await hashPassword(req.body.newPassword);
-    req.user.save();
+    req.user!.password = await hashPassword(req.body.newPassword);
+    req.user!.save();
 
     return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
@@ -441,15 +456,15 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
   }
 }
 
-async function logOutUser(req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) {
+async function logOutUser(req: Request & Partial<{ user: IUser; token: string }>, res: Response, next: NextFunction) {
   try {
-    req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((token) => token !== req.token);
+    req.user!.tokens.auth = (req.user!.tokens.auth as string[]).filter((token) => token !== req.token);
 
-    if (req.user.tokens.auth.length === 0) {
-      req.user.tokens.auth = undefined;
+    if (req.user!.tokens.auth.length === 0) {
+      req.user!.tokens.auth = undefined;
     }
 
-    await req.user.save();
+    await req.user!.save();
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, { authToken: null });
   } catch (exception) {
@@ -458,24 +473,24 @@ async function logOutUser(req: Request & { user: IUser; token: string }, res: Re
 }
 
 async function logOutUserFromSessions(
-  req: Request & { user: IUser; token: string },
+  req: Request & Partial<{ user: IUser; token: string }>,
   res: Response,
   next: NextFunction
 ) {
   try {
     if (req.body.preseveCurrentSession) {
-      if ((req.user.tokens.auth as string[]).length === 1) {
+      if ((req.user!.tokens.auth as string[]).length === 1) {
         return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, {
           error: 'Current session is the only one, so there is no other sessions to end!',
         });
       }
 
-      req.user.tokens.auth = (req.user.tokens.auth as string[]).filter((authToken) => authToken === req.token);
+      req.user!.tokens.auth = (req.user!.tokens.auth as string[]).filter((authToken) => authToken === req.token);
     } else {
-      req.user.tokens.auth = undefined;
+      req.user!.tokens.auth = undefined;
     }
 
-    await req.user.save();
+    await req.user!.save();
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, { authToken: null });
   } catch (exception) {
@@ -503,7 +518,7 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function addProductToObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+async function addProductToObserved(req: Request & { user?: IUser }, res: Response, next: NextFunction) {
   try {
     logger.log('(addProductToObserved) req.body:', req.body);
 
@@ -513,21 +528,21 @@ async function addProductToObserved(req: Request & { user: IUser }, res: Respons
       });
     }
 
-    const observationAdditionError = req.user.addProductToObserved(req.body.productId);
+    const observationAdditionError = req.user!.addProductToObserved(req.body.productId);
 
     if (observationAdditionError) {
       return wrapRes(res, HTTP_STATUS_CODE.CONFLICT, { error: observationAdditionError });
     }
 
-    await req.user.save();
+    await req.user!.save();
 
-    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user.observedProductsIDs || ([] as unknown[]) });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user!.observedProductsIDs || ([] as unknown[]) });
   } catch (exception) {
     return next(exception);
   }
 }
 
-async function removeProductFromObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+async function removeProductFromObserved(req: Request & { user?: IUser }, res: Response, next: NextFunction) {
   try {
     logger.log('(removeProductFromObserved) req.params:', req.params);
 
@@ -537,43 +552,43 @@ async function removeProductFromObserved(req: Request & { user: IUser }, res: Re
       });
     }
 
-    const observationRemovalError = req.user.removeProductFromObserved(req.params.productId);
+    const observationRemovalError = req.user!.removeProductFromObserved(req.params.productId);
 
     if (observationRemovalError) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: observationRemovalError });
     }
 
-    await req.user.save();
+    await req.user!.save();
 
-    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user.observedProductsIDs || ([] as unknown[]) });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user!.observedProductsIDs || ([] as unknown[]) });
   } catch (exception) {
     return next(exception);
   }
 }
 
-async function removeAllProductsFromObserved(req: Request & { user: IUser }, res: Response, next: NextFunction) {
+async function removeAllProductsFromObserved(req: Request & { user?: IUser }, res: Response, next: NextFunction) {
   try {
-    const observationsRemovalError = req.user.removeAllProductsFromObserved();
+    const observationsRemovalError = req.user!.removeAllProductsFromObserved();
 
     if (observationsRemovalError) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: observationsRemovalError });
     }
 
-    await req.user.save();
+    await req.user!.save();
 
-    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user.observedProductsIDs || ([] as unknown[]) });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: req.user!.observedProductsIDs || ([] as unknown[]) });
   } catch (exception) {
     return next(exception);
   }
 }
 
 async function getObservedProducts(
-  req: Request & { user: IUser },
+  req: Request & { user?: IUser },
   res: Response & { _OMIT_HTTP?: boolean },
   next: NextFunction
 ) {
   try {
-    if (!req.user.observedProductsIDs) {
+    if (!req.user!.observedProductsIDs) {
       const emptyObservedProductsResponse: unknown[] = [];
 
       if (res._OMIT_HTTP) {
@@ -583,13 +598,47 @@ async function getObservedProducts(
       return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: emptyObservedProductsResponse });
     }
 
-    const observedProducts = await getFromDB({ _id: req.user.observedProductsIDs }, 'Product');
+    const observedProducts = await getFromDB({ _id: req.user!.observedProductsIDs }, 'Product');
 
     if (res._OMIT_HTTP) {
       return observedProducts;
     }
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: observedProducts });
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function deleteUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    logger.log('(deleteUser) req.body:', req.body);
+
+    if (typeof req.body !== 'object') {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body must be an object!' });
+    } else if (!req.body.rawQuery) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request `rawQuery` must not be empty!' });
+    }
+
+    let query = req.body.rawQuery;
+
+    switch (req.body.queryType) {
+      case 'string': {
+        break;
+      }
+      case 'regex': {
+        query = new RegExp(req.body.rawQuery);
+        break;
+      }
+      default: {
+        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request `queryType` is invalid!' });
+      }
+    }
+
+    const deletedUser = await deleteFromDB(query, 'User');
+    logger.log('deletedUser?', deletedUser, ' /query:', query);
+
+    return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }

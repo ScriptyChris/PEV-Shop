@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import httpService from '../../features/httpService';
+import httpService from '@frontend/features/httpService';
 import ProductItem from './productItem';
-import Pagination from '../utils/pagination';
+import Pagination from '@frontend/components/utils/pagination';
 import CategoriesTree from './categoriesTree';
 import CompareProducts from './compareProducts';
 import { SearchProductsByName } from './search';

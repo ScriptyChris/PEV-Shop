@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { TLogger } from '../../../utils/logger';
-import { HTTP_STATUS_CODE } from '../../types';
+import type { TLogger } from '@commons/logger';
+import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from './middleware-response-wrapper';
 
 type TMiddlewareErrorHandler = (error: Error, req: Request, res: Response) => Pick<Response, 'json'>;

@@ -1,5 +1,5 @@
 import React, { useCallback, memo, useState, useEffect, createRef } from 'react';
-import { httpServiceSubscriber } from '../../features/httpService';
+import { httpServiceSubscriber } from '@frontend/features/httpService';
 
 const POPUP_TYPES = {
   NEUTRAL: 'NEUTRAL',
@@ -14,6 +14,7 @@ const getClosePopupBtn = (setPopupData) => {
 
   return {
     onClick: () => setPopupData(null),
+    // TODO: [UX] use translation
     text: 'Close',
   };
 };
@@ -101,7 +102,9 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
   return (
     <div className="popup-container">
       <aside className={`${baseClassName} ${baseClassName}${getClassNameByType(type)}`}>
-        <p className={`${baseClassName}__message`}>{message}</p>
+        <p className={`${baseClassName}__message`} data-cy="popup:message">
+          {message}
+        </p>
 
         {altMessage && (
           <div className={`${baseClassName}__message--alt`}>
@@ -110,7 +113,7 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
             {altButtons && (
               <div className={`${baseClassName}__buttons--alt`}>
                 {altButtons.map((altBtn) => (
-                  <button onClick={altBtn.onClick} key={altBtn.text}>
+                  <button onClick={altBtn.onClick} key={altBtn.text} data-cy={altBtn.dataCy}>
                     {altBtn.text}
                   </button>
                 ))}
@@ -121,7 +124,7 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
 
         <div className={`${baseClassName}__buttons`}>
           {buttons.map((btn, index) => (
-            <button onClick={btn.onClick} key={btn.text} ref={index === 0 ? firstBtnRef : null}>
+            <button onClick={btn.onClick} key={btn.text} data-cy={btn.dataCy} ref={index === 0 ? firstBtnRef : null}>
               {btn.text}
             </button>
           ))}

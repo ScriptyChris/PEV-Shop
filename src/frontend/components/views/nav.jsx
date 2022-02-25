@@ -1,9 +1,9 @@
 import { Link, useHistory } from 'react-router-dom';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import storeService from '../../features/storeService';
-import userSessionService from '../../features/userSessionService';
-import { ROUTES } from '../pages/_routes';
+import storeService from '@frontend/features/storeService';
+import userSessionService from '@frontend/features/userSessionService';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 const translations = Object.freeze({
   start: 'Start',
@@ -50,14 +50,18 @@ export default observer(function Nav() {
               {translations.logOut}
             </Link>
           ) : (
-            <Link to={ROUTES.LOG_IN}>{translations.logIn}</Link>
+            <Link to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
+              {translations.logIn}
+            </Link>
           )}
         </li>
         <li>
           {storeService.userAccountState ? (
             <Link to={ROUTES.ACCOUNT}>{translations.account}</Link>
           ) : (
-            <Link to={ROUTES.REGISTER}>{translations.register}</Link>
+            <Link to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
+              {translations.register}
+            </Link>
           )}
         </li>
       </ul>

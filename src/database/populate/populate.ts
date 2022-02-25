@@ -1,23 +1,24 @@
-// cross-env TS_NODE_PROJECT=../../../tsconfig.backend.json node --inspect-brk -r ts-node/register populate.ts -
-// -products=trialProducts.json categoryGroups=categoryGroups.json singleProduct cleanAll
+import getLogger from '@commons/logger';
+import { Model } from 'mongoose';
+import { ProductModel, IProduct } from '@database/models/_product';
+import { UserModel, IUser } from '@database/models/_user';
+import { TModelType } from '@database/models/models-index';
+import { hashPassword } from '@middleware/features/auth';
+import { connectWithDB } from '@database/connector';
 
-import getLogger from '../../../utils/logger';
-import { connect, connection, Model } from 'mongoose';
-import { ProductModel, IProduct } from '../models/_product';
-import { UserModel, IUser } from '../models/_user';
-import { TModelType } from '../models/models-index';
-import * as dotenv from 'dotenv';
-import { hashPassword } from '../../middleware/features/auth';
-
-// @ts-ignore
-const envVar = dotenv.default.config({ path: '../../../.env' }); // ../
 const logger = getLogger(module.filename);
 const PARAMS = Object.freeze({
+  EXECUTED_FROM_CLI: 'executedFromCLI',
   CLEAN_ALL_BEFORE: 'cleanAllBefore',
   JSON_FILE_PATH: {
-    PRODUCTS: 'productsInputPath=',
-    USERS: 'usersInputPath=',
+    PRODUCTS: 'productsInputPath',
+    USERS: 'usersInputPath',
   },
+});
+const DEFAULT_PARAMS = Object.freeze({
+  [PARAMS.CLEAN_ALL_BEFORE]: 'true',
+  [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initial-products.json',
+  [PARAMS.JSON_FILE_PATH.USERS]: './initial-users.json',
 });
 
 let relatedProductsErrors = 0;
@@ -41,71 +42,78 @@ let relatedProductsErrors = 0;
 
 type TPopulatedData = Record<string, unknown>;
 
-logger.log(
-  'process.argv:',
-  process.argv,
-  '\n/envVar:',
-  envVar,
-  '\n/__dirname:',
-  __dirname,
-  '\n/INIT_CWD:',
-  process.env.INIT_CWD,
-  '\n/require.main.filename:',
-  require && require.main && require.main.filename,
-  '\n'
-);
+logger.log('process.argv:', process.argv);
 
-if (!getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-  throw ReferenceError(`CLI argument ${PARAMS.JSON_FILE_PATH.PRODUCTS} must be provided as non empty string`);
+if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
+  throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string`);
 }
 
-(async () => {
-  await connectToDB();
+const executeDBPopulation = async () => {
+  const dbConnection = await connectWithDB();
 
-  if (getScriptParamValue(PARAMS.CLEAN_ALL_BEFORE)) {
+  if (!dbConnection || dbConnection instanceof Error) {
+    throw TypeError(`Database Population is not possible due to a problem with connection: \n${dbConnection}\n.`);
+  }
+
+  if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true') {
     const removedData = await Promise.all(
       [
         { name: 'products', ctor: ProductModel },
         { name: 'users', ctor: UserModel },
-      ].map(async ({ name, ctor }) => `\n-${name}: ${(await ctor.deleteMany({})).deletedCount}`)
+      ].map(async ({ name, ctor }) => {
+        // @ts-ignore
+        const deletionRes = await ctor.deleteMany({});
+        return `\n\t-${name}: ${deletionRes.deletedCount}`;
+      })
     );
 
     logger.log(`Cleaning done. Removed: ${removedData}`);
   }
 
-  if (getScriptParamValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-    const productsSourceDataList = getSourceData('Product') as TPopulatedData[];
+  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
+    const productsSourceDataList = getSourceData('Product');
     await populateProducts(ProductModel, productsSourceDataList);
     await updateRelatedProductsNames(ProductModel, productsSourceDataList);
   }
 
-  if (getScriptParamValue(PARAMS.JSON_FILE_PATH.USERS)) {
-    const usersSourceDataList = getSourceData('User') as TPopulatedData[];
+  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USERS)) {
+    const usersSourceDataList = getSourceData('User');
     await populateUsers(UserModel, usersSourceDataList);
   }
 
+  const populationResults = {
+    productsAmount: await ProductModel.find({}).countDocuments(),
+    usersAmount: await UserModel.find({}).countDocuments(),
+  };
+
   logger.log(
-    'Products amount after population:',
-    await ProductModel.find({}).countDocuments(),
-    ' /relatedProductsErrors:',
+    'Population results:',
+    '\n\t- products amount:',
+    populationResults.productsAmount,
+    '\n\t\t- relatedProductsErrors:',
     relatedProductsErrors,
-    '\n Users amount after population:',
-    await UserModel.find({}).countDocuments()
+    '\n\t- users amount:',
+    populationResults.usersAmount
   );
 
-  await connection.close();
-})();
+  /*
+    TODO: [DataBase - optimalization] ensure if it's necessary to close a connection after data population.
+    If closure is done on the same connection instance as the app relies on, 
+    then at least connection initiator should be checked before deciding whether to close it, 
+    to avoid closing connection for the entire app.
+  */
+  // await dbConnection.close();
 
-function connectToDB(): ReturnType<typeof connect> {
-  return connect(process.env.DATABASE_URL as string, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  return Object.values(populationResults).every(Boolean);
+};
+
+if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
+  executeDBPopulation();
 }
 
-function getSourceData(modelType: TModelType): TPopulatedData[] | ReferenceError {
+function getSourceData(modelType: TModelType): TPopulatedData[] {
   const normalizedModelType = `${modelType.toUpperCase()}S` as `${Uppercase<Exclude<TModelType, 'User-Role'>>}S`;
-  const sourceDataPath: string = getScriptParamValue(PARAMS.JSON_FILE_PATH[normalizedModelType]);
+  const sourceDataPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH[normalizedModelType]);
 
   if (!sourceDataPath) {
     throw ReferenceError(
@@ -113,6 +121,7 @@ function getSourceData(modelType: TModelType): TPopulatedData[] | ReferenceError
     );
   }
 
+  console.log('[getSourceData()] /sourceDataPath:', sourceDataPath);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const sourceDataFiles = require(sourceDataPath);
 
@@ -182,8 +191,12 @@ function updateRelatedProductsNames(
   );
 }
 
-function getScriptParamValue(param: string): string {
-  const paramValue = process.argv.find((arg: string) => arg.includes(param));
+function getScriptParamStringValue(paramName: string) {
+  const paramValue = process.argv.find((arg: string) => arg.includes(paramName)) ?? DEFAULT_PARAMS[paramName];
 
-  return paramValue ? (paramValue.split('=').pop() as string) : '';
+  console.log('[getScriptParamValue()] /paramName:', paramName, '/paramValue:', paramValue);
+
+  return paramValue ? paramValue.split('=').pop() : '';
 }
+
+export { executeDBPopulation };

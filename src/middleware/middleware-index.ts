@@ -1,34 +1,42 @@
-// @ts-ignore
-import Express from 'express';
-import { Application } from 'express';
-import getLogger from '../../utils/logger';
-// @ts-ignore
+/*
+  This module is located under `/dist` folder at runtime, but at "author time" (TypeScript compilation) 
+  no `/dist` wrapper is up there - during unit tests, this module is ran as TypeScript by Jest. 
+  Thus, two possible "root climbs" occur and such root relative path needs to be dynamically calculated. 
+  Because ESM doesn't support synchronous static paths from variables, CJS `require(..)` is used. 
+  Root relative path is calculated using `path.relative(..)`.
+*/
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const rootRelativePath = require('path').relative(__dirname, process.env.INIT_CWD);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require(`${rootRelativePath}/commons/moduleAliasesResolvers`).backend();
+
+import Express, { Request, Response, NextFunction, Application, json } from 'express';
+import getLogger from '@commons/logger';
 import glob from 'glob';
-// @ts-ignore
-import bodyParser from 'body-parser';
 import { resolve, sep } from 'path';
 import { existsSync } from 'fs';
+import apiConfig from './routes/api-config';
 import apiProducts from './routes/api-products';
 import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
 import apiOrders from './routes/api-orders';
-import * as dotenv from 'dotenv';
-import { HTTP_STATUS_CODE } from '../types';
-import { wrapRes } from '../middleware/helpers/middleware-response-wrapper';
+import { config as dotenvConfig } from 'dotenv';
+import { HTTP_STATUS_CODE } from '@src/types';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
+import { getPopulationState } from '@database/connector';
 
-// @ts-ignore
-dotenv.default.config();
+dotenvConfig();
 
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
 // TODO: [SECURITY] https://expressjs.com/en/advanced/best-practice-security.html
 const middleware = (app: Application): void => {
-  app.use(bodyParser.json());
-  app.use(apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
+  app.use(json());
+  app.use(apiConfig, apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
 
-  app.get('/images/*', (req, res) => {
+  app.get('/images/*', (req: Request, res: Response) => {
     const imagePath = req.url.split('/').pop() as string;
 
     getImage(imagePath)
@@ -55,19 +63,46 @@ function wrappedMiddleware(): void {
   const frontendPath = getFrontendPath();
 
   const app: Application = Express();
-  app.use(Express.static(frontendPath));
+  app.use(getDatabaseReadinessHandler(), Express.static(frontendPath));
 
   middleware(app);
 
   // TODO: [REFACTOR] this probably should detect what resource the URL wants and maybe not always return index.html
-  app.use('/', (req, res) => {
+  app.use('/', (req: Request, res: Response) => {
     console.log('global (404?) req.url:', req.url);
 
     return res.sendFile(`${frontendPath}/index.html`);
   });
-  app.listen(process.env.PORT, () => {
-    logger.log(`Server is listening on port ${process.env.PORT}`);
+  app.listen(process.env.APP_PORT, () => {
+    logger.log(`Server is listening on port ${process.env.APP_PORT}`);
   });
+}
+
+function getDatabaseReadinessHandler() {
+  let isDatabaseReady = false;
+
+  return async function handleDatabaseReadiness(req: Request, res: Response, next: NextFunction) {
+    if (!isDatabaseReady) {
+      isDatabaseReady = await getPopulationState();
+      console.log('[handleDatabaseReadiness()] isDatabaseReady:', isDatabaseReady);
+
+      if (isDatabaseReady) {
+        return next();
+      }
+
+      if (req.url !== '/api/populate-db') {
+        return res.status(HTTP_STATUS_CODE.SERVICE_UNAVAILABLE).send(
+          `
+            <p><strong>Database is not ready yet!</strong></p>
+            <p>Data population process should happen automatically at app's first startup (if you launch it via Docker) and lasts just a moment.</p>
+            <p>If you still see this error after a longer while, perhaps you need to run population manually? Check for <code>populate-db</code> npm script.</p>
+          `.trim()
+        );
+      }
+    }
+
+    return next();
+  };
 }
 
 function getFrontendPath(): string {
@@ -79,11 +114,10 @@ function getFrontendPath(): string {
 const getImage = (() => {
   const imageCache: { [prop: string]: string } = {};
 
-  return (fileName: string): Promise<string> => {
-    const cachedImage: any = imageCache[fileName];
+  return (fileName: string) => {
+    const cachedImage = imageCache[fileName];
 
     if (!cachedImage) {
-      // @ts-ignore
       return findFileRecursively(fileName).then(([image]) => {
         imageCache[fileName] = image;
 
@@ -95,9 +129,9 @@ const getImage = (() => {
   };
 })();
 
-function findFileRecursively(fileName: string): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    // TODO: wrap it with util.promisify
+function findFileRecursively(fileName: string) {
+  return new Promise<string[]>((resolve, reject) => {
+    // TODO: wrap it with util.promisify and handle error case typing
     glob(`${databaseDirname}/web-scraped/images/**/${fileName}`, (err: Error | null, files: string[]) => {
       if (err || !files.length) {
         reject(err || 'No files found!');

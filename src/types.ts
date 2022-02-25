@@ -1,5 +1,3 @@
-export type TJestMock<T = void> = jest.Mock<any, T | any>;
-
 export interface IProductInOrder {
   name: number;
   unitPrice: number;
@@ -15,6 +13,8 @@ export interface IPayByLinkMethod {
   maxAmount: number;
 }
 
+// remember to update `middleware-response-wrapper.ts` accordingly
+// TODO: [REFACTOR] automate synchronization
 export enum HTTP_STATUS_CODE {
   OK = 200,
   CREATED = 201,
@@ -25,6 +25,7 @@ export enum HTTP_STATUS_CODE {
   NOT_FOUND = 404,
   CONFLICT = 409,
   INTERNAL_SERVER_ERROR = 500,
+  SERVICE_UNAVAILABLE = 503,
   NETWORK_AUTH_REQUIRED = 511,
 }
 
@@ -39,3 +40,17 @@ export interface IUserCart {
 }
 
 export type TPagination = { pageNumber: number; productsPerPage: number };
+
+export type TE2E = {
+  [key: string]: {
+    [key: string]: (...args: any[]) => any;
+  };
+};
+
+export type TE2EUser = {
+  login: string;
+  password: string;
+  email: string;
+  accountType?: string;
+  isConfirmed?: boolean;
+};

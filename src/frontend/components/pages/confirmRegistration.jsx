@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import httpService from '../../features/httpService';
+import httpService from '@frontend/features/httpService';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
@@ -43,7 +43,7 @@ export default function ConfirmRegistration() {
   const [regConfirmStatus, setRegConfirmStatus] = useState(REG_CONFIRM_STATUS.WAITING);
 
   useEffect(() => {
-    const token = new URLSearchParams(searchParam).get('token');
+    const token = new URLSearchParams(searchParam).get('token').replaceAll(' ', '+');
 
     if (token) {
       httpService
@@ -69,8 +69,10 @@ export default function ConfirmRegistration() {
 
       {regConfirmStatus === REG_CONFIRM_STATUS.SUCCEEDED && (
         <>
-          <p>{REG_CONFIRM_STATES.SUCCEEDED.HINT}</p>
-          <button onClick={logIn}>{translations.logIn}</button>
+          <p data-cy="message:registration-confirmation-succeeded-hint">{REG_CONFIRM_STATES.SUCCEEDED.HINT}</p>
+          <button onClick={logIn} data-cy="button:log-in-after-confirmed-registration">
+            {translations.logIn}
+          </button>
         </>
       )}
       {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <p>{REG_CONFIRM_STATES.FAILED.HINT}</p>}

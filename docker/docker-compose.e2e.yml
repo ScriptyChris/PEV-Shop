@@ -1,0 +1,18 @@
+services:
+  cypress:
+    image: "cypress/included:9.1.1"
+    container_name: pev-cypress
+    depends_on:
+      - node
+    network_mode: "host"
+    working_dir: /app/test/e2e
+    environment:
+      - DISPLAY ## `xhost +local:` command must first be run on the host computer
+      - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
+      - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
+      - CYPRESS_WAIT_3_SEC=3000
+      - CYPRESS_WAIT_1_SEC=1000
+      - CYPRESS_TEST_MODE=development
+    entrypoint: "bash /app/test/e2e/run-tests.sh"
+    volumes:
+      - ../:/app

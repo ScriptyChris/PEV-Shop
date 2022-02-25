@@ -1,5 +1,4 @@
-import { TJestMock } from '../../../types';
-import { getMockImplementationError } from '../../../../test/mockUtils';
+import { getMockImplementationError, TJestMock } from '@unitTests/inline-mocks';
 
 const authMiddlewareFn: TJestMock & { _succeededCall?: () => () => Promise<void>; _failedCall?: () => null } = jest.fn(
   () => {

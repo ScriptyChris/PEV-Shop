@@ -1,0 +1,16 @@
+services:
+  node:
+    volumes:
+      - pev-node_modules:/app/node_modules
+      - pev-dist:/app/dist
+
+  cypress:
+    volumes:
+      - pev-node_modules:/app/node_modules
+      - pev-dist:/app/dist
+    environment:
+      - CYPRESS_TEST_MODE=CI/CD
+
+volumes:
+  pev-node_modules:
+  pev-dist:

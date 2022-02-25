@@ -1,0 +1,5 @@
+{
+  "exec": "tsc --project test/e2e/tsconfig.json --noEmit && npm run eslint:test:e2e && npm run prettier:test:e2e && cypress run --config-file test/e2e/cypress.json --headed",
+  "watch": ["test/e2e/cypress/integration", "test/e2e/cypress/support", "test/e2e/cypress/plugins"],
+  "ext": "ts"
+}

@@ -1,0 +1,10 @@
+{
+  "fixturesFolder": false,
+  "video": false,
+  "pluginsFile": "test/e2e/cypress/plugins/index.ts",
+  "integrationFolder": "test/e2e/cypress/integration",
+  "supportFile": "test/e2e/cypress/support/index.ts",
+  "screenshotsFolder": "test/e2e/cypress/screenshots",
+  "viewportWidth": 1366,
+  "viewportHeight": 768
+}

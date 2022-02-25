@@ -1,13 +1,13 @@
-import type { IUser, IUserPublic, TUserRegistrationCredentials } from '../../database/models/_user';
-import type { IProduct } from '../../database/models/_product';
+import type { IUser, IUserPublic, TUserRegistrationCredentials } from '@database/models/_user';
+import type { IProduct } from '@database/models/_product';
 import type {
   IEmbracedResponse,
   TSuccessfulHTTPStatusCodesToData,
   TClientErrorHTTPStatusCodesToData,
   TServerErrorHTTPStatusCodesToData,
-} from '../../middleware/helpers/middleware-response-wrapper';
-import type { TProductTechnicalSpecs } from '../../middleware/helpers/api-products-specs-mapper';
-import { HTTP_STATUS_CODE, IUserCart, TPagination } from '../../types';
+} from '@middleware/helpers/middleware-response-wrapper';
+import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
+import { HTTP_STATUS_CODE, IUserCart, TPagination } from '@src/types';
 
 type TResDataType<T> = T[keyof T];
 

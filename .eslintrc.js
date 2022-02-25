@@ -28,7 +28,9 @@ const config = {
 };
 
 if (!isTestEnv && isBackendOnly) {
-  config.ignorePatterns.push('test/', '__mocks__/', '**/__mocks__', 'src/**/*.js');
+  config.ignorePatterns.push(
+    'test/', '__mocks__/', '**/__mocks__', 'src/**/*.js', 'src/database/populate/*.sh'
+  );
 }
 
 module.exports = {

@@ -1,10 +1,9 @@
-import * as dotenv from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import { createTransport } from 'nodemailer';
 import SMTPTransport = require('nodemailer/lib/smtp-transport');
 import SendmailTransport = require('nodemailer/lib/sendmail-transport');
 
-// @ts-ignore
-dotenv.config();
+dotenvConfig();
 
 const translations = Object.freeze({
   activationSubject: 'Account activation',
@@ -28,7 +27,7 @@ const translations = Object.freeze({
 });
 const mailerConfig: SMTPTransport.Options = Object.freeze({
   host: process.env.EMAIL_HOST as string, //'0.0.0.0',
-  port: Number(process.env.EMAIL_PORT), //1025// 587 // TODO: [ENV] use 465 for HTTPS
+  port: Number(process.env.EMAIL_SMTP_PORT), //1025// 587 // TODO: [ENV] use 465 for HTTPS
 });
 
 const EMAIL_TYPES_CONFIG = Object.freeze({
