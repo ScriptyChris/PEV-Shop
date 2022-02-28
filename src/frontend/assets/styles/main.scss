@@ -1,4 +1,5 @@
 @import 'views/shop';
+@import 'views/nav';
 @import 'views/categoriesTree';
 @import 'views/productList';
 @import 'views/cart';
@@ -25,7 +26,7 @@ html {
 
 .app-root {
   display: grid;
-  grid-template-rows: 10vh 80vh 10vh;
+  grid-template-rows: 10vh minmax(80vh, auto) 10vh;
   grid-template-areas:
     "header"
     "main"
@@ -38,12 +39,9 @@ html {
 
 .header {
   grid-area: header;
-}
 
-.nav {
-  ul {
-    display: flex;
-    justify-content: space-evenly;
+  &__main-heading {
+    text-align: center
   }
 }
 

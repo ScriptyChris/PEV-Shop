@@ -8,8 +8,7 @@ import { SearchProductsByName } from './search';
 import ProductsFilter from './productsFilter';
 
 const translations = {
-  lackOfProducts: 'Brak produktów...',
-  filterProducts: 'Filtruj produkty',
+  lackOfProducts: 'Lack of products...',
   typeProductName: 'Type product name:',
 };
 const paginationTranslations = {
@@ -119,9 +118,10 @@ export default function ProductList() {
 
   return (
     <>
+      {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
       <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
 
-      {/*TODO: disable pagination list options, which are unnecessary, because of too little products*/}
+      {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
       <Pagination
         itemsName="product"
         translations={paginationTranslations}
@@ -132,12 +132,12 @@ export default function ProductList() {
         onItemPageChange={onProductPageChange}
       />
 
-      <ProductsFilter selectedCategories={productCategories} onFiltersUpdate={handleFiltersUpdate} />
-
-      {/* TODO: move the button into ProductsFilter component, presumably with CategoriesTree */}
-      <button onClick={filterProducts} disabled={filterBtnDisabled}>
-        {translations.filterProducts}
-      </button>
+      <ProductsFilter
+        selectedCategories={productCategories}
+        onFiltersUpdate={handleFiltersUpdate}
+        doFilterProducts={filterProducts}
+        filterBtnDisabled={filterBtnDisabled}
+      />
 
       <CompareProducts.List />
 

@@ -1,10 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
+import React, { useCallback, useEffect, useRef, createRef, useState, Fragment, useMemo, memo } from 'react';
 import { Formik, ErrorMessage } from 'formik';
+import classNames from 'classnames';
 import productSpecsService from '@frontend/features/productSpecsService';
 import FormFieldError from '@frontend/components/utils/formFieldError';
+import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
+  filtersWidgetToggleButton: 'Filters',
   filterUnavailable: 'Filters are not available',
+  toggleSpecControl: 'Toggle',
+  filterProducts: 'Apply filters',
   minExceededMax: 'Min value must be lower than or equal to max value!',
   maxBeneathMin: 'Max value must be greater than or equal to min value!',
   getBeyondValueRange({ boundaryName, boundaryValue }) {
@@ -63,13 +68,42 @@ const getControlsForSpecs = (() => {
       throw TypeError(`spec.type '${type}' was not recognized as a template method!`);
     }
 
-    // TODO: make each <fieldset> collapsible
+    const isMobileLayout = useMobileLayout();
+    const [isFieldControlHidden, setIsFieldControlHidden] = useState(isMobileLayout);
+
+    useEffect(() => setIsFieldControlHidden(isMobileLayout), [isMobileLayout]);
+
+    const getLegendContent = () => {
+      const defaultUnitOutput = defaultUnit ? `(${defaultUnit})` : '';
+
+      return `${translations.normalizeContent(name)} ${defaultUnitOutput}`;
+    };
+
+    const handleFieldControlsCollapseToggle = () => {
+      if (isMobileLayout) {
+        // TODO: [UX / a11y] auto-focus control's first input
+        setIsFieldControlHidden(!isFieldControlHidden);
+      }
+    };
+
     return (
       <fieldset key={`spec${name}Filter`}>
-        <legend>
-          {translations.normalizeContent(name)} {defaultUnit && `(${defaultUnit})`}
+        <legend className="products-filter__form-field-legend">
+          {isMobileLayout ? (
+            <button onClick={handleFieldControlsCollapseToggle} title={translations.toggleSpecControl}>
+              {getLegendContent()}
+            </button>
+          ) : (
+            getLegendContent()
+          )}
         </legend>
-        {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
+        <div
+          className={classNames('products-filter__form-field-controls', {
+            'products-filter__form-field-controls--hidden': isFieldControlHidden,
+          })}
+        >
+          {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
+        </div>
       </fieldset>
     );
   };
@@ -95,7 +129,7 @@ const getControlsForSpecs = (() => {
         specRangeName.length === 0 ? ['', ''] : specRangeName.map((item) => formikRestProps.values[item]);
 
       return (
-        <div key={keyAndId}>
+        <Fragment key={keyAndId}>
           {areSpecDescriptions && <div id={keyAndId}>{translations.normalizeContent(specDescriptions[index])}</div>}
 
           <input
@@ -139,7 +173,7 @@ const getControlsForSpecs = (() => {
                 />
               );
             })}
-        </div>
+        </Fragment>
       );
     });
   }
@@ -149,17 +183,17 @@ const getControlsForSpecs = (() => {
     const normalizedSpecValues = specValue[0].map((specV) => specV.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP));
 
     return normalizedSpecValues.map((val, index) => (
-      <Fragment key={`spec${specName}Control${index}`}>
-        <label>
-          {translations.normalizeContent(val)}
-          <input type="checkbox" name={`${specName}__${val}`} value={value} onChange={formikRestProps.handleChange} />
-        </label>
-      </Fragment>
+      <label key={`spec${specName}Control${index}`}>
+        {translations.normalizeContent(val)}
+        <input type="checkbox" name={`${specName}__${val}`} value={value} onChange={formikRestProps.handleChange} />
+      </label>
     ));
   }
 })();
 
-function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
+function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts, filterBtnDisabled }) {
+  const FORM_CLASS_NAME = 'products-filter__container';
+  const [isFormExpanded, setIsFormExpanded] = useState(false);
   const productsSpecsPerCategory = useRef({});
   const cachedValidationErrors = useRef({});
   const [productSpecsPerSelectedCategory, setProductSpecsPerSelectedCategory] = useState([]);
@@ -369,27 +403,47 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate }) {
     onFiltersUpdate({ isError, values: touchedValues });
   };
 
-  return Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
-    <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
-      {({ handleSubmit, ...formikRestProps }) => {
-        const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
-        formikRestProps.handleChange = function (event) {
-          // TODO: remove this when form will be submitted via button, not dynamically
-          formikRestProps.setFieldTouched(event.target.name, true, false);
+  const handleFiltersWidgetToggle = () => {
+    setIsFormExpanded(!isFormExpanded);
+  };
 
-          changeHandler(event);
-          _handleChange(event);
-        };
+  return (
+    <section className="products-filter">
+      {Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
+        <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
+          {({ handleSubmit, ...formikRestProps }) => {
+            const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
+            formikRestProps.handleChange = function (event) {
+              // TODO: remove this when form will be submitted via button, not dynamically
+              formikRestProps.setFieldTouched(event.target.name, true, false);
 
-        return (
-          <form onSubmit={handleSubmit} className="products-filter-form">
-            {getFormControls(formikRestProps)}
-          </form>
-        );
-      }}
-    </Formik>
-  ) : (
-    translations.filterUnavailable
+              changeHandler(event);
+              _handleChange(event);
+            };
+
+            return (
+              <>
+                <button onClick={handleFiltersWidgetToggle}>{translations.filtersWidgetToggleButton}</button>
+
+                <div
+                  className={classNames(FORM_CLASS_NAME, {
+                    [`${FORM_CLASS_NAME}--expanded`]: isFormExpanded,
+                  })}
+                >
+                  <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>
+
+                  <button onClick={doFilterProducts} disabled={filterBtnDisabled}>
+                    {translations.filterProducts}
+                  </button>
+                </div>
+              </>
+            );
+          }}
+        </Formik>
+      ) : (
+        translations.filterUnavailable
+      )}
+    </section>
   );
 }
 
