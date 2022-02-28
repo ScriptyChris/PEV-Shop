@@ -4,13 +4,16 @@ import { BrowserRouter } from 'react-router-dom';
 import Header from './components/views/header';
 import Main from './components/views/main';
 import Footer from './components/views/footer';
+import { MobileLayoutProvider } from './contexts/mobile-layout';
 
 const App = () => (
   <StrictMode>
     <BrowserRouter>
-      <Header />
-      <Main />
-      <Footer />
+      <MobileLayoutProvider>
+        <Header />
+        <Main />
+        <Footer />
+      </MobileLayoutProvider>
     </BrowserRouter>
   </StrictMode>
 );

@@ -1,12 +1,3 @@
-import getLogger from '@commons/logger';
-import { Model } from 'mongoose';
-import { ProductModel, IProduct } from '@database/models/_product';
-import { UserModel, IUser } from '@database/models/_user';
-import { TModelType } from '@database/models/models-index';
-import { hashPassword } from '@middleware/features/auth';
-import { connectWithDB } from '@database/connector';
-
-const logger = getLogger(module.filename);
 const PARAMS = Object.freeze({
   EXECUTED_FROM_CLI: 'executedFromCLI',
   CLEAN_ALL_BEFORE: 'cleanAllBefore',
@@ -20,6 +11,22 @@ const DEFAULT_PARAMS = Object.freeze({
   [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initial-products.json',
   [PARAMS.JSON_FILE_PATH.USERS]: './initial-users.json',
 });
+
+if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
+  // TODO: [DX] that might need to be refactored to avoid unnecessary CJS usage and relative path
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  require('../../../commons/moduleAliasesResolvers.js').backend();
+}
+
+import getLogger from '@commons/logger';
+import { Model } from 'mongoose';
+import { ProductModel, IProduct } from '@database/models/_product';
+import { UserModel, IUser } from '@database/models/_user';
+import { TModelType } from '@database/models/models-index';
+import { hashPassword } from '@middleware/features/auth';
+import { connectWithDB } from '@database/connector';
+
+const logger = getLogger(module.filename);
 
 let relatedProductsErrors = 0;
 
@@ -102,7 +109,9 @@ const executeDBPopulation = async () => {
     then at least connection initiator should be checked before deciding whether to close it, 
     to avoid closing connection for the entire app.
   */
-  // await dbConnection.close();
+  if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
+    await dbConnection.close();
+  }
 
   return Object.values(populationResults).every(Boolean);
 };
