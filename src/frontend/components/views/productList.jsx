@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import classNames from 'classnames';
 import httpService from '@frontend/features/httpService';
 import ProductItem from './productItem';
 import Pagination from '@frontend/components/utils/pagination';
@@ -6,6 +7,7 @@ import CategoriesTree from './categoriesTree';
 import CompareProducts from './compareProducts';
 import { SearchProductsByName } from './search';
 import ProductsFilter from './productsFilter';
+import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
   lackOfProducts: 'Lack of products...',
@@ -19,6 +21,50 @@ const paginationTranslations = {
 // TODO: setup this on backend and pass via some initial config to frontend
 const productsPerPageLimits = [15, 30, 60, Infinity];
 
+function useHandleFiltersBarStickiness() {
+  const isMobileLayout = useMobileLayout();
+  const [isFiltersBarSticky, setIsFiltersBarSticky] = useState(false);
+
+  let lastKnownScrollPosition = 0;
+  let scrollProcessing = false;
+
+  useEffect(() => {
+    if (isMobileLayout) {
+      setIsFiltersBarSticky(true);
+      stopListening();
+      startListening();
+
+      return stopListening;
+    }
+
+    setIsFiltersBarSticky(false);
+  }, [isMobileLayout]);
+
+  const handleStickiness = () => {
+    const isScrollUp = lastKnownScrollPosition > window.scrollY;
+
+    setIsFiltersBarSticky(isScrollUp);
+
+    lastKnownScrollPosition = window.scrollY;
+  };
+
+  const scrollListener = () => {
+    if (!scrollProcessing) {
+      window.requestAnimationFrame(() => {
+        handleStickiness();
+        scrollProcessing = false;
+      });
+
+      scrollProcessing = true;
+    }
+  };
+
+  const startListening = () => document.addEventListener('scroll', scrollListener);
+  const stopListening = () => document.removeEventListener('scroll', scrollListener);
+
+  return isFiltersBarSticky;
+}
+
 export default function ProductList() {
   const [productsList, setProductsList] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
@@ -27,6 +73,7 @@ export default function ProductList() {
   // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
   const [currentProductsPerPageLimit, setCurrentProductsPerPageLimit] = useState(productsPerPageLimits[0]);
   const [filterBtnDisabled, setFilterBtnDisabled] = useState(false);
+  const isFiltersBarSticky = useHandleFiltersBarStickiness();
 
   useEffect(() => {
     updateProductsList().catch((updateProductsListError) => {
@@ -118,36 +165,31 @@ export default function ProductList() {
 
   return (
     <>
-      {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
-      <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
+      <div
+        className={classNames('filters-bar', {
+          'filters-bar--sticky': isFiltersBarSticky,
+        })}
+      >
+        <SearchProductsByName
+          label={translations.typeProductName}
+          searchingTarget="productName"
+          debounceTimeMs={750}
+          pagination={{ currentProductPage: 1, currentProductsPerPageLimit }}
+          onReceivedProductsByName={handleSearchedProducts}
+        />
 
-      {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
-      <Pagination
-        itemsName="product"
-        translations={paginationTranslations}
-        currentItemPageIndex={currentProductPage - 1}
-        totalPages={totalPages}
-        itemLimitsPerPage={productsPerPageLimits}
-        onItemsPerPageLimitChange={onProductsPerPageLimitChange}
-        onItemPageChange={onProductPageChange}
-      />
+        {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
+        <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
 
-      <ProductsFilter
-        selectedCategories={productCategories}
-        onFiltersUpdate={handleFiltersUpdate}
-        doFilterProducts={filterProducts}
-        filterBtnDisabled={filterBtnDisabled}
-      />
+        <ProductsFilter
+          selectedCategories={productCategories}
+          onFiltersUpdate={handleFiltersUpdate}
+          doFilterProducts={filterProducts}
+          filterBtnDisabled={filterBtnDisabled}
+        />
+      </div>
 
       <CompareProducts.List />
-
-      <SearchProductsByName
-        label={translations.typeProductName}
-        searchingTarget="productName"
-        debounceTimeMs={750}
-        pagination={{ currentProductPage: 1, currentProductsPerPageLimit }}
-        onReceivedProductsByName={handleSearchedProducts}
-      />
 
       {/*TODO: implement changeable layout (tiles vs list)*/}
       <ul className="product-list">
@@ -161,6 +203,17 @@ export default function ProductList() {
             })
           : translations.lackOfProducts}
       </ul>
+
+      {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
+      <Pagination
+        itemsName="product"
+        translations={paginationTranslations}
+        currentItemPageIndex={currentProductPage - 1}
+        totalPages={totalPages}
+        itemLimitsPerPage={productsPerPageLimits}
+        onItemsPerPageLimitChange={onProductsPerPageLimitChange}
+        onItemPageChange={onProductPageChange}
+      />
     </>
   );
 }

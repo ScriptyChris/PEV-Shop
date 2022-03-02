@@ -1,10 +1,20 @@
-.categories-tree-form-field__proxy-input--hidden {
-  width: 0;
-  height: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  opacity: 0;
+.categories-tree-container {
+
+}
+
+.categories-tree {
+  &--hidden {
+    display: none;
+  }
+
+  &-form-field__proxy-input--hidden {
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    opacity: 0;
+  }
 }
 
 .rstm-tree-item-group {

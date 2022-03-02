@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useCallback, createRef, useRef } from 'react';
-import httpService from '@frontend/features/httpService';
 import TreeMenu from 'react-simple-tree-menu';
+import classNames from 'classnames';
+import httpService from '@frontend/features/httpService';
+import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
+const translations = Object.freeze({
+  toggleCategoriesTree: 'Categories',
+});
 const CATEGORIES_SEPARATOR = '|';
 
 function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultiselect, formField }) {
   const parsedPreSelectedCategory = preSelectedCategory.split(CATEGORIES_SEPARATOR);
+  const isMobileLayout = useMobileLayout();
+  const [isTreeHidden, setIsTreeHidden] = useState(isMobileLayout);
   const [categoriesMap, setCategoriesMap] = useState(null);
   const [autoSelectedCategory, setAutoSelectedCategory] = useState(false);
   const categoriesTreeRef = createRef();
@@ -42,6 +49,8 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
       onCategorySelect(preSelectedCategory);
     }
   }, [autoSelectedCategory]);
+
+  useEffect(() => setIsTreeHidden(isMobileLayout), [isMobileLayout]);
 
   const getCategoriesTree = () => {
     if (!categoriesMap) {
@@ -108,6 +117,8 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
     };
   };
 
+  const handleCategoriesTreeToggle = () => setIsTreeHidden(!isTreeHidden);
+
   const toggleActiveTreeNode = (nodeLevel, nodeIndex, matchedParentKey, nodeLabel) => {
     const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
     const currentNodeValue = `${matchedParentKey}${nodeLabel}`;
@@ -149,15 +160,24 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
   };
 
   return (
-    /*
-      Attribute [ref] is used on whole component wrapper, because
-      both useRef() hook and React.createRef() method don't seem to
-      give reference to nested functional component's DOM elements, such as used TreeMenu.
-    */
-    <div ref={categoriesTreeRef}>
-      {formField}
-      {getCategoriesTree()}
-    </div>
+    <section className="categories-tree-container">
+      {isMobileLayout && <button onClick={handleCategoriesTreeToggle}>{translations.toggleCategoriesTree}</button>}
+
+      {/*
+        Attribute [ref] is used on whole component wrapper, because
+        both useRef() hook and React.createRef() method don't seem to
+        give reference to nested functional component's DOM elements, such as used TreeMenu.
+      */}
+      <div
+        ref={categoriesTreeRef}
+        className={classNames('categories-tree', {
+          'categories-tree--hidden': isTreeHidden,
+        })}
+      >
+        {formField}
+        {getCategoriesTree()}
+      </div>
+    </section>
   );
 }
 

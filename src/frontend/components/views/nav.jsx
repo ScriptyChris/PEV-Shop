@@ -80,7 +80,7 @@ export default observer(function Nav() {
     setNavOverlayClasses(isNavExpanded ? navClassNamesReducer.classes.mobileOverlay : EMPTY_CLASS_NAME);
     setNavToggleButtonClasses(
       classNames(navClassNamesReducer.classes.navToggleButton, {
-        [`${navClassNamesReducer.classes.navToggleButton}--mobile-expanded`]: !isNavExpanded,
+        [`${navClassNamesReducer.classes.navToggleButton}--mobile-hidden`]: !isNavExpanded,
       })
     );
   }, [navClassNames]);

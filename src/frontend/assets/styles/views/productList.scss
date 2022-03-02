@@ -1,3 +1,33 @@
+.filters-bar {
+  background: orange;
+  position: relative;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: /* TODO: [UI] use more precise/dynamic value */ 50px auto;
+  grid-template-areas:
+    ". search"
+    ". categories"
+    ". filters";
+
+  // TODO: [UI] add some transition to stickiness
+  &--sticky {
+    position: sticky;
+  }
+
+  & :nth-child(1) {
+    grid-area: search;
+  }
+
+  & :nth-child(2) {
+    grid-area: categories;
+  }
+
+  & :nth-child(3) {
+    grid-area: filters;
+  }
+}
+
 .product-list {
   display: flex;
   flex-wrap: wrap;
