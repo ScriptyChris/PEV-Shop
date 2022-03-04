@@ -1,0 +1,43 @@
+.product-item {
+    position: relative;
+    // max-width: 250px;
+    border: 2px solid black;
+    // margin-bottom: 30px;
+  
+    &__image {
+      height: 100px;
+      background: radial-gradient(transparent, grey);
+    }
+  
+    &__metadata {
+      div {
+        display: flex;
+  
+        background: black;
+        color: white;
+  
+        dd {
+          word-break: break-word;
+        }
+      }
+    }
+  
+    &__actions-bar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 2rem;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+
+      &-buttons {
+          background: green;
+      }
+    }
+  
+    &__toggle-comparable {
+      // display: block;
+    }
+  }
+  

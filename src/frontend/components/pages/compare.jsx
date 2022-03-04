@@ -60,17 +60,23 @@ export default function Compare() {
           role="row"
           key={`body-row-${headerIndex}`}
         >
-          {comparisonData.comparableProductsData.map((productData, dataIndex) => (
-            <div className="compare-products__cell" role="cell" key={`cell-${dataIndex}`}>
-              {prepareSpecificProductDetail(detailHeader, productData[detailHeader])}
+          {comparisonData.comparableProductsData.map((productData, dataIndex) => {
+            const preparedProductDetail = prepareSpecificProductDetail(detailHeader, productData[detailHeader]);
 
-              {detailHeader === 'name' && (
-                <ProductItemLink
-                  productData={toJS(storeService.productComparisonState[dataIndex], { recurseEverything: true })}
-                />
-              )}
-            </div>
-          ))}
+            return (
+              <div className="compare-products__cell" role="cell" key={`cell-${dataIndex}`}>
+                {detailHeader === 'name' ? (
+                  <ProductItemLink
+                    productData={toJS(storeService.productComparisonState[dataIndex], { recurseEverything: true })}
+                  >
+                    {preparedProductDetail}
+                  </ProductItemLink>
+                ) : (
+                  preparedProductDetail
+                )}
+              </div>
+            );
+          })}
         </div>
       );
     };

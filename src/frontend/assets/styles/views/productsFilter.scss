@@ -1,12 +1,10 @@
-@import '../var.scss';
+.products-filter-container {}
 
 .products-filter {
-    &__container {
-        display: none;
+    display: none;
 
-        &--expanded {
-            display: block;
-        }
+    &--expanded {
+        display: block;
     }
 
     &__form {

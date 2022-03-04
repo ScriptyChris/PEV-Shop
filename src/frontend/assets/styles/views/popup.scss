@@ -1,4 +1,4 @@
-@import '../var';
+@import '../_var';
 
 // TODO: [UI] maybe tsuch overlay could be re-usable (with i.e. `.nav-mobile-overlay`)
 .popup-container {
@@ -7,7 +7,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 3;
+    z-index: $popupZIndex;
     background: $transparentGrey;
 }
 

@@ -1,3 +1,5 @@
+@import '../_var';
+
 .cart-toggle-button {
 
 }
@@ -13,7 +15,7 @@
 .cart-container {
   display: none;
   position: relative;
-  z-index: 2;
+  z-index: $cartZIndex;
 
   background: orange;
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import httpService from '@frontend/features/httpService';
 import ProductItem from './productItem';
@@ -13,6 +13,10 @@ const translations = {
   lackOfProducts: 'Lack of products...',
   typeProductName: 'Type product name:',
 };
+const viewModeTranslations = {
+  changeToDetails: 'Details view',
+  changeToTiles: 'Tiles view',
+};
 const paginationTranslations = {
   itemsPerPageSuffix: 'produktów',
   allItems: 'Wszystkie produkty',
@@ -21,29 +25,29 @@ const paginationTranslations = {
 // TODO: setup this on backend and pass via some initial config to frontend
 const productsPerPageLimits = [15, 30, 60, Infinity];
 
-function useHandleFiltersBarStickiness() {
+function useHandleListControlBarStickiness() {
   const isMobileLayout = useMobileLayout();
-  const [isFiltersBarSticky, setIsFiltersBarSticky] = useState(false);
+  const [isListControlBarSticky, setIsListControlBarSticky] = useState(false);
 
   let lastKnownScrollPosition = 0;
   let scrollProcessing = false;
 
   useEffect(() => {
     if (isMobileLayout) {
-      setIsFiltersBarSticky(true);
+      setIsListControlBarSticky(true);
       stopListening();
       startListening();
 
       return stopListening;
     }
 
-    setIsFiltersBarSticky(false);
+    setIsListControlBarSticky(false);
   }, [isMobileLayout]);
 
   const handleStickiness = () => {
     const isScrollUp = lastKnownScrollPosition > window.scrollY;
 
-    setIsFiltersBarSticky(isScrollUp);
+    setIsListControlBarSticky(isScrollUp);
 
     lastKnownScrollPosition = window.scrollY;
   };
@@ -62,7 +66,49 @@ function useHandleFiltersBarStickiness() {
   const startListening = () => document.addEventListener('scroll', scrollListener);
   const stopListening = () => document.removeEventListener('scroll', scrollListener);
 
-  return isFiltersBarSticky;
+  return isListControlBarSticky;
+}
+
+function useListViewModes() {
+  const viewTypes = ['product-list--details-view', 'product-list--tiles-view'];
+  const generateViewTypesMap = (targetIndex) =>
+    viewTypes.reduce(
+      (viewTypesMap, viewName, index) => ({
+        ...viewTypesMap,
+        [viewName]: index === targetIndex,
+      }),
+      {}
+    );
+  const matchViewTypeTranslation = () => {
+    const viewType = viewTypes[viewTypeIndex].match(/--(\w+)-/)[1];
+    const viewTypeTranslation = Object.entries(viewModeTranslations).find(([key]) =>
+      key.toLowerCase().includes(viewType)
+    )[1];
+
+    return viewTypeTranslation;
+  };
+  const [viewTypeIndex, setViewTypeIndex] = useState(0);
+  const [listViewModes, setListViewModes] = useState({});
+  const [listViewModesButtonText, setListViewModesButtonText] = useState('');
+
+  useEffect(() => {
+    setListViewModes(generateViewTypesMap(viewTypeIndex));
+    setListViewModesButtonText(matchViewTypeTranslation());
+  }, [viewTypeIndex]);
+
+  const updateViewTypeIndex = () => {
+    setViewTypeIndex((index) => {
+      const isLastViewType = index === viewTypes.length - 1;
+
+      return isLastViewType ? 0 : index + 1;
+    });
+  };
+
+  return {
+    currentListViewModes: listViewModes,
+    switchListViewModes: updateViewTypeIndex,
+    listViewModesButtonText,
+  };
 }
 
 export default function ProductList() {
@@ -73,7 +119,8 @@ export default function ProductList() {
   // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
   const [currentProductsPerPageLimit, setCurrentProductsPerPageLimit] = useState(productsPerPageLimits[0]);
   const [filterBtnDisabled, setFilterBtnDisabled] = useState(false);
-  const isFiltersBarSticky = useHandleFiltersBarStickiness();
+  const isListControlBarSticky = useHandleListControlBarStickiness();
+  const { currentListViewModes, switchListViewModes, listViewModesButtonText } = useListViewModes();
 
   useEffect(() => {
     updateProductsList().catch((updateProductsListError) => {
@@ -166,8 +213,8 @@ export default function ProductList() {
   return (
     <>
       <div
-        className={classNames('filters-bar', {
-          'filters-bar--sticky': isFiltersBarSticky,
+        className={classNames('product-list-control-bar', {
+          'product-list-control-bar--sticky': isListControlBarSticky,
         })}
       >
         <SearchProductsByName
@@ -187,12 +234,16 @@ export default function ProductList() {
           doFilterProducts={filterProducts}
           filterBtnDisabled={filterBtnDisabled}
         />
+
+        {/* TODO: [UX] add an icon representing current view mode and switch it accordingly */}
+        <button onClick={switchListViewModes} className="product-list-view-mode-button">
+          {listViewModesButtonText}
+        </button>
       </div>
 
       <CompareProducts.List />
 
-      {/*TODO: implement changeable layout (tiles vs list)*/}
-      <ul className="product-list">
+      <ul className={classNames('product-list', currentListViewModes)}>
         {productsList.length > 0
           ? productsList.map((product) => {
               return (

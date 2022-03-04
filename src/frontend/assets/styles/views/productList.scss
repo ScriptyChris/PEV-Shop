@@ -1,4 +1,6 @@
-.filters-bar {
+@import '../_var';
+
+.product-list-control-bar {
   background: orange;
   position: relative;
   top: 0;
@@ -8,54 +10,46 @@
   grid-template-areas:
     ". search"
     ". categories"
-    ". filters";
+    ". filters"
+    ". view-mode-button";
 
   // TODO: [UI] add some transition to stickiness
   &--sticky {
     position: sticky;
+    z-index: $productListCtrlBarZIndex;
   }
 
-  & :nth-child(1) {
+  & .search-container {
     grid-area: search;
   }
 
-  & :nth-child(2) {
+  & .categories-tree-container {
     grid-area: categories;
   }
 
-  & :nth-child(3) {
+  & .products-filter-container {
     grid-area: filters;
+  }
+
+  & .product-list-view-mode-button {
+    grid-area: view-mode-button;
   }
 }
 
 .product-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  // display: flex;
+  // flex-wrap: wrap;
+  // justify-content: space-between;
+
+  display: grid;
+  grid-gap: 1rem;
   list-style: none;
-}
 
-.product-list-item {
-  max-width: 250px;
-  border: 2px solid black;
-  margin-bottom: 30px;
-
-  &__image {
-    width: 250px;
+  &--details-view {
+    grid-template-columns: 1fr;
   }
 
-  &__metadata {
-    display: flex;
-
-    background: black;
-    color: white;
-
-    dd {
-      word-break: break-word;
-    }
-  }
-
-  &__toggle-comparable {
-    display: block;
+  &--tiles-view {
+    grid-template-columns: 1fr 1fr;
   }
 }

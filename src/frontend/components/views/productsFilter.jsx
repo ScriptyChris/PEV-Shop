@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, createRef, useState, Fragment, useMemo, memo } from 'react';
+import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
 import { Formik, ErrorMessage } from 'formik';
 import classNames from 'classnames';
 import productSpecsService from '@frontend/features/productSpecsService';
@@ -192,7 +192,6 @@ const getControlsForSpecs = (() => {
 })();
 
 function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts, filterBtnDisabled }) {
-  const FORM_CLASS_NAME = 'products-filter__container';
   const [isFormExpanded, setIsFormExpanded] = useState(false);
   const productsSpecsPerCategory = useRef({});
   const cachedValidationErrors = useRef({});
@@ -408,7 +407,7 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
   };
 
   return (
-    <section className="products-filter">
+    <section className="products-filter-container">
       {Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
         <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
           {({ handleSubmit, ...formikRestProps }) => {
@@ -426,8 +425,8 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
                 <button onClick={handleFiltersWidgetToggle}>{translations.filtersWidgetToggleButton}</button>
 
                 <div
-                  className={classNames(FORM_CLASS_NAME, {
-                    [`${FORM_CLASS_NAME}--expanded`]: isFormExpanded,
+                  className={classNames('products-filter', {
+                    'products-filter--expanded': isFormExpanded,
                   })}
                 >
                   <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>

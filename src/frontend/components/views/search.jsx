@@ -85,7 +85,7 @@ function SearchProductsByName(props) {
   };
 
   return (
-    <div className="search">
+    <div className="search-container">
       <Search {...props} onInputChange={handleInputSearchChange} />
       <label>
         {translations.caseSensitiveSearch}
