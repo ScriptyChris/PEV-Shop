@@ -1,24 +1,7 @@
-.products-filter-container {}
-
 .products-filter {
-    display: none;
-
-    &--expanded {
-        display: block;
-    }
-
     &__form {
-        &-field-legend button::after {
-            // TODO: [UX] this should be some rotating arrow instead of text
-            content: attr(title)
-        }
+        &-field-legend {}
 
-        &-field-legend button:hover::after {
-            color: red;
-        }
-
-        &-field-controls--hidden {
-            display: none;
-        }
+        &-field-controls {}
     }
 }

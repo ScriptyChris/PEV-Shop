@@ -1,13 +1,28 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
 import { Formik, ErrorMessage } from 'formik';
-import classNames from 'classnames';
+
+import Drawer from '@material-ui/core/Drawer';
+import Button from '@material-ui/core/Button';
+import ArrowBack from '@material-ui/icons/ArrowBack';
+import IconButton from '@material-ui/core/IconButton';
+import Tune from '@material-ui/icons/Tune';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import Typography from '@material-ui/core/Typography';
+
 import productSpecsService from '@frontend/features/productSpecsService';
 import FormFieldError from '@frontend/components/utils/formFieldError';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
-  filtersWidgetToggleButton: 'Filters',
+  filtersHeader: 'Filters',
+  filtersWidgetToggleButton: 'filters',
   filterUnavailable: 'Filters are not available',
+  goBackLabel: 'go back',
   toggleSpecControl: 'Toggle',
   filterProducts: 'Apply filters',
   minExceededMax: 'Min value must be lower than or equal to max value!',
@@ -52,16 +67,16 @@ const matchRegExp = new RegExp(
 );
 const parseInputName = (name) => name.match(matchRegExp).groups;
 
-const getControlsForSpecs = (() => {
+const GetControlsForSpecs = (() => {
   const TEMPLATE_FUNCTION_PER_CONTROL_TYPE = {
     NUMBER: getInputNumberControl,
     CHOICE: getInputCheckboxControl,
   };
 
-  return function GetControlsForSpecs(
+  return function _GetControlsForSpecs({
     formikRestProps,
-    { _normalizedName: name, values, type, descriptions, defaultUnit, _namesRangeMapping: namesRangeMapping }
-  ) {
+    spec: { _normalizedName: name, values, type, descriptions, defaultUnit, _namesRangeMapping: namesRangeMapping },
+  }) {
     const templateMethod = TEMPLATE_FUNCTION_PER_CONTROL_TYPE[type];
 
     if (typeof templateMethod !== 'function') {
@@ -69,9 +84,6 @@ const getControlsForSpecs = (() => {
     }
 
     const isMobileLayout = useMobileLayout();
-    const [isFieldControlHidden, setIsFieldControlHidden] = useState(isMobileLayout);
-
-    useEffect(() => setIsFieldControlHidden(isMobileLayout), [isMobileLayout]);
 
     const getLegendContent = () => {
       const defaultUnitOutput = defaultUnit ? `(${defaultUnit})` : '';
@@ -79,31 +91,26 @@ const getControlsForSpecs = (() => {
       return `${translations.normalizeContent(name)} ${defaultUnitOutput}`;
     };
 
-    const handleFieldControlsCollapseToggle = () => {
-      if (isMobileLayout) {
-        // TODO: [UX / a11y] auto-focus control's first input
-        setIsFieldControlHidden(!isFieldControlHidden);
-      }
-    };
-
     return (
       <fieldset key={`spec${name}Filter`}>
-        <legend className="products-filter__form-field-legend">
-          {isMobileLayout ? (
-            <button onClick={handleFieldControlsCollapseToggle} title={translations.toggleSpecControl}>
-              {getLegendContent()}
-            </button>
-          ) : (
-            getLegendContent()
-          )}
-        </legend>
-        <div
-          className={classNames('products-filter__form-field-controls', {
-            'products-filter__form-field-controls--hidden': isFieldControlHidden,
-          })}
+        <Accordion
+          onChange={(event, expanded) => {
+            if (expanded) {
+              const inputEl = event.currentTarget.nextElementSibling.querySelector('input');
+              // TODO: [React-refactor] focus might better be done on `ref` not natively queried DOM element
+              setTimeout(() => inputEl.focus());
+            }
+          }}
         >
-          {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
-        </div>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+            <legend className="products-filter__form-field-legend">{getLegendContent()}</legend>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className="products-filter__form-field-controls">
+              {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
+            </div>
+          </AccordionDetails>
+        </Accordion>
       </fieldset>
     );
   };
@@ -132,25 +139,29 @@ const getControlsForSpecs = (() => {
         <Fragment key={keyAndId}>
           {areSpecDescriptions && <div id={keyAndId}>{translations.normalizeContent(specDescriptions[index])}</div>}
 
-          <input
+          <TextField
             aria-labelledby={ariaLabelledBy}
             type="number"
-            min={vMin}
-            max={vMax}
-            name={specRangeName[0]}
-            value={minValue}
+            inputProps={{
+              min: vMin,
+              max: vMax,
+              name: specRangeName[0],
+              value: minValue,
+            }}
             onChange={formikRestProps.handleChange}
           />
 
           <span className="products-filter-form__range-separator">-</span>
 
-          <input
+          <TextField
             aria-labelledby={ariaLabelledBy}
             type="number"
-            min={vMin}
-            max={vMax}
-            name={specRangeName[1]}
-            value={maxValue}
+            inputProps={{
+              min: vMin,
+              max: vMax,
+              name: specRangeName[1],
+              value: maxValue,
+            }}
             onChange={formikRestProps.handleChange}
           />
 
@@ -185,7 +196,7 @@ const getControlsForSpecs = (() => {
     return normalizedSpecValues.map((val, index) => (
       <label key={`spec${specName}Control${index}`}>
         {translations.normalizeContent(val)}
-        <input type="checkbox" name={`${specName}__${val}`} value={value} onChange={formikRestProps.handleChange} />
+        <Checkbox name={`${specName}__${val}`} value={value} onChange={formikRestProps.handleChange} />
       </label>
     ));
   }
@@ -197,6 +208,7 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
   const cachedValidationErrors = useRef({});
   const [productSpecsPerSelectedCategory, setProductSpecsPerSelectedCategory] = useState([]);
   const [formInitials, setFormInitials] = useState({});
+  const isMobileLayout = useMobileLayout();
   const lastChangedInputMeta = useRef({
     name: CHARS.EMPTY,
     min: Number.NEGATIVE_INFINITY,
@@ -265,7 +277,7 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
         spec._normalizedName = spec.name.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP);
         spec._namesRangeMapping = getNameRangeMapping(spec._normalizedName, spec.descriptions);
 
-        return getControlsForSpecs(formikRestProps, spec);
+        return <GetControlsForSpecs formikRestProps={formikRestProps} spec={spec} key={spec.name} />;
       });
     },
     [productSpecsPerSelectedCategory, formInitials]
@@ -406,9 +418,58 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
     setIsFormExpanded(!isFormExpanded);
   };
 
-  return (
-    <section className="products-filter-container">
-      {Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
+  return Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
+    isMobileLayout ? (
+      <>
+        <IconButton
+          onClick={handleFiltersWidgetToggle}
+          aria-label={translations.filtersWidgetToggleButton}
+          title={translations.filtersWidgetToggleButton}
+        >
+          <Tune />
+        </IconButton>
+
+        <section>
+          <Drawer anchor="left" open={isFormExpanded} onClose={handleFiltersWidgetToggle}>
+            <IconButton
+              onClick={handleFiltersWidgetToggle}
+              aria-label={translations.goBackLabel}
+              title={translations.goBackLabel}
+            >
+              <ArrowBack />
+            </IconButton>
+
+            <Typography variant="h3" component="h3">
+              {translations.filtersHeader}
+            </Typography>
+
+            <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
+              {({ handleSubmit, ...formikRestProps }) => {
+                const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
+                formikRestProps.handleChange = function (event) {
+                  // TODO: remove this when form will be submitted via button, not dynamically
+                  formikRestProps.setFieldTouched(event.target.name, true, false);
+
+                  changeHandler(event);
+                  _handleChange(event);
+                };
+
+                return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
+              }}
+            </Formik>
+
+            <Button onClick={doFilterProducts} disabled={filterBtnDisabled}>
+              {translations.filterProducts}
+            </Button>
+          </Drawer>
+        </section>
+      </>
+    ) : (
+      <section>
+        <Typography variant="h3" component="h3">
+          {translations.filtersHeader}
+        </Typography>
+
         <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
           {({ handleSubmit, ...formikRestProps }) => {
             const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
@@ -420,29 +481,17 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
               _handleChange(event);
             };
 
-            return (
-              <>
-                <button onClick={handleFiltersWidgetToggle}>{translations.filtersWidgetToggleButton}</button>
-
-                <div
-                  className={classNames('products-filter', {
-                    'products-filter--expanded': isFormExpanded,
-                  })}
-                >
-                  <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>
-
-                  <button onClick={doFilterProducts} disabled={filterBtnDisabled}>
-                    {translations.filterProducts}
-                  </button>
-                </div>
-              </>
-            );
+            return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
           }}
         </Formik>
-      ) : (
-        translations.filterUnavailable
-      )}
-    </section>
+
+        <Button onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
+          {translations.filterProducts}
+        </Button>
+      </section>
+    )
+  ) : (
+    translations.filterUnavailable
   );
 }
 
