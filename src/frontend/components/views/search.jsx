@@ -1,9 +1,15 @@
 import React, { memo, useRef, createRef, useState, useEffect } from 'react';
+
+import TextField from '@material-ui/core/TextField';
+import InputLabel from '@material-ui/core/InputLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import TextFormat from '@material-ui/icons/TextFormat';
+
 import httpService from '@frontend/features/httpService';
 
 const translations = {
   defaultLabel: 'Search for:',
-  caseSensitiveSearch: 'Is case sensitive?',
+  caseSensitiveSearch: 'toggle case sensitivity',
 };
 
 const Search = memo(function Search({
@@ -44,18 +50,20 @@ const Search = memo(function Search({
   };
 
   return (
-    <div>
-      <label htmlFor={inputId}>{label}</label>
-      <input
+    <>
+      <InputLabel htmlFor={inputId}>{label}</InputLabel>
+      <TextField
         onChange={handleChange}
-        value={inputValue}
         id={inputId}
-        list={list}
-        autoFocus={autoFocus}
         type="search"
-        autoComplete="off"
+        inputProps={{
+          value: inputValue,
+          list: list,
+          autoFocus: autoFocus,
+          autoComplete: 'off',
+        }}
       />
-    </div>
+    </>
   );
 });
 
@@ -87,10 +95,15 @@ function SearchProductsByName(props) {
   return (
     <div className="search-container">
       <Search {...props} onInputChange={handleInputSearchChange} />
-      <label>
-        {translations.caseSensitiveSearch}
-        <input type="checkbox" onChange={handleCaseSensitiveChange} checked={isCaseSensitive} />
-      </label>
+      <InputLabel>
+        <Checkbox
+          icon={<TextFormat color="primary" />}
+          checkedIcon={<TextFormat color="secondary" />}
+          onChange={handleCaseSensitiveChange}
+          checked={isCaseSensitive}
+          inputProps={{ 'aria-label': translations.caseSensitiveSearch, title: translations.caseSensitiveSearch }}
+        />
+      </InputLabel>
     </div>
   );
 }
