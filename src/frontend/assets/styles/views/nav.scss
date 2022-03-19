@@ -1,46 +1,16 @@
 @import '../_var';
 
-.nav-mobile-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: $navZIndex;
-    background: $transparentGrey;
-    transition: background $transitionDuration;
-}
-
 .nav {
-    $width: 150px;
-
-    background: orange;
-
-    &--is-mobile {
-        width: $width;
-        position: fixed;
-        left: -$width;
-        transform: translateX(0);
-        transition: transform $transitionDuration
-    }
-
-    &--mobile-expanded {
-        transform: translateX($width);
-        transition: transform $transitionDuration
-    }
-
     &__links {
         display: flex;
         justify-content: space-evenly;
     }
 
     &__toggle-button {
-        &--mobile-hidden {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: $navZIndex;
-        }
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: $navZIndex;
     }
 }
 
