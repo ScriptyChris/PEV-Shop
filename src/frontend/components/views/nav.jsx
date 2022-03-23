@@ -18,7 +18,6 @@ import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = Object.freeze({
   toggleNavMenu: 'Menu',
-  start: 'Start',
   shop: 'Shop',
   addNewProduct: 'Add new product',
   modifyProduct: 'Modify product',
@@ -28,50 +27,45 @@ const translations = Object.freeze({
   account: 'Account',
 });
 
+function LinkWrapper({ children, ...restProps }) {
+  return (
+    <MUILink {...restProps} component={Link} color="inherit">
+      {children}
+    </MUILink>
+  );
+}
+
 function NavMenu({ logOutUser, isMobile }) {
   return (
     <nav className={classNames('nav', { 'nav--is-mobile': isMobile })}>
       <List className="nav__links">
         <ListItem>
-          <MUILink component={Link} to={ROUTES.ROOT}>
-            {translations.start}
-          </MUILink>
+          <LinkWrapper to={ROUTES.SHOP}>{translations.shop}</LinkWrapper>
         </ListItem>
         <ListItem>
-          <MUILink component={Link} to={ROUTES.SHOP}>
-            {translations.shop}
-          </MUILink>
+          <LinkWrapper to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</LinkWrapper>
         </ListItem>
         <ListItem>
-          <MUILink component={Link} to={ROUTES.ADD_NEW_PRODUCT}>
-            {translations.addNewProduct}
-          </MUILink>
-        </ListItem>
-        <ListItem>
-          <MUILink component={Link} to={ROUTES.MODIFY_PRODUCT}>
-            {translations.modifyProduct}
-          </MUILink>
+          <LinkWrapper to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</LinkWrapper>
         </ListItem>
         <ListItem>
           {storeService.userAccountState ? (
-            <MUILink component={Link} to={ROUTES.ROOT} onClick={logOutUser}>
+            <LinkWrapper to={ROUTES.ROOT} onClick={logOutUser}>
               {translations.logOut}
-            </MUILink>
+            </LinkWrapper>
           ) : (
-            <MUILink component={Link} to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
+            <LinkWrapper to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
               {translations.logIn}
-            </MUILink>
+            </LinkWrapper>
           )}
         </ListItem>
         <ListItem>
           {storeService.userAccountState ? (
-            <MUILink component={Link} to={ROUTES.ACCOUNT}>
-              {translations.account}
-            </MUILink>
+            <LinkWrapper to={ROUTES.ACCOUNT}>{translations.account}</LinkWrapper>
           ) : (
-            <MUILink component={Link} to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
+            <LinkWrapper to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
               {translations.register}
-            </MUILink>
+            </LinkWrapper>
           )}
         </ListItem>
       </List>
@@ -87,10 +81,9 @@ export default observer(function Nav() {
   const handleToggleNavMenu = () => setIsMobileMenuOpened(!isMobileMenuOpened);
 
   const handleNavMobileOverlayClick = (event) => {
-    const clickedInOverlay = event.target === event.currentTarget;
     const clickedInNavAnchor = event.target.tagName.toLowerCase() === 'a';
 
-    if (clickedInOverlay || clickedInNavAnchor) {
+    if (clickedInNavAnchor) {
       handleToggleNavMenu();
     }
   };
@@ -105,34 +98,36 @@ export default observer(function Nav() {
     });
   };
 
-  return (
-    <div onClick={handleNavMobileOverlayClick}>
-      {isMobileLayout ? (
-        <>
-          <IconButton
-            onClick={handleToggleNavMenu}
-            className="nav__toggle-button"
-            aria-label={translations.toggleNavMenu}
-            title={translations.toggleNavMenu}
-          >
-            <Menu />
-          </IconButton>
+  return isMobileLayout ? (
+    <>
+      <IconButton
+        onClick={handleToggleNavMenu}
+        className="nav__toggle-button"
+        color="inherit"
+        aria-label={translations.toggleNavMenu}
+        title={translations.toggleNavMenu}
+      >
+        <Menu />
+      </IconButton>
 
-          <Drawer anchor="left" open={isMobileMenuOpened} onClose={handleToggleNavMenu}>
-            <IconButton
-              onClick={handleToggleNavMenu}
-              aria-label={translations.toggleNavMenu}
-              title={translations.toggleNavMenu}
-            >
-              <ArrowBack />
-            </IconButton>
+      <Drawer
+        anchor="left"
+        open={isMobileMenuOpened}
+        onClose={handleToggleNavMenu}
+        onClick={handleNavMobileOverlayClick}
+      >
+        <IconButton
+          onClick={handleToggleNavMenu}
+          aria-label={translations.toggleNavMenu}
+          title={translations.toggleNavMenu}
+        >
+          <ArrowBack />
+        </IconButton>
 
-            <NavMenu logOutUser={logOutUser} isMobile={true} />
-          </Drawer>
-        </>
-      ) : (
-        <NavMenu logOutUser={logOutUser} />
-      )}
-    </div>
+        <NavMenu logOutUser={logOutUser} isMobile={true} />
+      </Drawer>
+    </>
+  ) : (
+    <NavMenu logOutUser={logOutUser} />
   );
 });

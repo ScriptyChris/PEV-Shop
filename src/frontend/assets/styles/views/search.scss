@@ -1,5 +1,28 @@
+.search-wrapper {
+  display: flex;
+}
+
 .search-container {
   display: flex;
-
   grid-area: search;
+  margin-bottom: 10px;
+  visibility: hidden;
+
+  &--is-visible {
+    visibility: visible;
+  }
+
+  &__field-label[class$="focused"] {
+    color: white;
+  }
+
+  &__field-letter-case-toggler {
+    [class$="colorPrimary"] {
+      color: white;
+    }
+
+    [class$="colorSecondary"] {
+      color: gray;
+    }
+  }
 }

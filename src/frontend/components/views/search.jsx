@@ -1,11 +1,19 @@
-import React, { memo, useRef, createRef, useState, useEffect } from 'react';
+import React, { memo, useRef, createRef, useState, useEffect, forwardRef } from 'react';
+import classNames from 'classnames';
 
-import TextField from '@material-ui/core/TextField';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
+import Input from '@material-ui/core/Input';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextFormat from '@material-ui/icons/TextFormat';
+import Slide from '@material-ui/core/Slide';
+import IconButton from '@material-ui/core/IconButton';
+import SearchIcon from '@material-ui/icons/Search';
 
 import httpService from '@frontend/features/httpService';
+import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
   defaultLabel: 'Search for:',
@@ -17,6 +25,8 @@ const Search = memo(function Search({
   searchingTarget = Math.random() /* TODO: make default value more spec conforming */,
   debounceTimeMs = 0,
   onInputChange,
+  forwardedRef,
+  customCheckbox = null,
   list = '',
   presetValue = '',
   autoFocus = false,
@@ -24,7 +34,7 @@ const Search = memo(function Search({
   if (Number.isNaN(debounceTimeMs) || typeof debounceTimeMs !== 'number') {
     throw TypeError(`debounceTimeMs prop must be number! Received: ${debounceTimeMs}`);
   } else if (typeof onInputChange !== 'function') {
-    throw TypeError(`onInputChange props must be a function! ReceivedL ${onInputChange}`);
+    throw TypeError(`onInputChange props must be a function! Received: ${onInputChange}`);
   }
 
   const [inputValue, setInputValue] = useState(presetValue);
@@ -51,40 +61,53 @@ const Search = memo(function Search({
 
   return (
     <>
-      <InputLabel htmlFor={inputId}>{label}</InputLabel>
-      <TextField
-        onChange={handleChange}
-        id={inputId}
-        type="search"
-        inputProps={{
-          value: inputValue,
-          list: list,
-          autoFocus: autoFocus,
-          autoComplete: 'off',
-        }}
-      />
+      <FormControl ref={forwardedRef} size="small">
+        <InputLabel className="search-container__field-label" htmlFor={inputId}>
+          {label}
+        </InputLabel>
+        <Input
+          id={inputId}
+          type="search"
+          onChange={handleChange}
+          inputProps={{
+            value: inputValue,
+            list: list,
+            autoFocus: autoFocus,
+            autoComplete: 'off',
+          }}
+          endAdornment={customCheckbox && <InputAdornment position="end">{customCheckbox}</InputAdornment>}
+        />
+      </FormControl>
     </>
   );
 });
 
-function SearchProductsByName(props) {
+const ForwardedSearch = forwardRef(function ForwardedSearch(props, ref) {
+  return <Search {...props} forwardedRef={ref} />;
+});
+
+function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMainHeadingSize, ...restProps }) {
+  const isMobileLayout = useMobileLayout();
   const [isCaseSensitive, setCaseSensitive] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(!isMobileLayout);
+
+  useEffect(() => setIsSearchVisible(!isMobileLayout), [isMobileLayout]);
 
   // TODO: fix issue with stale isCaseSensitive value when checkbox is ticked between user types query and debounce delays reaction
   const handleInputSearchChange = (searchValue) => {
-    const pagination = props.pagination
+    const mappedPagination = pagination
       ? {
-          pageNumber: props.pagination.currentProductPage,
-          productsPerPage: props.pagination.currentProductsPerPageLimit,
+          pageNumber: pagination.currentProductPage,
+          productsPerPage: pagination.currentProductsPerPageLimit,
         }
       : null;
 
-    httpService.getProductsByName(searchValue, isCaseSensitive, pagination).then((res) => {
+    httpService.getProductsByName(searchValue, isCaseSensitive, mappedPagination).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      props.onReceivedProductsByName(res);
+      onReceivedProductsByName(res);
     });
   };
 
@@ -92,23 +115,62 @@ function SearchProductsByName(props) {
     setCaseSensitive(checked);
   };
 
+  const toggleSearch = (shouldShow) => {
+    return () => {
+      if (isMobileLayout) {
+        setIsSearchVisible(shouldShow);
+        toggleMainHeadingSize(shouldShow);
+      }
+    };
+  };
+
+  const onSearchSlideEnter = (searchRootRef) => {
+    const searchInput = searchRootRef.querySelector('input[type="search"]');
+
+    setTimeout(() => searchInput.focus());
+  };
+
   return (
-    <div className="search-container">
-      <Search {...props} onInputChange={handleInputSearchChange} />
-      <InputLabel>
-        <Checkbox
-          icon={<TextFormat color="primary" />}
-          checkedIcon={<TextFormat color="secondary" />}
-          onChange={handleCaseSensitiveChange}
-          checked={isCaseSensitive}
-          inputProps={{ 'aria-label': translations.caseSensitiveSearch, title: translations.caseSensitiveSearch }}
-        />
-      </InputLabel>
-    </div>
+    <ClickAwayListener onClickAway={toggleSearch(false)}>
+      {/* This <div> is used solely to forward a ref from ClickAwayListener, which React Fragment cannot do */}
+      <div className="search-wrapper">
+        <section className={classNames('search-container', { 'search-container--is-visible': isSearchVisible })}>
+          <Slide direction="left" in={isSearchVisible} onEntered={onSearchSlideEnter}>
+            <ForwardedSearch
+              {...restProps}
+              onInputChange={handleInputSearchChange}
+              customCheckbox={
+                <Checkbox
+                  className="search-container__field-letter-case-toggler"
+                  icon={<TextFormat color="primary" />}
+                  checkedIcon={<TextFormat color="secondary" />}
+                  onChange={handleCaseSensitiveChange}
+                  checked={isCaseSensitive}
+                  inputProps={{
+                    'aria-label': translations.caseSensitiveSearch,
+                    title: translations.caseSensitiveSearch,
+                  }}
+                />
+              }
+            />
+          </Slide>
+        </section>
+
+        {!isSearchVisible && (
+          <IconButton onClick={toggleSearch(true)}>
+            <SearchIcon />
+          </IconButton>
+        )}
+      </div>
+    </ClickAwayListener>
   );
 }
 
-const SearchSingleProductByName = memo(function SearchSingleProductByName(props) {
+const SearchSingleProductByName = memo(function SearchSingleProductByName({
+  onSelectedProductName,
+  ignoredProductNames,
+  ...restProps
+}) {
   const [searchResults, setSearchResults] = useState([]);
   const [searchRecentValues, setSearchRecentValues] = useState({ oldValue: '', newValue: '' });
   const dataListRef = createRef();
@@ -120,7 +182,7 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
         dataListRef.current.children.length === 1 &&
         dataListRef.current.children[0].value === searchRecentValues.newValue
       ) {
-        props.onSelectedProductName(searchRecentValues.newValue);
+        onSelectedProductName(searchRecentValues.newValue);
       } else if (searchRecentValues.oldValue !== searchRecentValues.newValue) {
         const { oldValue: oldSearchValue, newValue: newSearchValue } = searchRecentValues;
         const newSearchValueContainsOld =
@@ -128,19 +190,20 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
 
         setSearchRecentValues((prev) => ({ oldValue: prev.newValue, newValue: prev.newValue }));
 
+        let p;
         const products = (
           newSearchValueContainsOld
             ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
-            : (await httpService.getProductsByName(searchRecentValues.newValue, false, null))
-                .then((res) => {
+            : (
+                await httpService.getProductsByName(searchRecentValues.newValue, false, null).then((res) => {
                   if (res.__EXCEPTION_ALREADY_HANDLED) {
                     return;
                   }
 
                   return res;
                 })
-                .map(({ name }) => name)
-        ).filter((productName) => !(props.ignoredProductNames || []).includes(productName));
+              ).map(({ name }) => name)
+        ).filter((productName) => !(ignoredProductNames || []).includes(productName));
 
         setSearchResults(products);
       }
@@ -153,9 +216,9 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName(props)
 
   return (
     <>
-      <Search {...props} onInputChange={handleInputSearchChange} />
+      <Search {...restProps} onInputChange={handleInputSearchChange} />
 
-      <datalist ref={dataListRef} id={props.list}>
+      <datalist ref={dataListRef} id={restProps.list}>
         {searchResults.map((relatedProductName) => (
           <option key={relatedProductName} value={relatedProductName}></option>
         ))}
