@@ -1,5 +1,16 @@
 import React, { createRef, useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import IconButton from '@material-ui/core/IconButton';
+import Fade from '@material-ui/core/Fade';
+import Paper from '@material-ui/core/Paper';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+
+const translations = {
+  scrollLeftBtn: 'scroll left',
+  scrollRightBtn: 'scroll right',
+};
+
 const getScrollBaseValue = ({ selector = '', varName = '' } = {}) => {
   if (typeof selector !== 'string' || selector.length === 0 || typeof varName !== 'string' || varName.length === 0) {
     return NaN;
@@ -20,16 +31,26 @@ const getScrollBaseValue = ({ selector = '', varName = '' } = {}) => {
   );
 };
 
-function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, text }) {
+function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, direction }) {
+  if (direction !== 'left' && direction !== 'right') {
+    throw Error(`Property 'direction' must be either 'left' or 'right'! Received: '${direction}'.`);
+  }
+
+  const IS_LEFT = direction === 'left';
+
   return (
-    <button
-      onClick={() => handleClick(directionPointer)}
-      className={`scroller-btn ${isVisible ? 'scroller-btn--visible' : ''}`}
-      disabled={isDisabled}
-      dangerouslySetInnerHTML={{
-        __html: text,
-      }}
-    />
+    <Fade in={isVisible} elevation={0}>
+      <Paper>
+        <IconButton
+          onClick={() => handleClick(directionPointer)}
+          aria-label={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
+          title={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
+          disabled={isDisabled}
+        >
+          {IS_LEFT ? <ChevronLeft /> : <ChevronRight />}
+        </IconButton>
+      </Paper>
+    </Fade>
   );
 }
 
@@ -189,7 +210,7 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
         directionPointer={SCROLL_DIRECTION.LEFT}
         isVisible={scrollingBtnVisible}
         isDisabled={leftBtnDisabled}
-        text={'&larr;'}
+        direction="left"
         handleClick={scrollToDirection}
       />
       {render({
@@ -207,7 +228,7 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
         directionPointer={SCROLL_DIRECTION.RIGHT}
         isVisible={scrollingBtnVisible}
         isDisabled={rightBtnDisabled}
-        text={'&rarr;'}
+        direction="right"
         handleClick={scrollToDirection}
       />
     </>
