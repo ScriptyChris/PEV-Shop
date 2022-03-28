@@ -6,7 +6,7 @@ import { ROUTES } from './_routes';
 import ProductList from '@frontend/components/views/productList';
 import ProductDetails from '@frontend/components/views/productDetails';
 import { NewProduct, ModifyProduct } from './newProduct';
-import Compare from './compare';
+import ProductComparison from './productComparison';
 import Order from './order';
 import NotFound from './notFound';
 
@@ -74,7 +74,7 @@ function Shop() {
           <ProductDetails />
         </Route>
         <Route path={ROUTES.COMPARE}>
-          <Compare />
+          <ProductComparison />
         </Route>
         <Route path={ROUTES.ADD_NEW_PRODUCT}>
           <NewProduct />

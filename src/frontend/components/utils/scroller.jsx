@@ -1,4 +1,5 @@
 import React, { createRef, useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import IconButton from '@material-ui/core/IconButton';
 import Fade from '@material-ui/core/Fade';
@@ -31,30 +32,31 @@ const getScrollBaseValue = ({ selector = '', varName = '' } = {}) => {
   );
 };
 
-function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, direction }) {
+function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, direction, portalTargetPlace }) {
   if (direction !== 'left' && direction !== 'right') {
     throw Error(`Property 'direction' must be either 'left' or 'right'! Received: '${direction}'.`);
   }
 
   const IS_LEFT = direction === 'left';
-
-  return (
+  const TheScrollButton = (
     <Fade in={isVisible} elevation={0}>
-      <Paper>
+      <Paper data-compare-btn-scroll-dir={direction}>
         <IconButton
           onClick={() => handleClick(directionPointer)}
+          disabled={isDisabled}
           aria-label={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
           title={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
-          disabled={isDisabled}
         >
           {IS_LEFT ? <ChevronLeft /> : <ChevronRight />}
         </IconButton>
       </Paper>
     </Fade>
   );
+
+  return portalTargetPlace?.current ? createPortal(TheScrollButton, portalTargetPlace.current) : TheScrollButton;
 }
 
-export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }) {
+export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, btnsParentRef }) {
   const [elementRef] = useState(createRef());
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
@@ -211,8 +213,10 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
         isVisible={scrollingBtnVisible}
         isDisabled={leftBtnDisabled}
         direction="left"
+        portalTargetPlace={btnsParentRef}
         handleClick={scrollToDirection}
       />
+
       {render({
         elementRef,
         forwardProps,
@@ -224,11 +228,13 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
           return { createRefGetter, REF_TYPE };
         },
       })}
+
       <ScrollButton
         directionPointer={SCROLL_DIRECTION.RIGHT}
         isVisible={scrollingBtnVisible}
         isDisabled={rightBtnDisabled}
         direction="right"
+        portalTargetPlace={btnsParentRef}
         handleClick={scrollToDirection}
       />
     </>

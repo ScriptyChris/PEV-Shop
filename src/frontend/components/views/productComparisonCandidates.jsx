@@ -20,6 +20,7 @@ import storeService from '@frontend/features/storeService';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 
 const translations = {
   addToCompare: 'Add to compare',
@@ -28,6 +29,7 @@ const translations = {
   removeComparableProduct: 'Remove',
   proceedComparison: 'Compare products',
   clearComparableProducts: 'Clear',
+  tooLittleProductsToCompare: 'At least 2 products needs to be selected to do a comparison.',
 };
 
 function ComparisonCandidatesCounter({ amount }) {
@@ -41,15 +43,16 @@ function ComparisonCandidatesCounter({ amount }) {
   const removeAmountBlinking = () => setIsAmountBlinking(false);
 
   return (
-    <small className="compare-products-candidates__list-counter" id="compareProductCandidatesListCounter">
+    <small className="product-comparison-candidates__list-counter" id="compareProductCandidatesListCounter">
       {amount > 0 && (
         <>
           <output
             onAnimationEnd={removeAmountBlinking}
-            className={classNames({ 'compare-products-candidates__list-counter--blinking': isAmountBlinking })}
+            className={classNames({ 'product-comparison-candidates__list-counter--blinking': isAmountBlinking })}
           >
-            {amount}&nbsp;
+            {amount}
           </output>
+          &nbsp;
           {translations.compareProductsLabel}
         </>
       )}
@@ -57,8 +60,9 @@ function ComparisonCandidatesCounter({ amount }) {
   );
 }
 
-const List = observer(function CompareProducts() {
+export const ProductComparisonCandidatesList = observer(function CompareProducts() {
   const isMobileLayout = useMobileLayout();
+  const [popupData, setPopupData] = useState(null);
   const CandidatesWrapper = isMobileLayout ? Collapse : Zoom;
 
   const handleRemoveComparableProduct = (productIndex) => {
@@ -69,33 +73,44 @@ const List = observer(function CompareProducts() {
     storeService.clearProductComparisonState();
   };
 
+  const showOptionalWarning = (event) => {
+    if (storeService.productComparisonState.length < 2) {
+      event.preventDefault();
+      setPopupData({
+        type: POPUP_TYPES.NEUTRAL,
+        message: translations.tooLittleProductsToCompare,
+        buttons: [getClosePopupBtn(setPopupData)],
+      });
+    }
+  };
+
   return (
     <CandidatesWrapper
-      in={!!storeService.productComparisonState.length}
-      className={classNames({ 'compare-products-candidates-pc-wrapper': !isMobileLayout })}
+      in={storeService.productComparisonState.length > 0}
+      className={classNames({ 'product-comparison-candidates-pc-wrapper': !isMobileLayout })}
     >
-      <Paper className="compare-products-candidates-container">
-        <div className="compare-products-candidates">
+      <Paper className="product-comparison-candidates-container">
+        <div className="product-comparison-candidates">
           <Scroller
             scrollerBaseValueMeta={{
-              selector: '.compare-products-candidates, .compare-products',
+              selector: '.product-comparison-candidates, .product-comparison',
               varName: '--product-list-item-width',
             }}
             forwardProps={{ trackedChanges: toJS(storeService.productComparisonState) }}
             render={({ elementRef, forwardProps: { trackedChanges: productComparisonState } }) => (
-              <div>
+              <div /* this `div` is hooked with a `ref` by Scroller component */>
                 <ol
                   ref={elementRef}
-                  className="compare-products-candidates__list vertically-centered"
+                  className="product-comparison-candidates__list vertically-centered"
                   // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
                   aria-labelledby="compareProductCandidatesListCounter"
                 >
                   {productComparisonState.map((product, index) => (
-                    <li className="compare-products-candidates__list-item" key={product._id}>
-                      <span>{product.name}</span>
+                    <li className="product-comparison-candidates__list-item" key={product._id}>
+                      <p>{product.name}</p>
                       <IconButton
                         onClick={() => handleRemoveComparableProduct(index)}
-                        className="compare-products-candidates__list-item-remove-button"
+                        className="product-comparison-candidates__list-item-remove-button"
                         aria-label={translations.removeComparableProduct}
                         title={translations.removeComparableProduct}
                       >
@@ -109,9 +124,10 @@ const List = observer(function CompareProducts() {
             )}
           />
 
-          <div className="compare-products-candidates__actions">
+          <div className="product-comparison-candidates__actions">
             <MUILink
               to={{ pathname: ROUTES.COMPARE }}
+              onClick={showOptionalWarning}
               component={Link}
               color="inherit"
               aria-label={translations.proceedComparison}
@@ -132,12 +148,13 @@ const List = observer(function CompareProducts() {
             </IconButton>
           </div>
         </div>
+        {popupData && <Popup {...popupData} />}
       </Paper>
     </CandidatesWrapper>
   );
 });
 
-const Toggler = observer(function ToggleProductComparable({ product }) {
+export const ProductComparisonCandidatesToggler = observer(function ToggleProductComparable({ product }) {
   const [isProductComparable, setIsProductComparable] = useState(false);
 
   useEffect(() =>
@@ -162,11 +179,9 @@ const Toggler = observer(function ToggleProductComparable({ product }) {
 
   return (
     <FormControlLabel
-      className="product-item-compare-toggler"
+      className="product-comparison-candidate-toggler"
       control={<Checkbox checked={isProductComparable} onChange={handleComparableToggle} color="primary" />}
       label={isProductComparable ? translations.removeFromCompare : translations.addToCompare}
     />
   );
 });
-
-export default { List, Toggler };

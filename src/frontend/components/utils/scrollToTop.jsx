@@ -6,6 +6,10 @@ import Fab from '@material-ui/core/Fab';
 
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
+const translations = {
+  scrollToTopBtn: 'scroll to top',
+};
+
 function ScrollToTop() {
   const isMobileLayout = useMobileLayout();
   const [isScrollBtnVisible, setIsScrollBtnVisible] = useState(false);
@@ -20,8 +24,8 @@ function ScrollToTop() {
 
   const handleScrollToTop = () => {
     window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
+      top: 0,
+      behavior: 'smooth',
     });
   };
 
@@ -32,6 +36,8 @@ function ScrollToTop() {
         color="primary"
         className="scroll-to-top-btn"
         size={isMobileLayout ? 'small' : 'large'}
+        aria-label={translations.scrollToTopBtn}
+        title={translations.scrollToTopBtn}
       >
         <KeyboardArrowUpIcon />
       </Fab>
