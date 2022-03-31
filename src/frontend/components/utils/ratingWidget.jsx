@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 
 const RATING_NUMBER_INCREASEMENT = 0.5;
-const RATING_MAX_VALUE = 5; /* TODO: get this from API */
+const RATING_MAX_VALUE = 5; /* TODO: [DX] get this from API */
 const CLASS_NAMES = Object.freeze({
   WIDGET: 'rating-widget',
   BUTTON: 'rating-widget__btn',
   ICON: 'rating-widget__icon',
 });
 
+// TODO: [UX] refactor this to MUI's Rating component
 export default function RatingWidget({
   presetValue = 0,
   scale = RATING_MAX_VALUE,
+  externalClassName = '',
   field: formikField,
   form: { setFieldValue } = {},
 }) {
@@ -66,7 +69,7 @@ export default function RatingWidget({
   };
 
   return (
-    <div className={CLASS_NAMES.WIDGET}>
+    <div className={classNames(CLASS_NAMES.WIDGET, externalClassName)}>
       {ratingValues.map((ratingValue, index) => {
         const { iconClasses, btnEventHandlers } = getRatingsMetadata(ratingValue, index);
 

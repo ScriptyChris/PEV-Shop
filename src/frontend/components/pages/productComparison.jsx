@@ -1,5 +1,5 @@
 import { toJS } from 'mobx';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -11,11 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
 import storeService from '@frontend/features/storeService';
-import {
-  getProductDetailsData,
-  prepareSpecificProductDetail,
-  getProductDetailsHeaders,
-} from '@frontend/components/views/productDetails';
+import { ProductSpecificDetail, getProductDetailsHeaders } from '@frontend/components/views/productDetails';
 import Scroller from '@frontend/components/utils/scroller';
 import { ProductItemLink } from '@frontend/components/views/productItem';
 
@@ -28,7 +24,9 @@ const translations = {
 export default function Compare() {
   const tableRef = useRef();
   const scrollerBtnsParentRef = useRef();
-  const [comparisonData, setComparisonData] = useState(null);
+  const comparisonData = prepareComparisonData();
+
+  useEffect(() => setTableStylingCSSVariables(), []);
 
   const setTableStylingCSSVariables = () => {
     tableRef.current.style.setProperty('--compare-rows-number', comparisonData.productDetailsHeadersKeys.length);
@@ -71,9 +69,12 @@ export default function Compare() {
           key={`body-row-${headerIndex}`}
         >
           {comparisonData.comparableProductsData.map((productData, dataIndex) => {
-            const preparedProductDetail = prepareSpecificProductDetail(detailHeader, productData[detailHeader]);
+            const preparedProductDetail = (
+              <ProductSpecificDetail detailName={detailHeader} detailValue={productData[detailHeader]} />
+            );
 
             return (
+              // TODO: [UX] hovering over certain spec could highlight regarding specs in other compared products
               <TableCell className="product-comparison__cell" component="div" role="cell" key={`cell-${dataIndex}`}>
                 {detailHeader === 'name' ? (
                   <ProductItemLink
@@ -90,18 +91,6 @@ export default function Compare() {
         </TableRow>
       );
     };
-
-  useEffect(() => {
-    (async () => {
-      setComparisonData(await prepareComparisonData(getProductDetailsHeaders()));
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (comparisonData) {
-      setTableStylingCSSVariables();
-    }
-  }, [comparisonData]);
 
   return comparisonData ? (
     <Paper className="product-comparison-container" component="section" elevation={0}>
@@ -150,18 +139,18 @@ export default function Compare() {
     translations.lackOfData
   );
 
-  async function prepareComparisonData(productDetailsHeaders) {
-    let productDetailsHeadersKeys = Object.keys(productDetailsHeaders).filter(
-      (header) => header !== 'relatedProductsNames'
-    );
-    let nameHeaderIndex = productDetailsHeadersKeys.findIndex((headerName) => headerName.toLowerCase() === 'name');
-    const comparableProductsData = await Promise.all(
-      storeService.productComparisonState.map((product) => getProductDetailsData(product))
-    );
+  function prepareComparisonData() {
+    const productDetailsHeaders = getProductDetailsHeaders(['relatedProducts']);
+    const productDetailsHeadersKeys = Object.keys(productDetailsHeaders);
 
+    let nameHeaderIndex = productDetailsHeadersKeys.findIndex((headerName) => headerName.toLowerCase() === 'name');
     const [nameHeader] = productDetailsHeadersKeys.splice(nameHeaderIndex, 1);
     productDetailsHeadersKeys.unshift(nameHeader);
     nameHeaderIndex = 0;
+
+    const comparableProductsData = storeService.productComparisonState.map(
+      ({ _id, relatedProducts, ...product }) => product
+    );
 
     return { nameHeaderIndex, productDetailsHeaders, productDetailsHeadersKeys, comparableProductsData };
   }

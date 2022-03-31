@@ -7,14 +7,13 @@ import classNames from 'classnames';
 import Collapse from '@material-ui/core/Collapse';
 import Zoom from '@material-ui/core/Zoom';
 import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ClearIcon from '@material-ui/icons/Clear';
 import DoneIcon from '@material-ui/icons/Done';
 import DeleteIcon from '@material-ui/icons/Delete';
 import MUILink from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 
 import storeService from '@frontend/features/storeService';
 import Scroller from '@frontend/components/utils/scroller';
@@ -31,6 +30,19 @@ const translations = {
   clearComparableProducts: 'Clear',
   tooLittleProductsToCompare: 'At least 2 products needs to be selected to do a comparison.',
 };
+
+function CompareIcon({ isChecked }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={classNames('product-comparison-candidates-toggle-icon', {
+        'product-comparison-candidates-toggle-icon--checked': isChecked,
+      })}
+    >
+      <path d="M13 7.83c.85-.3 1.53-.98 1.83-1.83H18l-3 7c0 1.66 1.57 3 3.5 3s3.5-1.34 3.5-3l-3-7h2V4h-6.17c-.41-1.17-1.52-2-2.83-2s-2.42.83-2.83 2H3v2h2l-3 7c0 1.66 1.57 3 3.5 3S9 14.66 9 13L6 6h3.17c.3.85.98 1.53 1.83 1.83V19H2v2h20v-2h-9V7.83zM20.37 13h-3.74l1.87-4.36L20.37 13zm-13 0H3.63L5.5 8.64 7.37 13zM12 6c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+    </svg>
+  );
+}
 
 function ComparisonCandidatesCounter({ amount }) {
   const [isAmountBlinking, setIsAmountBlinking] = useState(true);
@@ -154,7 +166,10 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
   );
 });
 
-export const ProductComparisonCandidatesToggler = observer(function ToggleProductComparable({ product }) {
+export const ProductComparisonCandidatesToggler = observer(function ToggleProductComparable({
+  product,
+  buttonVariant,
+}) {
   const [isProductComparable, setIsProductComparable] = useState(false);
 
   useEffect(() =>
@@ -169,19 +184,21 @@ export const ProductComparisonCandidatesToggler = observer(function ToggleProduc
     )
   );
 
-  const handleComparableToggle = ({ target }) => {
-    if (target.checked) {
-      storeService.updateProductComparisonState({ add: product });
-    } else {
-      storeService.updateProductComparisonState({ remove: { _id: product._id } });
-    }
+  const handleComparableToggle = () => {
+    const newStoreProductComparisonState = isProductComparable ? { remove: { _id: product._id } } : { add: product };
+    storeService.updateProductComparisonState(newStoreProductComparisonState);
   };
 
   return (
-    <FormControlLabel
-      className="product-comparison-candidate-toggler"
-      control={<Checkbox checked={isProductComparable} onChange={handleComparableToggle} color="primary" />}
-      label={isProductComparable ? translations.removeFromCompare : translations.addToCompare}
-    />
+    <Button
+      onClick={handleComparableToggle}
+      variant={buttonVariant}
+      size="small"
+      startIcon={<CompareIcon isChecked={isProductComparable} />}
+      aria-label={isProductComparable ? translations.removeFromCompare : translations.addToCompare}
+      title={isProductComparable ? translations.removeFromCompare : translations.addToCompare}
+    >
+      {isProductComparable ? translations.removeFromCompare : translations.addToCompare}
+    </Button>
   );
 });

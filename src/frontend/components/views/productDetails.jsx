@@ -1,13 +1,31 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useHistory, Link } from 'react-router-dom';
 import { Formik, Field } from 'formik';
+import classNames from 'classnames';
+
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import AddToQueueIcon from '@material-ui/icons/AddToQueue';
+import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
+import MenuList from '@material-ui/core/MenuList';
+import MenuItem from '@material-ui/core/MenuItem';
+import MUILink from '@material-ui/core/Link';
+import Divider from '@material-ui/core/Divider';
+
 import ProductItem from './productItem';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import RatingWidget from '@frontend/components/utils/ratingWidget';
 import { getLocalizedDate } from '@frontend/features/localization';
 import storeService from '@frontend/features/storeService';
+import { AddToCartButton } from '@frontend/components/views/cart';
 import { ROUTES } from '@frontend/components/pages/_routes';
+import { ProductComparisonCandidatesToggler } from '@frontend/components/views/productComparisonCandidates';
+import Scroller from '@frontend/components/utils/scroller';
+import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -17,7 +35,6 @@ const productDetailsTranslations = Object.freeze({
   technicalSpecs: 'Specification',
   reviews: 'Reviews',
   author: 'Author',
-  relatedProducts: 'Related products',
   editProduct: 'Edit',
   deleteProduct: 'Delete',
   promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
@@ -26,6 +43,11 @@ const productDetailsTranslations = Object.freeze({
   unObserveProduct: 'Unobserve',
   observingProductFailed: 'Failed adding product to observed!',
   unObservingProductFailed: 'Failed removing product from observed!',
+  productDetailsNavMenuLabel: 'product details nav menu',
+  descriptionNavLabel: 'Description',
+  technicalSpecsNavLabel: 'Specification',
+  reviewsNavLabel: 'Reviews',
+  relatedProductsNavLabel: 'Related products',
   addReview: 'Add review',
   anonymously: 'anonymously?',
   anonymous: 'Anonymous',
@@ -96,7 +118,7 @@ function AddReview({ productName, updateReviews }) {
 
               <Field name="rating" component={RatingWidget} required />
 
-              {/* TODO: adjust <textarea> size to device */}
+              {/* TODO: [UX] adjust <textarea> size to device */}
               <Field name="content" placeholder={productDetailsTranslations.reviewContentPlaceholder} as="textarea" />
 
               <button type="submit">{productDetailsTranslations.submitReview}</button>
@@ -113,52 +135,31 @@ function AddReview({ productName, updateReviews }) {
   return <button onClick={() => setShowReviewForm(true)}>{productDetailsTranslations.addReview}</button>;
 }
 
-export function getProductDetailsHeaders() {
+export function getProductDetailsHeaders(ignoredHeadersList = []) {
   const detailKeys = ['category', 'name', 'price', 'shortDescription', 'technicalSpecs', 'reviews', 'relatedProducts'];
 
   return detailKeys.reduce((detailsHeaders, key) => {
-    detailsHeaders[key] = productDetailsTranslations[key];
+    if (!ignoredHeadersList.includes(key)) {
+      detailsHeaders[key] = productDetailsTranslations[key];
+    }
 
     return detailsHeaders;
   }, {});
 }
 
-export function getProductDetailsData(product) {
-  return httpService.getProductsByNames(product.relatedProductsNames).then((res) => {
-    if (res.__EXCEPTION_ALREADY_HANDLED) {
-      return;
-    }
-
-    return {
-      category: product.category,
-      name: product.name,
-      price: product.price,
-      shortDescription: product.shortDescription,
-      technicalSpecs: product.technicalSpecs,
-      reviews: product.reviews,
-      url: product.url,
-      relatedProducts: res,
-    };
-  });
-}
-
-export function prepareSpecificProductDetail(detailName, detailValue, extras = {}) {
-  const getOptionalHeaderContent = (headerContent) => (extras.includeHeader ? headerContent : null);
-
+export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) {
   switch (detailName) {
     case 'name':
     case 'category': {
-      return detailValue;
+      return <p className={extras.className}>{detailValue}</p>;
     }
 
+    // TODO: create price component, which will handle things like promotion and will format price according to locale and/or chosen currency
     case 'price': {
-      // TODO: create price component, which will handle things like promotion and will format price according to locale and/or chosen currency
-      const optionalHeaderContent = getOptionalHeaderContent(`${productDetailsTranslations.price}: `);
-
-      if (optionalHeaderContent) {
+      if (extras.header) {
         return (
-          <p>
-            {optionalHeaderContent}
+          <p className={extras.className}>
+            {extras.header}
             {detailValue}
           </p>
         );
@@ -169,7 +170,7 @@ export function prepareSpecificProductDetail(detailName, detailValue, extras = {
 
     case 'shortDescription': {
       return (
-        <ul className="compare-products-list__item-short-description">
+        <ul>
           {detailValue.map((description, index) => {
             return <li key={`short-description-${index}`}>{description}</li>;
           })}
@@ -182,88 +183,94 @@ export function prepareSpecificProductDetail(detailName, detailValue, extras = {
         return productDetailsTranslations.emptyData;
       }
 
-      const optionalHeaderContent = getOptionalHeaderContent(
-        <summary>{productDetailsTranslations.technicalSpecs}:</summary>
-      );
-      const getBodyContent = () => (
-        <dl>
+      const SpecNestedData = ({ data }) => {
+        return Object.entries(data).map(([key, value]) => {
+          if (value && typeof value === 'object') {
+            return <SpecNestedData key={key} data={value} />;
+          }
+
+          return (
+            <dl key={key} className="product-technical-specs-nested-list">
+              <div className="product-technical-specs-nested-list__item" key={key}>
+                <dt>{key}</dt>
+                <dd>{value}</dd>
+              </div>
+            </dl>
+          );
+        });
+      };
+
+      return (
+        <dl className="product-technical-specs-list">
           {detailValue.map((productDetail, index) => {
+            const hasNestedData = typeof productDetail.data === 'object';
+
             return (
-              <div key={`spec-${index}`}>
+              <div
+                className={classNames('product-technical-specs-list__item', extras.classNames?.listItem)}
+                key={`spec-${index}`}
+              >
                 <dt>{productDetail.heading}</dt>
-                <dd>
-                  {/* TODO: use table for object data */}
-                  {typeof productDetail.data === 'object' ? JSON.stringify(productDetail.data) : productDetail.data}
+                <dd
+                  className={classNames({
+                    'product-technical-specs-list__item-nested-list-parent': hasNestedData,
+                  })}
+                >
+                  {hasNestedData ? <SpecNestedData data={productDetail.data} /> : productDetail.data}
                 </dd>
               </div>
             );
           })}
         </dl>
       );
-
-      // TODO: collapse it on mobile by default and expand on PC by default
-      if (extras.includeHeader) {
-        return (
-          <>
-            <details>
-              {optionalHeaderContent}
-              {getBodyContent()}
-            </details>
-          </>
-        );
-      }
-
-      return getBodyContent();
     }
 
     case 'reviews': {
-      let reviewsContent;
-
+      const RATING_MAX_VALUE = 5; /* TODO: get this from API */
       // TODO: move to separate component as it will likely has some additional logic (like pagination, sorting, filtering)
-      if (!detailValue.list.length) {
-        reviewsContent = productDetailsTranslations.emptyData;
-      } else {
-        const optionalHeaderContent = getOptionalHeaderContent(`${productDetailsTranslations.reviews}: `);
-        const RATING_MAX_VALUE = 5; /* TODO: get this from API */
+      const reviewsContent = detailValue.list.length ? (
+        <>
+          <RatingWidget presetValue={Math.round(detailValue.averageRating)} />
+          <p>
+            {detailValue.averageRating} / {RATING_MAX_VALUE} [{detailValue.list.length}]
+          </p>
 
-        reviewsContent = (
-          // TODO: collapse it on mobile by default and expand on PC by default
-          <details>
-            {/*TODO: do it in more aesthetic way*/}
-            <summary>
-              {optionalHeaderContent}
-              {detailValue.averageRating} / {RATING_MAX_VALUE} [{detailValue.list.length}]
-            </summary>
-            <ul>
-              {detailValue.list.map((reviewEntry, index) => {
-                return (
-                  <li key={`review-${index}`}>
-                    <article>
-                      <header>
-                        <RatingWidget presetValue={reviewEntry.rating} />
-                        <p>
-                          <b>
-                            {productDetailsTranslations.author}: {reviewEntry.author}
-                          </b>
-                          &nbsp;
-                          <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
-                        </p>
-                      </header>
-                      <cite>{reviewEntry.content}</cite>
-                    </article>
-                  </li>
-                );
-              })}
-            </ul>
-          </details>
-        );
-      }
+          {extras.showReviewsList && (
+            /* TODO: [UX] refactor to pagination/"load more" */
+            <details>
+              <MenuList>
+                {detailValue.list.map((reviewEntry, index) => {
+                  return (
+                    <MenuItem divider={true} key={`review-${index}`}>
+                      <article>
+                        <header>
+                          <RatingWidget presetValue={reviewEntry.rating} />
+                          <p>
+                            <b>
+                              {productDetailsTranslations.author}: {reviewEntry.author}
+                            </b>
+                            &nbsp;
+                            <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
+                          </p>
+                        </header>
+                        <cite>{reviewEntry.content}</cite>
+                      </article>
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            </details>
+          )}
+        </>
+      ) : (
+        productDetailsTranslations.emptyData
+      );
 
       return (
-        <>
-          {reviewsContent}
+        <div className="product-reviews">
           {extras.showAddReview && <AddReview productName={extras.productName} updateReviews={extras.updateReviews} />}
-        </>
+          {reviewsContent}
+        </div>
       );
     }
 
@@ -273,25 +280,20 @@ export function prepareSpecificProductDetail(detailName, detailValue, extras = {
         return productDetailsTranslations.emptyData;
       }
 
-      const optionalHeaderContent = getOptionalHeaderContent(<p>{productDetailsTranslations.relatedProducts}</p>);
-
       return (
-        <>
-          {optionalHeaderContent}
-          <ul>
-            {detailValue.map((relatedProduct, index) => {
-              return (
-                <li key={`related-product-${index}`}>
-                  {/*
-                      TODO: ProductItem component in this case will not have full product info, 
-                      so it has to somehow fetch it on it's own
-                    */}
-                  <ProductItem product={relatedProduct} />
-                </li>
-              );
-            })}
-          </ul>
-        </>
+        <MenuList ref={extras.listRef} className={extras.className}>
+          {detailValue.map((relatedProduct, index) => {
+            return (
+              <MenuItem button={false} disableGutters={extras.disableListItemGutters} key={`related-product-${index}`}>
+                {/*
+                  TODO: ProductItem component in this case will not have full product info, 
+                  so it has to somehow fetch it on it's own
+                */}
+                <ProductItem product={relatedProduct} />
+              </MenuItem>
+            );
+          })}
+        </MenuList>
       );
     }
 
@@ -301,15 +303,93 @@ export function prepareSpecificProductDetail(detailName, detailValue, extras = {
   }
 }
 
+const useSectionsObserver = () => {
+  const [activatedNavMenuItemIndex, setActivatedNavMenuItemIndex] = useState(-1);
+  const productDetailsNavSections = {
+    heading: {
+      ignored: true,
+      ref: useRef(),
+    },
+    description: {
+      id: 'productDetailsDescription',
+      label: productDetailsTranslations.descriptionNavLabel,
+      ref: useRef(),
+    },
+    technicalSpecs: {
+      id: 'productDetailsTechnicalSpecs',
+      label: productDetailsTranslations.technicalSpecsNavLabel,
+      ref: useRef(),
+    },
+    reviews: {
+      id: 'productDetailsReviews',
+      label: productDetailsTranslations.reviewsNavLabel,
+      ref: useRef(),
+    },
+    relatedProducts: {
+      id: 'productDetailsRelatedProducts',
+      label: productDetailsTranslations.relatedProductsNavLabel,
+      ref: useRef(),
+    },
+  };
+
+  const refObjsList = Object.values(productDetailsNavSections).map(({ ref }) => ref.current);
+
+  useEffect(() => {
+    if (!refObjsList.every(Boolean)) {
+      return;
+    }
+
+    let intersectionObserver;
+
+    // wait for React to render the DOM tree
+    setTimeout(setupIntersectionObserver, 0, intersectionObserver);
+
+    return () => intersectionObserver?.disconnect();
+  }, refObjsList);
+
+  const setupIntersectionObserver = (intersectionObserver) => {
+    const TOP_BOUNDARY = 155;
+    const sectionHeadingsToObserve = refObjsList;
+    const scrollingElement = document.documentElement;
+    let previousScrollValue = scrollingElement.scrollTop;
+
+    intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        const currentScrollValue = scrollingElement.scrollTop;
+        const isScrollingDown = previousScrollValue < currentScrollValue;
+        const currentHeadingIndex = sectionHeadingsToObserve.findIndex((heading) => entry.target === heading);
+        const previousHeading = sectionHeadingsToObserve[currentHeadingIndex - 1];
+
+        // TODO: [a11y] handle changing URL's hash on scrolling through sections
+        if (isScrollingDown && !entry.isIntersecting) {
+          setActivatedNavMenuItemIndex(currentHeadingIndex);
+        } else if (!isScrollingDown && entry.isIntersecting && previousHeading) {
+          setActivatedNavMenuItemIndex(currentHeadingIndex - 1);
+        }
+
+        previousScrollValue = scrollingElement.scrollTop;
+      },
+      {
+        rootMargin: `-${TOP_BOUNDARY}px 0px 0px 0px`,
+      }
+    );
+
+    sectionHeadingsToObserve.forEach((sectionHeading) => intersectionObserver.observe(sectionHeading));
+  };
+
+  return { productDetailsNavSections, activatedNavMenuItemIndex };
+};
+
 export default function ProductDetails({ product }) {
   // TODO: fetch product data independently when page is loaded explicitly (not navigated to from other page)
-  product = product || useLocation().state;
+  const location = useLocation();
+  product = product || location.state;
   const history = useHistory();
 
   console.log('[ProductDetails] product received from navigation: ', product);
 
-  const [productDetails, setProductDetails] = useState([]);
-  const [renderRelatedProducts, setRenderRelatedProducts] = useState(false);
+  const isMobileLayout = useMobileLayout();
+  const [productDetails, setProductDetails] = useState(null);
   const [popupData, setPopupData] = useState(null);
   // TODO: [BUG] update `isProductObserved` when component is re-rendered due to `product` prop param change
   const [isProductObserved, setIsProductObserved] = useState(
@@ -317,38 +397,37 @@ export default function ProductDetails({ product }) {
       (observedProductID) => observedProductID === product._id
     )
   );
-
-  const ignoredProductKeys = ['name', 'category', 'url', 'relatedProducts', 'url'];
+  const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
 
   useEffect(() => {
-    getProductDetailsData(product)
-      .then((productDetails) => {
-        setProductDetails(productDetails);
+    if (!product) {
+      return;
+    }
 
-        if (productDetails.relatedProducts?.length) {
-          setRenderRelatedProducts(true);
+    httpService
+      .getProductsByNames(product.relatedProductsNames)
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
         }
+
+        const relatedProducts = res;
+        setProductDetails({ ...product, relatedProducts });
       })
       .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
   }, [product]);
 
-  const getMainDetailsContent = () =>
-    Object.entries(productDetails)
-      .filter(([key]) => !ignoredProductKeys.includes(key))
-      .map(([key, value]) => (
-        <Fragment key={key}>
-          {prepareSpecificProductDetail(key, value, {
-            includeHeader: true,
-            showAddReview: key === 'reviews',
-            productName: productDetails.name,
-            updateReviews: (reviews) =>
-              setProductDetails((prev) => ({
-                ...prev,
-                reviews,
-              })),
-          })}
-        </Fragment>
-      ));
+  useEffect(() => {
+    if (location.hash) {
+      setTimeout(() => {
+        const scrollingTarget = document.querySelector(location.hash);
+
+        if (scrollingTarget) {
+          scrollingTarget.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+  }, [location.hash]);
 
   const navigateToProductModify = () => {
     history.push(ROUTES.MODIFY_PRODUCT, productDetails.name);
@@ -426,21 +505,209 @@ export default function ProductDetails({ product }) {
       });
   };
 
+  if (!productDetails) {
+    return null;
+  }
+
   return (
-    <section>
-      <p>
-        [{productDetails.category}]: {productDetails.name}
-        <button onClick={navigateToProductModify}>{productDetailsTranslations.editProduct}</button>
-        <button onClick={deleteProduct}>{productDetailsTranslations.deleteProduct}</button>
-        <button onClick={toggleProductObserve}>
-          {isProductObserved ? productDetailsTranslations.unObserveProduct : productDetailsTranslations.observeProduct}
-        </button>
-      </p>
+    <article className={classNames('product-details', { 'product-details--pc': !isMobileLayout })}>
+      <Paper
+        component="header"
+        elevation={0}
+        className="product-details__header"
+        ref={productDetailsNavSections.heading.ref}
+      >
+        <ProductSpecificDetail
+          detailName="category"
+          detailValue={productDetails.category}
+          extras={{
+            className: 'product-details__header-category',
+          }}
+        />
+        <p className="product-details__header-action-btns">
+          <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={navigateToProductModify}>
+            {productDetailsTranslations.editProduct}
+          </Button>
+          <Button size="small" variant="outlined" startIcon={<DeleteIcon />} onClick={deleteProduct}>
+            {productDetailsTranslations.deleteProduct}
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={isProductObserved ? <RemoveFromQueueIcon /> : <AddToQueueIcon />}
+            onClick={toggleProductObserve}
+          >
+            {isProductObserved
+              ? productDetailsTranslations.unObserveProduct
+              : productDetailsTranslations.observeProduct}
+          </Button>
+          <ProductComparisonCandidatesToggler product={product} buttonVariant="outlined" />
+        </p>
 
-      {getMainDetailsContent()}
+        <div className="product-details__header-image">TODO: [UI] image should go here</div>
+        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-item__image" />*/}
 
-      {renderRelatedProducts && prepareSpecificProductDetail('relatedProducts', productDetails.relatedProducts, true)}
+        <Typography variant="h2" component="h2" className="product-details__header-name">
+          <ProductSpecificDetail detailName="name" detailValue={productDetails.name} />
+        </Typography>
+        <RatingWidget
+          presetValue={productDetails.reviews.averageRating}
+          externalClassName="product-details__header-rating"
+        />
+
+        <ProductSpecificDetail
+          detailName="price"
+          detailValue={productDetails.price}
+          extras={{
+            header: productDetailsTranslations.price,
+            className: 'product-details__header-price',
+          }}
+        />
+        <AddToCartButton
+          productInfoForCart={{ name: productDetails.name, price: productDetails.price, _id: productDetails._id }}
+          startOrEndIcon="startIcon"
+          className="product-details__header-buy-btn"
+        />
+      </Paper>
+
+      <aside className="product-details__nav-menu">
+        <Scroller
+          scrollerBaseValueMeta={{
+            useDefault: true,
+          }}
+          render={({ elementRef }) => (
+            <div /* this `div` is hooked with a `ref` by Scroller component */>
+              <MenuList
+                ref={elementRef}
+                className="product-details__nav-menu-list"
+                component="ol"
+                disablePadding={true}
+                // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
+                aria-label={productDetailsTranslations.productDetailsNavMenuLabel}
+              >
+                {Object.entries(productDetailsNavSections).map(([, navSection], index) => {
+                  if (navSection.ignored) {
+                    return null;
+                  }
+
+                  return (
+                    <MenuItem
+                      key={navSection.id}
+                      className={classNames({
+                        activated: activatedNavMenuItemIndex === index,
+                      })}
+                    >
+                      <MUILink to={{ hash: `#${navSection.id}`, state: product }} component={Link} color="inherit">
+                        {navSection.label}
+                      </MUILink>
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            </div>
+          )}
+        />
+      </aside>
+
+      <section className="product-details__nav-section">
+        <Typography
+          variant="h3"
+          component="h3"
+          id={productDetailsNavSections.description.id}
+          ref={productDetailsNavSections.description.ref}
+        >
+          {productDetailsNavSections.description.label}
+        </Typography>
+        <ProductSpecificDetail detailName="shortDescription" detailValue={productDetails.shortDescription} />
+      </section>
+
+      <Divider />
+
+      <section className="product-details__nav-section">
+        <Typography
+          variant="h3"
+          component="h3"
+          id={productDetailsNavSections.technicalSpecs.id}
+          ref={productDetailsNavSections.technicalSpecs.ref}
+        >
+          {productDetailsNavSections.technicalSpecs.label}
+        </Typography>
+        <ProductSpecificDetail
+          detailName="technicalSpecs"
+          detailValue={productDetails.technicalSpecs}
+          extras={{
+            classNames: {
+              listItem: 'product-details__nav-section-specs',
+            },
+          }}
+        />
+      </section>
+
+      <Divider />
+
+      <section className="product-details__nav-section">
+        <Typography
+          variant="h3"
+          component="h3"
+          id={productDetailsNavSections.reviews.id}
+          ref={productDetailsNavSections.reviews.ref}
+        >
+          {productDetailsNavSections.reviews.label}
+        </Typography>
+        <ProductSpecificDetail
+          detailName="reviews"
+          detailValue={productDetails.reviews}
+          extras={{
+            showReviewsList: true,
+            showAddReview: true,
+            updateReviews: (reviews) =>
+              setProductDetails((prev) => ({
+                ...prev,
+                reviews,
+              })),
+          }}
+        />
+      </section>
+
+      <Divider />
+
+      <section className="product-details__nav-section">
+        <Typography
+          variant="h3"
+          component="h3"
+          id={productDetailsNavSections.relatedProducts.id}
+          ref={productDetailsNavSections.relatedProducts.ref}
+        >
+          {productDetailsNavSections.relatedProducts.label}
+        </Typography>
+
+        {productDetails.relatedProducts?.length && (
+          <div className="product-details__nav-section-related-products">
+            <Scroller
+              scrollerBaseValueMeta={{
+                selector: '.product-details__nav-section-related-products',
+                varName: '--related-product-item-width',
+              }}
+              render={({ elementRef }) => (
+                <div /* this `div` is hooked with a `ref` by Scroller component */>
+                  <ProductSpecificDetail
+                    detailName="relatedProducts"
+                    detailValue={productDetails.relatedProducts}
+                    extras={{
+                      listRef: elementRef,
+                      disableListItemGutters: true,
+                    }}
+                  />
+                </div>
+              )}
+            />
+          </div>
+        )}
+      </section>
+
+      <Divider />
+
       {popupData && <Popup type={popupData.type} message={popupData.message} buttons={popupData.buttons} />}
-    </section>
+    </article>
   );
 }

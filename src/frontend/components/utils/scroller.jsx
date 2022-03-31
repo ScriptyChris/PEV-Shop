@@ -56,6 +56,8 @@ function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, di
   return portalTargetPlace?.current ? createPortal(TheScrollButton, portalTargetPlace.current) : TheScrollButton;
 }
 
+// TODO: [UX] implement swipe scroll for mobile
+// TODO: [UX] implement automatic scrolling to the currently clicked and focused list item
 export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, btnsParentRef }) {
   const [elementRef] = useState(createRef());
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
@@ -64,7 +66,7 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, 
   const headRowRefs = useRef([]);
   const bodyRowRefs = useRef([]);
   const resizeObserverRef = useRef(null);
-  // TODO: consider if useMemo is really needed if value is only used on first render
+  // TODO: [DX] consider if useMemo is really needed if value is only used on first render
   const handleInitialRender = useMemo(() => {
     const initialRenderClassName = 'initial-render';
 
@@ -77,8 +79,10 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, 
     };
   }, []);
   const [multipleRefsGetterUsed, setMultipleRefsGetterUsed] = useState(false);
-  // TODO: consider if useMemo is needed if scrollBaseValue is used just once
-  const scrollBaseValue = useMemo(() => getScrollBaseValue(scrollerBaseValueMeta), []);
+  // TODO: [DX] consider if useMemo is needed if scrollBaseValue is used just once
+  const scrollBaseValue = scrollerBaseValueMeta.useDefault
+    ? 50
+    : useMemo(() => getScrollBaseValue(scrollerBaseValueMeta), []);
 
   const REF_TYPE = Object.freeze({
     HEAD: 'head',
@@ -86,7 +90,7 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, 
   });
   const SCROLL_VARIABLE = {
     NAME: '--scrollValue',
-    BASE_VALUE: scrollBaseValue || 15,
+    BASE_VALUE: scrollBaseValue,
     LEFT_EDGE: 0,
   };
   const SCROLL_DIRECTION = { LEFT: 1, RIGHT: -1 };

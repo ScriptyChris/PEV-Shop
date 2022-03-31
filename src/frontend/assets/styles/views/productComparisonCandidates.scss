@@ -75,7 +75,20 @@
 }
 
 .product-comparison-candidate-toggler {
-  margin-left: 0;
-  margin-right: 0;
-  padding-right: 1rem;
+  margin-inline: 0;
+
+  // TODO: [DX] improve overwriting MUI default style
+  .MuiFormControlLabel-label {
+    font-size: 0.8125rem;
+  }
+}
+
+.product-comparison-candidates-toggle-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: currentColor;
+
+  &--checked {
+    fill: #3f51b5;
+  }
 }

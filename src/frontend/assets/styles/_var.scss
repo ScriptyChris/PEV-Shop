@@ -13,9 +13,14 @@ $navZIndex: 3;
 $cartZIndex: 2;
 $productListCtrlBarZIndex: 1;
 $scrollerZIndex: 1;
+$productDetailsNavMenuZIndex: 1;
 
 // commons
 .product-comparison-candidates,
 .product-comparison {
   --product-list-item-width: 200px;
+
+  [data-scrollable-parent] {
+    min-height: 5.5rem;
+  }
 }

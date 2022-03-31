@@ -51,19 +51,3 @@
     order: -1;
   }
 }
-
-.product-comparison-list {
-  display: flex;
-  list-style: none;
-  margin: 0 24px;
-
-  &__item {
-    margin: 0 0.5rem;
-    border: 1px solid orange;
-    min-width: 225px;
-  }
-
-  &__item-short-description {
-    padding-left: 1.5rem;
-  }
-}

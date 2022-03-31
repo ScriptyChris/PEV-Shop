@@ -1,0 +1,213 @@
+.product-details--pc {
+    margin: 0 10vw;
+
+    .product-details {
+        &__header {
+            grid-template-areas:
+                "category action-buttons"
+                "image name"
+                "image rating"
+                "image price"
+                "image buy-btn";
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem 3rem;
+        }
+
+        &__nav-menu:before {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border: inherit;
+            height: 100%;
+            inset-inline: -10vw;
+            box-sizing: content-box;
+        }
+
+        &__nav-menu-list {
+            width: 100%;
+            justify-content: center;
+        }
+
+        &__nav-section-specs {
+            & > dt {
+                margin-left: 10rem;
+            }
+        }
+    }
+}
+
+.product-details {
+    &__header {
+        display: grid;
+        grid-template-areas:
+            "category category"
+            "action-buttons action-buttons"
+            "image image"
+            "name ."
+            "rating ."
+            ". price"
+            "buy-btn buy-btn";
+        margin-top: 0.5rem;
+        row-gap: 0.5rem;
+    }
+
+    &__header-category {
+        grid-area: category;
+    }
+
+    &__header-action-btns {
+        grid-area: action-buttons;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 0 auto;
+        gap: 0.25rem;
+    }
+
+    &__header-image {
+        grid-area: image;
+        height: 100px;
+        background: radial-gradient(transparent, grey);
+    }
+
+    &__header-name {
+        grid-area: name;
+    }
+
+    &__header-rating {
+        grid-area: rating;
+    }
+
+    &__header-price {
+        grid-area: price;
+    }
+
+    &__header-buy-btn {
+        grid-area: buy-btn;
+        width: 20rem;
+        margin: 0 auto;
+    }
+
+    &__nav-menu {
+        display: flex;
+        align-items: center;
+        margin-block: 1rem;
+        // TODO: [UI] use better (MUI) color
+        border-block: 1px solid lightgrey;
+        position: sticky;
+        top: 4rem;
+        background: white;
+        z-index: $productDetailsNavMenuZIndex;
+
+        button {
+            width: 2rem;
+        }
+
+        [data-scrollable-parent] {
+            height: 3rem;
+        }
+    }
+
+    &__nav-menu-list {
+        display: flex;
+        list-style: none;
+
+        li {
+            padding: 0;
+
+            &.activated {
+                // TODO: [DX] find better way to take MUI's style
+                background: rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        a {
+            padding: 0.875rem 1rem;
+        }
+    }
+
+    &__nav-section {
+        margin-block: 1rem;
+
+        h3 {
+            scroll-margin-top: 8rem;
+        }
+    }
+
+    &__nav-section-specs {
+        display: grid;
+        grid-template-columns: 1.75fr 2fr;
+        padding: 0.75rem 1rem;
+
+        &:nth-of-type(2n - 1) {
+            background: lightgrey;
+        }
+    }
+
+    &__nav-section-related-products {
+        display: flex;
+        align-items: center;
+        --related-product-item-width: 200px;
+
+        [data-compare-btn-scroll-dir] button {
+            width: 2rem;
+        }
+
+        [data-scrollable-parent] {
+            height: 14rem;
+        }
+
+        ul {
+            display: flex;
+            gap: 1rem;
+        }
+    }
+}
+
+.product-technical-specs-list {
+    &__item {
+        display: grid;
+        grid-template-columns: 1.75fr 2fr;
+        text-align: center;
+        padding: 0.75rem 1rem;
+    
+        &:nth-of-type(2n - 1) {
+            background: lightgrey;
+        }
+    
+        dt {
+            font-weight: bold;
+        }
+    }
+
+    &__item-nested-list-parent {
+        grid-column: span 2;
+    }
+}
+
+.product-technical-specs-nested-list {
+    &:last-child {
+        .product-technical-specs-nested-list__item {
+            border-bottom-width: 1px;
+        }
+    }
+
+    &__item {
+        display: grid;
+        grid-template-columns: 1.75fr 2fr;
+        border: 0 solid lightgrey;
+        border-top-width: 1px;
+
+        dt {
+            text-align: right;
+            font-style: italic;
+        }
+    }
+}
+
+.product-reviews {
+    cite {
+        white-space: normal;
+    }
+}
