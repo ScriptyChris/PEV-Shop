@@ -13,7 +13,7 @@ function Pagination(props) {
   const updateAriaLabelForPageBtn = (pageNr) => `${translations.page} ${pageNr}`;
 
   return (
-    <nav className="pagination-container">
+    <div className="pagination-container">
       {/*
         TODO: [UX] make it possible to use `<select>` and `<ReactPaginate />` separately, 
         so i.e. selector can be used once on the top of page and pagination itself twice - on the top and the bottom.
@@ -50,7 +50,7 @@ function Pagination(props) {
         nextAriaLabel={translations.nextAriaLabel}
         ariaLabelBuilder={updateAriaLabelForPageBtn}
       />
-    </nav>
+    </div>
   );
 }
 

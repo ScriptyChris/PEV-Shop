@@ -72,10 +72,14 @@ function ComparisonCandidatesCounter({ amount }) {
   );
 }
 
-export const ProductComparisonCandidatesList = observer(function CompareProducts() {
+export const ProductComparisonCandidatesList = observer(function CompareProducts({
+  collapsibleAnimation,
+  forceHideWhenEmpty,
+  compensateOuterTopMargin,
+}) {
   const isMobileLayout = useMobileLayout();
   const [popupData, setPopupData] = useState(null);
-  const CandidatesWrapper = isMobileLayout ? Collapse : Zoom;
+  const CandidatesWrapper = isMobileLayout || collapsibleAnimation ? Collapse : Zoom;
 
   const handleRemoveComparableProduct = (productIndex) => {
     storeService.updateProductComparisonState({ remove: { index: productIndex } });
@@ -99,7 +103,11 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
   return (
     <CandidatesWrapper
       in={storeService.productComparisonState.length > 0}
-      className={classNames({ 'product-comparison-candidates-pc-wrapper': !isMobileLayout })}
+      style={{ marginTop: compensateOuterTopMargin ? '-0.5rem' : null }}
+      className={classNames({
+        'product-comparison-candidates-pc-wrapper': !isMobileLayout,
+        'product-comparison-candidates--hidden': forceHideWhenEmpty && storeService.productComparisonState.length === 0,
+      })}
     >
       <Paper className="product-comparison-candidates-container">
         <div className="product-comparison-candidates">

@@ -9,6 +9,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextFormat from '@material-ui/icons/TextFormat';
 import Slide from '@material-ui/core/Slide';
+import Zoom from '@material-ui/core/Zoom';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 
@@ -90,6 +91,7 @@ function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMain
   const isMobileLayout = useMobileLayout();
   const [isCaseSensitive, setCaseSensitive] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(!isMobileLayout);
+  const [isSearchBtnHidden, setIsSearchBtnHidden] = useState(!isMobileLayout);
 
   useEffect(() => setIsSearchVisible(!isMobileLayout), [isMobileLayout]);
 
@@ -124,10 +126,16 @@ function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMain
     };
   };
 
-  const onSearchSlideEnter = (searchRootRef) => {
+  const focusSearchInput = (searchRootRef) => {
     const searchInput = searchRootRef.querySelector('input[type="search"]');
 
     setTimeout(() => searchInput.focus());
+  };
+
+  const toggleSearchBtn = (shouldShow) => {
+    return () => {
+      setIsSearchBtnHidden(shouldShow);
+    };
   };
 
   return (
@@ -135,7 +143,7 @@ function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMain
       {/* This <div> is used solely to forward a ref from ClickAwayListener, which React Fragment cannot do */}
       <div className="search-wrapper">
         <section className={classNames('search-container', { 'search-container--is-visible': isSearchVisible })}>
-          <Slide direction="left" in={isSearchVisible} onEntered={onSearchSlideEnter}>
+          <Zoom in={isSearchVisible} onEntered={focusSearchInput}>
             <ForwardedSearch
               {...restProps}
               onInputChange={handleInputSearchChange}
@@ -153,14 +161,19 @@ function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMain
                 />
               }
             />
-          </Slide>
+          </Zoom>
         </section>
 
-        {!isSearchVisible && (
-          <IconButton onClick={toggleSearch(true)}>
+        <Zoom in={!isSearchVisible} onEnter={toggleSearchBtn(false, 'enter')} onExit={toggleSearchBtn(true, 'exit')}>
+          <IconButton
+            onClick={toggleSearch(true)}
+            className={classNames({
+              'search-wrapper__toggle-button--is-hidden': isSearchBtnHidden,
+            })}
+          >
             <SearchIcon />
           </IconButton>
-        )}
+        </Zoom>
       </div>
     </ClickAwayListener>
   );
@@ -190,7 +203,6 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
 
         setSearchRecentValues((prev) => ({ oldValue: prev.newValue, newValue: prev.newValue }));
 
-        let p;
         const products = (
           newSearchValueContainsOld
             ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))

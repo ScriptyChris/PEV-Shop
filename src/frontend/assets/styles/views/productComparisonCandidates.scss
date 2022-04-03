@@ -10,6 +10,10 @@
   display: flex;
   align-items: center;
 
+  &--hidden {
+    height: 0;
+  }
+
   &__list {
     list-style: none;
     display: inline-flex;

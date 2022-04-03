@@ -1,29 +1,4 @@
-@import '../_var';
-
-.cart-toggle-button {
-
-}
-
-.cart-cleanup-button {
-
-}
-
-.cart-submit-button {
-
-}
-
-.cart-container {
-  display: none;
-  position: relative;
-  z-index: $cartZIndex;
-
-  background: orange;
-
-  td, th {
-    border: 1px solid black;
-  }
-
-  &--visible {
-    display: block;
-  }
+.cart-action-buttons {
+  display: flex;
+  justify-content: space-evenly;
 }

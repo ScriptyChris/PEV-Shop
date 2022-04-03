@@ -83,8 +83,6 @@ const GetControlsForSpecs = (() => {
       throw TypeError(`spec.type '${type}' was not recognized as a template method!`);
     }
 
-    const isMobileLayout = useMobileLayout();
-
     const getLegendContent = () => {
       const defaultUnitOutput = defaultUnit ? `(${defaultUnit})` : '';
 
@@ -418,80 +416,81 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
     setIsFormExpanded(!isFormExpanded);
   };
 
-  return Object.keys(productsSpecsPerCategory.current).length && Object.keys(formInitials).length ? (
-    isMobileLayout ? (
-      <>
-        <IconButton
-          onClick={handleFiltersWidgetToggle}
-          aria-label={translations.filtersWidgetToggleButton}
-          title={translations.filtersWidgetToggleButton}
-        >
-          <Tune />
-        </IconButton>
+  if (!Object.keys(productsSpecsPerCategory.current).length || !Object.keys(formInitials).length) {
+    return translations.filterUnavailable;
+  }
 
+  return isMobileLayout ? (
+    <>
+      <IconButton
+        onClick={handleFiltersWidgetToggle}
+        aria-label={translations.filtersWidgetToggleButton}
+        title={translations.filtersWidgetToggleButton}
+      >
+        <Tune />
+      </IconButton>
+
+      <Drawer anchor="left" open={isFormExpanded} onClose={handleFiltersWidgetToggle}>
         <section>
-          <Drawer anchor="left" open={isFormExpanded} onClose={handleFiltersWidgetToggle}>
-            <IconButton
-              onClick={handleFiltersWidgetToggle}
-              aria-label={translations.goBackLabel}
-              title={translations.goBackLabel}
-            >
-              <ArrowBack />
-            </IconButton>
+          <IconButton
+            onClick={handleFiltersWidgetToggle}
+            className="MuiButton-fullWidth"
+            aria-label={translations.goBackLabel}
+            title={translations.goBackLabel}
+          >
+            <ArrowBack />
+          </IconButton>
 
-            <Typography variant="h3" component="h3">
-              {translations.filtersHeader}
-            </Typography>
+          <Typography variant="h3" component="h3">
+            {translations.filtersHeader}
+          </Typography>
 
-            <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
-              {({ handleSubmit, ...formikRestProps }) => {
-                const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
-                formikRestProps.handleChange = function (event) {
-                  // TODO: remove this when form will be submitted via button, not dynamically
-                  formikRestProps.setFieldTouched(event.target.name, true, false);
+          <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
+            {({ handleSubmit, ...formikRestProps }) => {
+              const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
+              formikRestProps.handleChange = function (event) {
+                // TODO: remove this when form will be submitted via button, not dynamically
+                formikRestProps.setFieldTouched(event.target.name, true, false);
 
-                  changeHandler(event);
-                  _handleChange(event);
-                };
+                changeHandler(event);
+                _handleChange(event);
+              };
 
-                return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
-              }}
-            </Formik>
+              return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
+            }}
+          </Formik>
 
-            <Button onClick={doFilterProducts} disabled={filterBtnDisabled}>
-              {translations.filterProducts}
-            </Button>
-          </Drawer>
+          <Button onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
+            {translations.filterProducts}
+          </Button>
         </section>
-      </>
-    ) : (
-      <section>
-        <Typography variant="h3" component="h3">
-          {translations.filtersHeader}
-        </Typography>
-
-        <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
-          {({ handleSubmit, ...formikRestProps }) => {
-            const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
-            formikRestProps.handleChange = function (event) {
-              // TODO: remove this when form will be submitted via button, not dynamically
-              formikRestProps.setFieldTouched(event.target.name, true, false);
-
-              changeHandler(event);
-              _handleChange(event);
-            };
-
-            return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
-          }}
-        </Formik>
-
-        <Button onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
-          {translations.filterProducts}
-        </Button>
-      </section>
-    )
+      </Drawer>
+    </>
   ) : (
-    translations.filterUnavailable
+    <section>
+      <Typography variant="h3" component="h3">
+        {translations.filtersHeader}
+      </Typography>
+
+      <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
+        {({ handleSubmit, ...formikRestProps }) => {
+          const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
+          formikRestProps.handleChange = function (event) {
+            // TODO: remove this when form will be submitted via button, not dynamically
+            formikRestProps.setFieldTouched(event.target.name, true, false);
+
+            changeHandler(event);
+            _handleChange(event);
+          };
+
+          return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
+        }}
+      </Formik>
+
+      <Button onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
+        {translations.filterProducts}
+      </Button>
+    </section>
   );
 }
 

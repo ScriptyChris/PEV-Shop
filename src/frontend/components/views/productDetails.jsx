@@ -16,6 +16,7 @@ import MUILink from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
 
 import ProductItem from './productItem';
+import { ProductComparisonCandidatesList } from '@frontend/components/views/productComparisonCandidates';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import RatingWidget from '@frontend/components/utils/ratingWidget';
@@ -511,6 +512,14 @@ export default function ProductDetails({ product }) {
 
   return (
     <article className={classNames('product-details', { 'product-details--pc': !isMobileLayout })}>
+      <aside className="product-details__aside">
+        <ProductComparisonCandidatesList
+          collapsibleAnimation={true}
+          forceHideWhenEmpty={true}
+          compensateOuterTopMargin={true}
+        />
+      </aside>
+
       <Paper
         component="header"
         elevation={0}

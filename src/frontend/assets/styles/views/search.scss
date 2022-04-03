@@ -1,5 +1,11 @@
 .search-wrapper {
   display: flex;
+
+  &__toggle-button--is-hidden {
+    width: 0;
+    padding: 0;
+    visibility: hidden;
+  }
 }
 
 .search-container {

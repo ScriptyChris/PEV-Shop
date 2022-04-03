@@ -37,6 +37,10 @@
 }
 
 .product-details {
+    &__aside {
+        margin-top: 0.5rem;
+    }
+
     &__header {
         display: grid;
         grid-template-areas:

@@ -10,18 +10,22 @@ const USER_CART_STATE: IUserCart = {
 
 const INITIAL_USER_ACCOUNT_STATE = null;
 
-type TUserCartProducts = IUserCart['products'][number] & { count: number };
+type TUserCartProduct = IUserCart['products'][number] & { count: number };
 
 class StoreService {
   _userAccountState: IUserPublic | null;
   _userCartState: IUserCart;
-  _productComparisonState: TUserCartProducts[];
+  _productComparisonState: TUserCartProduct[];
 
   constructor() {
     // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's IUserPublic
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
     this._userCartState = { ...USER_CART_STATE };
     this._productComparisonState = [];
+  }
+
+  _getProductIndex(newUserCartStateName: TUserCartProduct['name']) {
+    return this._userCartState.products.findIndex((productItem) => productItem.name === newUserCartStateName);
   }
 
   updateUserAccountState(userAccountState: IUserPublic) {
@@ -32,20 +36,38 @@ class StoreService {
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
   }
 
-  updateUserCartState(userCartState: TUserCartProducts) {
-    this._userCartState.totalPrice += userCartState.price;
+  addProductToUserCartState(newUserCartState: TUserCartProduct) {
+    this._userCartState.totalPrice += newUserCartState.price;
+    const productIndexInCart = this._getProductIndex(newUserCartState.name);
 
-    const productIndexInCart = this._userCartState.products.findIndex(
-      (productItem) => productItem.name === userCartState.name
-    );
-    if (productIndexInCart !== -1) {
-      (this._userCartState.products[productIndexInCart] as TUserCartProducts).count++;
+    if (productIndexInCart === -1) {
+      newUserCartState.count = 1;
+      this._userCartState.products.push(newUserCartState);
     } else {
-      userCartState.count = 1;
-      this._userCartState.products.push(userCartState);
+      (this._userCartState.products[productIndexInCart] as TUserCartProduct).count++;
     }
 
     this._userCartState.totalCount++;
+  }
+
+  removeProductFromUserCartState(newUserCartState: TUserCartProduct) {
+    this._userCartState.totalPrice -= newUserCartState.price;
+    const productIndexInCart = this._getProductIndex(newUserCartState.name);
+
+    if (productIndexInCart === -1) {
+      return;
+    }
+
+    const product = this._userCartState.products[productIndexInCart] as TUserCartProduct;
+
+    if (product.count > 0) {
+      product.count--;
+      this._userCartState.totalCount--;
+    }
+
+    if (product.count === 0) {
+      this._userCartState.products.splice(productIndexInCart, 1);
+    }
   }
 
   clearUserCartState() {
@@ -65,8 +87,8 @@ class StoreService {
     add,
     remove,
   }: {
-    add: TUserCartProducts;
-    remove: Partial<{ index: number; _id: TUserCartProducts['_id'] }>;
+    add: TUserCartProduct;
+    remove: Partial<{ index: number; _id: TUserCartProduct['_id'] }>;
   }) {
     console.log('(updateProductComparisonState) /add:', add, ' /remove:', remove);
 
@@ -115,7 +137,8 @@ decorate(StoreService, {
   clearUserAccountState: action,
 
   _userCartState: observable,
-  updateUserCartState: action,
+  addProductToUserCartState: action,
+  removeProductFromUserCartState: action,
   clearUserCartState: action,
 
   _productComparisonState: observable,
