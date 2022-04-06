@@ -1,46 +1,96 @@
 @import '../_var';
 
+$sidebarWidth: 17rem;
+
+.product-list-container--pc {
+  display: grid;
+  grid-template-columns: $sidebarWidth auto;
+  grid-template-areas: 
+    "sidebar topbar"
+    "sidebar list"
+    "sidebar pagination";
+  grid-column-gap: 2rem;
+  margin: 0 4rem;
+
+  .product-list-search-bar {
+    grid-area: search;
+  }
+
+  .product-list-control-sidebar {
+    grid-area: sidebar;
+    position: fixed;
+    width: $sidebarWidth;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    & > section {
+      margin: 1rem;
+    }
+  }
+
+  .product-list-control-topbar {
+    grid-area: topbar;
+    display: flex;
+    gap: 1rem;
+    height: 6rem;
+
+    &__buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  }
+
+  .product-list-control-bar {
+    &__buttons-view-mode {
+      margin-left: 0;
+    }
+  }
+
+  .product-list {
+    grid-area: list;
+  }
+
+  .product-list-pagination {
+    grid-area: pagination;
+    justify-content: center;
+  }
+}
+
 .product-list-control-bar {
-  background: orange;
   position: relative;
   top: 0;
   left: 0;
-  display: grid;
-  grid-template-columns: /* TODO: [UI] use more precise/dynamic value */ 50px auto;
-  grid-template-areas:
-    ". search"
-    ". categories"
-    ". filters"
-    ". view-mode-button";
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 10px 2px #3f51b5; /* TODO: [CSS] reuse color from variable */
+  border: 0px solid #3f51b5; /* TODO: [CSS] reuse color from variable */
+  border-left-width: 2px;
+  border-right-width: 2px;
+  border-radius: 0 0 8px 8px;
+  background: white;
 
   // TODO: [UI] add some transition to stickiness
   &--sticky {
     position: sticky;
+    top: 4rem;
     z-index: $productListCtrlBarZIndex;
   }
 
-  & .search-container {
-    grid-area: search;
-  }
+  &__buttons {
+    grid-area: buttons;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-  & .categories-tree-container {
-    grid-area: categories;
-  }
-
-  & .products-filter-container {
-    grid-area: filters;
-  }
-
-  & .product-list-view-mode-button {
-    grid-area: view-mode-button;
+    &-view-mode {
+      margin-left: 0.3rem;
+    }
   }
 }
 
 .product-list {
-  // display: flex;
-  // flex-wrap: wrap;
-  // justify-content: space-between;
-
   display: grid;
   grid-gap: 1rem;
   list-style: none;

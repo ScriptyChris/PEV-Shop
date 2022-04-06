@@ -1,22 +1,74 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
+import { useLocation } from 'react-router-dom';
+
+import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
+import SortIcon from '@material-ui/icons/Sort';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import ViewModuleIcon from '@material-ui/icons/ViewModule';
+import ListIcon from '@material-ui/icons/List';
+import Toolbar from '@material-ui/core/Toolbar';
+
 import httpService from '@frontend/features/httpService';
 import ProductItem from './productItem';
 import Pagination from '@frontend/components/utils/pagination';
 import CategoriesTree from './categoriesTree';
-import CompareProducts from './compareProducts';
-import { SearchProductsByName } from './search';
+import { ProductComparisonCandidatesList } from './productComparisonCandidates';
 import ProductsFilter from './productsFilter';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
   lackOfProducts: 'Lack of products...',
   typeProductName: 'Type product name:',
+  sortingMode: 'sorting',
 };
 const viewModeTranslations = {
-  changeToDetails: 'Details view',
-  changeToTiles: 'Tiles view',
+  changeToDetails: 'details view',
+  changeToTiles: 'tiles view',
 };
+
+function ViewModeBtn({ viewModeType, onClick, isMobileLayout }) {
+  const color = isMobileLayout ? 'inherit' : 'primary';
+
+  switch (viewModeType) {
+    case 'details': {
+      return (
+        <Button
+          onClick={onClick}
+          startIcon={<ListIcon />}
+          className="product-list-control-bar__buttons-view-mode"
+          variant="contained"
+          color={color}
+          aria-label={viewModeTranslations.changeToDetails}
+          title={viewModeTranslations.changeToDetails}
+        >
+          {viewModeTranslations.changeToDetails}
+        </Button>
+      );
+    }
+    case 'tiles': {
+      return (
+        <Button
+          onClick={onClick}
+          startIcon={<ViewModuleIcon />}
+          className="product-list-control-bar__buttons-view-mode"
+          variant="contained"
+          color={color}
+          aria-label={viewModeTranslations.changeToTiles}
+          title={viewModeTranslations.changeToTiles}
+        >
+          {viewModeTranslations.changeToTiles}
+        </Button>
+      );
+    }
+    default: {
+      throw TypeError(`Unrecognized viewModeType: '${viewModeType}'!`);
+    }
+  }
+}
+
 const paginationTranslations = {
   itemsPerPageSuffix: 'produktów',
   allItems: 'Wszystkie produkty',
@@ -25,8 +77,7 @@ const paginationTranslations = {
 // TODO: setup this on backend and pass via some initial config to frontend
 const productsPerPageLimits = [15, 30, 60, Infinity];
 
-function useHandleListControlBarStickiness() {
-  const isMobileLayout = useMobileLayout();
+function useHandleListControlBarStickiness(isMobileLayout) {
   const [isListControlBarSticky, setIsListControlBarSticky] = useState(false);
 
   let lastKnownScrollPosition = 0;
@@ -63,8 +114,8 @@ function useHandleListControlBarStickiness() {
     }
   };
 
-  const startListening = () => document.addEventListener('scroll', scrollListener);
-  const stopListening = () => document.removeEventListener('scroll', scrollListener);
+  const startListening = () => document.addEventListener('scroll', scrollListener, { passive: true });
+  const stopListening = () => document.removeEventListener('scroll', scrollListener, { passive: true });
 
   return isListControlBarSticky;
 }
@@ -79,21 +130,14 @@ function useListViewModes() {
       }),
       {}
     );
-  const matchViewTypeTranslation = () => {
-    const viewType = viewTypes[viewTypeIndex].match(/--(\w+)-/)[1];
-    const viewTypeTranslation = Object.entries(viewModeTranslations).find(([key]) =>
-      key.toLowerCase().includes(viewType)
-    )[1];
-
-    return viewTypeTranslation;
-  };
+  const matchViewTypeBtn = () => viewTypes[viewTypeIndex].match(/--(\w+)-/)[1];
   const [viewTypeIndex, setViewTypeIndex] = useState(0);
   const [listViewModes, setListViewModes] = useState({});
-  const [listViewModesButtonText, setListViewModesButtonText] = useState('');
+  const [listViewModesButton, setListViewModesButton] = useState(matchViewTypeBtn());
 
   useEffect(() => {
     setListViewModes(generateViewTypesMap(viewTypeIndex));
-    setListViewModesButtonText(matchViewTypeTranslation());
+    setListViewModesButton(matchViewTypeBtn());
   }, [viewTypeIndex]);
 
   const updateViewTypeIndex = () => {
@@ -107,11 +151,12 @@ function useListViewModes() {
   return {
     currentListViewModes: listViewModes,
     switchListViewModes: updateViewTypeIndex,
-    listViewModesButtonText,
+    listViewModesButton,
   };
 }
 
 export default function ProductList() {
+  const { state: locationState } = useLocation();
   const [productsList, setProductsList] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -119,14 +164,17 @@ export default function ProductList() {
   // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
   const [currentProductsPerPageLimit, setCurrentProductsPerPageLimit] = useState(productsPerPageLimits[0]);
   const [filterBtnDisabled, setFilterBtnDisabled] = useState(false);
-  const isListControlBarSticky = useHandleListControlBarStickiness();
-  const { currentListViewModes, switchListViewModes, listViewModesButtonText } = useListViewModes();
+  const isMobileLayout = useMobileLayout();
+  const isListControlBarSticky = useHandleListControlBarStickiness(isMobileLayout);
+  const { currentListViewModes, switchListViewModes, listViewModesButton } = useListViewModes();
 
   useEffect(() => {
-    updateProductsList().catch((updateProductsListError) => {
-      console.error('updateProductsListError:', updateProductsListError);
-    });
-  }, []);
+    updateProductsList(locationState?.searchedProducts && { products: locationState.searchedProducts }).catch(
+      (updateProductsListError) => {
+        console.error('updateProductsListError:', updateProductsListError);
+      }
+    );
+  }, [locationState]);
 
   const updateProductsList = async ({
     pageNumber = currentProductPage,
@@ -206,65 +254,108 @@ export default function ProductList() {
     }).then();
   };
 
-  const handleSearchedProducts = async (products) => {
-    updateProductsList({ products: await products }).then();
-  };
+  const handleSorting = () => console.log('sorting is to be implemented...');
 
   return (
-    <>
-      <div
-        className={classNames('product-list-control-bar', {
-          'product-list-control-bar--sticky': isListControlBarSticky,
-        })}
-      >
-        <SearchProductsByName
-          label={translations.typeProductName}
-          searchingTarget="productName"
-          debounceTimeMs={750}
-          pagination={{ currentProductPage: 1, currentProductsPerPageLimit }}
-          onReceivedProductsByName={handleSearchedProducts}
-        />
+    <article
+      className={classNames('product-list-container', {
+        'product-list-container--pc': !isMobileLayout,
+        'product-list-control-bar--mobile': isMobileLayout,
+      })}
+    >
+      {isMobileLayout ? (
+        <aside
+          className={classNames('product-list-control-bar', {
+            'product-list-control-bar--sticky': isListControlBarSticky,
+          })}
+        >
+          <div className="product-list-control-bar__buttons">
+            <ViewModeBtn
+              viewModeType={listViewModesButton}
+              onClick={switchListViewModes}
+              isMobileLayout={isMobileLayout}
+            />
 
-        {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
-        <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
+            <div>
+              {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
+              <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
 
-        <ProductsFilter
-          selectedCategories={productCategories}
-          onFiltersUpdate={handleFiltersUpdate}
-          doFilterProducts={filterProducts}
-          filterBtnDisabled={filterBtnDisabled}
-        />
+              <ProductsFilter
+                selectedCategories={productCategories}
+                onFiltersUpdate={handleFiltersUpdate}
+                doFilterProducts={filterProducts}
+                filterBtnDisabled={filterBtnDisabled}
+              />
 
-        {/* TODO: [UX] add an icon representing current view mode and switch it accordingly */}
-        <button onClick={switchListViewModes} className="product-list-view-mode-button">
-          {listViewModesButtonText}
-        </button>
-      </div>
+              {/* TODO: [UX] add sorting */}
+              <IconButton onClick={handleSorting} aria-label={translations.sortBtn} title={translations.sortBtn}>
+                <SortIcon />
+              </IconButton>
+            </div>
+          </div>
 
-      <CompareProducts.List />
+          <Divider variant="fullWidth" />
 
+          <ProductComparisonCandidatesList />
+        </aside>
+      ) : (
+        <>
+          <Paper component="aside" variant="outlined" className="product-list-control-sidebar">
+            {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
+            <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
+
+            <Divider />
+
+            <ProductsFilter
+              selectedCategories={productCategories}
+              onFiltersUpdate={handleFiltersUpdate}
+              doFilterProducts={filterProducts}
+              filterBtnDisabled={filterBtnDisabled}
+            />
+          </Paper>
+          <Toolbar className="product-list-control-topbar" component="aside">
+            <div className="product-list-control-topbar__buttons">
+              <ViewModeBtn viewModeType={listViewModesButton} onClick={switchListViewModes} />
+
+              {/* TODO: [UX] add sorting */}
+              <Button
+                onClick={handleSorting}
+                startIcon={<SortIcon />}
+                variant="contained"
+                color="primary"
+                aria-label={translations.sortingMode}
+                title={translations.sortingMode}
+              >
+                {translations.sortingMode}
+              </Button>
+            </div>
+
+            <ProductComparisonCandidatesList />
+          </Toolbar>
+        </>
+      )}
       <ul className={classNames('product-list', currentListViewModes)}>
         {productsList.length > 0
-          ? productsList.map((product) => {
-              return (
-                <li key={product.name}>
-                  <ProductItem product={product} />
-                </li>
-              );
-            })
+          ? productsList.map((product) => (
+              <li key={product.name}>
+                <ProductItem product={product} />
+              </li>
+            ))
           : translations.lackOfProducts}
       </ul>
 
       {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
-      <Pagination
-        itemsName="product"
-        translations={paginationTranslations}
-        currentItemPageIndex={currentProductPage - 1}
-        totalPages={totalPages}
-        itemLimitsPerPage={productsPerPageLimits}
-        onItemsPerPageLimitChange={onProductsPerPageLimitChange}
-        onItemPageChange={onProductPageChange}
-      />
-    </>
+      <Toolbar className="product-list-pagination">
+        <Pagination
+          itemsName="product"
+          translations={paginationTranslations}
+          currentItemPageIndex={currentProductPage - 1}
+          totalPages={totalPages}
+          itemLimitsPerPage={productsPerPageLimits}
+          onItemsPerPageLimitChange={onProductsPerPageLimitChange}
+          onItemPageChange={onProductPageChange}
+        />
+      </Toolbar>
+    </article>
   );
 }

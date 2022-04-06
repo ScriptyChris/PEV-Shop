@@ -118,6 +118,7 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
             }}
             forwardProps={{ trackedChanges: toJS(storeService.productComparisonState) }}
             render={({ elementRef, forwardProps: { trackedChanges: productComparisonState } }) => (
+              // TODO: [UX] adjust element's width according to children count (and container free space)
               <div /* this `div` is hooked with a `ref` by Scroller component */>
                 <ol
                   ref={elementRef}

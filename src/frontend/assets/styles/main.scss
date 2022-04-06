@@ -35,19 +35,17 @@ html {
 
 .app-root {
   display: grid;
-  grid-template-rows: 10vh minmax(80vh, auto) 10vh;
+  grid-template-rows: 4rem minmax(calc(100vh - 8rem), auto) 4rem;
   grid-template-areas:
     "header"
     "main"
     "footer";
-
-  & > * {
-    border: 1px solid red;
-  }
 }
 
 .header {
   grid-area: header;
+  height: 4rem;
+  justify-content: center;
 
   &__toolbar {
     justify-content: space-between;
