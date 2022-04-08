@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import storeService from '@frontend/features/storeService';
+
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import IconButton from '@material-ui/core/IconButton';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Divider from '@material-ui/core/Divider';
+
 import { ROUTES } from '@frontend/components/pages/_routes';
-import CompareProduct from './compareProducts';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { AddToCartButton } from '@frontend/components/views/cart';
+import { ProductComparisonCandidatesToggler } from './productComparisonCandidates';
 
 const translations = {
   productName: 'Name',
@@ -14,7 +23,6 @@ const translations = {
   actionsBarTogglerLabel: 'toggle actions bar',
   descriptiveProductPrice: 'product price',
   detailsBtn: 'Check details!',
-  addToCart: 'Add to cart!',
 };
 
 function ProductItemBasicDesc({ isCompact, compactLabel, dataCy, label, value }) {
@@ -55,84 +63,74 @@ export function ProductItemLink({
 }
 
 export default function ProductItem({ product, hasCompactBasicDesc = true }) {
-  const isMobileLayout = useMobileLayout();
-  const [actionsBarBtnsVisible, setActionsBarBtnsVisible] = useState(false);
+  const [menuBtnRef, setMenuBtnRef] = useState(null);
   const { name, price, _id } = product;
 
-  const handleClickToggleActionsBarBtns = () => {
-    setActionsBarBtnsVisible(!actionsBarBtnsVisible);
-
-    // simple one-time "off-click" for any app's element
-    document.addEventListener('click', () => setActionsBarBtnsVisible(false), { once: true });
-  };
-
-  const handleHoverToggleActionsBar = (shouldShow) => {
-    return () => {
-      if (!isMobileLayout) {
-        setActionsBarBtnsVisible(shouldShow);
-      }
-    };
-  };
-
-  const handleAddToCartClick = () => {
-    storeService.updateUserCartState({ name, price, _id } /* TODO: [TS] `as IUserCart['products']` */);
+  const handleClickToggleActionsBarBtns = (shouldShow) => {
+    return ({ currentTarget }) => setMenuBtnRef(shouldShow ? currentTarget : null);
   };
 
   return (
-    <div
-      onMouseEnter={handleHoverToggleActionsBar(true)}
-      onMouseLeave={handleHoverToggleActionsBar(false)}
-      className="product-item"
-      data-cy="container:product-item"
-    >
-      <ProductItemLink productData={product}>
-        <div className="product-item__image">TODO: [UI] image should go here</div>
-        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-item__image" />*/}
-      </ProductItemLink>
+    <Card className="product-item" data-cy="container:product-item">
+      <CardHeader
+        className="product-item__actions-bar"
+        action={
+          <IconButton
+            onClick={handleClickToggleActionsBarBtns(true)}
+            aria-label={translations.actionsBarTogglerLabel}
+            title={translations.actionsBarTogglerLabel}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        }
+      />
 
-      <dl className="product-item__metadata">
+      <CardContent>
         <ProductItemLink productData={product}>
-          <ProductItemBasicDesc
-            isCompact={hasCompactBasicDesc}
-            compactLabel={translations.descriptiveProductName}
-            dataCy="label:product-name"
-            label={translations.productName}
-            value={name}
-          />
+          <div className="product-item__image">TODO: [UI] image should go here</div>
+          {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-item__image" />*/}
         </ProductItemLink>
 
-        <ProductItemBasicDesc
-          isCompact={hasCompactBasicDesc}
-          compactLabel={translations.descriptiveProductPrice}
-          dataCy="label:product-price"
-          label={translations.price}
-          value={price}
-        />
-      </dl>
+        <dl className="product-item__metadata">
+          <ProductItemLink productData={product}>
+            <ProductItemBasicDesc
+              isCompact={hasCompactBasicDesc}
+              compactLabel={translations.descriptiveProductName}
+              dataCy="label:product-name"
+              label={translations.productName}
+              value={name}
+            />
+          </ProductItemLink>
 
-      <div className="product-item__actions-bar">
-        {actionsBarBtnsVisible && (
-          <div className="product-item__actions-bar-buttons">
-            <button onClick={handleAddToCartClick} data-cy="button:add-product-to-cart">
-              {translations.addToCart}
-            </button>
-
-            <CompareProduct.Toggler product={product} />
-          </div>
-        )}
-
-        {isMobileLayout && (
-          <button
-            onClick={handleClickToggleActionsBarBtns}
-            className="product-item__actions-bar-toggler"
-            title={translations.actionsBarTogglerLabel}
-            aria-label={translations.actionsBarTogglerLabel}
-          >
-            {/* TODO: [UI] put an icon here */}
-            [...]
-          </button>
-        )}
-      </div>
-    </div>
+          <ProductItemBasicDesc
+            isCompact={hasCompactBasicDesc}
+            compactLabel={translations.descriptiveProductPrice}
+            dataCy="label:product-price"
+            label={translations.price}
+            value={price}
+          />
+        </dl>
+      </CardContent>
+      <Menu
+        anchorEl={menuBtnRef}
+        open={!!menuBtnRef}
+        onClose={handleClickToggleActionsBarBtns(false)}
+        getContentAnchorEl={null}
+        anchorOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem button={false} className="product-item__actions-bar-button-item">
+          <AddToCartButton productInfoForCart={{ name, price, _id }} />
+          <Divider orientation="vertical" flexItem />
+          <ProductComparisonCandidatesToggler product={product} />
+        </MenuItem>
+      </Menu>
+    </Card>
   );
 }
