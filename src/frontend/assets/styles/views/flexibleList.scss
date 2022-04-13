@@ -1,0 +1,16 @@
+.flexible-list {
+    &__item {
+        justify-content: space-between;
+        gap: 0.5rem;
+        height: 3rem;
+    }
+
+    &__item-add-btn {
+        margin: auto;
+    }
+
+    &__item-btns {
+        display: flex;
+        gap: 0.5rem;
+    }
+}

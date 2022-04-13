@@ -1,23 +1,32 @@
-import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Formik, Field, ErrorMessage } from 'formik';
+import classNames from 'classnames';
+
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+
 import httpService from '@frontend/features/httpService';
 import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
 import FormFieldError from '@frontend/components/utils/formFieldError';
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
+import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
   intro: 'Fill new product details',
   baseInformation: 'Basic information',
   technicalSpecs: 'Technical specification',
   categoryChooser: 'Category',
-  chooseCategoryFirst: 'please, choose category first',
+  chooseCategoryFirst: 'A category needs to be chosen first...',
   name: 'Name',
   price: 'Price',
   addNewSpec: 'Add new spec',
   confirm: 'Confirm',
+  cancel: 'Cancel',
   save: 'Save',
   relatedProductsNames: 'Related products names',
   relatedProductName: 'Product name',
@@ -48,32 +57,41 @@ const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP)
 
 function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleBlur } }) {
   return (
-    <fieldset>
+    <fieldset className="new-product__base-info">
       <legend>{translations.baseInformation}</legend>
 
-      <label htmlFor="newProductName">{translations.name}</label>
-      <input
-        id="newProductName"
-        name="name"
-        type="text"
-        onChange={handleChange}
-        onBlur={handleBlur}
-        defaultValue={initialData.name}
-        required
-      />
+      <div className="new-product__base-info-group">
+        <label htmlFor="newProductName">{translations.name}</label>
+        <TextField
+          id="newProductName"
+          name="name"
+          type="text"
+          variant="outlined"
+          size="small"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          defaultValue={initialData.name}
+          required
+        />
+      </div>
 
-      <label htmlFor="newProductPrice">{translations.price}</label>
-      <input
-        id="newProductPrice"
-        name="price"
-        type="number"
-        step="0.01"
-        min="0.01"
-        onChange={handleChange}
-        onBlur={handleBlur}
-        defaultValue={initialData.price}
-        required
-      />
+      <div className="new-product__base-info-group">
+        <label htmlFor="newProductPrice">{translations.price}</label>
+        <TextField
+          id="newProductPrice"
+          name="price"
+          type="number"
+          step="0.01"
+          min="0.01"
+          variant="outlined"
+          size="small"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          defaultValue={initialData.price}
+          required
+        />
+        {/* TODO: [feature] add currency chooser */}
+      </div>
     </fieldset>
   );
 }
@@ -91,15 +109,19 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
 
       <FlexibleList
         initialListItems={initialData[formikField.name]}
-        newItemComponent={(listFeatures) => (
-          <ShortDescription.InputComponent shortDescriptionList={shortDescriptionList} listFeatures={listFeatures} />
-        )}
-        editItemComponent={(shortDescItem, index, listFeatures) => (
+        NewItemComponent={({ listFeatures, ...restProps }) => (
           <ShortDescription.InputComponent
+            {...restProps}
             shortDescriptionList={shortDescriptionList}
-            editedDescIndex={index}
-            presetValue={shortDescItem}
             listFeatures={listFeatures}
+          />
+        )}
+        EditItemComponent={({ item: shortDescItem, ...restProps }) => (
+          <ShortDescription.InputComponent
+            {...restProps}
+            shortDescriptionList={shortDescriptionList}
+            isEditMode={true}
+            presetValue={shortDescItem}
           />
         )}
         emitUpdatedItemsList={setShortDescriptionList}
@@ -110,42 +132,57 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
   );
 }
 ShortDescription.InputComponent = function InputComponent(props) {
-  const inputRef = createRef();
-  const [isDisabled, setIsDisabled] = useState(false);
-  const updateItem = (updateValue, isEditMode) => {
-    if (isEditMode) {
-      props.listFeatures.editItem(updateValue, props.editedDescIndex);
-    } else {
-      props.listFeatures.addItem(updateValue);
+  const inputRef = useRef();
+  const [isChildrenVisible, setIsChildrenVisible] = useState(false);
+  const [isConfirmBtnDisabled, setIsConfirmBtnDisabled] = useState(props.isEditMode);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (inputRef.current && props.children) {
+      setIsChildrenVisible(true);
     }
-  };
-  const isEditMode = props.editedDescIndex > -1;
+  }, [inputRef.current, props.children]);
+
   const validateInput = (value) => {
     const isValid = !props.shortDescriptionList.some((descriptionItem) => value === descriptionItem);
-    setIsDisabled(!isValid);
+    setIsConfirmBtnDisabled(!isValid);
+    setError(isValid ? '' : translations.duplicatedDescription);
 
     return isValid;
   };
 
   return (
     <>
-      <input
-        ref={inputRef}
-        type="text"
+      <TextField
+        inputRef={inputRef}
+        variant="outlined"
+        size="small"
         defaultValue={props.presetValue || ''}
         onKeyDown={(event) => {
           if (event.key === 'Enter') {
             event.preventDefault();
 
+            if (isConfirmBtnDisabled) {
+              return;
+            }
+
             const inputValue = event.target.value;
 
             if (validateInput(inputValue)) {
-              updateItem(inputValue, isEditMode);
+              props.updateItem({
+                updateValue: inputValue,
+                isEditMode: props.isEditMode,
+                editedIndex: props.editedIndex,
+              });
             }
+          } else if (event.key === 'Escape') {
+            props.listFeatures.resetState();
           }
         }}
         onChange={({ target: { value } }) => {
-          if (isDisabled) {
+          setIsConfirmBtnDisabled(!!(props.presetValue && props.presetValue === value));
+
+          if (isConfirmBtnDisabled) {
             validateInput(value);
           }
         }}
@@ -153,21 +190,24 @@ ShortDescription.InputComponent = function InputComponent(props) {
         required
       />
 
-      <button
-        type="button"
-        onClick={() => {
-          const inputValue = inputRef.current.value;
+      {isChildrenVisible &&
+        props.children({
+          inputItemRef: inputRef,
+          isConfirmBtnDisabled,
+          onConfirmBtnClick: () => {
+            const inputValue = inputRef.current.value;
 
-          if (validateInput(inputValue)) {
-            updateItem(inputValue, isEditMode);
-          }
-        }}
-        disabled={isDisabled}
-      >
-        {translations.confirm}
-      </button>
+            if (validateInput(inputValue)) {
+              props.updateItem({
+                updateValue: inputValue,
+                isEditMode: props.isEditMode,
+                editedIndex: props.editedIndex,
+              });
+            }
+          },
+        })}
 
-      {isDisabled && <FormFieldError>{translations.duplicatedDescription}</FormFieldError>}
+      {error && <FormFieldError>{error}</FormFieldError>}
     </>
   );
 };
@@ -190,6 +230,7 @@ function CategorySelector({
         component={CategoriesTreeFormField}
         onCategorySelect={handleCategorySelect}
         preSelectedCategory={initialData.category}
+        forceCombinedView={true}
       />
       <ErrorMessage name="category" component={FormFieldError} />
     </fieldset>
@@ -232,76 +273,86 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
     }
   }, [prepareInitialDataStructure.structure]);
 
-  const getSpecsFields = () => {
-    return productCurrentSpecs.map((spec) => {
-      const fieldIdentifier = `${spec.name
-        .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
-        .replace(/\s/g, '')}Field`;
-      const minValue = spec.fieldType === 'number' ? 0 : null;
-      const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
-
-      return (
-        <div key={fieldIdentifier}>
-          <label htmlFor={fieldIdentifier}>
-            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-            {SPEC_NAMES_SEPARATORS.SPACE}
-            {spec.defaultUnit && `(${spec.defaultUnit})`}
-          </label>
-
-          {Array.isArray(spec.descriptions) ? (
-            spec.descriptions.map((specDescription, index) => {
-              const groupFieldIdentifier = `${fieldIdentifier}${index}`;
-              const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
-
-              return (
-                <div key={groupFieldIdentifier}>
-                  <label htmlFor={groupFieldIdentifier}>
-                    {specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-                  </label>
-
-                  <input
-                    name={mergedName}
-                    type={spec.fieldType}
-                    min={minValue}
-                    id={groupFieldIdentifier}
-                    onChange={handleChange}
-                    defaultValue={
-                      prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[mergedName] : ''
-                    }
-                    required
-                  />
-                </div>
-              );
-            })
-          ) : (
-            <input
-              name={BASE_NAME}
-              type={spec.fieldType}
-              min={minValue}
-              id={fieldIdentifier}
-              onChange={handleChange}
-              defaultValue={
-                prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
-              }
-              required
-            />
-          )}
-
-          <ErrorMessage name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`} component={FormFieldError} />
-        </div>
-      );
-    });
-  };
-
   return (
-    <fieldset>
-      <legend>
-        {translations.technicalSpecs}
-        {SPEC_NAMES_SEPARATORS.SPACE}
-        {productCurrentSpecs.length === 0 && <span>({translations.chooseCategoryFirst})</span>}
-      </legend>
+    <fieldset className="new-product__technical-specs">
+      <legend>{translations.technicalSpecs}</legend>
 
-      {productCurrentSpecs.length > 0 && getSpecsFields()}
+      {productCurrentSpecs.length > 0 ? (
+        productCurrentSpecs.map((spec) => {
+          const fieldIdentifier = `${spec.name
+            .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
+            .replace(/\s/g, '')}Field`;
+          const minValue = spec.fieldType === 'number' ? 0 : null;
+          const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
+          const isSpecDescriptionsArray = Array.isArray(spec.descriptions);
+
+          return (
+            <div
+              className={classNames(
+                { 'new-product__technical-specs-controls-group': !isSpecDescriptionsArray },
+                { 'new-product__technical-specs-controls-group--nested-container': isSpecDescriptionsArray }
+              )}
+              key={fieldIdentifier}
+            >
+              <label htmlFor={fieldIdentifier}>
+                {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+                {SPEC_NAMES_SEPARATORS.SPACE}
+                {spec.defaultUnit && `(${spec.defaultUnit})`}
+              </label>
+
+              {isSpecDescriptionsArray ? (
+                spec.descriptions.map((specDescription, index) => {
+                  const groupFieldIdentifier = `${fieldIdentifier}${index}`;
+                  const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+
+                  return (
+                    <div className="new-product__technical-specs-controls-group" key={groupFieldIdentifier}>
+                      <label htmlFor={groupFieldIdentifier}>
+                        {specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+                      </label>
+
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        name={mergedName}
+                        type={spec.fieldType}
+                        inputProps={{ min: minValue }}
+                        id={groupFieldIdentifier}
+                        onChange={handleChange}
+                        defaultValue={
+                          prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[mergedName] : ''
+                        }
+                        required
+                      />
+                    </div>
+                  );
+                })
+              ) : (
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  name={BASE_NAME}
+                  type={spec.fieldType}
+                  inputProps={{ min: minValue }}
+                  id={fieldIdentifier}
+                  onChange={handleChange}
+                  defaultValue={
+                    prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
+                  }
+                  required
+                />
+              )}
+
+              <ErrorMessage
+                name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
+                component={FormFieldError}
+              />
+            </div>
+          );
+        })
+      ) : (
+        <em className="new-product__technical-specs-category-choice-reminder">{translations.chooseCategoryFirst}</em>
+      )}
     </fieldset>
   );
 }
@@ -314,42 +365,43 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
   }, [relatedProductNamesList]);
 
   const BoundSearchSingleProductByName = useCallback(
-    (props) => (
-      <SearchSingleProductByName
-        {...props}
-        list="foundRelatedProductsNames"
-        debounceTimeMs={200}
-        label={translations.relatedProductName}
-        searchingTarget="relatedProductsNames"
-        ignoredProductNames={relatedProductNamesList.filter(
-          (productName) => productName && props.presetValue !== productName
-        )}
-        onSelectedProductName={(productName) => {
-          if (props.editedProductIndex > -1) {
-            props.listFeatures.editItem(productName, props.editedProductIndex);
-          } else {
-            props.listFeatures.addItem(productName);
-          }
-        }}
-        autoFocus={true}
-      />
+    ({ children = () => void 0, ...props }) => (
+      <>
+        <SearchSingleProductByName
+          {...props}
+          list="foundRelatedProductsNames"
+          debounceTimeMs={200}
+          label={translations.relatedProductName}
+          searchingTarget="relatedProductsNames"
+          ignoredProductNames={relatedProductNamesList.filter(
+            (productName) => productName && props.presetValue !== productName
+          )}
+          onSelectedProductName={(productName) => {
+            if (props.editedProductIndex > -1) {
+              props.listFeatures.editItem(productName, props.editedProductIndex);
+            } else {
+              props.listFeatures.addItem(productName);
+            }
+          }}
+          onEscapeBtn={() => props.listFeatures.resetState()}
+          autoFocus={true}
+          separateLabel={true}
+        />
+        {children()}
+      </>
     ),
     [relatedProductNamesList]
   );
 
   return (
-    <fieldset className="new-product">
+    <fieldset className="new-product__related-product-names">
       <legend>{translations.relatedProductsNames}</legend>
 
       <FlexibleList
         initialListItems={initialData[formikField.name]}
-        newItemComponent={(listFeatures) => <BoundSearchSingleProductByName listFeatures={listFeatures} />}
-        editItemComponent={(relatedProductName, index, listFeatures) => (
-          <BoundSearchSingleProductByName
-            presetValue={relatedProductName}
-            editedProductIndex={index}
-            listFeatures={listFeatures}
-          />
+        NewItemComponent={(props) => <BoundSearchSingleProductByName {...props} />}
+        EditItemComponent={({ item: relatedProductName, index, ...restProps }) => (
+          <BoundSearchSingleProductByName {...restProps} presetValue={relatedProductName} editedProductIndex={index} />
         )}
         emitUpdatedItemsList={setRelatedProductNamesList}
       />
@@ -434,6 +486,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 
     return _getNestedEntries;
   }, []);
+  const isMobileLayout = useMobileLayout();
 
   useEffect(() => {
     (async () => {
@@ -553,11 +606,13 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   };
 
   return (
-    <section>
+    <Paper component="section" className={classNames('new-product', { 'new-product--pc': !isMobileLayout })}>
       <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
         {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
-            <h2>{translations.intro}</h2>
+            <Typography variant="h2" component="h2">
+              {translations.intro}
+            </Typography>
 
             <BaseInfo
               data={{ initialData: formikRestProps.values }}
@@ -584,16 +639,18 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
               component={RelatedProductsNames}
             />
 
-            <button
+            <Button
               type="submit"
               onClick={() => !formikRestProps.touched.category && formikRestProps.setFieldTouched('category')}
+              variant="outlined"
+              fullWidth
             >
               {translations.save}
-            </button>
+            </Button>
           </form>
         )}
       </Formik>
-    </section>
+    </Paper>
   );
 };
 ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 'relatedProductsNames'];

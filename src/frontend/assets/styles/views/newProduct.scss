@@ -1,5 +1,65 @@
+.new-product--pc {
+  max-width: 768px;
+  margin-inline: auto;
+}
+
 .new-product {
-  li {
+  padding: 0.25rem;
+
+  legend {
+    margin-left: 1rem;
+  }
+
+  &__base-info-group {
+    height: 3rem;
+    margin: 0 1rem;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__base-info {
+    input {
+      &:focus {
+        // TODO: [UI] normalize color usage
+        border: 2px solid #3f51b5;
+        border-color: #1976d2;
+        outline: none;
+      }
+    }
+  }
+  
+  &__technical-specs-category-choice-reminder {
+    display: block;
+    text-align: center;
+    margin: 1rem;
+  }
+
+  &__technical-specs-controls-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 3rem;
+  }
+
+  &__technical-specs-controls-group--nested-container {
+    .new-product__technical-specs-controls-group {
+      margin: 0;
+
+      label {
+        margin-left: 2rem;
+      }
+    }
+  }
+
+  &__technical-specs-controls-group,
+  &__technical-specs-controls-group--nested-container {
+    margin: 0 1rem;
+    align-items: center;
+  }
+
+  &__related-product-names {
+    li {
+      display: flex;
+    }
   }
 }

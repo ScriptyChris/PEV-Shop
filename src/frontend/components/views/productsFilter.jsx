@@ -91,6 +91,8 @@ const GetControlsForSpecs = (() => {
 
     return (
       <fieldset key={`spec${name}Filter`}>
+        {/* TODO: [UX] fix layout to prevent vertical overflow (especially when accordion is fully expanded) */}
+        {/* TODO: [UX] accordion should rather be fully expanded by default on PC */}
         <Accordion
           onChange={(event, expanded) => {
             if (expanded) {

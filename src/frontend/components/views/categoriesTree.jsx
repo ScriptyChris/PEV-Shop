@@ -223,9 +223,10 @@ function Tree({
   );
 }
 
-function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultiselect, formField }) {
+function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultiselect, formField, forceCombinedView }) {
   const isMobileLayout = useMobileLayout();
-  const [isTreeHidden, setIsTreeHidden] = useState(isMobileLayout);
+  const isSeparatedView = isMobileLayout && !forceCombinedView;
+  const [isTreeHidden, setIsTreeHidden] = useState(isSeparatedView);
   const { treeData, treeInitials, updateTreeInitials } = useTreeMetaData({
     preSelectedCategory,
     onCategorySelect,
@@ -233,7 +234,7 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
   const categoriesTreeRef = useRef();
   const activeTreeNodes = useRef(new Map());
 
-  useEffect(() => setIsTreeHidden(isMobileLayout), [isMobileLayout]);
+  useEffect(() => setIsTreeHidden(isSeparatedView), [isMobileLayout]);
 
   const handleCategoriesTreeToggle = () => setIsTreeHidden(!isTreeHidden);
 
@@ -283,7 +284,7 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
     return matchedParent ? `${matchedParent.label}${CATEGORIES_SEPARATOR}` : '';
   };
 
-  return isMobileLayout ? (
+  return isSeparatedView ? (
     <>
       <IconButton
         onClick={handleCategoriesTreeToggle}

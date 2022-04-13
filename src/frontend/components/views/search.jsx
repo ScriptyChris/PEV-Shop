@@ -2,13 +2,10 @@ import React, { memo, useRef, createRef, useState, useEffect, forwardRef } from 
 import classNames from 'classnames';
 
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
+import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextFormat from '@material-ui/icons/TextFormat';
-import Slide from '@material-ui/core/Slide';
 import Zoom from '@material-ui/core/Zoom';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
@@ -26,21 +23,31 @@ const Search = memo(function Search({
   searchingTarget = Math.random() /* TODO: make default value more spec conforming */,
   debounceTimeMs = 0,
   onInputChange,
+  onEscapeBtn = () => void 0,
   forwardedRef,
   customCheckbox = null,
   list = '',
   presetValue = '',
   autoFocus = false,
+  separateLabel = false,
 }) {
   if (Number.isNaN(debounceTimeMs) || typeof debounceTimeMs !== 'number') {
     throw TypeError(`debounceTimeMs prop must be number! Received: ${debounceTimeMs}`);
   } else if (typeof onInputChange !== 'function') {
-    throw TypeError(`onInputChange props must be a function! Received: ${onInputChange}`);
+    throw TypeError(`onInputChange prop must be a function! Received: ${onInputChange}`);
+  } else if (onEscapeBtn && typeof onEscapeBtn !== 'function') {
+    throw TypeError(`onEscapeBtn prop must be a function! Received: ${onEscapeBtn}`);
   }
 
   const [inputValue, setInputValue] = useState(presetValue);
   const debounce = useRef(-1);
   const inputId = `${searchingTarget}Search`;
+  const variantAndSize = separateLabel
+    ? {
+        variant: 'outlined',
+        size: 'small',
+      }
+    : {};
 
   const debounceNotify = (notifier) => {
     if (debounce.current > -1) {
@@ -60,25 +67,37 @@ const Search = memo(function Search({
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      onEscapeBtn();
+    }
+  };
+
   return (
     <>
-      <FormControl ref={forwardedRef} size="small">
-        <InputLabel className="search-container__field-label" htmlFor={inputId}>
+      {separateLabel && (
+        <label className="search-container__field-label" htmlFor={inputId}>
           {label}
-        </InputLabel>
-        <Input
-          id={inputId}
-          type="search"
-          onChange={handleChange}
-          inputProps={{
-            value: inputValue,
-            list: list,
-            autoFocus: autoFocus,
-            autoComplete: 'off',
-          }}
-          endAdornment={customCheckbox && <InputAdornment position="end">{customCheckbox}</InputAdornment>}
-        />
-      </FormControl>
+        </label>
+      )}
+      <TextField
+        ref={forwardedRef}
+        id={inputId}
+        type="search"
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        inputProps={{
+          value: inputValue,
+          list: list,
+          autoFocus: autoFocus,
+          autoComplete: 'off',
+        }}
+        InputProps={{
+          endAdornment: customCheckbox && <InputAdornment position="end">{customCheckbox}</InputAdornment>,
+        }}
+        placeholder={separateLabel ? '' : label}
+        {...variantAndSize}
+      />
     </>
   );
 });
