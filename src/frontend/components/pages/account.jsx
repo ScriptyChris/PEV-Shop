@@ -5,7 +5,7 @@ import httpService from '@frontend/features/httpService';
 import { SetNewPassword } from '@frontend/components/views/password';
 import userSessionService from '@frontend/features/userSessionService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
-import ProductItem from '@frontend/components/views/productItem';
+import ProductCard from '@frontend/components/views/productCard';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
@@ -199,7 +199,7 @@ function ObservedProducts() {
         {observedProducts.length
           ? observedProducts.map((product) => (
               <li key={product.name}>
-                <ProductItem product={product} />
+                <ProductCard product={product} />
               </li>
             ))
           : translations.lackOfData}

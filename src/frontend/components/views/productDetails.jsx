@@ -15,7 +15,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MUILink from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
 
-import ProductItem from './productItem';
+import ProductCard from './productCard';
 import { ProductComparisonCandidatesList } from '@frontend/components/views/productComparisonCandidates';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
@@ -117,7 +117,7 @@ function AddReview({ productName, updateReviews }) {
                 </span>
               </div>
 
-              <Field name="rating" component={RatingWidget} required />
+              <Field name="rating" component={RatingWidget} isBig={true} required />
 
               {/* TODO: [UX] adjust <textarea> size to device */}
               <Field name="content" placeholder={productDetailsTranslations.reviewContentPlaceholder} as="textarea" />
@@ -287,10 +287,10 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
             return (
               <MenuItem button={false} disableGutters={extras.disableListItemGutters} key={`related-product-${index}`}>
                 {/*
-                  TODO: ProductItem component in this case will not have full product info, 
-                  so it has to somehow fetch it on it's own
+                  TODO: ProductCard component in this case will not have full product info, 
+                  so it has to somehow fetch it on its own
                 */}
-                <ProductItem product={relatedProduct} />
+                <ProductCard product={relatedProduct} />
               </MenuItem>
             );
           })}
@@ -554,13 +554,14 @@ export default function ProductDetails({ product }) {
         </p>
 
         <div className="product-details__header-image">TODO: [UI] image should go here</div>
-        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-item__image" />*/}
+        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-details__header-image" />*/}
 
         <Typography variant="h2" component="h2" className="product-details__header-name">
           <ProductSpecificDetail detailName="name" detailValue={productDetails.name} />
         </Typography>
         <RatingWidget
           presetValue={productDetails.reviews.averageRating}
+          isBig={true}
           externalClassName="product-details__header-rating"
         />
 
@@ -695,7 +696,7 @@ export default function ProductDetails({ product }) {
             <Scroller
               scrollerBaseValueMeta={{
                 selector: '.product-details__nav-section-related-products',
-                varName: '--related-product-item-width',
+                varName: '--related-product-card-width',
               }}
               render={({ elementRef }) => (
                 <div /* this `div` is hooked with a `ref` by Scroller component */>

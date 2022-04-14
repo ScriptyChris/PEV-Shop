@@ -11,6 +11,7 @@ const CLASS_NAMES = Object.freeze({
 
 // TODO: [UX] refactor this to MUI's Rating component
 export default function RatingWidget({
+  isBig = false,
   presetValue = 0,
   scale = RATING_MAX_VALUE,
   externalClassName = '',
@@ -19,6 +20,10 @@ export default function RatingWidget({
 }) {
   if (Number.parseInt(scale) !== scale) {
     throw TypeError(`'scale' prop must be an integer! Received '${scale}'`);
+  } else if (typeof presetValue !== 'number') {
+    throw TypeError(`'presetValue' prop must be a number! Received '${presetValue}'`);
+  } else if (typeof isBig !== 'boolean') {
+    throw TypeError(`'isBig' prop must be a boolean! Received '${isBig}'`);
   }
 
   const [lastActiveRatingValue, setLastActiveRatingValue] = useState(presetValue);
@@ -51,11 +56,10 @@ export default function RatingWidget({
       iconClasses.push(`${CLASS_NAMES.ICON}--odd`);
     }
 
-    if (presetValue) {
-      iconClasses.push(`${CLASS_NAMES.ICON}--small`);
-    } else {
-      iconClasses.push(`${CLASS_NAMES.ICON}--big`);
+    const smallOrBig = isBig ? 'big' : 'small';
+    iconClasses.push(`${CLASS_NAMES.ICON}--${smallOrBig}`);
 
+    if (!presetValue) {
       if (ratingValue <= lastHoverRatingValue) {
         iconClasses.push(`${CLASS_NAMES.ICON}--hover`);
       }

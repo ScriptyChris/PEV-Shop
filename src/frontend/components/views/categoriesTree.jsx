@@ -18,6 +18,7 @@ const translations = Object.freeze({
   toggleCategoriesTree: 'Categories',
   goBackLabel: 'go back',
   categoriesSearchAriaLabel: 'Type and search',
+  lackOfData: 'No data!',
 });
 const CATEGORIES_SEPARATOR = '|';
 
@@ -283,6 +284,10 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
     const matchedParent = treeData.find((node) => clickedItem.parent && clickedItem.parent === node.key);
     return matchedParent ? `${matchedParent.label}${CATEGORIES_SEPARATOR}` : '';
   };
+
+  if (!treeData) {
+    return translations.lackOfData;
+  }
 
   return isSeparatedView ? (
     <>

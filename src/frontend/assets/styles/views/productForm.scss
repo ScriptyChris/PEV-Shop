@@ -1,9 +1,9 @@
-.new-product--pc {
+.product-form--pc {
   max-width: 768px;
   margin-inline: auto;
 }
 
-.new-product {
+.product-form {
   padding: 0.25rem;
 
   legend {
@@ -42,7 +42,7 @@
   }
 
   &__technical-specs-controls-group--nested-container {
-    .new-product__technical-specs-controls-group {
+    .product-form__technical-specs-controls-group {
       margin: 0;
 
       label {

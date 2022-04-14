@@ -25,7 +25,7 @@ const translations = {
   detailsBtn: 'Check details!',
 };
 
-function ProductItemBasicDesc({ isCompact, compactLabel, dataCy, label, value }) {
+function ProductCardBasicDesc({ isCompact, compactLabel, dataCy, label, value }) {
   return (
     <div>
       {isCompact ? (
@@ -43,7 +43,7 @@ function ProductItemBasicDesc({ isCompact, compactLabel, dataCy, label, value })
   );
 }
 
-export function ProductItemLink({
+export function ProductCardLink({
   productData,
   children,
   /* TODO: [UX] consider if it's needed */ isTextVisible = false,
@@ -62,7 +62,7 @@ export function ProductItemLink({
   );
 }
 
-export default function ProductItem({ product, hasCompactBasicDesc = true }) {
+export default function ProductCard({ product, hasCompactBasicDesc = true }) {
   const [menuBtnRef, setMenuBtnRef] = useState(null);
   const { name, price, _id } = product;
 
@@ -71,14 +71,15 @@ export default function ProductItem({ product, hasCompactBasicDesc = true }) {
   };
 
   return (
-    <Card className="product-item" data-cy="container:product-item">
+    <Card className="product-card" data-cy="container:product-card">
       <CardHeader
-        className="product-item__actions-bar"
+        className="product-card__actions-bar-toggler"
         action={
           <IconButton
             onClick={handleClickToggleActionsBarBtns(true)}
             aria-label={translations.actionsBarTogglerLabel}
             title={translations.actionsBarTogglerLabel}
+            data-cy="button:toggle-action-bar"
           >
             <MoreVertIcon />
           </IconButton>
@@ -86,23 +87,23 @@ export default function ProductItem({ product, hasCompactBasicDesc = true }) {
       />
 
       <CardContent>
-        <ProductItemLink productData={product}>
-          <div className="product-item__image">TODO: [UI] image should go here</div>
-          {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-item__image" />*/}
-        </ProductItemLink>
+        <ProductCardLink productData={product}>
+          <div className="product-card__image">TODO: [UI] image should go here</div>
+          {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
+        </ProductCardLink>
 
-        <dl className="product-item__metadata">
-          <ProductItemLink productData={product}>
-            <ProductItemBasicDesc
+        <dl className="product-card__metadata">
+          <ProductCardLink productData={product}>
+            <ProductCardBasicDesc
               isCompact={hasCompactBasicDesc}
               compactLabel={translations.descriptiveProductName}
               dataCy="label:product-name"
               label={translations.productName}
               value={name}
             />
-          </ProductItemLink>
+          </ProductCardLink>
 
-          <ProductItemBasicDesc
+          <ProductCardBasicDesc
             isCompact={hasCompactBasicDesc}
             compactLabel={translations.descriptiveProductPrice}
             dataCy="label:product-price"
@@ -124,10 +125,18 @@ export default function ProductItem({ product, hasCompactBasicDesc = true }) {
           vertical: 'center',
           horizontal: 'right',
         }}
+        MenuListProps={{
+          className: 'product-card__actions-bar',
+          'data-cy': 'container:product-card__action-bar',
+        }}
       >
-        <MenuItem button={false} className="product-item__actions-bar-button-item">
+        <MenuItem button={false} className="product-card__actions-bar-item">
           <AddToCartButton productInfoForCart={{ name, price, _id }} />
+        </MenuItem>
+        <MenuItem button={false} disableGutters={true} className="product-card__actions-bar-item">
           <Divider orientation="vertical" flexItem />
+        </MenuItem>
+        <MenuItem button={false} className="product-card__actions-bar-item">
           <ProductComparisonCandidatesToggler product={product} />
         </MenuItem>
       </Menu>

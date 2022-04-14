@@ -35,7 +35,7 @@ function LinkWrapper({ children, ...restProps }) {
   );
 }
 
-function NavMenu({ logOutUser, isMobile }) {
+const NavMenu = observer(({ logOutUser, isMobile }) => {
   return (
     <nav className={classNames('nav', { 'nav--is-mobile': isMobile })}>
       <List className="nav__links">
@@ -71,9 +71,9 @@ function NavMenu({ logOutUser, isMobile }) {
       </List>
     </nav>
   );
-}
+});
 
-export default observer(function Nav() {
+export default function Nav() {
   const history = useHistory();
   const isMobileLayout = useMobileLayout();
   const [isMobileMenuOpened, setIsMobileMenuOpened] = useState(false);
@@ -130,4 +130,4 @@ export default observer(function Nav() {
   ) : (
     <NavMenu logOutUser={logOutUser} />
   );
-});
+}

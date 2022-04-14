@@ -146,9 +146,11 @@ function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMain
   };
 
   const focusSearchInput = (searchRootRef) => {
-    const searchInput = searchRootRef.querySelector('input[type="search"]');
+    if (restProps.autoFocus) {
+      const searchInput = searchRootRef.querySelector('input[type="search"]');
 
-    setTimeout(() => searchInput.focus());
+      setTimeout(() => searchInput.focus());
+    }
   };
 
   const toggleSearchBtn = (shouldShow) => {

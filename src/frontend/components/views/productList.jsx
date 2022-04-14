@@ -12,7 +12,7 @@ import ListIcon from '@material-ui/icons/List';
 import Toolbar from '@material-ui/core/Toolbar';
 
 import httpService from '@frontend/features/httpService';
-import ProductItem from './productItem';
+import ProductCard from './productCard';
 import Pagination from '@frontend/components/utils/pagination';
 import CategoriesTree from './categoriesTree';
 import { ProductComparisonCandidatesList } from './productComparisonCandidates';
@@ -338,7 +338,7 @@ export default function ProductList() {
         {productsList.length > 0
           ? productsList.map((product) => (
               <li key={product.name}>
-                <ProductItem product={product} />
+                <ProductCard product={product} />
               </li>
             ))
           : translations.lackOfProducts}

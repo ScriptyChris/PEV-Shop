@@ -152,7 +152,7 @@
     &__nav-section-related-products {
         display: flex;
         align-items: center;
-        --related-product-item-width: 200px;
+        --related-product-card-width: 200px;
 
         [data-compare-btn-scroll-dir] button {
             width: 2rem;

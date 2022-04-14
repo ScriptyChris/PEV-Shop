@@ -1,13 +1,17 @@
-.product-item {
+.product-card {
   position: relative;
 
-  &__actions-bar {
+  &__actions-bar-toggler {
     position: absolute;
     top: 0;
     right: 0;
   }
+  
+  &__actions-bar {
+    display: flex;
+  }
 
-  &__actions-bar-button-item {
+  &__actions-bar-item {
     column-gap: 0.5rem;
   }
 

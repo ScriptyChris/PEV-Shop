@@ -5,7 +5,7 @@ import { Route, Switch } from 'react-router-dom';
 import { ROUTES } from './_routes';
 import ProductList from '@frontend/components/views/productList';
 import ProductDetails from '@frontend/components/views/productDetails';
-import { NewProduct, ModifyProduct } from './newProduct';
+import { NewProduct, ModifyProduct } from './productForm';
 import ProductComparison from './productComparison';
 import Order from './order';
 import NotFound from './notFound';

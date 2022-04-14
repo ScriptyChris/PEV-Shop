@@ -13,7 +13,7 @@ import TableCell from '@material-ui/core/TableCell';
 import storeService from '@frontend/features/storeService';
 import { ProductSpecificDetail, getProductDetailsHeaders } from '@frontend/components/views/productDetails';
 import Scroller from '@frontend/components/utils/scroller';
-import { ProductItemLink } from '@frontend/components/views/productItem';
+import { ProductCardLink } from '@frontend/components/views/productCard';
 
 const translations = {
   productsAmountLabelPrefix: 'Comparing',
@@ -77,11 +77,11 @@ export default function Compare() {
               // TODO: [UX] hovering over certain spec could highlight regarding specs in other compared products
               <TableCell className="product-comparison__cell" component="div" role="cell" key={`cell-${dataIndex}`}>
                 {detailHeader === 'name' ? (
-                  <ProductItemLink
+                  <ProductCardLink
                     productData={toJS(storeService.productComparisonState[dataIndex], { recurseEverything: true })}
                   >
                     {preparedProductDetail}
-                  </ProductItemLink>
+                  </ProductCardLink>
                 ) : (
                   preparedProductDetail
                 )}

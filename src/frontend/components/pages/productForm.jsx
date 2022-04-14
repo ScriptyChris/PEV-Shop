@@ -57,10 +57,10 @@ const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP)
 
 function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleBlur } }) {
   return (
-    <fieldset className="new-product__base-info">
+    <fieldset className="product-form__base-info">
       <legend>{translations.baseInformation}</legend>
 
-      <div className="new-product__base-info-group">
+      <div className="product-form__base-info-group">
         <label htmlFor="newProductName">{translations.name}</label>
         <TextField
           id="newProductName"
@@ -75,7 +75,7 @@ function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleB
         />
       </div>
 
-      <div className="new-product__base-info-group">
+      <div className="product-form__base-info-group">
         <label htmlFor="newProductPrice">{translations.price}</label>
         <TextField
           id="newProductPrice"
@@ -274,7 +274,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
   }, [prepareInitialDataStructure.structure]);
 
   return (
-    <fieldset className="new-product__technical-specs">
+    <fieldset className="product-form__technical-specs">
       <legend>{translations.technicalSpecs}</legend>
 
       {productCurrentSpecs.length > 0 ? (
@@ -289,8 +289,8 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
           return (
             <div
               className={classNames(
-                { 'new-product__technical-specs-controls-group': !isSpecDescriptionsArray },
-                { 'new-product__technical-specs-controls-group--nested-container': isSpecDescriptionsArray }
+                { 'product-form__technical-specs-controls-group': !isSpecDescriptionsArray },
+                { 'product-form__technical-specs-controls-group--nested-container': isSpecDescriptionsArray }
               )}
               key={fieldIdentifier}
             >
@@ -306,7 +306,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
                   const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
 
                   return (
-                    <div className="new-product__technical-specs-controls-group" key={groupFieldIdentifier}>
+                    <div className="product-form__technical-specs-controls-group" key={groupFieldIdentifier}>
                       <label htmlFor={groupFieldIdentifier}>
                         {specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
                       </label>
@@ -351,7 +351,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
           );
         })
       ) : (
-        <em className="new-product__technical-specs-category-choice-reminder">{translations.chooseCategoryFirst}</em>
+        <em className="product-form__technical-specs-category-choice-reminder">{translations.chooseCategoryFirst}</em>
       )}
     </fieldset>
   );
@@ -394,7 +394,7 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
   );
 
   return (
-    <fieldset className="new-product__related-product-names">
+    <fieldset className="product-form__related-product-names">
       <legend>{translations.relatedProductsNames}</legend>
 
       <FlexibleList
@@ -606,7 +606,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   };
 
   return (
-    <Paper component="section" className={classNames('new-product', { 'new-product--pc': !isMobileLayout })}>
+    <Paper component="section" className={classNames('product-form', { 'product-form--pc': !isMobileLayout })}>
       <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
         {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
@@ -623,12 +623,10 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
               data={{ initialData: formikRestProps.values }}
               component={ShortDescription}
             />
-            {Object.values(productSpecsMap.current).filter(Boolean).length && (
-              <CategorySelector
-                data={{ initialData: formikRestProps.values }}
-                methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
-              />
-            )}
+            <CategorySelector
+              data={{ initialData: formikRestProps.values }}
+              methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
+            />
             <TechnicalSpecs
               data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
               methods={{ handleChange: formikRestProps.handleChange, setFieldValue: formikRestProps.setFieldValue }}
