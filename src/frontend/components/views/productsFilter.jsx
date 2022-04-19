@@ -102,7 +102,11 @@ const GetControlsForSpecs = (() => {
             }
           }}
         >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls={`spec-${name}-content`}
+            id={`spec-${name}-header`}
+          >
             <legend className="products-filter__form-field-legend">{getLegendContent()}</legend>
           </AccordionSummary>
           <AccordionDetails>

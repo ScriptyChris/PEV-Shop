@@ -35,6 +35,10 @@ function LinkWrapper({ children, ...restProps }) {
   );
 }
 
+/*
+  TODO: [UX/a11y] implement (interactive - so i.e. user can go back a few levels) mini nav widget 
+        located under main header to indicate where user currently is
+*/
 const NavMenu = observer(({ logOutUser, isMobile }) => {
   return (
     <nav className={classNames('nav', { 'nav--is-mobile': isMobile })}>

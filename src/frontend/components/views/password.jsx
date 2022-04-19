@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Formik, Field } from 'formik';
+
+import InputLabel from '@material-ui/core/InputLabel';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+
 import FormFieldError from '@frontend/components/utils/formFieldError';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
@@ -45,15 +50,19 @@ function PasswordField({ identity, translation, error, dataCy }) {
   const [passwordMinLength, passwordMaxLength] = [8, 20];
 
   return (
-    <div>
-      <label htmlFor={identity}>{translation}</label>
+    <div className="set-new-password__field">
+      <InputLabel htmlFor={identity}>{translation}</InputLabel>
       {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
-      <Field
+      <TextField
         type="password"
         name={identity}
         id={identity}
-        minLength={passwordMinLength}
-        maxLength={passwordMaxLength}
+        variant="outlined"
+        size="small"
+        inputProps={{
+          minLength: passwordMinLength,
+          maxLength: passwordMaxLength,
+        }}
         required
         data-cy={dataCy}
       />
@@ -223,11 +232,11 @@ function SetNewPassword({ contextType }) {
   };
 
   return (
-    <section>
+    <section className="set-new-password">
       <Formik onSubmit={onSubmitHandler} validateOnChange={false} validate={formValidator} initialValues={formInitials}>
         {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
-            <fieldset>
+            <fieldset className="set-new-password__fieldset">
               <legend>
                 <h2>{translations.setNewPasswordHeader}</h2>
               </legend>
@@ -254,7 +263,15 @@ function SetNewPassword({ contextType }) {
                 dataCy="input:repeated-new-password"
               />
 
-              <button data-cy="button:submit-new-password">{translations.submitNewPassword}</button>
+              <Button
+                variant="outlined"
+                className="set-new-password__submit-btn"
+                aria-label={translations.submitNewPassword}
+                title={translations.submitNewPassword}
+                data-cy="button:submit-new-password"
+              >
+                {translations.submitNewPassword}
+              </Button>
             </fieldset>
           </form>
         )}

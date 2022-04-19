@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
 
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
+import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
@@ -47,11 +46,13 @@ export function ProductCardLink({
   productData,
   children,
   /* TODO: [UX] consider if it's needed */ isTextVisible = false,
+  ...restProps
 }) {
   // TODO: maybe state should be just index or prop name of the element and target component should get it from store?
 
   return (
     <Link
+      {...restProps}
       to={{
         pathname: `${ROUTES.PRODUCT}/${productData.url}`,
         state: productData,
@@ -62,36 +63,46 @@ export function ProductCardLink({
   );
 }
 
-export default function ProductCard({ product, hasCompactBasicDesc = true }) {
+export const PRODUCT_CARD_LAYOUT_TYPES = Object.freeze({
+  DETAILED: 'DETAILED',
+  COMPACT: 'COMPACT',
+});
+
+const productCardLayoutTypesClassModifiers = {
+  DETAILED: 'detailed-layout',
+  COMPACT: 'compact-layout',
+};
+
+export default function ProductCard({
+  product,
+  RenderedComponent,
+  layoutType = PRODUCT_CARD_LAYOUT_TYPES.DETAILED,
+  hasCompactBasicDesc = true,
+}) {
+  if (!PRODUCT_CARD_LAYOUT_TYPES[layoutType]) {
+    throw TypeError(`layoutType prop '${layoutType}' doesn't match PRODUCT_CARD_LAYOUT_TYPES!`);
+  }
+
   const [menuBtnRef, setMenuBtnRef] = useState(null);
   const { name, price, _id } = product;
+  const elevation = layoutType === PRODUCT_CARD_LAYOUT_TYPES.COMPACT ? 0 : 1;
 
   const handleClickToggleActionsBarBtns = (shouldShow) => {
     return ({ currentTarget }) => setMenuBtnRef(shouldShow ? currentTarget : null);
   };
 
   return (
-    <Card className="product-card" data-cy="container:product-card">
-      <CardHeader
-        className="product-card__actions-bar-toggler"
-        action={
-          <IconButton
-            onClick={handleClickToggleActionsBarBtns(true)}
-            aria-label={translations.actionsBarTogglerLabel}
-            title={translations.actionsBarTogglerLabel}
-            data-cy="button:toggle-action-bar"
-          >
-            <MoreVertIcon />
-          </IconButton>
-        }
-      />
-
-      <CardContent>
-        <ProductCardLink productData={product}>
-          <div className="product-card__image">TODO: [UI] image should go here</div>
-          {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
-        </ProductCardLink>
-
+    <Paper
+      component={RenderedComponent || 'div'}
+      className={classNames('product-card', `product-card--${productCardLayoutTypesClassModifiers[layoutType]}`)}
+      data-cy="container:product-card"
+      elevation={elevation}
+    >
+      <ProductCardLink className="product-card__link" productData={product}>
+        <div className="product-card__image">TODO: [UI] image should go here</div>
+        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
+      </ProductCardLink>
+      <div className="product-card__content">
         <dl className="product-card__metadata">
           <ProductCardLink productData={product}>
             <ProductCardBasicDesc
@@ -111,7 +122,17 @@ export default function ProductCard({ product, hasCompactBasicDesc = true }) {
             value={price}
           />
         </dl>
-      </CardContent>
+      </div>
+      <IconButton
+        onClick={handleClickToggleActionsBarBtns(true)}
+        aria-label={translations.actionsBarTogglerLabel}
+        title={translations.actionsBarTogglerLabel}
+        className="product-card__actions-bar-toggler"
+        data-cy="button:toggle-action-bar"
+      >
+        <MoreVertIcon />
+      </IconButton>
+
       <Menu
         anchorEl={menuBtnRef}
         open={!!menuBtnRef}
@@ -139,7 +160,8 @@ export default function ProductCard({ product, hasCompactBasicDesc = true }) {
         <MenuItem button={false} className="product-card__actions-bar-item">
           <ProductComparisonCandidatesToggler product={product} />
         </MenuItem>
+        {/* TODO: [UX] add (un)observing product */}
       </Menu>
-    </Card>
+    </Paper>
   );
 }

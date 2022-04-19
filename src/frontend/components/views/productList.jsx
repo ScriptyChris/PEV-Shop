@@ -8,11 +8,13 @@ import SortIcon from '@material-ui/icons/Sort';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import ViewModuleIcon from '@material-ui/icons/ViewModule';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import ListIcon from '@material-ui/icons/List';
 import Toolbar from '@material-ui/core/Toolbar';
 
 import httpService from '@frontend/features/httpService';
-import ProductCard from './productCard';
+import ProductCard, { PRODUCT_CARD_LAYOUT_TYPES } from './productCard';
 import Pagination from '@frontend/components/utils/pagination';
 import CategoriesTree from './categoriesTree';
 import { ProductComparisonCandidatesList } from './productComparisonCandidates';
@@ -122,22 +124,14 @@ function useHandleListControlBarStickiness(isMobileLayout) {
 
 function useListViewModes() {
   const viewTypes = ['product-list--details-view', 'product-list--tiles-view'];
-  const generateViewTypesMap = (targetIndex) =>
-    viewTypes.reduce(
-      (viewTypesMap, viewName, index) => ({
-        ...viewTypesMap,
-        [viewName]: index === targetIndex,
-      }),
-      {}
-    );
-  const matchViewTypeBtn = () => viewTypes[viewTypeIndex].match(/--(\w+)-/)[1];
+  const getCurrentViewModeType = () => viewTypes[viewTypeIndex].match(/--(\w+)-/)[1];
   const [viewTypeIndex, setViewTypeIndex] = useState(0);
-  const [listViewModes, setListViewModes] = useState({});
-  const [listViewModesButton, setListViewModesButton] = useState(matchViewTypeBtn());
+  const [listViewModeClassName, setListViewModeClassName] = useState('');
+  const [listViewModeType, setListViewModeType] = useState(getCurrentViewModeType());
 
   useEffect(() => {
-    setListViewModes(generateViewTypesMap(viewTypeIndex));
-    setListViewModesButton(matchViewTypeBtn());
+    setListViewModeClassName(viewTypes[viewTypeIndex]);
+    setListViewModeType(getCurrentViewModeType());
   }, [viewTypeIndex]);
 
   const updateViewTypeIndex = () => {
@@ -149,11 +143,16 @@ function useListViewModes() {
   };
 
   return {
-    currentListViewModes: listViewModes,
-    switchListViewModes: updateViewTypeIndex,
-    listViewModesButton,
+    currentListViewModeClassName: listViewModeClassName,
+    switchListViewMode: updateViewTypeIndex,
+    listViewModeType,
   };
 }
+
+const listViewModeToProductCardLayoutMap = {
+  details: PRODUCT_CARD_LAYOUT_TYPES.DETAILED,
+  tiles: PRODUCT_CARD_LAYOUT_TYPES.COMPACT,
+};
 
 export default function ProductList() {
   const { state: locationState } = useLocation();
@@ -166,7 +165,7 @@ export default function ProductList() {
   const [filterBtnDisabled, setFilterBtnDisabled] = useState(false);
   const isMobileLayout = useMobileLayout();
   const isListControlBarSticky = useHandleListControlBarStickiness(isMobileLayout);
-  const { currentListViewModes, switchListViewModes, listViewModesButton } = useListViewModes();
+  const { currentListViewModeClassName, switchListViewMode, listViewModeType } = useListViewModes();
 
   useEffect(() => {
     updateProductsList(locationState?.searchedProducts && { products: locationState.searchedProducts }).catch(
@@ -270,11 +269,7 @@ export default function ProductList() {
           })}
         >
           <div className="product-list-control-bar__buttons">
-            <ViewModeBtn
-              viewModeType={listViewModesButton}
-              onClick={switchListViewModes}
-              isMobileLayout={isMobileLayout}
-            />
+            <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} isMobileLayout={isMobileLayout} />
 
             <div>
               {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
@@ -315,7 +310,7 @@ export default function ProductList() {
           </Paper>
           <Toolbar className="product-list-control-topbar" component="aside">
             <div className="product-list-control-topbar__buttons">
-              <ViewModeBtn viewModeType={listViewModesButton} onClick={switchListViewModes} />
+              <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} />
 
               {/* TODO: [UX] add sorting */}
               <Button
@@ -334,15 +329,18 @@ export default function ProductList() {
           </Toolbar>
         </>
       )}
-      <ul className={classNames('product-list', currentListViewModes)}>
+      <List className={classNames('product-list', currentListViewModeClassName)}>
         {productsList.length > 0
           ? productsList.map((product) => (
-              <li key={product.name}>
-                <ProductCard product={product} />
-              </li>
+              <ProductCard
+                key={product.name}
+                product={product}
+                layoutType={listViewModeToProductCardLayoutMap[listViewModeType]}
+                RenderedComponent={ListItem}
+              />
             ))
           : translations.lackOfProducts}
-      </ul>
+      </List>
 
       {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
       <Toolbar className="product-list-pagination">
