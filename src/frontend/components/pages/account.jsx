@@ -4,8 +4,6 @@ import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import MUILink from '@material-ui/core/Link';
@@ -15,8 +13,6 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
 
 import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
 import storeService from '@frontend/features/storeService';
@@ -24,7 +20,7 @@ import httpService from '@frontend/features/httpService';
 import { SetNewPassword } from '@frontend/components/views/password';
 import userSessionService from '@frontend/features/userSessionService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
-import ProductCard, { PRODUCT_CARD_LAYOUT_TYPES } from '@frontend/components/views/productCard';
+import ObservedProducts from '@frontend/components/views/productObservability';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES } from './_routes';
 
@@ -36,10 +32,6 @@ const translations = Object.freeze({
   goToObservedProducts: 'Observed products',
   goToOrders: 'Orders',
   editUserData: 'Edit',
-  unobserveAllProducts: 'Unobserve all',
-  unobserveProduct: 'Unobserve product',
-  unobserveAllProductsFailedMsg: 'Failed to unobserve all products :(',
-  unobserveProductFailedMsg: 'Failed to unobserve product :(',
   logOutFromAllSessions: 'Log out from all sessions',
   logOutFromOtherSessions: 'Log out from other sessions',
   logOutFromAllSessionsConfirmMsg: 'Are you sure you want to log out from all sessions?',
@@ -186,95 +178,6 @@ function Security() {
 
         {popupData && <Popup {...popupData} />}
       </div>
-    </section>
-  );
-}
-
-function ObservedProducts() {
-  const isMobileLayout = useMobileLayout();
-  const [observedProducts, setObservedProducts] = useState([]);
-  const [canUnobserveAllProducts, setCanUnobserveAllProducts] = useState(
-    !!storeService.userAccountState?.observedProductsIDs?.length
-  );
-  const [popupData, setPopupData] = useState(null);
-
-  useEffect(() => {
-    httpService.getObservedProducts().then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
-        return;
-      }
-
-      setObservedProducts(res);
-    });
-  }, []);
-
-  const handleUnobserveAllProducts = () => {
-    httpService
-      .disableGenericErrorHandler()
-      .removeAllProductsFromObserved()
-      .then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
-          return;
-        } else if (res.__ERROR_TO_HANDLE) {
-          setPopupData({
-            type: POPUP_TYPES.FAILURE,
-            message: translations.unobserveAllProductsFailedMsg,
-            buttons: [getClosePopupBtn(setPopupData)],
-          });
-        } else {
-          setCanUnobserveAllProducts(false);
-          setObservedProducts(res);
-          storeService.updateUserAccountState({
-            ...storeService.userAccountState,
-            observedProductsIDs: res,
-          });
-        }
-      });
-  };
-
-  // TODO: [FEATURE] implement unobserving a single product
-  const handleUnobserveProduct = (event) => {
-    event.stopPropagation();
-
-    console.log('TODO: [FEATURE] implement unobserving a single product');
-  };
-
-  return (
-    <section className="account__menu-tab" data-cy="section:observed-products">
-      {/* TODO: [UX] add searching and filtering for observed products */}
-      <Button
-        onClick={handleUnobserveAllProducts}
-        disabled={!canUnobserveAllProducts}
-        variant="outlined"
-        aria-label={translations.unobserveAllProducts}
-        title={translations.unobserveAllProducts}
-      >
-        {translations.unobserveAllProducts}
-      </Button>
-
-      <List component="ol" className="account__menu-tab-observed-products-list" disablePadding={isMobileLayout}>
-        {observedProducts.length
-          ? observedProducts.map((product, index) => (
-              <ListItem
-                key={product.name}
-                disableGutters={isMobileLayout}
-                divider={index < observedProducts.length - 1}
-              >
-                <IconButton
-                  onClick={handleUnobserveProduct}
-                  onFocus={(event) => event.stopPropagation()}
-                  aria-label={translations.unobserveProduct}
-                  title={translations.unobserveProduct}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <ProductCard product={product} layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED} />
-              </ListItem>
-            ))
-          : translations.lackOfData}
-      </List>
-
-      {popupData && <Popup {...popupData} />}
     </section>
   );
 }

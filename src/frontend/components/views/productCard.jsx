@@ -11,6 +11,7 @@ import Divider from '@material-ui/core/Divider';
 
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { AddToCartButton } from '@frontend/components/views/cart';
+import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
 import { ProductComparisonCandidatesToggler } from './productComparisonCandidates';
 
 const translations = {
@@ -91,6 +92,12 @@ export default function ProductCard({
     return ({ currentTarget }) => setMenuBtnRef(shouldShow ? currentTarget : null);
   };
 
+  const MenuItemDivider = (
+    <MenuItem button={false} disableGutters={true} className="product-card__actions-bar-item">
+      <Divider orientation="vertical" flexItem />
+    </MenuItem>
+  );
+
   return (
     <Paper
       component={RenderedComponent || 'div'}
@@ -154,11 +161,13 @@ export default function ProductCard({
         <MenuItem button={false} className="product-card__actions-bar-item">
           <AddToCartButton productInfoForCart={{ name, price, _id }} />
         </MenuItem>
-        <MenuItem button={false} disableGutters={true} className="product-card__actions-bar-item">
-          <Divider orientation="vertical" flexItem />
-        </MenuItem>
+        {MenuItemDivider}
         <MenuItem button={false} className="product-card__actions-bar-item">
           <ProductComparisonCandidatesToggler product={product} />
+        </MenuItem>
+        {MenuItemDivider}
+        <MenuItem button={false} className="product-card__actions-bar-item">
+          <ProductObservabilityToggler productId={product._id} />
         </MenuItem>
         {/* TODO: [UX] add (un)observing product */}
       </Menu>

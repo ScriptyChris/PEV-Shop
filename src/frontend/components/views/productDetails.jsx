@@ -8,8 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
-import AddToQueueIcon from '@material-ui/icons/AddToQueue';
-import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import MUILink from '@material-ui/core/Link';
@@ -21,9 +19,9 @@ import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import RatingWidget from '@frontend/components/utils/ratingWidget';
 import { getLocalizedDate } from '@frontend/features/localization';
-import storeService from '@frontend/features/storeService';
 import { AddToCartButton } from '@frontend/components/views/cart';
 import { ROUTES } from '@frontend/components/pages/_routes';
+import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
 import { ProductComparisonCandidatesToggler } from '@frontend/components/views/productComparisonCandidates';
 import Scroller from '@frontend/components/utils/scroller';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
@@ -40,10 +38,6 @@ const productDetailsTranslations = Object.freeze({
   deleteProduct: 'Delete',
   promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
   goTologIn: 'Log in',
-  observeProduct: 'Observe',
-  unObserveProduct: 'Unobserve',
-  observingProductFailed: 'Failed adding product to observed!',
-  unObservingProductFailed: 'Failed removing product from observed!',
   productDetailsNavMenuLabel: 'product details nav menu',
   descriptionNavLabel: 'Description',
   technicalSpecsNavLabel: 'Specification',
@@ -392,12 +386,6 @@ export default function ProductDetails({ product }) {
   const isMobileLayout = useMobileLayout();
   const [productDetails, setProductDetails] = useState(null);
   const [popupData, setPopupData] = useState(null);
-  // TODO: [BUG] update `isProductObserved` when component is re-rendered due to `product` prop param change
-  const [isProductObserved, setIsProductObserved] = useState(
-    (storeService.userAccountState?.observedProductsIDs || []).some(
-      (observedProductID) => observedProductID === product._id
-    )
-  );
   const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
 
   useEffect(() => {
@@ -464,48 +452,6 @@ export default function ProductDetails({ product }) {
       });
   };
 
-  const toggleProductObserve = () => {
-    if (!storeService.userAccountState) {
-      return setPopupData({
-        type: POPUP_TYPES.NEUTRAL,
-        message: productDetailsTranslations.promptToLoginBeforeProductObserveToggling,
-        buttons: [
-          {
-            text: productDetailsTranslations.goTologIn,
-            onClick: () => history.push(ROUTES.LOG_IN),
-          },
-          getClosePopupBtn(setPopupData),
-        ],
-      });
-    }
-
-    httpService
-      .disableGenericErrorHandler() /* eslint-disable-next-line no-unexpected-multiline */
-      [isProductObserved ? 'removeProductFromObserved' : 'addProductToObserved'](product._id)
-      .then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
-          return;
-        } else if (res.__ERROR_TO_HANDLE) {
-          const message = isProductObserved
-            ? productDetailsTranslations.unObservingProductFailed
-            : productDetailsTranslations.observingProductFailed;
-
-          setPopupData({
-            type: POPUP_TYPES.FAILURE,
-            message,
-            buttons: [getClosePopupBtn(setPopupData)],
-          });
-        } else {
-          // TODO: [BUG] update observed products IDs list in storage
-          storeService.updateUserAccountState({
-            ...storeService.userAccountState,
-            observedProductsIDs: res,
-          });
-          setIsProductObserved(!isProductObserved);
-        }
-      });
-  };
-
   if (!productDetails) {
     return null;
   }
@@ -540,16 +486,7 @@ export default function ProductDetails({ product }) {
           <Button size="small" variant="outlined" startIcon={<DeleteIcon />} onClick={deleteProduct}>
             {productDetailsTranslations.deleteProduct}
           </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={isProductObserved ? <RemoveFromQueueIcon /> : <AddToQueueIcon />}
-            onClick={toggleProductObserve}
-          >
-            {isProductObserved
-              ? productDetailsTranslations.unObserveProduct
-              : productDetailsTranslations.observeProduct}
-          </Button>
+          <ProductObservabilityToggler productId={product._id} />
           <ProductComparisonCandidatesToggler product={product} buttonVariant="outlined" />
         </p>
 

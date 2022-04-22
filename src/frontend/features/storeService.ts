@@ -106,6 +106,14 @@ class StoreService {
     this._productComparisonState.length = 0;
   }
 
+  updateProductObservedState(observedProductsIDs: IUserPublic['observedProductsIDs']) {
+    this.updateUserAccountState({ ...this._userAccountState, observedProductsIDs } as IUserPublic);
+  }
+
+  clearProductObservedState() {
+    this.updateUserAccountState({ ...this._userAccountState, observedProductsIDs: [] } as IUserPublic);
+  }
+
   get userCartState() {
     return this._userCartState;
   }
@@ -144,6 +152,9 @@ decorate(StoreService, {
   _productComparisonState: observable,
   updateProductComparisonState: action,
   clearProductComparisonState: action,
+
+  updateProductObservedState: action,
+  clearProductObservedState: action,
 });
 
 const storeService = new StoreService();
