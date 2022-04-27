@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Formik, Field } from 'formik';
 import { Link, useHistory } from 'react-router-dom';
+
+import Typography from '@material-ui/core/Typography';
+import InputLabel from '@material-ui/core/InputLabel';
+import MUILink from '@material-ui/core/Link';
+import Button from '@material-ui/core/Button';
+
+import { FormikTextFieldForwarder } from '@frontend/components/utils/formControls';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from './_routes';
+import { PasswordField } from '@frontend/components/views/password';
 
 const translations = Object.freeze({
   logInHeader: 'Login to shop',
@@ -13,22 +22,14 @@ const translations = Object.freeze({
 });
 
 export default function LogIn() {
-  const [userLogin, setUserLogin] = useState('');
-  const [userPassword, setUserPassword] = useState('');
+  const formInitials = {
+    login: '',
+    password: '',
+  };
   const history = useHistory();
 
-  const onInputChange = ({ target }) => {
-    if (target.id === 'login') {
-      setUserLogin(target.value);
-    } else if (target.id === 'password') {
-      setUserPassword(target.value);
-    }
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    userSessionService.logIn({ login: userLogin, password: userPassword }).then((res) => {
+  const onSubmitHandler = (values) => {
+    userSessionService.logIn(values).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
@@ -42,46 +43,50 @@ export default function LogIn() {
   };
 
   return (
-    <section>
-      {/* TODO: [REFACTOR] use <Formik /> */}
-      <form onSubmit={handleSubmit}>
-        <fieldset>
-          <legend>
-            <h2>{translations.logInHeader}</h2>
-          </legend>
+    <section className="login">
+      <Formik onSubmit={onSubmitHandler} validateOnChange={false} initialValues={formInitials}>
+        {({ handleSubmit }) => (
+          <form onSubmit={handleSubmit}>
+            <fieldset className="login__root-fieldset MuiFormControl-root">
+              <legend className="login__header MuiFormLabel-root">
+                <Typography variant="h2">{translations.logInHeader}</Typography>
+              </legend>
 
-          <div>
-            <label htmlFor="login">{translations.logInField}</label>
-            <input id="login" type="text" value={userLogin} onChange={onInputChange} required data-cy="input:login" />
-          </div>
+              <div className="login__login-field">
+                <InputLabel htmlFor="login">{translations.logInField}</InputLabel>
+                <Field
+                  component={FormikTextFieldForwarder}
+                  variant="outlined"
+                  size="small"
+                  id="login"
+                  name="login"
+                  required
+                  data-cy="input:login"
+                />
+              </div>
 
-          {/* TODO: [REFACTOR] use `recoverAccount.PasswordField` component */}
-          <div>
-            <label htmlFor="password">{translations.passwordField}</label>
-            <input
-              id="password"
-              type="password"
-              value={userPassword}
-              onChange={onInputChange}
-              minLength="8"
-              maxLength="20"
-              required
-              data-cy="input:password"
-            />
-          </div>
+              <PasswordField identity="password" translation={translations.passwordField} dataCy="input:password" />
 
-          <button type="submit" data-cy="button:submit-login">
-            {translations.submitLogIn}
-          </button>
-        </fieldset>
-      </form>
+              <Button
+                className="login__submit-button"
+                variant="outlined"
+                size="small"
+                type="submit"
+                data-cy="button:submit-login"
+              >
+                {translations.submitLogIn}
+              </Button>
+            </fieldset>
+          </form>
+        )}
+      </Formik>
 
-      <div>
-        <p>{translations.resetPasswordHint}</p>
-        <Link to={ROUTES.RESET_PASSWORD} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
+      <Typography variant="body1" className="login__reset-password-hint">
+        {translations.resetPasswordHint}{' '}
+        <MUILink to={ROUTES.RESET_PASSWORD} component={Link} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
           {translations.resetPasswordLink}
-        </Link>
-      </div>
+        </MUILink>
+      </Typography>
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}
       {/* TODO: [UX] if User credentials are invalid, show regarding info instead of redirecting to /account  */}

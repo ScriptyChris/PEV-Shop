@@ -1,6 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Formik, Field } from 'formik';
 import { useHistory } from 'react-router-dom';
+
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormLabel from '@material-ui/core/FormLabel';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Radio from '@material-ui/core/Radio';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+
+import { FormikTextFieldForwarder } from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { PasswordField } from '@frontend/components/views/password';
@@ -11,7 +22,7 @@ const translations = Object.freeze({
   logInField: 'Login',
   passwordField: 'Password',
   repeatedPasswordField: 'Repeat password',
-  submitRegistration: 'Register!',
+  submitRegistration: 'Register',
   email: 'Email',
   accountType: 'Account type',
   clientType: 'Client',
@@ -29,15 +40,32 @@ const translations = Object.freeze({
 });
 
 export default function Register() {
-  const [formInitials] = useState({
+  const formInitials = {
     login: '',
     password: '',
     repeatedPassword: '',
     email: '',
     accountType: '',
-  });
+  };
   const [popupData, setPopupData] = useState(null);
   const history = useHistory();
+  const getAccountTypeChangeHandler = useCallback((setFieldValue) => {
+    return ({ target: { value } }) => {
+      setFieldValue('accountType', value);
+    };
+  }, []);
+  const accountTypes = /* TODO: [DX] should be synced with API */ [
+    {
+      value: 'client',
+      label: translations.clientType,
+      identity: 'registrationAccountClientType',
+    },
+    {
+      value: 'retailer',
+      label: translations.retailerType,
+      identity: 'registrationAccountRetailerType',
+    },
+  ];
 
   // TODO: [UX] show password related errors independently, based on recently blurred field
   const formValidator = (values) => {
@@ -94,18 +122,28 @@ export default function Register() {
   };
 
   return (
-    <section>
+    <section className="register">
       <Formik onSubmit={onSubmitHandler} validateOnChange={false} validate={formValidator} initialValues={formInitials}>
         {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>
-                <h2>{translations.registerHeader}</h2>
+            <fieldset className="register__root-fieldset MuiFormControl-root">
+              <legend className="register__header MuiFormLabel-root">
+                <Typography variant="h2" component="h2">
+                  {translations.registerHeader}
+                </Typography>
               </legend>
 
-              <div>
-                <label htmlFor="registrationLogin">{translations.logInField}</label>
-                <Field name="login" id="registrationLogin" required data-cy="input:register-login" />
+              <div className="register__login">
+                <InputLabel htmlFor="registrationLogin">{translations.logInField}</InputLabel>
+                <Field
+                  component={FormikTextFieldForwarder}
+                  variant="outlined"
+                  size="small"
+                  name="login"
+                  id="registrationLogin"
+                  required
+                  data-cy="input:register-login"
+                />
               </div>
 
               <PasswordField
@@ -122,36 +160,55 @@ export default function Register() {
                 dataCy="input:register-repeated-password"
               />
 
-              <div>
-                <label htmlFor="registrationEmail">{translations.email}</label>
-                <Field name="email" id="registrationEmail" type="email" required data-cy="input:register-email" />
-              </div>
-
-              <div id="accountTypesGroup">{translations.accountType}</div>
-              <div role="group" aria-labelledby="accountTypesGroup">
-                <label htmlFor="registrationAccountClientType">{translations.clientType}</label>
+              <div className="register__email">
+                <InputLabel htmlFor="registrationEmail">{translations.email}</InputLabel>
                 <Field
-                  name="accountType"
-                  id="registrationAccountClientType"
-                  type="radio"
-                  value={translations.clientType.toLowerCase()}
+                  component={FormikTextFieldForwarder}
+                  variant="outlined"
+                  size="small"
+                  name="email"
+                  id="registrationEmail"
+                  type="email"
                   required
-                  data-cy="input:register-account-client-type"
-                />
-
-                <label htmlFor="registrationAccountRetailerType">{translations.retailerType}</label>
-                <Field
-                  name="accountType"
-                  id="registrationAccountRetailerType"
-                  type="radio"
-                  value={translations.retailerType.toLowerCase()}
-                  required
+                  data-cy="input:register-email"
                 />
               </div>
 
-              <button type="submit" data-cy="button:submit-register">
+              <FormControl component="fieldset">
+                <FormLabel component="legend">{translations.accountType}</FormLabel>
+                <RadioGroup
+                  className="register__account-types"
+                  aria-label={translations.accountType.toLowerCase()}
+                  name="accountType"
+                  value={formikRestProps.values.accountType}
+                  onChange={getAccountTypeChangeHandler(formikRestProps.setFieldValue)}
+                >
+                  {accountTypes.map((accountType) => (
+                    <FormControlLabel
+                      value={accountType.value}
+                      control={
+                        <Radio
+                          id={accountType.identity}
+                          inputProps={{ 'data-cy': `input:register-account-${accountType.value}-type` }}
+                          required
+                        />
+                      }
+                      label={accountType.label}
+                      htmlFor={accountType.identity}
+                      key={accountType.value}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+
+              <Button
+                className="register__submit-button"
+                type="submit"
+                variant="outlined"
+                data-cy="button:submit-register"
+              >
                 {translations.submitRegistration}
-              </button>
+              </Button>
             </fieldset>
           </form>
         )}

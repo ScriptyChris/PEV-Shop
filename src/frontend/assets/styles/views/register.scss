@@ -1,0 +1,32 @@
+.register {
+    margin: 1rem;
+
+    &__root-fieldset {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    &__header {
+        text-align: center;
+        padding: 1rem;
+        padding-top: 0;
+    }
+
+    &__login,
+    &__email {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__account-types {
+        text-align: center;
+        margin: 1rem 2rem 0;
+    }
+
+    &__submit-button {
+        width: max-content;
+        align-self: center;
+    }
+}

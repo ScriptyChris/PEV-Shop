@@ -1,4 +1,4 @@
-import React, { createRef, useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import IconButton from '@material-ui/core/IconButton';
@@ -59,7 +59,7 @@ function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, di
 // TODO: [UX] implement swipe scroll for mobile
 // TODO: [UX] implement automatic scrolling to the currently clicked and focused list item
 export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, btnsParentRef }) {
-  const [elementRef] = useState(createRef());
+  const elementRef = useRef();
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
   const [rightBtnDisabled, setRightBtnDisabled] = useState(false);

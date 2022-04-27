@@ -54,11 +54,11 @@ const productDetailsTranslations = Object.freeze({
 
 function AddReview({ productName, updateReviews }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [formInitials] = useState({
+  const formInitials = {
     author: 'TODO: put user nick here',
     rating: 0,
     content: '',
-  });
+  };
   const [popupData, setPopupData] = useState(null);
 
   const onAnonymousChange = (checked, setFieldValue) => {

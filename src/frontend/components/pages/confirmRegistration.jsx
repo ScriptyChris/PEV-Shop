@@ -3,6 +3,9 @@ import { useLocation, useHistory } from 'react-router-dom';
 import httpService from '@frontend/features/httpService';
 import { ROUTES } from './_routes';
 
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+
 const translations = Object.freeze({
   header: 'Registration confirmation',
   status: 'Checking status',
@@ -60,19 +63,21 @@ export default function ConfirmRegistration() {
   const logIn = () => history.push(ROUTES.LOG_IN);
 
   return (
-    <section>
-      <h2>{translations.header}</h2>
+    <section className="confirm-registration">
+      <Typography variant="h2">{translations.header}</Typography>
 
-      <p>
-        {translations.status}: {REG_CONFIRM_STATES[regConfirmStatus].INDICATOR}
-      </p>
+      <Typography variant="body1">
+        {translations.status}: <strong>{REG_CONFIRM_STATES[regConfirmStatus].INDICATOR}</strong>
+      </Typography>
 
       {regConfirmStatus === REG_CONFIRM_STATUS.SUCCEEDED && (
         <>
-          <p data-cy="message:registration-confirmation-succeeded-hint">{REG_CONFIRM_STATES.SUCCEEDED.HINT}</p>
-          <button onClick={logIn} data-cy="button:log-in-after-confirmed-registration">
+          <Typography variant="body1" data-cy="message:registration-confirmation-succeeded-hint">
+            {REG_CONFIRM_STATES.SUCCEEDED.HINT}
+          </Typography>
+          <Button onClick={logIn} data-cy="button:log-in-after-confirmed-registration" variant="outlined" size="small">
             {translations.logIn}
-          </button>
+          </Button>
         </>
       )}
       {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <p>{REG_CONFIRM_STATES.FAILED.HINT}</p>}

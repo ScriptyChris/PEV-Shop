@@ -3,10 +3,11 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 
 import InputLabel from '@material-ui/core/InputLabel';
-import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
 import FormFieldError from '@frontend/components/utils/formFieldError';
+import { FormikTextFieldForwarder } from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { ROUTES } from '@frontend/components/pages/_routes';
@@ -50,11 +51,12 @@ function PasswordField({ identity, translation, error, dataCy }) {
   const [passwordMinLength, passwordMaxLength] = [8, 20];
 
   return (
-    <div className="set-new-password__field">
+    <div className="password-field">
       <InputLabel htmlFor={identity}>{translation}</InputLabel>
       {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
-      <TextField
+      <Field
         type="password"
+        component={FormikTextFieldForwarder}
         name={identity}
         id={identity}
         variant="outlined"
@@ -73,9 +75,9 @@ function PasswordField({ identity, translation, error, dataCy }) {
 }
 
 function ResetPassword() {
-  const [formInitials] = useState({
+  const formInitials = {
     email: '',
-  });
+  };
   const [popupData, setPopupData] = useState(null);
 
   // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time
@@ -113,21 +115,38 @@ function ResetPassword() {
   };
 
   return (
-    <section>
+    <section className="reset-password">
       <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
         {({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>
-                <h2>{translations.resetPasswordHeader}</h2>
+            <fieldset className="reset-password__root-fieldset MuiFormControl-root">
+              <legend className="reset-password__header MuiFormLabel-root">
+                <Typography variant="h2">{translations.resetPasswordHeader}</Typography>
               </legend>
 
-              <div>
-                <label htmlFor="resettingEmail">{translations.resettingEmailField}</label>
-                <Field name="email" id="resettingEmail" type="email" required data-cy="input:reset-email" />
+              <div className="reset-password__email-field">
+                <InputLabel htmlFor="resettingEmail">{translations.resettingEmailField}</InputLabel>
+                <Field
+                  component={FormikTextFieldForwarder}
+                  name="email"
+                  id="resettingEmail"
+                  type="email"
+                  variant="outlined"
+                  size="small"
+                  required
+                  data-cy="input:reset-email"
+                />
               </div>
 
-              <button data-cy="button:submit-reset">{translations.submitReset}</button>
+              <Button
+                className="reset-password__submit-btn"
+                type="submit"
+                variant="outlined"
+                size="small"
+                data-cy="button:submit-reset"
+              >
+                {translations.submitReset}
+              </Button>
             </fieldset>
           </form>
         )}
@@ -146,11 +165,11 @@ function SetNewPassword({ contextType }) {
   }
 
   const [urlToken, setUrlToken] = useState(null);
-  const [formInitials] = useState({
+  const formInitials = {
     currentPassword: contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN ? '' : undefined,
     newPassword: '',
     repeatedNewPassword: '',
-  });
+  };
   const [popupData, setPopupData] = useState(null);
   const history = useHistory();
   const { search: searchParam } = useLocation();
@@ -236,7 +255,7 @@ function SetNewPassword({ contextType }) {
       <Formik onSubmit={onSubmitHandler} validateOnChange={false} validate={formValidator} initialValues={formInitials}>
         {({ handleSubmit, ...formikRestProps }) => (
           <form onSubmit={handleSubmit}>
-            <fieldset className="set-new-password__fieldset">
+            <fieldset className="set-new-password__root-fieldset">
               <legend>
                 <h2>{translations.setNewPasswordHeader}</h2>
               </legend>
@@ -269,6 +288,7 @@ function SetNewPassword({ contextType }) {
                 aria-label={translations.submitNewPassword}
                 title={translations.submitNewPassword}
                 data-cy="button:submit-new-password"
+                type="submit"
               >
                 {translations.submitNewPassword}
               </Button>
