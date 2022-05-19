@@ -122,7 +122,7 @@ function AddReview({ productName, updateReviews }) {
         </Formik>
 
         <button onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</button>
-        {popupData && <Popup {...popupData} />}
+        <Popup {...popupData} />
       </>
     );
   }
@@ -654,7 +654,7 @@ export default function ProductDetails({ product }) {
 
       <Divider />
 
-      {popupData && <Popup type={popupData.type} message={popupData.message} buttons={popupData.buttons} />}
+      <Popup {...popupData} />
     </article>
   );
 }

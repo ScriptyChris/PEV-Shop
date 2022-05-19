@@ -30,7 +30,7 @@ describe('order', () => {
     cy.get('@productCardContainer').find('[data-cy="button:toggle-action-bar"]').click();
     cy.get('[data-cy="container:product-card__action-bar"]').as('productCardActionBar');
     cy.get('@productCardActionBar').find('[data-cy="button:add-product-to-cart"]').click();
-    
+
     // close menu overlay
     cy.get('@productCardActionBar').closest('[role="presentation"]').children('[aria-hidden="true"]').click();
 

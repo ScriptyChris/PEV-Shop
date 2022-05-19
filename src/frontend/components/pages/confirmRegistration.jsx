@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import httpService from '@frontend/features/httpService';
 import { ROUTES } from './_routes';
 
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import MUILink from '@material-ui/core/Link';
 
 const translations = Object.freeze({
   header: 'Registration confirmation',
@@ -13,7 +13,15 @@ const translations = Object.freeze({
   waitingIndicator: '...',
   succeededIndicator: 'confirmed :)',
   failedIndicator: 'failed :(',
-  succeededHint: 'You can now log in to your new account.',
+  succeededHint: (
+    <>
+      You can now{' '}
+      <MUILink to={ROUTES.LOG_IN} component={Link} data-cy={`link:${ROUTES.LOG_IN}`}>
+        click here
+      </MUILink>{' '}
+      to log in to your new account.
+    </>
+  ),
   failedHint: `
     Provided token is invalid or has expired! 
     Please, ensure you used the exact token from received email or try to register again.
@@ -41,7 +49,6 @@ const REG_CONFIRM_STATES = Object.freeze({
 });
 
 export default function ConfirmRegistration() {
-  const history = useHistory();
   const { search: searchParam } = useLocation();
   const [regConfirmStatus, setRegConfirmStatus] = useState(REG_CONFIRM_STATUS.WAITING);
 
@@ -60,8 +67,6 @@ export default function ConfirmRegistration() {
     }
   }, []);
 
-  const logIn = () => history.push(ROUTES.LOG_IN);
-
   return (
     <section className="confirm-registration">
       <Typography variant="h2">{translations.header}</Typography>
@@ -75,9 +80,6 @@ export default function ConfirmRegistration() {
           <Typography variant="body1" data-cy="message:registration-confirmation-succeeded-hint">
             {REG_CONFIRM_STATES.SUCCEEDED.HINT}
           </Typography>
-          <Button onClick={logIn} data-cy="button:log-in-after-confirmed-registration" variant="outlined" size="small">
-            {translations.logIn}
-          </Button>
         </>
       )}
       {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <p>{REG_CONFIRM_STATES.FAILED.HINT}</p>}

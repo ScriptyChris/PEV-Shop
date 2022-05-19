@@ -1,4 +1,12 @@
-import React, { useCallback, memo, useState, useEffect, createRef } from 'react';
+import React, { useCallback, memo, useState, useEffect, useRef } from 'react';
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Zoom from '@material-ui/core/Zoom';
+import Button from '@material-ui/core/Button';
+
 import { httpServiceSubscriber } from '@frontend/features/httpService';
 
 const POPUP_TYPES = {
@@ -19,21 +27,21 @@ const getClosePopupBtn = (setPopupData) => {
   };
 };
 
-const getClassNameByType = (type) => {
-  switch (type) {
-    case POPUP_TYPES.SUCCESS: {
-      return '--success';
-    }
+// const getClassNameByType = (type) => {
+//   switch (type) {
+//     case POPUP_TYPES.SUCCESS: {
+//       return '--success';
+//     }
 
-    case POPUP_TYPES.FAILURE: {
-      return '--failure';
-    }
+//     case POPUP_TYPES.FAILURE: {
+//       return '--failure';
+//     }
 
-    default: {
-      return '';
-    }
-  }
-};
+//     default: {
+//       return '';
+//     }
+//   }
+// };
 
 const GenericErrorPopup = memo(function GenericErrorPopup() {
   const [popupData, setPopupData] = useState(null);
@@ -65,12 +73,26 @@ const GenericErrorPopup = memo(function GenericErrorPopup() {
     };
   }, []);
 
-  return popupData && <Popup {...popupData} />;
+  return <Popup {...popupData} />;
 });
 
 export { POPUP_TYPES, getClosePopupBtn, GenericErrorPopup };
 
-export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage, buttons = [], altButtons }) {
+export default function Popup(props) {
+  if (!Object.keys(props).length) {
+    return null;
+  }
+
+  const {
+    type = POPUP_TYPES.NEUTRAL /* TODO: [UX] associate popup type with it's title color */,
+    // title,
+    message,
+    altMessage,
+    buttons,
+    singleAltBtn,
+    dataCy,
+  } = props;
+
   if (!Object.keys(POPUP_TYPES).includes(type)) {
     throw TypeError(
       `'type' prop must be one of POPUP_TYPES!\n
@@ -85,51 +107,70 @@ export default function Popup({ type = POPUP_TYPES.NEUTRAL, message, altMessage,
     );
   }
 
-  if (!Array.isArray(buttons) || buttons.length === 0) {
+  if (buttons && singleAltBtn) {
+    throw Error(`'buttons' and 'singleAltBtn' cannot be both provided at the same time!`);
+  } else if (!buttons && !singleAltBtn) {
+    throw Error(
+      `Either 'buttons' or 'singleAltBtn' must be provided!\n
+      Received: '${JSON.stringify(buttons)}' and '${JSON.stringify(singleAltBtn)}.`
+    );
+  } else if (Array.isArray(buttons) && buttons.length === 0) {
     throw TypeError(
-      `'buttons' prop must be an non-empty array!\n
+      `'buttons' prop must be a non-empty array!\n
       Received ${JSON.stringify(buttons)}`
     );
   }
 
-  const firstBtnRef = createRef();
-  const baseClassName = `popup`;
-
-  useEffect(() => {
-    firstBtnRef.current.focus();
-  }, []);
+  const firstBtnRef = useRef();
+  const handleOpen = () => firstBtnRef.current.focus();
 
   return (
-    <div className="popup-container">
-      <aside className={`${baseClassName} ${baseClassName}${getClassNameByType(type)}`}>
-        <p className={`${baseClassName}__message`} data-cy="popup:message">
+    <Dialog
+      open
+      TransitionComponent={Zoom}
+      data-cy={dataCy}
+      TransitionProps={{ onEntered: handleOpen }}
+      aria-labelledby="popup-description" /* TODO: [a11y] use aria-describedby, which requires React > v16 */
+    >
+      <DialogContent>
+        <DialogContentText data-cy="popup:message" id="popup-description" color="textPrimary">
           {message}
-        </p>
-
-        {altMessage && (
-          <div className={`${baseClassName}__message--alt`}>
-            <p>{altMessage}</p>
-
-            {altButtons && (
-              <div className={`${baseClassName}__buttons--alt`}>
-                {altButtons.map((altBtn) => (
-                  <button onClick={altBtn.onClick} key={altBtn.text} data-cy={altBtn.dataCy}>
-                    {altBtn.text}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+        </DialogContentText>
+      </DialogContent>
+      {altMessage && (
+        <DialogContent>
+          <DialogContentText>{altMessage}</DialogContentText>
+        </DialogContent>
+      )}
+      <DialogActions>
+        {singleAltBtn && (
+          <Button
+            onClick={singleAltBtn.onClick}
+            key={singleAltBtn.text}
+            data-cy={singleAltBtn.dataCy}
+            ref={firstBtnRef}
+            variant="text"
+            size="small"
+            style={{ margin: 'auto' }}
+          >
+            {singleAltBtn.text}
+          </Button>
         )}
 
-        <div className={`${baseClassName}__buttons`}>
-          {buttons.map((btn, index) => (
-            <button onClick={btn.onClick} key={btn.text} data-cy={btn.dataCy} ref={index === 0 ? firstBtnRef : null}>
-              {btn.text}
-            </button>
-          ))}
-        </div>
-      </aside>
-    </div>
+        {buttons?.map((btn, index) => (
+          <Button
+            onClick={btn.onClick}
+            key={btn.text}
+            data-cy={btn.dataCy}
+            ref={index === 0 ? firstBtnRef : null}
+            variant="outlined"
+            size="small"
+            color={index === 0 ? 'primary' : 'default'}
+          >
+            {btn.text}
+          </Button>
+        ))}
+      </DialogActions>
+    </Dialog>
   );
 }

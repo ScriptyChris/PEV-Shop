@@ -32,11 +32,14 @@ Cypress.Commands.add('registerTestUserByUI', ({ login, email }) => {
   cy.get('[data-cy="input:register-email"]').type(email);
   cy.get('[data-cy="input:register-account-client-type"]').check();
   cy.get('[data-cy="button:submit-register"]').click();
-  cy.contains(`[data-cy="button:go-to-login-from-register"]`, 'Go to login');
+  cy.get('[data-cy="popup:user-successfully-registered"]')
+    .should('be.visible')
+    .find(`[data-cy="button:resend-register-email"]`)
+    .should('be.visible');
 });
 
 Cypress.Commands.add('confirmTestUserRegistrationByUI', (email) => {
-  return cy.getLinkFromEmail(email, 'Account activation', '/pages/confirm-registration').then((link) => {
+  return cy.getAccountActivationLinkFromEmail(email).then((link) => {
     cy.intercept('/api/users/confirm-registration', (req) => {
       req.continue((res) => {
         expect(res.body.payload.isUserConfirmed).to.be.true;
@@ -47,7 +50,7 @@ Cypress.Commands.add('confirmTestUserRegistrationByUI', (email) => {
     cy.wait('@confirmRegistration');
     cy.contains(
       '[data-cy="message:registration-confirmation-succeeded-hint"]',
-      'You can now log in to your new account.'
+      'You can now click here to log in to your new account.'
     );
   });
 });
@@ -58,7 +61,7 @@ Cypress.Commands.add('registerTestUser', (testUser, canFail?) => {
 
 Cypress.Commands.add('confirmTestUserRegistration', (email) => {
   return cy
-    .getLinkFromEmail(email, 'Account activation', '/pages/confirm-registration')
+    .getAccountActivationLinkFromEmail(email)
     .then((link) => {
       const token = (new URLSearchParams(link.search).get('token') as string).replace(/\s/g, '+');
 
@@ -81,14 +84,6 @@ Cypress.Commands.add('registerAndLoginTestUser', (testUser) => {
 
       return res;
     });
-});
-
-Cypress.Commands.add('registerAndLoginTestUserByUI', (testUser) => {
-  cy.registerTestUserByUI(testUser);
-  cy.confirmTestUserRegistrationByUI(testUser.email);
-  cy.get('[data-cy="button:log-in-after-confirmed-registration"]').click();
-
-  return cy.loginTestUserByUI(testUser);
 });
 
 Cypress.Commands.add('loginTestUser', (testUser, canFail) => {

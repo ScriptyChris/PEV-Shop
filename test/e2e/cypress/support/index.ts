@@ -13,12 +13,12 @@ declare global {
       getMatchingEmails(receiver: string, subject: string): Cypress.Chainable<TMessage[]>;
       getEmailContent(receiver: string, subject: string): Cypress.Chainable<string>;
       getLinkFromEmail(receiver: string, subject: string, linkSelectorMatcher: string): Cypress.Chainable<URL>;
+      getAccountActivationLinkFromEmail(receiver: string): Cypress.Chainable<URL>;
       registerTestUserByUI({ login, email }: Pick<TE2EUser, 'login' | 'email'>): void;
       confirmTestUserRegistrationByUI(email: string): Cypress.Chainable<URL>;
       registerTestUser(testUser: TE2EUser, canFail?: boolean): Cypress.Chainable<Cypress.Response<TE2EUser>>;
       confirmTestUserRegistration(email: string): Cypress.Chainable<Chai.Assertion>;
       registerAndLoginTestUser(testUser: TE2EUser): Cypress.Chainable<IUserPublic>;
-      registerAndLoginTestUserByUI(testUser: TE2EUser): void;
       loginTestUser(
         testUser: Pick<TE2EUser, 'login' | 'password'>,
         canFail?: boolean

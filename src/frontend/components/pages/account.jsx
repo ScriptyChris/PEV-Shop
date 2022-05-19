@@ -176,7 +176,7 @@ function Security() {
           {translations.logOutFromOtherSessions}
         </Button>
 
-        {popupData && <Popup {...popupData} />}
+        <Popup {...popupData} />
       </div>
     </section>
   );

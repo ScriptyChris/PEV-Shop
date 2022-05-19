@@ -50,10 +50,13 @@ describe('#register', () => {
     expectMatchingEmailsCount(2);
   });
 
-  it('should redirect to login page from registration popup', () => {
+  it('should redirect to login page from confirm registration page', () => {
     cy.visit(ROUTES.REGISTER);
     cy.registerTestUserByUI(testUsers[2]);
-    cy.get(`[data-cy="button:go-to-login-from-register"]`).click();
+    cy.getAccountActivationLinkFromEmail(testUsers[2].email).then((link) => {
+      return cy.visit(`${link.pathname}${link.search}`);
+    });
+    cy.get(`[data-cy="link:${ROUTES.LOG_IN}"]`).click();
     cy.location('pathname').should('eq', ROUTES.LOG_IN);
   });
 });

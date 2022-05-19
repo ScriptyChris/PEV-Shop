@@ -105,7 +105,7 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
         </Button>
       )}
 
-      {popupData && <Popup type={popupData.type} message={popupData.message} buttons={popupData.buttons} />}
+      <Popup {...popupData} />
     </>
   );
 });
@@ -197,7 +197,7 @@ export default observer(function ObservedProducts() {
           : translations.lackOfData}
       </List>
 
-      {popupData && <Popup {...popupData} />}
+      <Popup {...popupData} />
     </section>
   );
 });

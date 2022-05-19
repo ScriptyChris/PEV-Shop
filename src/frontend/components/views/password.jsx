@@ -152,7 +152,7 @@ function ResetPassword() {
         )}
       </Formik>
 
-      {popupData && <Popup {...popupData} />}
+      <Popup {...popupData} />
     </section>
   );
 }
@@ -297,7 +297,7 @@ function SetNewPassword({ contextType }) {
         )}
       </Formik>
 
-      {popupData && <Popup {...popupData} />}
+      <Popup {...popupData} />
     </section>
   );
 }

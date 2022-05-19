@@ -169,7 +169,8 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
             </IconButton>
           </div>
         </div>
-        {popupData && <Popup {...popupData} />}
+
+        <Popup {...popupData} />
       </Paper>
     </CandidatesWrapper>
   );

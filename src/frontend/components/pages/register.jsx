@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { Formik, Field } from 'formik';
-import { useHistory } from 'react-router-dom';
 
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -15,7 +14,6 @@ import { FormikTextFieldForwarder } from '@frontend/components/utils/formControl
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { PasswordField } from '@frontend/components/views/password';
-import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -48,7 +46,6 @@ export default function Register() {
     accountType: '',
   };
   const [popupData, setPopupData] = useState(null);
-  const history = useHistory();
   const getAccountTypeChangeHandler = useCallback((setFieldValue) => {
     return ({ target: { value } }) => {
       setFieldValue('accountType', value);
@@ -95,22 +92,14 @@ export default function Register() {
         } else {
           setPopupData({
             type: POPUP_TYPES.SUCCESS,
+            dataCy: 'popup:user-successfully-registered',
             message: translations.registrationSuccessMsg,
             altMessage: translations.registrationSuccessAltMsg,
-            buttons: [
-              {
-                onClick: () => history.push(ROUTES.LOG_IN),
-                text: translations.popupGoToLogin,
-                dataCy: 'button:go-to-login-from-register',
-              },
-            ],
-            altButtons: [
-              {
-                onClick: () => resendConfirmRegistration(values.email),
-                text: translations.popupReSendEmail,
-                dataCy: 'button:resend-register-email',
-              },
-            ],
+            singleAltBtn: {
+              onClick: () => resendConfirmRegistration(values.email),
+              text: translations.popupReSendEmail,
+              dataCy: 'button:resend-register-email',
+            },
           });
         }
       });
@@ -214,7 +203,7 @@ export default function Register() {
         )}
       </Formik>
 
-      {popupData && <Popup {...popupData} />}
+      <Popup {...popupData} />
     </section>
   );
 }
