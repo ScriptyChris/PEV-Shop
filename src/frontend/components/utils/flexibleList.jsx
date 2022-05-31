@@ -4,7 +4,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import { PEVButton } from '@frontend/components/utils/formControls';
+import { PEVButton } from '@frontend/components/utils/pevElements';
 
 const translations = {
   add: 'Add',

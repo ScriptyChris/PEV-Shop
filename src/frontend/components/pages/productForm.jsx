@@ -14,7 +14,7 @@ import {
   PEVTextField,
   PEVFieldset,
   PEVLegend,
-} from '@frontend/components/utils/formControls';
+} from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';

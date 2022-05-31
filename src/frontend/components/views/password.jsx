@@ -8,7 +8,7 @@ import {
   PEVTextField,
   PEVFieldset,
   PEVLegend,
-} from '@frontend/components/utils/formControls';
+} from '@frontend/components/utils/pevElements';
 import FormFieldError from '@frontend/components/utils/formFieldError';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';

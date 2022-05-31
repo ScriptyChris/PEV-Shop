@@ -10,7 +10,7 @@ import {
   PEVTextField,
   PEVFieldset,
   PEVLegend,
-} from '@frontend/components/utils/formControls';
+} from '@frontend/components/utils/pevElements';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from './_routes';
 import { PasswordField } from '@frontend/components/views/password';

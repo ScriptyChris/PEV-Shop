@@ -8,7 +8,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVIconButton } from '@frontend/components/utils/formControls';
+import { PEVIconButton } from '@frontend/components/utils/pevElements';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { AddToCartButton } from '@frontend/components/views/cart';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';

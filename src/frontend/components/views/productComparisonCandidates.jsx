@@ -11,7 +11,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVButton, PEVIconButton, PEVLink } from '@frontend/components/utils/formControls';
+import { PEVButton, PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES } from '@frontend/components/pages/_routes';

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 
-import { PEVLink, PEVHeading } from '@frontend/components/utils/formControls';
+import { PEVLink, PEVHeading } from '@frontend/components/utils/pevElements';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import Nav from './nav';
 import Cart from './cart';

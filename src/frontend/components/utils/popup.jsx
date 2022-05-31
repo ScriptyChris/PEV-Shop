@@ -6,7 +6,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import Zoom from '@material-ui/core/Zoom';
 
-import { PEVButton } from '@frontend/components/utils/formControls';
+import { PEVButton } from '@frontend/components/utils/pevElements';
 import { httpServiceSubscriber } from '@frontend/features/httpService';
 
 const POPUP_TYPES = {

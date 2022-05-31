@@ -16,7 +16,7 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
-import { PEVButton, PEVIconButton, PEVHeading } from '@frontend/components/utils/formControls';
+import { PEVButton, PEVIconButton, PEVHeading } from '@frontend/components/utils/pevElements';
 import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
 import { ROUTES } from '@frontend/components/pages/_routes';

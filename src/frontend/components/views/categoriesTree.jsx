@@ -8,7 +8,7 @@ import ArrowBack from '@material-ui/icons/ArrowBack';
 import List from '@material-ui/core/List';
 import TextField from '@material-ui/core/TextField';
 
-import { PEVIconButton, PEVHeading } from '@frontend/components/utils/formControls';
+import { PEVIconButton, PEVHeading } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 

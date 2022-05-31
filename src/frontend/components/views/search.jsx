@@ -8,7 +8,7 @@ import TextFormat from '@material-ui/icons/TextFormat';
 import Zoom from '@material-ui/core/Zoom';
 import SearchIcon from '@material-ui/icons/Search';
 
-import { PEVForm, PEVIconButton, PEVCheckbox } from '@frontend/components/utils/formControls';
+import { PEVForm, PEVIconButton, PEVCheckbox } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 

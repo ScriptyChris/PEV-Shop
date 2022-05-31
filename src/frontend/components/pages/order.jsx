@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect } from 'react';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';
-import { PEVButton } from '@frontend/components/utils/formControls';
+import { PEVButton } from '@frontend/components/utils/pevElements';
 
 const translations = Object.freeze({
   payForOrder: 'Pay!',

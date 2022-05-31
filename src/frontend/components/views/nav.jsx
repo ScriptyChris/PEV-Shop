@@ -9,7 +9,7 @@ import ArrowBack from '@material-ui/icons/ArrowBack';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 
-import { PEVIconButton, PEVLink } from '@frontend/components/utils/formControls';
+import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from '@frontend/components/pages/_routes';

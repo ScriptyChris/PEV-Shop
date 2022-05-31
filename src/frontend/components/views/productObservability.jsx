@@ -7,7 +7,7 @@ import AddToQueueIcon from '@material-ui/icons/AddToQueue';
 import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import { PEVButton, PEVIconButton } from '@frontend/components/utils/formControls';
+import { PEVButton, PEVIconButton } from '@frontend/components/utils/pevElements';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';

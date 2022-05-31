@@ -11,7 +11,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListIcon from '@material-ui/icons/List';
 import Toolbar from '@material-ui/core/Toolbar';
 
-import { PEVButton, PEVIconButton } from '@frontend/components/utils/formControls';
+import { PEVButton, PEVIconButton } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import ProductCard, { PRODUCT_CARD_LAYOUT_TYPES } from './productCard';
 import Pagination from '@frontend/components/utils/pagination';

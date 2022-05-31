@@ -11,7 +11,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
-import { PEVButton, PEVLink, PEVHeading } from '@frontend/components/utils/formControls';
+import { PEVButton, PEVLink, PEVHeading } from '@frontend/components/utils/pevElements';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';

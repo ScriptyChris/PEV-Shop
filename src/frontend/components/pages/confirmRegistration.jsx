@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import httpService from '@frontend/features/httpService';
 import { ROUTES } from './_routes';
 
-import { PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/formControls';
+import { PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/pevElements';
 
 const translations = Object.freeze({
   header: 'Registration confirmation',

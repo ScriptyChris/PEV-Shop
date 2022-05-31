@@ -21,7 +21,7 @@ import {
   PEVLegend,
   PEVParagraph,
   PEVTextField,
-} from '@frontend/components/utils/formControls';
+} from '@frontend/components/utils/pevElements';
 import productSpecsService from '@frontend/features/productSpecsService';
 import FormFieldError from '@frontend/components/utils/formFieldError';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';

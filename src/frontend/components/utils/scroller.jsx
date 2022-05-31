@@ -6,7 +6,7 @@ import Paper from '@material-ui/core/Paper';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 
-import { PEVIconButton } from '@frontend/components/utils/formControls';
+import { PEVIconButton } from '@frontend/components/utils/pevElements';
 
 const translations = {
   scrollLeftBtn: 'scroll left',

@@ -11,7 +11,7 @@ import {
   PEVTextField,
   PEVFieldset,
   PEVLegend,
-} from '@frontend/components/utils/formControls';
+} from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { PasswordField } from '@frontend/components/views/password';

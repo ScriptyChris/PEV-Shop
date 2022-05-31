@@ -19,7 +19,7 @@ import {
   PEVHeading,
   PEVParagraph,
   PEVFieldset,
-} from '@frontend/components/utils/formControls';
+} from '@frontend/components/utils/pevElements';
 import ProductCard from './productCard';
 import { ProductComparisonCandidatesList } from '@frontend/components/views/productComparisonCandidates';
 import httpService from '@frontend/features/httpService';

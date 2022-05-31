@@ -9,7 +9,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
-import { PEVHeading } from '@frontend/components/utils/formControls';
+import { PEVHeading } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import { ProductSpecificDetail, getProductDetailsHeaders } from '@frontend/components/views/productDetails';
 import Scroller from '@frontend/components/utils/scroller';
