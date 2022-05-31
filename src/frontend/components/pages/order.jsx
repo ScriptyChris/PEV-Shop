@@ -1,6 +1,7 @@
 import React, { memo, useState, useEffect } from 'react';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';
+import { PEVButton } from '@frontend/components/utils/formControls';
 
 const translations = Object.freeze({
   payForOrder: 'Pay!',
@@ -51,7 +52,7 @@ export default function Order() {
   return (
     <>
       <Shipment updateChosenShipmentPoint={setChosenShipmentPoint} />
-      <button onClick={payForOrder}>{translations.payForOrder}</button>
+      <PEVButton onClick={payForOrder}>{translations.payForOrder}</PEVButton>
     </>
   );
 }

@@ -69,6 +69,11 @@ html {
       animation: $transitionDuration shrinkAndWrap;
     }
   }
+
+  // TODO: [DX] do it in more appropriate place (scope)
+  .search-wrapper label[class$="focused"] {
+      color: white;
+  }
 }
 
 @keyframes shrinkAndWrap {

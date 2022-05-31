@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import httpService from '@frontend/features/httpService';
 import { ROUTES } from './_routes';
 
-import Typography from '@material-ui/core/Typography';
-import MUILink from '@material-ui/core/Link';
+import { PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/formControls';
 
 const translations = Object.freeze({
   header: 'Registration confirmation',
@@ -16,9 +15,9 @@ const translations = Object.freeze({
   succeededHint: (
     <>
       You can now{' '}
-      <MUILink to={ROUTES.LOG_IN} component={Link} data-cy={`link:${ROUTES.LOG_IN}`}>
+      <PEVLink to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
         click here
-      </MUILink>{' '}
+      </PEVLink>{' '}
       to log in to your new account.
     </>
   ),
@@ -69,17 +68,17 @@ export default function ConfirmRegistration() {
 
   return (
     <section className="confirm-registration">
-      <Typography variant="h2">{translations.header}</Typography>
+      <PEVHeading level={2}>{translations.header}</PEVHeading>
 
-      <Typography variant="body1">
+      <PEVParagraph>
         {translations.status}: <strong>{REG_CONFIRM_STATES[regConfirmStatus].INDICATOR}</strong>
-      </Typography>
+      </PEVParagraph>
 
       {regConfirmStatus === REG_CONFIRM_STATUS.SUCCEEDED && (
         <>
-          <Typography variant="body1" data-cy="message:registration-confirmation-succeeded-hint">
+          <PEVParagraph data-cy="message:registration-confirmation-succeeded-hint">
             {REG_CONFIRM_STATES.SUCCEEDED.HINT}
-          </Typography>
+          </PEVParagraph>
         </>
       )}
       {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <p>{REG_CONFIRM_STATES.FAILED.HINT}</p>}

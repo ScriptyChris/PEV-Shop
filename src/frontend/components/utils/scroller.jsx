@@ -1,11 +1,12 @@
 import React, { useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import IconButton from '@material-ui/core/IconButton';
 import Fade from '@material-ui/core/Fade';
 import Paper from '@material-ui/core/Paper';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
+
+import { PEVIconButton } from '@frontend/components/utils/formControls';
 
 const translations = {
   scrollLeftBtn: 'scroll left',
@@ -41,14 +42,13 @@ function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, di
   const TheScrollButton = (
     <Fade in={isVisible} elevation={0}>
       <Paper data-compare-btn-scroll-dir={direction}>
-        <IconButton
+        <PEVIconButton
           onClick={() => handleClick(directionPointer)}
           disabled={isDisabled}
-          aria-label={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
-          title={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
+          a11y={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
         >
           {IS_LEFT ? <ChevronLeft /> : <ChevronRight />}
-        </IconButton>
+        </PEVIconButton>
       </Paper>
     </Fade>
   );

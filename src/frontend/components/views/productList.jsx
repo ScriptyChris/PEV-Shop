@@ -5,14 +5,13 @@ import { useLocation } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import SortIcon from '@material-ui/icons/Sort';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
 import ViewModuleIcon from '@material-ui/icons/ViewModule';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListIcon from '@material-ui/icons/List';
 import Toolbar from '@material-ui/core/Toolbar';
 
+import { PEVButton, PEVIconButton } from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import ProductCard, { PRODUCT_CARD_LAYOUT_TYPES } from './productCard';
 import Pagination from '@frontend/components/utils/pagination';
@@ -24,7 +23,7 @@ import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 const translations = {
   lackOfProducts: 'Lack of products...',
   typeProductName: 'Type product name:',
-  sortingMode: 'sorting',
+  sortingMode: 'choose sorting mode',
 };
 const viewModeTranslations = {
   changeToDetails: 'details view',
@@ -37,32 +36,28 @@ function ViewModeBtn({ viewModeType, onClick, isMobileLayout }) {
   switch (viewModeType) {
     case 'details': {
       return (
-        <Button
+        <PEVButton
           onClick={onClick}
           startIcon={<ListIcon />}
           className="product-list-control-bar__buttons-view-mode"
           variant="contained"
           color={color}
-          aria-label={viewModeTranslations.changeToDetails}
-          title={viewModeTranslations.changeToDetails}
         >
           {viewModeTranslations.changeToDetails}
-        </Button>
+        </PEVButton>
       );
     }
     case 'tiles': {
       return (
-        <Button
+        <PEVButton
           onClick={onClick}
           startIcon={<ViewModuleIcon />}
           className="product-list-control-bar__buttons-view-mode"
           variant="contained"
           color={color}
-          aria-label={viewModeTranslations.changeToTiles}
-          title={viewModeTranslations.changeToTiles}
         >
           {viewModeTranslations.changeToTiles}
-        </Button>
+        </PEVButton>
       );
     }
     default: {
@@ -283,9 +278,9 @@ export default function ProductList() {
               />
 
               {/* TODO: [UX] add sorting */}
-              <IconButton onClick={handleSorting} aria-label={translations.sortBtn} title={translations.sortBtn}>
+              <PEVIconButton onClick={handleSorting} a11y={translations.sortingMode}>
                 <SortIcon />
-              </IconButton>
+              </PEVIconButton>
             </div>
           </div>
 
@@ -313,16 +308,9 @@ export default function ProductList() {
               <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} />
 
               {/* TODO: [UX] add sorting */}
-              <Button
-                onClick={handleSorting}
-                startIcon={<SortIcon />}
-                variant="contained"
-                color="primary"
-                aria-label={translations.sortingMode}
-                title={translations.sortingMode}
-              >
+              <PEVButton onClick={handleSorting} startIcon={<SortIcon />} variant="contained" color="primary">
                 {translations.sortingMode}
-              </Button>
+              </PEVButton>
             </div>
 
             <ProductComparisonCandidatesList />

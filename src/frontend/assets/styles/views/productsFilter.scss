@@ -2,6 +2,32 @@
     &__form {
         &-field-legend {}
 
-        &-field-controls {}
+        &-field-controls {
+            flex-direction: column;
+
+            &-level {
+                display: grid;
+                grid-template-columns: 2fr 1fr 2fr;
+                align-items: center;
+                margin: 0.5rem;
+            }
+
+            &-unnested {
+                display: contents;
+            }
+
+            &-nested {
+                margin: 0.5rem;
+            }
+
+            &--vertical {
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        &-range-separator {
+            justify-self: center;
+        }
     }
 }

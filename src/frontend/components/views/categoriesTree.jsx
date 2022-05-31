@@ -3,13 +3,12 @@ import TreeMenu, { ItemComponent } from 'react-simple-tree-menu';
 import classNames from 'classnames';
 
 import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
 import AccountTree from '@material-ui/icons/AccountTree';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import List from '@material-ui/core/List';
 import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
 
+import { PEVIconButton, PEVHeading } from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
@@ -291,27 +290,20 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
 
   return isSeparatedView ? (
     <>
-      <IconButton
-        onClick={handleCategoriesTreeToggle}
-        aria-label={translations.toggleCategoriesTree}
-        title={translations.toggleCategoriesTree}
-      >
+      <PEVIconButton onClick={handleCategoriesTreeToggle} a11y={translations.toggleCategoriesTree}>
         <AccountTree />
-      </IconButton>
+      </PEVIconButton>
       <Drawer anchor="left" open={!isTreeHidden} onClose={handleCategoriesTreeToggle}>
         <section>
-          <IconButton
+          <PEVIconButton
             onClick={handleCategoriesTreeToggle}
             className="MuiButton-fullWidth"
-            aria-label={translations.toggleCategoriesTree}
-            title={translations.toggleCategoriesTree}
+            a11y={translations.toggleCategoriesTree}
           >
             <ArrowBack />
-          </IconButton>
+          </PEVIconButton>
 
-          <Typography variant="h3" component="h3">
-            {translations.treeHeader}
-          </Typography>
+          <PEVHeading level={3}>{translations.treeHeader}</PEVHeading>
 
           <Tree
             treeData={treeData}
@@ -327,9 +319,7 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
     </>
   ) : (
     <section>
-      <Typography variant="h3" component="h3">
-        {translations.treeHeader}
-      </Typography>
+      <PEVHeading level={3}>{translations.treeHeader}</PEVHeading>
       <Tree
         treeData={treeData}
         treeInitials={treeInitials}

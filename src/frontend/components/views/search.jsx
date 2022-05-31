@@ -4,18 +4,18 @@ import classNames from 'classnames';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Checkbox from '@material-ui/core/Checkbox';
 import TextFormat from '@material-ui/icons/TextFormat';
 import Zoom from '@material-ui/core/Zoom';
-import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 
+import { PEVForm, PEVIconButton, PEVCheckbox } from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
   defaultLabel: 'Search for:',
   caseSensitiveSearch: 'toggle case sensitivity',
+  doSearchLabel: 'do search',
 };
 
 const Search = memo(function Search({
@@ -29,7 +29,6 @@ const Search = memo(function Search({
   list = '',
   presetValue = '',
   autoFocus = false,
-  separateLabel = false,
 }) {
   if (Number.isNaN(debounceTimeMs) || typeof debounceTimeMs !== 'number') {
     throw TypeError(`debounceTimeMs prop must be number! Received: ${debounceTimeMs}`);
@@ -42,12 +41,6 @@ const Search = memo(function Search({
   const [inputValue, setInputValue] = useState(presetValue);
   const debounce = useRef(-1);
   const inputId = `${searchingTarget}Search`;
-  const variantAndSize = separateLabel
-    ? {
-        variant: 'outlined',
-        size: 'small',
-      }
-    : {};
 
   const debounceNotify = (notifier) => {
     if (debounce.current > -1) {
@@ -74,31 +67,28 @@ const Search = memo(function Search({
   };
 
   return (
-    <>
-      {separateLabel && (
-        <label className="search-container__field-label" htmlFor={inputId}>
-          {label}
-        </label>
+    // Alone (and kind of no-op) `Formik` component wrapper is used only to provide a (React) context for underlying fields, which rely on Context API
+    <PEVForm
+      overrideRenderFn={() => (
+        <TextField
+          ref={forwardedRef}
+          id={inputId}
+          type="search"
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          inputProps={{
+            value: inputValue,
+            list: list,
+            autoFocus: autoFocus,
+            autoComplete: 'off',
+          }}
+          InputProps={{
+            endAdornment: customCheckbox && <InputAdornment position="end">{customCheckbox}</InputAdornment>,
+          }}
+          label={label}
+        />
       )}
-      <TextField
-        ref={forwardedRef}
-        id={inputId}
-        type="search"
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        inputProps={{
-          value: inputValue,
-          list: list,
-          autoFocus: autoFocus,
-          autoComplete: 'off',
-        }}
-        InputProps={{
-          endAdornment: customCheckbox && <InputAdornment position="end">{customCheckbox}</InputAdornment>,
-        }}
-        placeholder={separateLabel ? '' : label}
-        {...variantAndSize}
-      />
-    </>
+    />
   );
 });
 
@@ -169,16 +159,15 @@ function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMain
               {...restProps}
               onInputChange={handleInputSearchChange}
               customCheckbox={
-                <Checkbox
+                <PEVCheckbox
                   className="search-container__field-letter-case-toggler"
+                  identity="searchCaseSensitivity"
                   icon={<TextFormat color="primary" />}
                   checkedIcon={<TextFormat color="secondary" />}
                   onChange={handleCaseSensitiveChange}
                   checked={isCaseSensitive}
-                  inputProps={{
-                    'aria-label': translations.caseSensitiveSearch,
-                    title: translations.caseSensitiveSearch,
-                  }}
+                  label={translations.caseSensitiveSearch}
+                  noExplicitlyVisibleLabel
                 />
               }
             />
@@ -186,14 +175,15 @@ function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMain
         </section>
 
         <Zoom in={!isSearchVisible} onEnter={toggleSearchBtn(false, 'enter')} onExit={toggleSearchBtn(true, 'exit')}>
-          <IconButton
+          <PEVIconButton
             onClick={toggleSearch(true)}
             className={classNames({
               'search-wrapper__toggle-button--is-hidden': isSearchBtnHidden,
             })}
+            a11y={translations.doSearchLabel}
           >
             <SearchIcon />
-          </IconButton>
+          </PEVIconButton>
         </Zoom>
       </div>
     </ClickAwayListener>

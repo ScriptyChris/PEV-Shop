@@ -1,18 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useHistory, Link } from 'react-router-dom';
-import { Formik, Field } from 'formik';
+import { useLocation, useHistory } from 'react-router-dom';
+import { Field } from 'formik';
 import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import MUILink from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
+import FormGroup from '@material-ui/core/FormGroup';
 
+import {
+  PEVForm,
+  PEVButton,
+  PEVLink,
+  PEVRadio,
+  PEVHeading,
+  PEVParagraph,
+  PEVFieldset,
+} from '@frontend/components/utils/formControls';
 import ProductCard from './productCard';
 import { ProductComparisonCandidatesList } from '@frontend/components/views/productComparisonCandidates';
 import httpService from '@frontend/features/httpService';
@@ -44,10 +51,9 @@ const productDetailsTranslations = Object.freeze({
   reviewsNavLabel: 'Reviews',
   relatedProductsNavLabel: 'Related products',
   addReview: 'Add review',
-  anonymously: 'anonymously?',
-  anonymous: 'Anonymous',
+  anonymously: 'Anonymous',
   reviewContentPlaceholder: 'You can share your opinion here...',
-  cancelReview: 'Cancel review',
+  cancelReview: 'Cancel',
   submitReview: 'Submit',
   emptyData: 'No data!',
 });
@@ -55,15 +61,11 @@ const productDetailsTranslations = Object.freeze({
 function AddReview({ productName, updateReviews }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const formInitials = {
-    author: 'TODO: put user nick here',
+    author: '',
     rating: 0,
     content: '',
   };
   const [popupData, setPopupData] = useState(null);
-
-  const onAnonymousChange = (checked, setFieldValue) => {
-    setFieldValue('author', checked ? productDetailsTranslations.anonymous : formInitials.author);
-  };
 
   const onSubmitHandler = (values) => {
     httpService
@@ -92,42 +94,50 @@ function AddReview({ productName, updateReviews }) {
   if (showReviewForm) {
     return (
       <>
-        <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
-          {({ handleSubmit, ...formikRestProps }) => (
-            <form onSubmit={handleSubmit}>
-              <div>
-                <span>
-                  <label htmlFor="author">{productDetailsTranslations.author}:</label>
-                  <Field name="author" type="text" readOnly required />
-                </span>
-
-                <span>
-                  <label htmlFor="asAnonymous">{productDetailsTranslations.anonymously}</label>
-                  <input
-                    id="asAnonymous"
-                    type="checkbox"
-                    onChange={({ target: { checked } }) => onAnonymousChange(checked, formikRestProps.setFieldValue)}
-                  />
-                </span>
+        <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials}>
+          <PEVFieldset>
+            <PEVParagraph>{productDetailsTranslations.author}:</PEVParagraph>
+            <FormGroup row>
+              <div className="product-reviews__author">
+                <PEVRadio
+                  label="TODO: put user nick here"
+                  value="TODO: put user nick here"
+                  name="author"
+                  identity="namedAuthor"
+                  required
+                />
               </div>
+              <div className="product-reviews__author">
+                <PEVRadio
+                  label={productDetailsTranslations.anonymously}
+                  value={productDetailsTranslations.anonymously}
+                  name="author"
+                  identity="anonymousAuthor"
+                  required
+                />
+              </div>
+            </FormGroup>
 
-              <Field name="rating" component={RatingWidget} isBig={true} required />
+            <Field component={RatingWidget} name="rating" isBig required />
 
-              {/* TODO: [UX] adjust <textarea> size to device */}
-              <Field name="content" placeholder={productDetailsTranslations.reviewContentPlaceholder} as="textarea" />
+            {/* TODO: [UX] adjust <textarea> size to device */}
+            <Field
+              component="textarea"
+              name="content"
+              placeholder={productDetailsTranslations.reviewContentPlaceholder}
+            />
+          </PEVFieldset>
 
-              <button type="submit">{productDetailsTranslations.submitReview}</button>
-            </form>
-          )}
-        </Formik>
+          <PEVButton type="submit">{productDetailsTranslations.submitReview}</PEVButton>
+          <PEVButton onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</PEVButton>
+        </PEVForm>
 
-        <button onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</button>
         <Popup {...popupData} />
       </>
     );
   }
 
-  return <button onClick={() => setShowReviewForm(true)}>{productDetailsTranslations.addReview}</button>;
+  return <PEVButton onClick={() => setShowReviewForm(true)}>{productDetailsTranslations.addReview}</PEVButton>;
 }
 
 export function getProductDetailsHeaders(ignoredHeadersList = []) {
@@ -153,10 +163,10 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
     case 'price': {
       if (extras.header) {
         return (
-          <p className={extras.className}>
+          <PEVParagraph className={extras.className}>
             {extras.header}
             {detailValue}
-          </p>
+          </PEVParagraph>
         );
       }
 
@@ -480,12 +490,12 @@ export default function ProductDetails({ product }) {
           }}
         />
         <p className="product-details__header-action-btns">
-          <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={navigateToProductModify}>
+          <PEVButton size="small" startIcon={<EditIcon />} onClick={navigateToProductModify}>
             {productDetailsTranslations.editProduct}
-          </Button>
-          <Button size="small" variant="outlined" startIcon={<DeleteIcon />} onClick={deleteProduct}>
+          </PEVButton>
+          <PEVButton size="small" startIcon={<DeleteIcon />} onClick={deleteProduct}>
             {productDetailsTranslations.deleteProduct}
-          </Button>
+          </PEVButton>
           <ProductObservabilityToggler productId={product._id} />
           <ProductComparisonCandidatesToggler product={product} buttonVariant="outlined" />
         </p>
@@ -493,9 +503,9 @@ export default function ProductDetails({ product }) {
         <div className="product-details__header-image">TODO: [UI] image should go here</div>
         {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-details__header-image" />*/}
 
-        <Typography variant="h2" component="h2" className="product-details__header-name">
+        <PEVHeading level={2} className="product-details__header-name">
           <ProductSpecificDetail detailName="name" detailValue={productDetails.name} />
-        </Typography>
+        </PEVHeading>
         <RatingWidget
           presetValue={productDetails.reviews.averageRating}
           isBig={true}
@@ -544,9 +554,7 @@ export default function ProductDetails({ product }) {
                         activated: activatedNavMenuItemIndex === index,
                       })}
                     >
-                      <MUILink to={{ hash: `#${navSection.id}`, state: product }} component={Link} color="inherit">
-                        {navSection.label}
-                      </MUILink>
+                      <PEVLink to={{ hash: `#${navSection.id}`, state: product }}>{navSection.label}</PEVLink>
                     </MenuItem>
                   );
                 })}
@@ -557,28 +565,26 @@ export default function ProductDetails({ product }) {
       </aside>
 
       <section className="product-details__nav-section">
-        <Typography
-          variant="h3"
-          component="h3"
+        <PEVHeading
+          level={3}
           id={productDetailsNavSections.description.id}
           ref={productDetailsNavSections.description.ref}
         >
           {productDetailsNavSections.description.label}
-        </Typography>
+        </PEVHeading>
         <ProductSpecificDetail detailName="shortDescription" detailValue={productDetails.shortDescription} />
       </section>
 
       <Divider />
 
       <section className="product-details__nav-section">
-        <Typography
-          variant="h3"
-          component="h3"
+        <PEVHeading
+          level={3}
           id={productDetailsNavSections.technicalSpecs.id}
           ref={productDetailsNavSections.technicalSpecs.ref}
         >
           {productDetailsNavSections.technicalSpecs.label}
-        </Typography>
+        </PEVHeading>
         <ProductSpecificDetail
           detailName="technicalSpecs"
           detailValue={productDetails.technicalSpecs}
@@ -593,14 +599,9 @@ export default function ProductDetails({ product }) {
       <Divider />
 
       <section className="product-details__nav-section">
-        <Typography
-          variant="h3"
-          component="h3"
-          id={productDetailsNavSections.reviews.id}
-          ref={productDetailsNavSections.reviews.ref}
-        >
+        <PEVHeading level={3} id={productDetailsNavSections.reviews.id} ref={productDetailsNavSections.reviews.ref}>
           {productDetailsNavSections.reviews.label}
-        </Typography>
+        </PEVHeading>
         <ProductSpecificDetail
           detailName="reviews"
           detailValue={productDetails.reviews}
@@ -619,14 +620,13 @@ export default function ProductDetails({ product }) {
       <Divider />
 
       <section className="product-details__nav-section">
-        <Typography
-          variant="h3"
-          component="h3"
+        <PEVHeading
+          level={3}
           id={productDetailsNavSections.relatedProducts.id}
           ref={productDetailsNavSections.relatedProducts.ref}
         >
           {productDetailsNavSections.relatedProducts.label}
-        </Typography>
+        </PEVHeading>
 
         {productDetails.relatedProducts?.length && (
           <div className="product-details__nav-section-related-products">

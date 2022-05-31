@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import Typography from '@material-ui/core/Typography';
 import ArrowBack from '@material-ui/icons/ArrowBack';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ShoppingCart from '@material-ui/icons/ShoppingCart';
 import AddShoppingCart from '@material-ui/icons/AddShoppingCart';
@@ -19,6 +16,7 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
+import { PEVButton, PEVIconButton, PEVHeading } from '@frontend/components/utils/formControls';
 import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
 import { ROUTES } from '@frontend/components/pages/_routes';
@@ -52,7 +50,7 @@ export function AddToCartButton({ productInfoForCart, startOrEndIcon = null, cla
     );
   }
 
-  const ButtonTag = startOrEndIcon ? Button : IconButton;
+  const ButtonTag = startOrEndIcon ? PEVButton : PEVIconButton;
 
   const handleAddToCartClick = () => {
     storeService.addProductToUserCartState(productInfoForCart /* TODO: [TS] `as IUserCart['products']` */);
@@ -63,8 +61,7 @@ export function AddToCartButton({ productInfoForCart, startOrEndIcon = null, cla
     // TODO: [UX] add info tooltip after product is added to cart
     <ButtonTag
       onClick={handleAddToCartClick}
-      aria-label={translations.addToCartBtn}
-      title={translations.addToCartBtn}
+      a11y={translations.addToCartBtn}
       className={className}
       {...{ [startOrEndIcon]: startOrEndIcon ? <AddShoppingCart /> : null }}
       variant={startOrEndIcon ? 'contained' : null}
@@ -113,30 +110,22 @@ export default observer(function Cart() {
 
   return (
     <>
-      <IconButton
+      <PEVIconButton
         color="inherit"
         onClick={handleTogglingCart}
-        aria-label={translations.cartLabel}
-        title={translations.cartLabel}
+        a11y={translations.cartLabel}
         data-cy="button:toggle-cart"
       >
         <ShoppingCart />
-      </IconButton>
+      </PEVIconButton>
 
       <Drawer anchor="right" open={isCartOpen} onClose={handleTogglingCart}>
         <section data-cy="container:cart">
-          <IconButton
-            onClick={handleTogglingCart}
-            className="MuiButton-fullWidth"
-            aria-label={translations.goBackLabel}
-            title={translations.goBackLabel}
-          >
+          <PEVIconButton onClick={handleTogglingCart} className="MuiButton-fullWidth" a11y={translations.goBackLabel}>
             <ArrowBack />
-          </IconButton>
+          </PEVIconButton>
 
-          <Typography variant="h3" component="h3">
-            {translations.header}
-          </Typography>
+          <PEVHeading level={3}>{translations.header}</PEVHeading>
 
           <TableContainer component={Paper}>
             <Table size="small" aria-label={translations.cartLabel}>
@@ -161,13 +150,12 @@ export default observer(function Cart() {
                       <TableCell>{productItem.count}</TableCell>
                       <TableCell data-cy="label:cart-product-price">{productItem.price}</TableCell>
                       <TableCell>
-                        <IconButton
+                        <PEVIconButton
                           onClick={() => handleRemoveProductFromCart(productItem)}
-                          aria-label={translations.removeProductFromCart}
-                          title={translations.removeProductFromCart}
+                          a11y={translations.removeProductFromCart}
                         >
                           <DeleteIcon />
-                        </IconButton>
+                        </PEVIconButton>
                       </TableCell>
                     </TableRow>
                   ))
@@ -186,22 +174,12 @@ export default observer(function Cart() {
           </TableContainer>
 
           <div className="cart-action-buttons">
-            <Button
-              onClick={handleCartSubmission}
-              disabled={isCartEmpty}
-              aria-label={translations.submitCart}
-              title={translations.submitCart}
-            >
+            <PEVButton onClick={handleCartSubmission} disabled={isCartEmpty}>
               {translations.submitCart}
-            </Button>
-            <Button
-              onClick={handleCartCleanup}
-              disabled={isCartEmpty}
-              aria-label={translations.cleanupCart}
-              title={translations.cleanupCart}
-            >
+            </PEVButton>
+            <PEVButton onClick={handleCartCleanup} disabled={isCartEmpty}>
               {translations.cleanupCart}
-            </Button>
+            </PEVButton>
           </div>
         </section>
       </Drawer>

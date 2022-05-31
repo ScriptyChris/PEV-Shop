@@ -1,13 +1,16 @@
 import React from 'react';
-import { Formik, Field } from 'formik';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-import Typography from '@material-ui/core/Typography';
-import InputLabel from '@material-ui/core/InputLabel';
-import MUILink from '@material-ui/core/Link';
-import Button from '@material-ui/core/Button';
-
-import { FormikTextFieldForwarder } from '@frontend/components/utils/formControls';
+import {
+  PEVForm,
+  PEVButton,
+  PEVLink,
+  PEVParagraph,
+  PEVHeading,
+  PEVTextField,
+  PEVFieldset,
+  PEVLegend,
+} from '@frontend/components/utils/formControls';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from './_routes';
 import { PasswordField } from '@frontend/components/views/password';
@@ -44,49 +47,30 @@ export default function LogIn() {
 
   return (
     <section className="login">
-      <Formik onSubmit={onSubmitHandler} validateOnChange={false} initialValues={formInitials}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <fieldset className="login__root-fieldset MuiFormControl-root">
-              <legend className="login__header MuiFormLabel-root">
-                <Typography variant="h2">{translations.logInHeader}</Typography>
-              </legend>
+      <PEVForm onSubmit={onSubmitHandler} validateOnChange={false} initialValues={formInitials}>
+        <PEVFieldset className="login__root-fieldset MuiFormControl-root">
+          <PEVLegend className="login__header MuiFormLabel-root">
+            <PEVHeading level={2}>{translations.logInHeader}</PEVHeading>
+          </PEVLegend>
 
-              <div className="login__login-field">
-                <InputLabel htmlFor="login">{translations.logInField}</InputLabel>
-                <Field
-                  component={FormikTextFieldForwarder}
-                  variant="outlined"
-                  size="small"
-                  id="login"
-                  name="login"
-                  required
-                  data-cy="input:login"
-                />
-              </div>
+          <div className="login__login-field">
+            <PEVTextField identity="login" label={translations.logInField} required data-cy="input:login" />
+          </div>
 
-              <PasswordField identity="password" translation={translations.passwordField} dataCy="input:password" />
+          <PasswordField identity="password" label={translations.passwordField} dataCy="input:password" />
 
-              <Button
-                className="login__submit-button"
-                variant="outlined"
-                size="small"
-                type="submit"
-                data-cy="button:submit-login"
-              >
-                {translations.submitLogIn}
-              </Button>
-            </fieldset>
-          </form>
-        )}
-      </Formik>
+          <PEVButton className="login__submit-button" size="small" type="submit" data-cy="button:submit-login">
+            {translations.submitLogIn}
+          </PEVButton>
+        </PEVFieldset>
+      </PEVForm>
 
-      <Typography variant="body1" className="login__reset-password-hint">
+      <PEVParagraph className="login__reset-password-hint">
         {translations.resetPasswordHint}{' '}
-        <MUILink to={ROUTES.RESET_PASSWORD} component={Link} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
+        <PEVLink to={ROUTES.RESET_PASSWORD} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
           {translations.resetPasswordLink}
-        </MUILink>
-      </Typography>
+        </PEVLink>
+      </PEVParagraph>
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}
       {/* TODO: [UX] if User credentials are invalid, show regarding info instead of redirecting to /account  */}

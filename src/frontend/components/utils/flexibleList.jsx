@@ -2,7 +2,9 @@ import React, { useState, useEffect, useReducer, useMemo } from 'react';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Button from '@material-ui/core/Button';
+import InputLabel from '@material-ui/core/InputLabel';
+
+import { PEVButton } from '@frontend/components/utils/formControls';
 
 const translations = {
   add: 'Add',
@@ -102,19 +104,13 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
   const getConfirmAndCancelButtons = ({ inputItemRef = {}, onConfirmBtnClick, isConfirmBtnDisabled } = {}) => (
     <div className="flexible-list__item-btns">
       {inputItemRef.current && (
-        <Button
-          variant="outlined"
-          size="small"
-          type="button"
-          onClick={onConfirmBtnClick}
-          disabled={isConfirmBtnDisabled}
-        >
+        <PEVButton size="small" type="button" onClick={onConfirmBtnClick} disabled={isConfirmBtnDisabled}>
           {translations.confirm}
-        </Button>
+        </PEVButton>
       )}
-      <Button variant="outlined" size="small" type="button" onClick={features.resetState}>
+      <PEVButton size="small" type="button" onClick={features.resetState}>
         {translations.cancel}
-      </Button>
+      </PEVButton>
     </div>
   );
 
@@ -128,15 +124,14 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
           return (
             <ListItem className="flexible-list__item" key={item}>
               {addBtnVisible ? (
-                <Button
+                <PEVButton
                   className="flexible-list__item-add-btn"
-                  variant="outlined"
                   size="small"
                   type="button"
                   onClick={features.prepareAddItem}
                 >
                   {translations.add}
-                </Button>
+                </PEVButton>
               ) : (
                 <NewItemComponent listFeatures={features} updateItem={updateItem}>
                   {getConfirmAndCancelButtons}
@@ -155,19 +150,14 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
                 </EditItemComponent>
               ) : (
                 <>
-                  <output>{item}</output>
+                  <InputLabel component="output">{item}</InputLabel>
                   <div className="flexible-list__item-btns">
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      type="button"
-                      onClick={() => features.prepareEditItem(index)}
-                    >
+                    <PEVButton size="small" type="button" onClick={() => features.prepareEditItem(index)}>
                       {translations.edit}
-                    </Button>
-                    <Button variant="outlined" size="small" type="button" onClick={() => features.deleteItem(index)}>
+                    </PEVButton>
+                    <PEVButton size="small" type="button" onClick={() => features.deleteItem(index)}>
                       {translations.delete}
-                    </Button>
+                    </PEVButton>
                   </div>
                 </>
               )}

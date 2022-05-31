@@ -5,8 +5,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import Zoom from '@material-ui/core/Zoom';
-import Button from '@material-ui/core/Button';
 
+import { PEVButton } from '@frontend/components/utils/formControls';
 import { httpServiceSubscriber } from '@frontend/features/httpService';
 
 const POPUP_TYPES = {
@@ -144,7 +144,7 @@ export default function Popup(props) {
       )}
       <DialogActions>
         {singleAltBtn && (
-          <Button
+          <PEVButton
             onClick={singleAltBtn.onClick}
             key={singleAltBtn.text}
             data-cy={singleAltBtn.dataCy}
@@ -154,21 +154,20 @@ export default function Popup(props) {
             style={{ margin: 'auto' }}
           >
             {singleAltBtn.text}
-          </Button>
+          </PEVButton>
         )}
 
         {buttons?.map((btn, index) => (
-          <Button
+          <PEVButton
             onClick={btn.onClick}
             key={btn.text}
             data-cy={btn.dataCy}
             ref={index === 0 ? firstBtnRef : null}
-            variant="outlined"
             size="small"
             color={index === 0 ? 'primary' : 'default'}
           >
             {btn.text}
-          </Button>
+          </PEVButton>
         ))}
       </DialogActions>
     </Dialog>

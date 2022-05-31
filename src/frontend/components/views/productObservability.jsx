@@ -3,12 +3,11 @@ import { observer } from 'mobx-react-lite';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Button from '@material-ui/core/Button';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
 import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
-import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 
+import { PEVButton, PEVIconButton } from '@frontend/components/utils/formControls';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
@@ -94,15 +93,13 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
       {getCustomButton ? (
         getCustomButton(toggleProductObserve)
       ) : (
-        <Button
+        <PEVButton
           size="small"
           startIcon={isProductObserved ? <RemoveFromQueueIcon /> : <AddToQueueIcon />}
           onClick={toggleProductObserve}
-          aria-label={buttonContent}
-          title={buttonContent}
         >
           {buttonContent}
-        </Button>
+        </PEVButton>
       )}
 
       <Popup {...popupData} />
@@ -160,15 +157,9 @@ export default observer(function ObservedProducts() {
     <section className="account__menu-tab" data-cy="section:observed-products">
       {/* TODO: [UX] add searching and filtering for observed products */}
 
-      <Button
-        onClick={unobserveAllProducts}
-        disabled={!canUnobserveAllProducts}
-        variant="outlined"
-        aria-label={translations.unobserveAllProducts}
-        title={translations.unobserveAllProducts}
-      >
+      <PEVButton onClick={unobserveAllProducts} disabled={!canUnobserveAllProducts}>
         {translations.unobserveAllProducts}
-      </Button>
+      </PEVButton>
 
       <List component="ol" className="account__menu-tab-observed-products-list" disablePadding={isMobileLayout}>
         {observedProducts.length
@@ -181,14 +172,13 @@ export default observer(function ObservedProducts() {
                 <ProductObservabilityToggler
                   productId={product._id}
                   getCustomButton={(toggleProductObserve) => (
-                    <IconButton
+                    <PEVIconButton
                       onClick={getUnobserveProductHandler(toggleProductObserve)}
                       onFocus={(event) => event.stopPropagation()}
-                      aria-label={translations.unobserveProduct}
-                      title={translations.unobserveProduct}
+                      a11y={translations.unobserveProduct}
                     >
                       <DeleteIcon />
-                    </IconButton>
+                    </PEVIconButton>
                   )}
                 />
                 <ProductCard product={product} layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED} />

@@ -1,19 +1,27 @@
-import React, { useCallback, useEffect, useRef, useState, Fragment, useMemo, memo } from 'react';
-import { Formik, ErrorMessage } from 'formik';
+import React, { useCallback, useEffect, useRef, useState, useMemo, memo } from 'react';
+import { ErrorMessage } from 'formik';
+import classNames from 'classnames';
 
 import Drawer from '@material-ui/core/Drawer';
-import Button from '@material-ui/core/Button';
 import ArrowBack from '@material-ui/icons/ArrowBack';
-import IconButton from '@material-ui/core/IconButton';
 import Tune from '@material-ui/icons/Tune';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import TextField from '@material-ui/core/TextField';
+import InputLabel from '@material-ui/core/InputLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Typography from '@material-ui/core/Typography';
 
+import {
+  PEVForm,
+  PEVButton,
+  PEVIconButton,
+  PEVHeading,
+  PEVFieldset,
+  PEVLegend,
+  PEVParagraph,
+  PEVTextField,
+} from '@frontend/components/utils/formControls';
 import productSpecsService from '@frontend/features/productSpecsService';
 import FormFieldError from '@frontend/components/utils/formFieldError';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout';
@@ -27,6 +35,8 @@ const translations = {
   filterProducts: 'Apply filters',
   minExceededMax: 'Min value must be lower than or equal to max value!',
   maxBeneathMin: 'Max value must be greater than or equal to min value!',
+  inputRangeFrom: 'from',
+  inputRangeTo: 'to',
   getBeyondValueRange({ boundaryName, boundaryValue }) {
     if (!boundaryName || !boundaryValue) {
       throw ReferenceError(`boundaryName: ${boundaryName} and boundaryValue: ${boundaryValue} must not be empty!`);
@@ -78,7 +88,6 @@ const GetControlsForSpecs = (() => {
     spec: { _normalizedName: name, values, type, descriptions, defaultUnit, _namesRangeMapping: namesRangeMapping },
   }) {
     const templateMethod = TEMPLATE_FUNCTION_PER_CONTROL_TYPE[type];
-
     if (typeof templateMethod !== 'function') {
       throw TypeError(`spec.type '${type}' was not recognized as a template method!`);
     }
@@ -90,7 +99,7 @@ const GetControlsForSpecs = (() => {
     };
 
     return (
-      <fieldset key={`spec${name}Filter`}>
+      <PEVFieldset key={`spec${name}Filter`}>
         {/* TODO: [UX] fix layout to prevent vertical overflow (especially when accordion is fully expanded) */}
         {/* TODO: [UX] accordion should rather be fully expanded by default on PC */}
         <Accordion
@@ -107,15 +116,13 @@ const GetControlsForSpecs = (() => {
             aria-controls={`spec-${name}-content`}
             id={`spec-${name}-header`}
           >
-            <legend className="products-filter__form-field-legend">{getLegendContent()}</legend>
+            <PEVLegend className="products-filter__form-field-legend">{getLegendContent()}</PEVLegend>
           </AccordionSummary>
-          <AccordionDetails>
-            <div className="products-filter__form-field-controls">
-              {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
-            </div>
+          <AccordionDetails className="products-filter__form-field-controls">
+            {templateMethod(formikRestProps, name, namesRangeMapping[name], values, descriptions)}
           </AccordionDetails>
         </Accordion>
-      </fieldset>
+      </PEVFieldset>
     );
   };
 
@@ -140,55 +147,75 @@ const GetControlsForSpecs = (() => {
         specRangeName.length === 0 ? ['', ''] : specRangeName.map((item) => formikRestProps.values[item]);
 
       return (
-        <Fragment key={keyAndId}>
-          {areSpecDescriptions && <div id={keyAndId}>{translations.normalizeContent(specDescriptions[index])}</div>}
+        <div
+          key={keyAndId}
+          className={classNames({
+            'products-filter__form-field-controls-level': !areSpecDescriptions,
+            'products-filter__form-field-controls-nested': areSpecDescriptions,
+          })}
+        >
+          {areSpecDescriptions && (
+            <PEVParagraph id={keyAndId}>{translations.normalizeContent(specDescriptions[index])}</PEVParagraph>
+          )}
 
-          <TextField
-            aria-labelledby={ariaLabelledBy}
-            type="number"
-            inputProps={{
-              min: vMin,
-              max: vMax,
-              name: specRangeName[0],
-              value: minValue,
-            }}
-            onChange={formikRestProps.handleChange}
-          />
-
-          <span className="products-filter-form__range-separator">-</span>
-
-          <TextField
-            aria-labelledby={ariaLabelledBy}
-            type="number"
-            inputProps={{
-              min: vMin,
-              max: vMax,
-              name: specRangeName[1],
-              value: maxValue,
-            }}
-            onChange={formikRestProps.handleChange}
-          />
-
-          {errorList.length > 0 &&
-            errorList.map((errorObj, index) => {
-              let errorMessage = '';
-
-              if (errorObj.conflictWithCounterPart) {
-                errorMessage = translations[errorObj.conflictWithCounterPart];
-              } else if (errorObj.beyondValueRange) {
-                errorMessage = translations.getBeyondValueRange(errorObj.beyondValueRange);
-              }
-
-              return (
-                <ErrorMessage
-                  name={errorObj._name}
-                  key={`${ariaLabelledBy}-error${index}`}
-                  component={FormFieldError}
-                  customMessage={errorMessage}
-                />
-              );
+          <div
+            className={classNames({
+              'products-filter__form-field-controls-level': areSpecDescriptions,
+              'products-filter__form-field-controls-unnested': !areSpecDescriptions,
             })}
-        </Fragment>
+            aria-label={`${specName}${areSpecDescriptions ? '-' + keyAndId : ''}`}
+          >
+            <PEVTextField
+              labelInside
+              label={translations.inputRangeFrom}
+              identity={specRangeName[0]}
+              type="number"
+              inputProps={{
+                min: vMin,
+                max: vMax,
+                name: specRangeName[0],
+                value: minValue,
+              }}
+              onChange={formikRestProps.handleChange}
+            />
+
+            <span className="products-filter__form-range-separator">-</span>
+
+            <PEVTextField
+              labelInside
+              label={translations.inputRangeTo}
+              identity={specRangeName[1]}
+              type="number"
+              inputProps={{
+                min: vMin,
+                max: vMax,
+                name: specRangeName[1],
+                value: maxValue,
+              }}
+              onChange={formikRestProps.handleChange}
+            />
+
+            {errorList.length > 0 &&
+              errorList.map((errorObj, index) => {
+                let errorMessage = '';
+
+                if (errorObj.conflictWithCounterPart) {
+                  errorMessage = translations[errorObj.conflictWithCounterPart];
+                } else if (errorObj.beyondValueRange) {
+                  errorMessage = translations.getBeyondValueRange(errorObj.beyondValueRange);
+                }
+
+                return (
+                  <ErrorMessage
+                    name={errorObj._name}
+                    key={`${ariaLabelledBy}-error${index}`}
+                    component={FormFieldError}
+                    customMessage={errorMessage}
+                  />
+                );
+              })}
+          </div>
+        </div>
       );
     });
   }
@@ -197,12 +224,19 @@ const GetControlsForSpecs = (() => {
     const value = formikRestProps.values[specName] === undefined ? '' : formikRestProps.values[specName];
     const normalizedSpecValues = specValue[0].map((specV) => specV.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP));
 
-    return normalizedSpecValues.map((val, index) => (
-      <label key={`spec${specName}Control${index}`}>
-        {translations.normalizeContent(val)}
-        <Checkbox name={`${specName}__${val}`} value={value} onChange={formikRestProps.handleChange} />
-      </label>
-    ));
+    return normalizedSpecValues.map((val, index) => {
+      const identity = `${specName}__${val}`;
+
+      return (
+        // TODO: [DX] refactor to use PEVCheckbox (which will most likely require refactoring of whole specs mechanism)
+        <div className="products-filter__form-field-controls--vertical" key={`spec${specName}Control${index}`}>
+          <Checkbox name={identity} id={identity} value={value} onChange={formikRestProps.handleChange} />
+          <InputLabel key={`spec${specName}Control${index}`} htmlFor={identity}>
+            {translations.normalizeContent(val)}
+          </InputLabel>
+        </div>
+      );
+    });
   }
 })();
 
@@ -330,6 +364,12 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
         min: lastChangedInputMinValue,
         max: lastChangedInputMaxValue,
       } = lastChangedInputMeta.current;
+
+      // TODO: this quick fix may need to be improved and should only matter when inputs are empty
+      if (lastChangedInputName === '') {
+        return cachedValidationErrors.current;
+      }
+
       const parsedInputName = parseInputName(lastChangedInputName);
       const hasCounterPart = parsedInputName.modifier;
 
@@ -426,76 +466,59 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
     return translations.filterUnavailable;
   }
 
+  const filterForm = (
+    <PEVForm
+      initialValues={formInitials}
+      validate={validateHandler}
+      onChange={changeHandler}
+      overrideRenderFn={({ handleSubmit, ...formikRestProps }) => {
+        const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
+        formikRestProps.handleChange = function (event) {
+          // TODO: remove this when form will be submitted via button, not dynamically
+          formikRestProps.setFieldTouched(event.target.name, true, false);
+
+          changeHandler(event);
+          _handleChange(event);
+        };
+
+        return (
+          <form onSubmit={handleSubmit}>
+            {getFormControls(formikRestProps)}
+            <PEVButton type="button" onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
+              {translations.filterProducts}
+            </PEVButton>
+          </form>
+        );
+      }}
+    />
+  );
+
   return isMobileLayout ? (
     <>
-      <IconButton
-        onClick={handleFiltersWidgetToggle}
-        aria-label={translations.filtersWidgetToggleButton}
-        title={translations.filtersWidgetToggleButton}
-      >
+      <PEVIconButton onClick={handleFiltersWidgetToggle} a11y={translations.filtersWidgetToggleButton}>
         <Tune />
-      </IconButton>
+      </PEVIconButton>
 
       <Drawer anchor="left" open={isFormExpanded} onClose={handleFiltersWidgetToggle}>
         <section>
-          <IconButton
+          <PEVIconButton
             onClick={handleFiltersWidgetToggle}
             className="MuiButton-fullWidth"
-            aria-label={translations.goBackLabel}
-            title={translations.goBackLabel}
+            a11y={translations.goBackLabel}
           >
             <ArrowBack />
-          </IconButton>
+          </PEVIconButton>
 
-          <Typography variant="h3" component="h3">
-            {translations.filtersHeader}
-          </Typography>
+          <PEVHeading level={3}>{translations.filtersHeader}</PEVHeading>
 
-          <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
-            {({ handleSubmit, ...formikRestProps }) => {
-              const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
-              formikRestProps.handleChange = function (event) {
-                // TODO: remove this when form will be submitted via button, not dynamically
-                formikRestProps.setFieldTouched(event.target.name, true, false);
-
-                changeHandler(event);
-                _handleChange(event);
-              };
-
-              return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
-            }}
-          </Formik>
-
-          <Button onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
-            {translations.filterProducts}
-          </Button>
+          {filterForm}
         </section>
       </Drawer>
     </>
   ) : (
     <section>
-      <Typography variant="h3" component="h3">
-        {translations.filtersHeader}
-      </Typography>
-
-      <Formik initialValues={formInitials} validate={validateHandler} onChange={changeHandler}>
-        {({ handleSubmit, ...formikRestProps }) => {
-          const _handleChange = formikRestProps.handleChange.bind(formikRestProps);
-          formikRestProps.handleChange = function (event) {
-            // TODO: remove this when form will be submitted via button, not dynamically
-            formikRestProps.setFieldTouched(event.target.name, true, false);
-
-            changeHandler(event);
-            _handleChange(event);
-          };
-
-          return <form onSubmit={handleSubmit}>{getFormControls(formikRestProps)}</form>;
-        }}
-      </Formik>
-
-      <Button onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
-        {translations.filterProducts}
-      </Button>
+      <PEVHeading level={3}>{translations.filtersHeader}</PEVHeading>
+      {filterForm}
     </section>
   );
 }

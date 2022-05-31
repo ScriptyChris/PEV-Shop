@@ -3,14 +3,13 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import classNames from 'classnames';
 
-import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import MUILink from '@material-ui/core/Link';
 
+import { PEVIconButton, PEVLink } from '@frontend/components/utils/formControls';
 import storeService from '@frontend/features/storeService';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from '@frontend/components/pages/_routes';
@@ -27,14 +26,6 @@ const translations = Object.freeze({
   account: 'Account',
 });
 
-function LinkWrapper({ children, ...restProps }) {
-  return (
-    <MUILink {...restProps} component={Link} color="inherit">
-      {children}
-    </MUILink>
-  );
-}
-
 /*
   TODO: [UX/a11y] implement (interactive - so i.e. user can go back a few levels) mini nav widget 
         located under main header to indicate where user currently is
@@ -44,32 +35,32 @@ const NavMenu = observer(({ logOutUser, isMobile }) => {
     <nav className={classNames('nav', { 'nav--is-mobile': isMobile })}>
       <List className="nav__links">
         <ListItem>
-          <LinkWrapper to={ROUTES.SHOP}>{translations.shop}</LinkWrapper>
+          <PEVLink to={ROUTES.SHOP}>{translations.shop}</PEVLink>
         </ListItem>
         <ListItem>
-          <LinkWrapper to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</LinkWrapper>
+          <PEVLink to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</PEVLink>
         </ListItem>
         <ListItem>
-          <LinkWrapper to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</LinkWrapper>
+          <PEVLink to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</PEVLink>
         </ListItem>
         <ListItem>
           {storeService.userAccountState ? (
-            <LinkWrapper to={ROUTES.ROOT} onClick={logOutUser}>
+            <PEVLink to={ROUTES.ROOT} onClick={logOutUser}>
               {translations.logOut}
-            </LinkWrapper>
+            </PEVLink>
           ) : (
-            <LinkWrapper to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
+            <PEVLink to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
               {translations.logIn}
-            </LinkWrapper>
+            </PEVLink>
           )}
         </ListItem>
         <ListItem>
           {storeService.userAccountState ? (
-            <LinkWrapper to={ROUTES.ACCOUNT}>{translations.account}</LinkWrapper>
+            <PEVLink to={ROUTES.ACCOUNT}>{translations.account}</PEVLink>
           ) : (
-            <LinkWrapper to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
+            <PEVLink to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
               {translations.register}
-            </LinkWrapper>
+            </PEVLink>
           )}
         </ListItem>
       </List>
@@ -104,15 +95,14 @@ export default function Nav() {
 
   return isMobileLayout ? (
     <>
-      <IconButton
+      <PEVIconButton
         onClick={handleToggleNavMenu}
         className="nav__toggle-button"
         color="inherit"
-        aria-label={translations.toggleNavMenu}
-        title={translations.toggleNavMenu}
+        a11y={translations.toggleNavMenu}
       >
         <Menu />
-      </IconButton>
+      </PEVIconButton>
 
       <Drawer
         anchor="left"
@@ -120,13 +110,9 @@ export default function Nav() {
         onClose={handleToggleNavMenu}
         onClick={handleNavMobileOverlayClick}
       >
-        <IconButton
-          onClick={handleToggleNavMenu}
-          aria-label={translations.toggleNavMenu}
-          title={translations.toggleNavMenu}
-        >
+        <PEVIconButton onClick={handleToggleNavMenu} a11y={translations.toggleNavMenu}>
           <ArrowBack />
-        </IconButton>
+        </PEVIconButton>
 
         <NavMenu logOutUser={logOutUser} isMobile={true} />
       </Drawer>

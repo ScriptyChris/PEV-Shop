@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Formik, Field } from 'formik';
 
-import InputLabel from '@material-ui/core/InputLabel';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-
+import {
+  PEVForm,
+  PEVButton,
+  PEVHeading,
+  PEVTextField,
+  PEVFieldset,
+  PEVLegend,
+} from '@frontend/components/utils/formControls';
 import FormFieldError from '@frontend/components/utils/formFieldError';
-import { FormikTextFieldForwarder } from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { ROUTES } from '@frontend/components/pages/_routes';
@@ -40,10 +42,10 @@ const translations = Object.freeze({
   popupGoToLogIn: 'Go to log in',
 });
 
-function PasswordField({ identity, translation, error, dataCy }) {
-  if (!identity || !translation) {
+function PasswordField({ identity, label, error, dataCy }) {
+  if (!identity || !label) {
     throw ReferenceError(
-      `'identity' and 'translation' props must be non-empty! Received subsequently: '${identity}' and '${translation}'`
+      `'identity' and 'label' props must be non-empty! Received subsequently: '${identity}' and '${label}'`
     );
   }
 
@@ -52,21 +54,17 @@ function PasswordField({ identity, translation, error, dataCy }) {
 
   return (
     <div className="password-field">
-      <InputLabel htmlFor={identity}>{translation}</InputLabel>
       {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
-      <Field
+      <PEVTextField
         type="password"
-        component={FormikTextFieldForwarder}
-        name={identity}
-        id={identity}
-        variant="outlined"
-        size="small"
+        identity={identity}
+        label={label}
         inputProps={{
           minLength: passwordMinLength,
           maxLength: passwordMaxLength,
+          'data-cy': dataCy,
         }}
         required
-        data-cy={dataCy}
       />
 
       {error && <FormFieldError>{error}</FormFieldError>}
@@ -116,41 +114,28 @@ function ResetPassword() {
 
   return (
     <section className="reset-password">
-      <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <fieldset className="reset-password__root-fieldset MuiFormControl-root">
-              <legend className="reset-password__header MuiFormLabel-root">
-                <Typography variant="h2">{translations.resetPasswordHeader}</Typography>
-              </legend>
+      <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials}>
+        <PEVFieldset className="reset-password__root-fieldset MuiFormControl-root">
+          <PEVLegend className="reset-password__header MuiFormLabel-root">
+            <PEVHeading level={2}>{translations.resetPasswordHeader}</PEVHeading>
+          </PEVLegend>
 
-              <div className="reset-password__email-field">
-                <InputLabel htmlFor="resettingEmail">{translations.resettingEmailField}</InputLabel>
-                <Field
-                  component={FormikTextFieldForwarder}
-                  name="email"
-                  id="resettingEmail"
-                  type="email"
-                  variant="outlined"
-                  size="small"
-                  required
-                  data-cy="input:reset-email"
-                />
-              </div>
+          <div className="reset-password__email-field">
+            <PEVTextField
+              type="email"
+              identity="resettingEmail"
+              name="email"
+              label={translations.resettingEmailField}
+              required
+              inputProps={{ 'data-cy': 'input:reset-email' }}
+            />
+          </div>
 
-              <Button
-                className="reset-password__submit-btn"
-                type="submit"
-                variant="outlined"
-                size="small"
-                data-cy="button:submit-reset"
-              >
-                {translations.submitReset}
-              </Button>
-            </fieldset>
-          </form>
-        )}
-      </Formik>
+          <PEVButton className="reset-password__submit-btn" type="submit" size="small" data-cy="button:submit-reset">
+            {translations.submitReset}
+          </PEVButton>
+        </PEVFieldset>
+      </PEVForm>
 
       <Popup {...popupData} />
     </section>
@@ -252,50 +237,46 @@ function SetNewPassword({ contextType }) {
 
   return (
     <section className="set-new-password">
-      <Formik onSubmit={onSubmitHandler} validateOnChange={false} validate={formValidator} initialValues={formInitials}>
-        {({ handleSubmit, ...formikRestProps }) => (
-          <form onSubmit={handleSubmit}>
-            <fieldset className="set-new-password__root-fieldset">
-              <legend>
-                <h2>{translations.setNewPasswordHeader}</h2>
-              </legend>
+      <PEVForm
+        onSubmit={onSubmitHandler}
+        validateOnChange={false}
+        validate={formValidator}
+        initialValues={formInitials}
+      >
+        {(formikProps) => (
+          <PEVFieldset className="set-new-password__root-fieldset">
+            <PEVLegend>
+              <PEVHeading level={2}>{translations.setNewPasswordHeader}</PEVHeading>
+            </PEVLegend>
 
-              {contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN && (
-                <PasswordField
-                  identity="currentPassword"
-                  translation={translations.currentPasswordField}
-                  error={formikRestProps.errors.currentPassword}
-                />
-              )}
-
+            {contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN && (
               <PasswordField
-                identity="newPassword"
-                translation={translations.newPasswordField}
-                error={formikRestProps.errors.newPassword}
-                dataCy="input:new-password"
+                identity="currentPassword"
+                label={translations.currentPasswordField}
+                error={formikProps.errors.currentPassword}
               />
+            )}
 
-              <PasswordField
-                identity="repeatedNewPassword"
-                translation={translations.repeatedNewPasswordField}
-                error={formikRestProps.errors.repeatedNewPassword}
-                dataCy="input:repeated-new-password"
-              />
+            <PasswordField
+              identity="newPassword"
+              label={translations.newPasswordField}
+              error={formikProps.errors.newPassword}
+              dataCy="input:new-password"
+            />
 
-              <Button
-                variant="outlined"
-                className="set-new-password__submit-btn"
-                aria-label={translations.submitNewPassword}
-                title={translations.submitNewPassword}
-                data-cy="button:submit-new-password"
-                type="submit"
-              >
-                {translations.submitNewPassword}
-              </Button>
-            </fieldset>
-          </form>
+            <PasswordField
+              identity="repeatedNewPassword"
+              label={translations.repeatedNewPasswordField}
+              error={formikProps.errors.repeatedNewPassword}
+              dataCy="input:repeated-new-password"
+            />
+
+            <PEVButton className="set-new-password__submit-btn" data-cy="button:submit-new-password" type="submit">
+              {translations.submitNewPassword}
+            </PEVButton>
+          </PEVFieldset>
         )}
-      </Formik>
+      </PEVForm>
 
       <Popup {...popupData} />
     </section>

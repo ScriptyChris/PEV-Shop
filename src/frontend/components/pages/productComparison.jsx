@@ -2,7 +2,6 @@ import { toJS } from 'mobx';
 import React, { useRef, useEffect, useCallback } from 'react';
 
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -10,6 +9,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
+import { PEVHeading } from '@frontend/components/utils/formControls';
 import storeService from '@frontend/features/storeService';
 import { ProductSpecificDetail, getProductDetailsHeaders } from '@frontend/components/views/productDetails';
 import Scroller from '@frontend/components/utils/scroller';
@@ -95,11 +95,11 @@ export default function Compare() {
   return comparisonData ? (
     <Paper className="product-comparison-container" component="section" elevation={0}>
       <header ref={scrollerBtnsParentRef} className="product-comparison__header">
-        <Typography variant="h3" component="h3">
+        <PEVHeading level={3}>
           {translations.productsAmountLabelPrefix}{' '}
           <output id="comparedProductsListCounter">{comparisonData.comparableProductsData.length}</output>{' '}
           {translations.productsAmountLabelSuffix}
-        </Typography>
+        </PEVHeading>
       </header>
 
       <TableContainer component={Paper} className="product-comparison">

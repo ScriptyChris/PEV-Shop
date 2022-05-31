@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Divider from '@material-ui/core/Divider';
 
+import { PEVIconButton } from '@frontend/components/utils/formControls';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { AddToCartButton } from '@frontend/components/views/cart';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
@@ -130,15 +130,14 @@ export default function ProductCard({
           />
         </dl>
       </div>
-      <IconButton
+      <PEVIconButton
         onClick={handleClickToggleActionsBarBtns(true)}
-        aria-label={translations.actionsBarTogglerLabel}
-        title={translations.actionsBarTogglerLabel}
+        a11y={translations.actionsBarTogglerLabel}
         className="product-card__actions-bar-toggler"
         data-cy="button:toggle-action-bar"
       >
         <MoreVertIcon />
-      </IconButton>
+      </PEVIconButton>
 
       <Menu
         anchorEl={menuBtnRef}

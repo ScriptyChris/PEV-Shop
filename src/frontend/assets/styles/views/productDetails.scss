@@ -211,6 +211,11 @@
 }
 
 .product-reviews {
+    &__author {
+        display: flex;
+        align-items: center;
+    }
+
     cite {
         white-space: normal;
     }

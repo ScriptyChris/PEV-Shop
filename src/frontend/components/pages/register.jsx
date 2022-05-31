@@ -1,16 +1,17 @@
 import React, { useState, useCallback } from 'react';
-import { Formik, Field } from 'formik';
 
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormLabel from '@material-ui/core/FormLabel';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
-import { FormikTextFieldForwarder } from '@frontend/components/utils/formControls';
+import {
+  PEVForm,
+  PEVButton,
+  PEVHeading,
+  PEVTextField,
+  PEVFieldset,
+  PEVLegend,
+} from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { PasswordField } from '@frontend/components/views/password';
@@ -112,96 +113,88 @@ export default function Register() {
 
   return (
     <section className="register">
-      <Formik onSubmit={onSubmitHandler} validateOnChange={false} validate={formValidator} initialValues={formInitials}>
-        {({ handleSubmit, ...formikRestProps }) => (
-          <form onSubmit={handleSubmit}>
-            <fieldset className="register__root-fieldset MuiFormControl-root">
-              <legend className="register__header MuiFormLabel-root">
-                <Typography variant="h2" component="h2">
-                  {translations.registerHeader}
-                </Typography>
-              </legend>
+      <PEVForm
+        onSubmit={onSubmitHandler}
+        validateOnChange={false}
+        validate={formValidator}
+        initialValues={formInitials}
+      >
+        {(formikProps) => (
+          <PEVFieldset className="register__root-fieldset MuiFormControl-root">
+            <PEVLegend className="register__header MuiFormLabel-root">
+              <PEVHeading level={2}>{translations.registerHeader}</PEVHeading>
+            </PEVLegend>
 
-              <div className="register__login">
-                <InputLabel htmlFor="registrationLogin">{translations.logInField}</InputLabel>
-                <Field
-                  component={FormikTextFieldForwarder}
-                  variant="outlined"
-                  size="small"
-                  name="login"
-                  id="registrationLogin"
-                  required
-                  data-cy="input:register-login"
-                />
-              </div>
-
-              <PasswordField
-                identity="password"
-                translation={translations.passwordField}
-                error={formikRestProps.errors.password}
-                dataCy="input:register-password"
+            <div className="register__login">
+              <PEVTextField
+                identity="registrationLogin"
+                name="login"
+                label={translations.logInField}
+                required
+                inputProps={{
+                  'data-cy': 'input:register-login',
+                }}
               />
+            </div>
 
-              <PasswordField
-                identity="repeatedPassword"
-                translation={translations.repeatedPasswordField}
-                error={formikRestProps.errors.repeatedPassword}
-                dataCy="input:register-repeated-password"
+            <PasswordField
+              identity="password"
+              label={translations.passwordField}
+              error={formikProps.errors.password}
+              dataCy="input:register-password"
+            />
+
+            <PasswordField
+              identity="repeatedPassword"
+              label={translations.repeatedPasswordField}
+              error={formikProps.errors.repeatedPassword}
+              dataCy="input:register-repeated-password"
+            />
+
+            <div className="register__email">
+              <PEVTextField
+                type="email"
+                identity="registrationEmail"
+                name="email"
+                label={translations.email}
+                required
+                inputProps={{ 'data-cy': 'input:register-email' }}
               />
+            </div>
 
-              <div className="register__email">
-                <InputLabel htmlFor="registrationEmail">{translations.email}</InputLabel>
-                <Field
-                  component={FormikTextFieldForwarder}
-                  variant="outlined"
-                  size="small"
-                  name="email"
-                  id="registrationEmail"
-                  type="email"
-                  required
-                  data-cy="input:register-email"
-                />
-              </div>
-
-              <FormControl component="fieldset">
-                <FormLabel component="legend">{translations.accountType}</FormLabel>
-                <RadioGroup
-                  className="register__account-types"
-                  aria-label={translations.accountType.toLowerCase()}
-                  name="accountType"
-                  value={formikRestProps.values.accountType}
-                  onChange={getAccountTypeChangeHandler(formikRestProps.setFieldValue)}
-                >
-                  {accountTypes.map((accountType) => (
-                    <FormControlLabel
-                      value={accountType.value}
-                      control={
-                        <Radio
-                          id={accountType.identity}
-                          inputProps={{ 'data-cy': `input:register-account-${accountType.value}-type` }}
-                          required
-                        />
-                      }
-                      label={accountType.label}
-                      htmlFor={accountType.identity}
-                      key={accountType.value}
-                    />
-                  ))}
-                </RadioGroup>
-              </FormControl>
-
-              <Button
-                className="register__submit-button"
-                type="submit"
-                variant="outlined"
-                data-cy="button:submit-register"
+            <PEVFieldset>
+              <PEVLegend>{translations.accountType}</PEVLegend>
+              <RadioGroup
+                className="register__account-types"
+                aria-label={translations.accountType.toLowerCase()}
+                name="accountType"
+                value={formikProps.values.accountType}
+                onChange={getAccountTypeChangeHandler(formikProps.setFieldValue)}
               >
-                {translations.submitRegistration}
-              </Button>
-            </fieldset>
-          </form>
+                {accountTypes.map((accountType) => (
+                  <FormControlLabel
+                    value={accountType.value}
+                    control={
+                      <Radio
+                        id={accountType.identity}
+                        inputProps={{ 'data-cy': `input:register-account-${accountType.value}-type` }}
+                        required
+                      />
+                    }
+                    label={accountType.label}
+                    htmlFor={accountType.identity}
+                    key={accountType.value}
+                  />
+                ))}
+              </RadioGroup>
+            </PEVFieldset>
+
+            <PEVButton className="register__submit-button" type="submit" data-cy="button:submit-register">
+              {translations.submitRegistration}
+            </PEVButton>
+          </PEVFieldset>
         )}
-      </Formik>
+      </PEVForm>
 
       <Popup {...popupData} />
     </section>

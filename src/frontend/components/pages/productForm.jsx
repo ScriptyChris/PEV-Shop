@@ -1,13 +1,20 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Formik, Field, ErrorMessage } from 'formik';
+import { Field, ErrorMessage } from 'formik';
 import classNames from 'classnames';
 
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import InputLabel from '@material-ui/core/InputLabel';
 
+import {
+  PEVForm,
+  PEVButton,
+  PEVHeading,
+  PEVTextField,
+  PEVFieldset,
+  PEVLegend,
+} from '@frontend/components/utils/formControls';
 import httpService from '@frontend/features/httpService';
 import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
@@ -55,44 +62,37 @@ const FIELD_NAME_PREFIXES = Object.freeze({
 });
 const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP);
 
-function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleBlur } }) {
+function BaseInfo({ data: { initialData = {} } }) {
   return (
-    <fieldset className="product-form__base-info">
-      <legend>{translations.baseInformation}</legend>
+    <PEVFieldset className="product-form__base-info">
+      <PEVLegend>{translations.baseInformation}</PEVLegend>
 
       <div className="product-form__base-info-group">
-        <label htmlFor="newProductName">{translations.name}</label>
-        <TextField
-          id="newProductName"
+        <PEVTextField
           name="name"
-          type="text"
-          variant="outlined"
-          size="small"
-          onChange={handleChange}
-          onBlur={handleBlur}
+          identity="newProductName"
+          label={translations.name}
           defaultValue={initialData.name}
           required
         />
       </div>
 
       <div className="product-form__base-info-group">
-        <label htmlFor="newProductPrice">{translations.price}</label>
-        <TextField
-          id="newProductPrice"
+        <PEVTextField
           name="price"
+          identity="newProductPrice"
+          label={translations.price}
           type="number"
-          step="0.01"
-          min="0.01"
-          variant="outlined"
-          size="small"
-          onChange={handleChange}
-          onBlur={handleBlur}
+          inputProps={{
+            step: '0.01',
+            min: '0.01',
+          }}
           defaultValue={initialData.price}
           required
         />
         {/* TODO: [feature] add currency chooser */}
       </div>
-    </fieldset>
+    </PEVFieldset>
   );
 }
 
@@ -104,8 +104,8 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
   }, [shortDescriptionList]);
 
   return (
-    <fieldset>
-      <legend>{translations.shortDescription}</legend>
+    <PEVFieldset>
+      <PEVLegend>{translations.shortDescription}</PEVLegend>
 
       <FlexibleList
         initialListItems={initialData[formikField.name]}
@@ -128,7 +128,7 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
       />
 
       <input {...formikField} type="hidden" />
-    </fieldset>
+    </PEVFieldset>
   );
 }
 ShortDescription.InputComponent = function InputComponent(props) {
@@ -221,8 +221,8 @@ function CategorySelector({
   };
 
   return (
-    <fieldset>
-      <legend>{translations.categoryChooser}</legend>
+    <PEVFieldset>
+      <PEVLegend>{translations.categoryChooser}</PEVLegend>
 
       <Field
         name="category"
@@ -233,7 +233,7 @@ function CategorySelector({
         forceCombinedView={true}
       />
       <ErrorMessage name="category" component={FormFieldError} />
-    </fieldset>
+    </PEVFieldset>
   );
 }
 
@@ -274,8 +274,8 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
   }, [prepareInitialDataStructure.structure]);
 
   return (
-    <fieldset className="product-form__technical-specs">
-      <legend>{translations.technicalSpecs}</legend>
+    <PEVFieldset className="product-form__technical-specs">
+      <PEVLegend>{translations.technicalSpecs}</PEVLegend>
 
       {productCurrentSpecs.length > 0 ? (
         productCurrentSpecs.map((spec) => {
@@ -294,11 +294,11 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
               )}
               key={fieldIdentifier}
             >
-              <label htmlFor={fieldIdentifier}>
+              <InputLabel htmlFor={fieldIdentifier}>
                 {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
                 {SPEC_NAMES_SEPARATORS.SPACE}
                 {spec.defaultUnit && `(${spec.defaultUnit})`}
-              </label>
+              </InputLabel>
 
               {isSpecDescriptionsArray ? (
                 spec.descriptions.map((specDescription, index) => {
@@ -307,18 +307,12 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
 
                   return (
                     <div className="product-form__technical-specs-controls-group" key={groupFieldIdentifier}>
-                      <label htmlFor={groupFieldIdentifier}>
-                        {specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-                      </label>
-
-                      <TextField
-                        variant="outlined"
-                        size="small"
+                      <PEVTextField
                         name={mergedName}
+                        identity={groupFieldIdentifier}
+                        label={specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
                         type={spec.fieldType}
                         inputProps={{ min: minValue }}
-                        id={groupFieldIdentifier}
-                        onChange={handleChange}
                         defaultValue={
                           prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[mergedName] : ''
                         }
@@ -353,7 +347,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
       ) : (
         <em className="product-form__technical-specs-category-choice-reminder">{translations.chooseCategoryFirst}</em>
       )}
-    </fieldset>
+    </PEVFieldset>
   );
 }
 
@@ -371,7 +365,7 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
           {...props}
           list="foundRelatedProductsNames"
           debounceTimeMs={200}
-          label={translations.relatedProductName}
+          InputLabel={translations.relatedProductName}
           searchingTarget="relatedProductsNames"
           ignoredProductNames={relatedProductNamesList.filter(
             (productName) => productName && props.presetValue !== productName
@@ -385,7 +379,6 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
           }}
           onEscapeBtn={() => props.listFeatures.resetState()}
           autoFocus={true}
-          separateLabel={true}
         />
         {children()}
       </>
@@ -394,8 +387,8 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
   );
 
   return (
-    <fieldset className="product-form__related-product-names">
-      <legend>{translations.relatedProductsNames}</legend>
+    <PEVFieldset className="product-form__related-product-names">
+      <PEVLegend>{translations.relatedProductsNames}</PEVLegend>
 
       <FlexibleList
         initialListItems={initialData[formikField.name]}
@@ -407,7 +400,7 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
       />
 
       <input {...formikField} type="hidden" />
-    </fieldset>
+    </PEVFieldset>
   );
 }
 
@@ -607,47 +600,37 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 
   return (
     <Paper component="section" className={classNames('product-form', { 'product-form--pc': !isMobileLayout })}>
-      <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
-        {({ handleSubmit, ...formikRestProps }) => (
-          <form onSubmit={handleSubmit}>
-            <Typography variant="h2" component="h2">
-              {translations.intro}
-            </Typography>
+      <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
+        {(formikProps) => (
+          <>
+            <PEVHeading level={2}>{translations.intro}</PEVHeading>
 
-            <BaseInfo
-              data={{ initialData: formikRestProps.values }}
-              methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
-            />
-            <Field
-              name="shortDescription"
-              data={{ initialData: formikRestProps.values }}
-              component={ShortDescription}
-            />
+            <BaseInfo data={{ initialData: formikProps.values }} />
+            <Field name="shortDescription" data={{ initialData: formikProps.values }} component={ShortDescription} />
             <CategorySelector
-              data={{ initialData: formikRestProps.values }}
+              data={{ initialData: formikProps.values }}
               methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
             />
             <TechnicalSpecs
               data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
-              methods={{ handleChange: formikRestProps.handleChange, setFieldValue: formikRestProps.setFieldValue }}
+              methods={{ handleChange: formikProps.handleChange, setFieldValue: formikProps.setFieldValue }}
             />
             <Field
               name="relatedProductsNames"
-              data={{ initialData: formikRestProps.values }}
+              data={{ initialData: formikProps.values }}
               component={RelatedProductsNames}
             />
 
-            <Button
+            <PEVButton
               type="submit"
-              onClick={() => !formikRestProps.touched.category && formikRestProps.setFieldTouched('category')}
-              variant="outlined"
+              onClick={() => !formikProps.touched.category && formikProps.setFieldTouched('category')}
               fullWidth
             >
               {translations.save}
-            </Button>
-          </form>
+            </PEVButton>
+          </>
         )}
-      </Formik>
+      </PEVForm>
     </Paper>
   );
 };

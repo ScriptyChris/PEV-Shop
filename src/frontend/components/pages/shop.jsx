@@ -61,7 +61,7 @@ function Shop() {
 
   return (
     <section>
-      <h2>Shop!!!</h2>
+      {/* <PEVHeading level={2}>Shop!!!</PEVHeading> */}
 
       {/*{showChooser()}*/}
 

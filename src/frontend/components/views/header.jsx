@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 
-import MUILink from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 
+import { PEVLink, PEVHeading } from '@frontend/components/utils/formControls';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import Nav from './nav';
 import Cart from './cart';
@@ -36,15 +35,12 @@ export default function Header() {
   return (
     <AppBar className="header">
       <Toolbar className="header__toolbar">
-        <Typography
-          variant="h1"
-          component="h1"
+        <PEVHeading
+          level={1}
           className={classNames('header__main-heading', { 'header__main-heading--small': isHeadingSmall })}
         >
-          <MUILink to={ROUTES.ROOT} component={Link} color="inherit">
-            {translations.appMainHeader}
-          </MUILink>
-        </Typography>
+          <PEVLink to={ROUTES.ROOT}>{translations.appMainHeader}</PEVLink>
+        </PEVHeading>
 
         <SearchProductsByName
           label={translations.typeProductName}

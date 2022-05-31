@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, Link, Route, Switch } from 'react-router-dom';
+import { useHistory, Route, Switch } from 'react-router-dom';
 import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import MUILink from '@material-ui/core/Link';
-import Button from '@material-ui/core/Button';
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
+import { PEVButton, PEVLink, PEVHeading } from '@frontend/components/utils/formControls';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';
@@ -81,15 +79,9 @@ function UserProfile() {
         </Table>
       </TableContainer>
 
-      <Button
-        className="account__menu-tab-user-profile-edit-btn"
-        onClick={edit}
-        variant="outlined"
-        aria-label={translations.editUserData}
-        title={translations.editUserData}
-      >
+      <PEVButton className="account__menu-tab-user-profile-edit-btn" onClick={edit}>
         {translations.editUserData}
-      </Button>
+      </PEVButton>
     </section>
   ) : (
     translations.lackOfData
@@ -157,24 +149,12 @@ function Security() {
       <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
       <div className="account__menu-tab-logout-from-sessions">
-        <Button
-          variant="outlined"
-          onClick={() => logOutFromSessions(false)}
-          aria-label={translations.logOutFromAllSessions}
-          title={translations.logOutFromAllSessions}
-          data-cy="button:logout-from-all-sessions"
-        >
+        <PEVButton onClick={() => logOutFromSessions(false)} data-cy="button:logout-from-all-sessions">
           {translations.logOutFromAllSessions}
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={() => logOutFromSessions(true)}
-          aria-label={translations.logOutFromOtherSessions}
-          title={translations.logOutFromOtherSessions}
-          data-cy="button:logout-from-other-sessions"
-        >
+        </PEVButton>
+        <PEVButton onClick={() => logOutFromSessions(true)} data-cy="button:logout-from-other-sessions">
           {translations.logOutFromOtherSessions}
-        </Button>
+        </PEVButton>
 
         <Popup {...popupData} />
       </div>
@@ -227,9 +207,9 @@ export default function Account() {
 
   return (
     <article className={classNames('account', { 'account--pc': !isMobileLayout })}>
-      <Typography variant="h2" component="h2" className="account__header">
+      <PEVHeading level={2} className="account__header">
         {translations.accountHeader}
-      </Typography>
+      </PEVHeading>
 
       <nav className="account__menu-nav">
         {isMobileLayout ? (
@@ -252,14 +232,9 @@ export default function Account() {
                       key={item.url}
                       // TODO: [UX] highlight active link
                     >
-                      <MUILink
-                        to={`${ROUTES.ACCOUNT}/${item.url}`}
-                        component={Link}
-                        color="inherit"
-                        data-cy="link:account-feature"
-                      >
+                      <PEVLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
                         {item.translation}
-                      </MUILink>
+                      </PEVLink>
                     </MenuItem>
                   ))}
                 </MenuList>
@@ -271,9 +246,9 @@ export default function Account() {
             <MenuList className="account__menu-nav-list">
               {MENU_ITEMS.map((item) => (
                 <MenuItem disableGutters key={item.url}>
-                  <MUILink to={`${ROUTES.ACCOUNT}/${item.url}`} component={Link} data-cy="link:account-feature">
+                  <PEVLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
                     {item.translation}
-                  </MUILink>
+                  </PEVLink>
                 </MenuItem>
               ))}
             </MenuList>
