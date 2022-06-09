@@ -3,6 +3,7 @@ import { useHistory, Route, Switch } from 'react-router-dom';
 import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -11,7 +12,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
-import { PEVButton, PEVLink, PEVHeading } from '@frontend/components/utils/pevElements';
+import { PEVButton, PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/pevElements';
 import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';
@@ -65,7 +66,7 @@ function UserProfile() {
   };
 
   return userData ? (
-    <section className="account__menu-tab" data-cy="section:user-profile">
+    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:user-profile">
       <TableContainer className="account__menu-tab-profile-table-container">
         <Table>
           <TableBody>
@@ -145,10 +146,13 @@ function Security() {
   }, [logOutFromSessionsConfirmation, shouldPreserveCurrentSession]);
 
   return (
-    <section className="account__menu-tab" data-cy="section:security">
+    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:security">
       <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
-      <div className="account__menu-tab-logout-from-sessions">
+      <Divider className="account__menu-tab-divider" light />
+
+      <div className="pev-flex account__menu-tab-logout-from-sessions">
+        {/* TODO: [feature] add list of active sessions and their selective removing */}
         <PEVButton onClick={() => logOutFromSessions(false)} data-cy="button:logout-from-all-sessions">
           {translations.logOutFromAllSessions}
         </PEVButton>
@@ -164,9 +168,11 @@ function Security() {
 
 function Orders() {
   return (
-    <section className="account__menu-tab" data-cy="section:orders">
+    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:orders">
       <input placeholder="TODO: [FEATURE] implement searching orders via name and date(?)" type="search" />
-      <p>TODO: [FEATURE] implement listing orders with options such as: status, invoice, review, refund</p>
+      <PEVParagraph>
+        TODO: [FEATURE] implement listing orders with options such as: status, invoice, review, refund
+      </PEVParagraph>
     </section>
   );
 }
@@ -197,7 +203,7 @@ export default function Account() {
     },
   ]);
   const TabsLayoutWrapper = ({ children }) =>
-    isMobileLayout ? <>{children}</> : <Paper className="account__menu-tabs">{children}</Paper>;
+    isMobileLayout ? children : <Paper className="account__menu-tabs">{children}</Paper>;
 
   useEffect(() => {
     // TODO: [DX] automatically select first link (user profile) in a better way

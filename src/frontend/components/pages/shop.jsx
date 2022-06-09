@@ -60,7 +60,7 @@ function Shop() {
   // };
 
   return (
-    <section>
+    <>
       {/* <PEVHeading level={2}>Shop!!!</PEVHeading> */}
 
       {/*{showChooser()}*/}
@@ -90,7 +90,7 @@ function Shop() {
           <NotFound />
         </Route>
       </Switch>
-    </section>
+    </>
   );
 }
 

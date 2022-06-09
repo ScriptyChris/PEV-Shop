@@ -1,13 +1,13 @@
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import classNames from 'classnames';
 
 import Menu from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
-import ArrowBack from '@material-ui/icons/ArrowBack';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
+import CloseIcon from '@material-ui/icons/Close';
+import MenuList from '@material-ui/core/MenuList';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
@@ -32,18 +32,18 @@ const translations = Object.freeze({
 */
 const NavMenu = observer(({ logOutUser, isMobile }) => {
   return (
-    <nav className={classNames('nav', { 'nav--is-mobile': isMobile })}>
-      <List className="nav__links">
-        <ListItem>
+    <nav className={classNames('nav-menu', { 'nav-menu--is-mobile': isMobile })}>
+      <MenuList className="nav-menu__links">
+        <MenuItem>
           <PEVLink to={ROUTES.SHOP}>{translations.shop}</PEVLink>
-        </ListItem>
-        <ListItem>
+        </MenuItem>
+        <MenuItem>
           <PEVLink to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</PEVLink>
-        </ListItem>
-        <ListItem>
+        </MenuItem>
+        <MenuItem>
           <PEVLink to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</PEVLink>
-        </ListItem>
-        <ListItem>
+        </MenuItem>
+        <MenuItem>
           {storeService.userAccountState ? (
             <PEVLink to={ROUTES.ROOT} onClick={logOutUser}>
               {translations.logOut}
@@ -53,8 +53,8 @@ const NavMenu = observer(({ logOutUser, isMobile }) => {
               {translations.logIn}
             </PEVLink>
           )}
-        </ListItem>
-        <ListItem>
+        </MenuItem>
+        <MenuItem>
           {storeService.userAccountState ? (
             <PEVLink to={ROUTES.ACCOUNT}>{translations.account}</PEVLink>
           ) : (
@@ -62,8 +62,8 @@ const NavMenu = observer(({ logOutUser, isMobile }) => {
               {translations.register}
             </PEVLink>
           )}
-        </ListItem>
-      </List>
+        </MenuItem>
+      </MenuList>
     </nav>
   );
 });
@@ -97,7 +97,7 @@ export default function Nav() {
     <>
       <PEVIconButton
         onClick={handleToggleNavMenu}
-        className="nav__toggle-button"
+        className="nav-toggle-btn"
         color="inherit"
         a11y={translations.toggleNavMenu}
       >
@@ -110,8 +110,8 @@ export default function Nav() {
         onClose={handleToggleNavMenu}
         onClick={handleNavMobileOverlayClick}
       >
-        <PEVIconButton onClick={handleToggleNavMenu} a11y={translations.toggleNavMenu}>
-          <ArrowBack />
+        <PEVIconButton className="nav-close-btn" onClick={handleToggleNavMenu} a11y={translations.toggleNavMenu}>
+          <CloseIcon />
         </PEVIconButton>
 
         <NavMenu logOutUser={logOutUser} isMobile={true} />

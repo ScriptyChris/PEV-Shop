@@ -3,7 +3,7 @@ import { ErrorMessage } from 'formik';
 import classNames from 'classnames';
 
 import Drawer from '@material-ui/core/Drawer';
-import ArrowBack from '@material-ui/icons/ArrowBack';
+import CloseIcon from '@material-ui/icons/Close';
 import Tune from '@material-ui/icons/Tune';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -482,9 +482,19 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
         };
 
         return (
-          <form onSubmit={handleSubmit}>
+          <form
+            className={classNames('products-filter__form pev-flex pev-flex--columned', {
+              'products-filter__form--pc': !isMobileLayout,
+            })}
+            onSubmit={handleSubmit}
+          >
             {getFormControls(formikRestProps)}
-            <PEVButton type="button" onClick={doFilterProducts} fullWidth disabled={filterBtnDisabled}>
+            <PEVButton
+              type="button"
+              className="products-filter__submit-btn"
+              onClick={doFilterProducts}
+              disabled={filterBtnDisabled}
+            >
               {translations.filterProducts}
             </PEVButton>
           </form>
@@ -500,16 +510,20 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
       </PEVIconButton>
 
       <Drawer anchor="left" open={isFormExpanded} onClose={handleFiltersWidgetToggle}>
-        <section>
-          <PEVIconButton
-            onClick={handleFiltersWidgetToggle}
-            className="MuiButton-fullWidth"
-            a11y={translations.goBackLabel}
-          >
-            <ArrowBack />
-          </PEVIconButton>
+        <section className="products-filter pev-flex pev-flex--columned">
+          <header className="products-filter__header">
+            <PEVIconButton
+              onClick={handleFiltersWidgetToggle}
+              className="products-filter__close-btn"
+              a11y={translations.goBackLabel}
+            >
+              <CloseIcon />
+            </PEVIconButton>
 
-          <PEVHeading level={3}>{translations.filtersHeader}</PEVHeading>
+            <PEVHeading className="pev-centered-padded-text" level={3}>
+              {translations.filtersHeader}
+            </PEVHeading>
+          </header>
 
           {filterForm}
         </section>

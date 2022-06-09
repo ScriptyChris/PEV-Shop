@@ -2,6 +2,9 @@
   TODO: [refactor/improvement] maybe `@import` is not the best utility, 
   especially for `_var`, because it creates globals
 */
+@import '_var';
+@import '_helpers';
+@import 'views/app';
 @import 'views/shop';
 @import 'views/nav';
 @import 'views/categoriesTree';
@@ -20,13 +23,11 @@
 @import 'views/popup';
 @import 'views/ratingWidget';
 @import 'views/register.scss';
-@import 'views/confirmRegistration.scss';
 @import 'views/login.scss';
 @import 'views/account';
 @import 'views/password';
 @import 'views/scrollToTop';
 @import 'views/flexibleList';
-@import '_var';
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -36,62 +37,4 @@
 
 html {
   font-size: 16px;
-}
-
-.app-root {
-  display: grid;
-  grid-template-rows: 4rem minmax(calc(100vh - 8rem), auto) 4rem;
-  grid-template-areas:
-    "header"
-    "main"
-    "footer";
-}
-
-.header {
-  grid-area: header;
-  height: 4rem;
-  justify-content: center;
-
-  &__toolbar {
-    justify-content: space-between;
-  }
-  
-  &__main-heading {
-    text-align: center;
-    white-space: nowrap;
-    font-size: 1.75rem;
-    transition: font-size $transitionDuration;
-
-    &--small {
-      white-space: normal;
-      font-size: 1rem;
-      // using animation instead of transition to avoid jagged text wrapping behavior
-      animation: $transitionDuration shrinkAndWrap;
-    }
-  }
-
-  // TODO: [DX] do it in more appropriate place (scope)
-  .search-wrapper label[class$="focused"] {
-      color: white;
-  }
-}
-
-@keyframes shrinkAndWrap {
-  from {
-    white-space: nowrap;
-    font-size: 1.75rem;
-  }
-
-  to {
-    white-space: normal;
-    font-size: 1rem;
-  }
-}
-
-.main {
-  grid-area: main;
-}
-
-.footer {
-  grid-area: footer;
 }

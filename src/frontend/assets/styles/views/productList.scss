@@ -1,16 +1,14 @@
 @import '../_var';
 
-$sidebarWidth: 17rem;
-
 .product-list-container--pc {
   display: grid;
-  grid-template-columns: $sidebarWidth auto;
+  grid-template-columns: 1fr 3.5fr;
   grid-template-areas: 
     "sidebar topbar"
     "sidebar list"
     "sidebar pagination";
-  grid-column-gap: 2rem;
-  margin: 0 4rem;
+  grid-gap: 1rem 2rem;
+  margin: 1rem;
 
   .product-list-search-bar {
     grid-area: search;
@@ -18,8 +16,7 @@ $sidebarWidth: 17rem;
 
   .product-list-control-sidebar {
     grid-area: sidebar;
-    position: fixed;
-    width: $sidebarWidth;
+    height: max-content;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -33,7 +30,6 @@ $sidebarWidth: 17rem;
     grid-area: topbar;
     display: flex;
     gap: 1rem;
-    height: 6rem;
 
     &__buttons {
       display: flex;
@@ -80,9 +76,6 @@ $sidebarWidth: 17rem;
 
   &__buttons {
     grid-area: buttons;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 
     &-view-mode {
       margin-left: 0.3rem;

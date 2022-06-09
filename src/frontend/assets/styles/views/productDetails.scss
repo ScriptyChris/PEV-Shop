@@ -1,6 +1,4 @@
 .product-details--pc {
-    margin: 0 10vw;
-
     .product-details {
         &__header {
             grid-template-areas:
@@ -11,16 +9,6 @@
                 "image buy-btn";
             grid-template-columns: 1fr 1fr;
             gap: 1rem 3rem;
-        }
-
-        &__nav-menu:before {
-            content: '';
-            position: absolute;
-            background: inherit;
-            border: inherit;
-            height: 100%;
-            inset-inline: -10vw;
-            box-sizing: content-box;
         }
 
         &__nav-menu-list {
@@ -37,10 +25,8 @@
 }
 
 .product-details {
-    &__aside {
-        margin-top: 0.5rem;
-    }
-
+    margin: 1rem;
+    
     &__header {
         display: grid;
         grid-template-areas:
@@ -51,7 +37,6 @@
             "rating ."
             ". price"
             "buy-btn buy-btn";
-        margin-top: 0.5rem;
         row-gap: 0.5rem;
     }
 
@@ -65,7 +50,6 @@
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
-        margin: 0 auto;
         gap: 0.25rem;
     }
 
@@ -89,11 +73,12 @@
 
     &__header-buy-btn {
         grid-area: buy-btn;
-        width: 20rem;
-        margin: 0 auto;
+        width: 75%;
+        margin-inline: auto;
     }
 
     &__nav-menu {
+        position: relative;
         display: flex;
         align-items: center;
         margin-block: 1rem;
@@ -111,6 +96,16 @@
         [data-scrollable-parent] {
             height: 3rem;
         }
+    }
+
+    &__nav-menu:before {
+        content: '';
+        position: absolute;
+        background: inherit;
+        border: inherit;
+        height: 100%;
+        inset-inline: -1rem;
+        box-sizing: content-box;
     }
 
     &__nav-menu-list {
@@ -132,7 +127,7 @@
     }
 
     &__nav-section {
-        margin-block: 1rem;
+        margin: 1rem;
 
         h3 {
             scroll-margin-top: 8rem;
@@ -211,7 +206,7 @@
 }
 
 .product-reviews {
-    &__author {
+    &__new-author {
         display: flex;
         align-items: center;
     }

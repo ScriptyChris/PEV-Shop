@@ -53,7 +53,7 @@ function PasswordField({ identity, label, error, dataCy }) {
   const [passwordMinLength, passwordMaxLength] = [8, 20];
 
   return (
-    <div className="password-field">
+    <div className="pev-flex">
       {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
       <PEVTextField
         type="password"
@@ -113,14 +113,14 @@ function ResetPassword() {
   };
 
   return (
-    <section className="reset-password">
+    <section className="reset-password pev-fixed-container">
       <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials}>
-        <PEVFieldset className="reset-password__root-fieldset MuiFormControl-root">
-          <PEVLegend className="reset-password__header MuiFormLabel-root">
+        <PEVFieldset className="reset-password__root-fieldset">
+          <PEVLegend className="pev-centered-padded-text">
             <PEVHeading level={2}>{translations.resetPasswordHeader}</PEVHeading>
           </PEVLegend>
 
-          <div className="reset-password__email-field">
+          <div className="pev-flex">
             <PEVTextField
               type="email"
               identity="resettingEmail"
@@ -244,8 +244,8 @@ function SetNewPassword({ contextType }) {
         initialValues={formInitials}
       >
         {(formikProps) => (
-          <PEVFieldset className="set-new-password__root-fieldset">
-            <PEVLegend>
+          <PEVFieldset className="pev-fixed-container pev-flex pev-flex--columned set-new-password__root-fieldset">
+            <PEVLegend className="pev-centered-padded-text">
               <PEVHeading level={2}>{translations.setNewPasswordHeader}</PEVHeading>
             </PEVLegend>
 

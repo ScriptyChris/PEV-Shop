@@ -112,7 +112,7 @@ export default function Register() {
   };
 
   return (
-    <section className="register">
+    <section className="register pev-fixed-container">
       <PEVForm
         onSubmit={onSubmitHandler}
         validateOnChange={false}
@@ -120,12 +120,12 @@ export default function Register() {
         initialValues={formInitials}
       >
         {(formikProps) => (
-          <PEVFieldset className="register__root-fieldset MuiFormControl-root">
-            <PEVLegend className="register__header MuiFormLabel-root">
+          <PEVFieldset className="register__root-fieldset pev-flex pev-flex--columned">
+            <PEVLegend className="pev-centered-padded-text">
               <PEVHeading level={2}>{translations.registerHeader}</PEVHeading>
             </PEVLegend>
 
-            <div className="register__login">
+            <div className="pev-flex">
               <PEVTextField
                 identity="registrationLogin"
                 name="login"
@@ -151,7 +151,7 @@ export default function Register() {
               dataCy="input:register-repeated-password"
             />
 
-            <div className="register__email">
+            <div className="pev-flex">
               <PEVTextField
                 type="email"
                 identity="registrationEmail"

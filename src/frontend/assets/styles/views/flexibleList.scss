@@ -1,8 +1,34 @@
 .flexible-list {
+    list-style: disc;
+
     &__item {
         justify-content: space-between;
         gap: 0.5rem;
-        height: 3rem;
+        margin-left: 1rem;
+
+        &::before {
+            content: '';
+            display: list-item;
+        }
+
+        &--is-add-btn::before {
+            content: none;
+        }
+
+        &--is-editable {
+            list-style: none;
+            margin-left: -1rem;
+            width: calc(100% + 2rem);
+        }
+
+        & > :first-child {
+            margin-right: auto;
+        }
+        
+        &--is-add-btn {
+            padding-bottom: 0;
+            margin-left: 0;
+        }
     }
 
     &__item-add-btn {

@@ -154,7 +154,7 @@ export default observer(function ObservedProducts() {
   };
 
   return (
-    <section className="account__menu-tab" data-cy="section:observed-products">
+    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:observed-products">
       {/* TODO: [UX] add searching and filtering for observed products */}
 
       <PEVButton onClick={unobserveAllProducts} disabled={!canUnobserveAllProducts}>

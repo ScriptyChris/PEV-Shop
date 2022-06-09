@@ -1,18 +1,22 @@
 @import '../_var';
 
-.nav {
+.nav-toggle-btn {
+    order: -1;
+}
+
+.nav-close-btn {
+    margin-inline: auto;
+}
+
+.nav-menu {
+    &--is-mobile {
+        .nav-menu__links {
+            flex-direction: column;
+        }
+    }
+
     &__links {
         display: flex;
         justify-content: space-evenly;
-    }
-
-    &__toggle-button {
-        order: -1;
-    }
-}
-
-.nav--is-mobile {
-    .nav__links {
-        flex-direction: column;
     }
 }

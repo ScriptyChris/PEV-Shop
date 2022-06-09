@@ -263,7 +263,7 @@ export default function ProductList() {
             'product-list-control-bar--sticky': isListControlBarSticky,
           })}
         >
-          <div className="product-list-control-bar__buttons">
+          <div className="product-list-control-bar__buttons pev-flex">
             <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} isMobileLayout={isMobileLayout} />
 
             <div>

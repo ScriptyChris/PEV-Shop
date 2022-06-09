@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import ArrowBack from '@material-ui/icons/ArrowBack';
 import DeleteIcon from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
 import ShoppingCart from '@material-ui/icons/ShoppingCart';
 import AddShoppingCart from '@material-ui/icons/AddShoppingCart';
 import TableContainer from '@material-ui/core/TableContainer';
 import Drawer from '@material-ui/core/Drawer';
-import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
@@ -120,14 +119,18 @@ export default observer(function Cart() {
       </PEVIconButton>
 
       <Drawer anchor="right" open={isCartOpen} onClose={handleTogglingCart}>
-        <section data-cy="container:cart">
-          <PEVIconButton onClick={handleTogglingCart} className="MuiButton-fullWidth" a11y={translations.goBackLabel}>
-            <ArrowBack />
-          </PEVIconButton>
+        <section className="cart pev-flex pev-flex--columned" data-cy="container:cart">
+          <header className="cart__header">
+            <PEVHeading className="pev-centered-padded-text" level={3}>
+              {translations.header}
+            </PEVHeading>
 
-          <PEVHeading level={3}>{translations.header}</PEVHeading>
+            <PEVIconButton onClick={handleTogglingCart} className="cart__back-btn" a11y={translations.goBackLabel}>
+              <CloseIcon />
+            </PEVIconButton>
+          </header>
 
-          <TableContainer component={Paper}>
+          <TableContainer className="cart__table">
             <Table size="small" aria-label={translations.cartLabel}>
               <TableHead>
                 <TableRow>
@@ -173,7 +176,7 @@ export default observer(function Cart() {
             </Table>
           </TableContainer>
 
-          <div className="cart-action-buttons">
+          <div className="cart__action-buttons">
             <PEVButton onClick={handleCartSubmission} disabled={isCartEmpty}>
               {translations.submitCart}
             </PEVButton>

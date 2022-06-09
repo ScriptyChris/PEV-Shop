@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
 
 import FormLabel from '@material-ui/core/FormLabel';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -72,9 +73,9 @@ export const PEVLink = forwardRef(function PEVLink({ children, ...restProps }, r
   );
 });
 
-export const PEVFieldset = forwardRef(function PEVFieldset({ children, ...restProps }, ref) {
+export const PEVFieldset = forwardRef(function PEVFieldset({ children, className, ...restProps }, ref) {
   return (
-    <fieldset className={useFieldsetStyles().root} {...restProps} ref={ref}>
+    <fieldset className={classNames(useFieldsetStyles().root, className)} {...restProps} ref={ref}>
       {children}
     </fieldset>
   );
@@ -163,7 +164,10 @@ export const PEVRadio = forwardRef(function PEVRadio(props, ref) {
   return <Field component={PEVCheckboxOrRadio} {...props} type="radio" ref={ref} />;
 });
 
-export const PEVForm = forwardRef(function PEVForm({ initialValues = {}, children, overrideRenderFn, ...props }, ref) {
+export const PEVForm = forwardRef(function PEVForm(
+  { initialValues = {}, children, overrideRenderFn, className, ...props },
+  ref
+) {
   // TODO: consider if providing `onSubmit` and `initialViews` is required or just optional
   const callStack = new Error().stack;
   const onSubmit = props.onSubmit || (() => console.log("Empty form's `onSubmit()`.\nCall stack:", { callStack }));
@@ -180,13 +184,13 @@ export const PEVForm = forwardRef(function PEVForm({ initialValues = {}, childre
           return overrideRenderFn(formikProps);
         }
 
-        return <Form>{typeof children === 'function' ? children(formikProps) : children}</Form>;
+        return <Form className={className}>{typeof children === 'function' ? children(formikProps) : children}</Form>;
       }}
     </Formik>
   );
 });
 
-export const PEVHeading = forwardRef(function PEVHeading({ level, children, ...restProps }, ref) {
+export const PEVHeading = forwardRef(function PEVHeading({ level, children, withMargin, ...restProps }, ref) {
   const isLevelANumberBetween1And6 = typeof level === 'number' && level >= 1 && level <= 6;
 
   if (!isLevelANumberBetween1And6) {
@@ -194,7 +198,7 @@ export const PEVHeading = forwardRef(function PEVHeading({ level, children, ...r
   }
 
   return (
-    <Typography {...restProps} variant={`h${level}`} ref={ref}>
+    <Typography {...restProps} variant={`h${level}`} ref={ref} style={{ margin: withMargin && '1rem' }}>
       {children}
     </Typography>
   );

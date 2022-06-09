@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useReducer, useMemo } from 'react';
+import classNames from 'classnames';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import InputLabel from '@material-ui/core/InputLabel';
+import AddIcon from '@material-ui/icons/AddCircleOutline';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
+import DoneIcon from '@material-ui/icons/Done';
 
-import { PEVButton } from '@frontend/components/utils/pevElements';
+import { PEVIconButton } from '@frontend/components/utils/pevElements';
 
 const translations = {
   add: 'Add',
@@ -102,16 +108,28 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
   };
 
   const getConfirmAndCancelButtons = ({ inputItemRef = {}, onConfirmBtnClick, isConfirmBtnDisabled } = {}) => (
-    <div className="flexible-list__item-btns">
+    <>
       {inputItemRef.current && (
-        <PEVButton size="small" type="button" onClick={onConfirmBtnClick} disabled={isConfirmBtnDisabled}>
-          {translations.confirm}
-        </PEVButton>
+        <PEVIconButton
+          className="MuiButton-outlined"
+          type="button"
+          a11y={translations.confirm}
+          onClick={onConfirmBtnClick}
+          disabled={isConfirmBtnDisabled}
+        >
+          <DoneIcon />
+        </PEVIconButton>
       )}
-      <PEVButton size="small" type="button" onClick={features.resetState}>
-        {translations.cancel}
-      </PEVButton>
-    </div>
+
+      <PEVIconButton
+        className="MuiButton-outlined"
+        type="button"
+        a11y={translations.cancel}
+        onClick={features.resetState}
+      >
+        <CloseIcon />
+      </PEVIconButton>
+    </>
   );
 
   return (
@@ -122,16 +140,22 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
           const addBtnVisible = state[flexibleListStates.ADD_BTN_VISIBILITY];
 
           return (
-            <ListItem className="flexible-list__item" key={item}>
+            <ListItem
+              className={classNames('flexible-list__item', {
+                'flexible-list__item--is-add-btn': addBtnVisible,
+                'flexible-list__item--is-editable': !addBtnVisible,
+              })}
+              key={item}
+            >
               {addBtnVisible ? (
-                <PEVButton
+                <PEVIconButton
                   className="flexible-list__item-add-btn"
-                  size="small"
                   type="button"
+                  a11y={translations.add}
                   onClick={features.prepareAddItem}
                 >
-                  {translations.add}
-                </PEVButton>
+                  <AddIcon fontSize="large" />
+                </PEVIconButton>
               ) : (
                 <NewItemComponent listFeatures={features} updateItem={updateItem}>
                   {getConfirmAndCancelButtons}
@@ -143,7 +167,10 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
           const currentlyEdited = state[flexibleListStates.EDITING_INDEX] === index;
 
           return (
-            <ListItem className="flexible-list__item" key={item}>
+            <ListItem
+              className={classNames('flexible-list__item', { 'flexible-list__item--is-editable': currentlyEdited })}
+              key={item}
+            >
               {currentlyEdited ? (
                 <EditItemComponent item={item} editedIndex={index} listFeatures={features} updateItem={updateItem}>
                   {getConfirmAndCancelButtons}
@@ -152,12 +179,16 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
                 <>
                   <InputLabel component="output">{item}</InputLabel>
                   <div className="flexible-list__item-btns">
-                    <PEVButton size="small" type="button" onClick={() => features.prepareEditItem(index)}>
-                      {translations.edit}
-                    </PEVButton>
-                    <PEVButton size="small" type="button" onClick={() => features.deleteItem(index)}>
-                      {translations.delete}
-                    </PEVButton>
+                    <PEVIconButton
+                      type="button"
+                      a11y={translations.edit}
+                      onClick={() => features.prepareEditItem(index)}
+                    >
+                      <EditIcon />
+                    </PEVIconButton>
+                    <PEVIconButton type="button" a11y={translations.delete} onClick={() => features.deleteItem(index)}>
+                      <DeleteIcon />
+                    </PEVIconButton>
                   </div>
                 </>
               )}

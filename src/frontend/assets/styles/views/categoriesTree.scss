@@ -1,3 +1,17 @@
+.categories-tree-menu {
+  &__header {
+    position: relative;
+    width: 100%;
+  }
+
+  &__close-btn {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+}
+
 .categories-tree {
   &--hidden {
     display: none;

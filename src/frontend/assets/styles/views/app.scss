@@ -1,0 +1,66 @@
+.app-root {
+    display: grid;
+    grid-template-rows: 4rem minmax(calc(100vh - 8rem), auto) 4rem;
+    grid-template-areas:
+        "header"
+        "main"
+        "footer";
+}
+  
+.header {
+    grid-area: header;
+    height: 4rem;
+    justify-content: center;
+  
+    &__toolbar {
+      justify-content: space-between;
+    }
+    
+    &__main-heading {
+      text-align: center;
+      white-space: nowrap;
+      font-size: 1.75rem;
+      transition: font-size $transitionDuration;
+  
+      &--small {
+        white-space: normal;
+        font-size: 1rem;
+        // using animation instead of transition to avoid jagged text wrapping behavior
+        animation: $transitionDuration shrinkAndWrap;
+      }
+    }
+  
+    // TODO: [DX] do it in more appropriate place (scope)
+    .search-wrapper label[class$="focused"] {
+        color: white;
+    }
+}
+  
+@keyframes shrinkAndWrap {
+    from {
+      white-space: nowrap;
+      font-size: 1.75rem;
+    }
+  
+    to {
+      white-space: normal;
+      font-size: 1rem;
+    }
+}
+  
+.main {
+    grid-area: main;
+    justify-self: center;
+    max-width: 768px;
+    width: 100%;
+}
+  
+.footer {
+    grid-area: footer;
+}
+  
+@media screen and (min-width: 769px /* TODO: [DX] find a way to use [S]CSS variable here */) {
+    .main {
+      max-width: 1280px;
+    }
+}

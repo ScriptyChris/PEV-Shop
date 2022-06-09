@@ -46,14 +46,14 @@ export default function LogIn() {
   };
 
   return (
-    <section className="login">
+    <section className="login pev-fixed-container">
       <PEVForm onSubmit={onSubmitHandler} validateOnChange={false} initialValues={formInitials}>
-        <PEVFieldset className="login__root-fieldset MuiFormControl-root">
-          <PEVLegend className="login__header MuiFormLabel-root">
+        <PEVFieldset className="login__root-fieldset">
+          <PEVLegend className="pev-centered-padded-text">
             <PEVHeading level={2}>{translations.logInHeader}</PEVHeading>
           </PEVLegend>
 
-          <div className="login__login-field">
+          <div className="pev-flex">
             <PEVTextField identity="login" label={translations.logInField} required data-cy="input:login" />
           </div>
 
@@ -68,7 +68,7 @@ export default function LogIn() {
       <PEVParagraph className="login__reset-password-hint">
         {translations.resetPasswordHint}{' '}
         <PEVLink to={ROUTES.RESET_PASSWORD} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
-          {translations.resetPasswordLink}
+          <em>{translations.resetPasswordLink}</em>
         </PEVLink>
       </PEVParagraph>
 

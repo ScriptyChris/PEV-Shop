@@ -1,5 +1,6 @@
 .product-comparison-container {
   position: relative;
+  max-width: inherit;
 }
 
 .product-comparison {
@@ -36,13 +37,10 @@
     grid-template-columns: repeat(var(--compare-columns-number, auto), minmax(var(--product-list-item-width),1fr));
   }
 
-  &__cell {
-
-  }
+  &__cell {}
 }
 
 .product-comparison__header {
-  height: 3rem;
   display: flex;
   align-items: center;
   justify-content: space-around;

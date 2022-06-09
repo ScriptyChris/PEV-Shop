@@ -67,21 +67,21 @@ export default function ConfirmRegistration() {
   }, []);
 
   return (
-    <section className="confirm-registration">
-      <PEVHeading level={2}>{translations.header}</PEVHeading>
+    <section className="pev-flex pev-flex--columned">
+      <PEVHeading level={2} withMargin>
+        {translations.header}
+      </PEVHeading>
 
       <PEVParagraph>
         {translations.status}: <strong>{REG_CONFIRM_STATES[regConfirmStatus].INDICATOR}</strong>
       </PEVParagraph>
 
       {regConfirmStatus === REG_CONFIRM_STATUS.SUCCEEDED && (
-        <>
-          <PEVParagraph data-cy="message:registration-confirmation-succeeded-hint">
-            {REG_CONFIRM_STATES.SUCCEEDED.HINT}
-          </PEVParagraph>
-        </>
+        <PEVParagraph data-cy="message:registration-confirmation-succeeded-hint">
+          {REG_CONFIRM_STATES.SUCCEEDED.HINT}
+        </PEVParagraph>
       )}
-      {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <p>{REG_CONFIRM_STATES.FAILED.HINT}</p>}
+      {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <PEVParagraph>{REG_CONFIRM_STATES.FAILED.HINT}</PEVParagraph>}
     </section>
   );
 }

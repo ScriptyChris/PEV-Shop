@@ -8,6 +8,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
 import FormGroup from '@material-ui/core/FormGroup';
 
@@ -40,7 +42,8 @@ const productDetailsTranslations = Object.freeze({
   shortDescription: 'Short description',
   technicalSpecs: 'Specification',
   reviews: 'Reviews',
-  author: 'Author',
+  reviewAuthor: 'Author',
+  reviewNewAuthor: 'Add review as',
   editProduct: 'Edit',
   deleteProduct: 'Delete',
   promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
@@ -94,30 +97,8 @@ function AddReview({ productName, updateReviews }) {
   if (showReviewForm) {
     return (
       <>
-        <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials}>
-          <PEVFieldset>
-            <PEVParagraph>{productDetailsTranslations.author}:</PEVParagraph>
-            <FormGroup row>
-              <div className="product-reviews__author">
-                <PEVRadio
-                  label="TODO: put user nick here"
-                  value="TODO: put user nick here"
-                  name="author"
-                  identity="namedAuthor"
-                  required
-                />
-              </div>
-              <div className="product-reviews__author">
-                <PEVRadio
-                  label={productDetailsTranslations.anonymously}
-                  value={productDetailsTranslations.anonymously}
-                  name="author"
-                  identity="anonymousAuthor"
-                  required
-                />
-              </div>
-            </FormGroup>
-
+        <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials} className="pev-flex pev-flex--columned">
+          <PEVFieldset className="pev-flex pev-flex--columned">
             <Field component={RatingWidget} name="rating" isBig required />
 
             {/* TODO: [UX] adjust <textarea> size to device */}
@@ -126,10 +107,36 @@ function AddReview({ productName, updateReviews }) {
               name="content"
               placeholder={productDetailsTranslations.reviewContentPlaceholder}
             />
+
+            <div className="pev-flex">
+              <PEVParagraph>{productDetailsTranslations.reviewNewAuthor}:</PEVParagraph>
+              <FormGroup>
+                <div className="product-reviews__new-author">
+                  <PEVRadio
+                    label="TODO: put user nick here"
+                    value="TODO: put user nick here"
+                    name="author"
+                    identity="namedAuthor"
+                    required
+                  />
+                </div>
+                <div className="product-reviews__new-author">
+                  <PEVRadio
+                    label={productDetailsTranslations.anonymously}
+                    value={productDetailsTranslations.anonymously}
+                    name="author"
+                    identity="anonymousAuthor"
+                    required
+                  />
+                </div>
+              </FormGroup>
+            </div>
           </PEVFieldset>
 
-          <PEVButton type="submit">{productDetailsTranslations.submitReview}</PEVButton>
-          <PEVButton onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</PEVButton>
+          <div className="pev-flex">
+            <PEVButton type="submit">{productDetailsTranslations.submitReview}</PEVButton>
+            <PEVButton onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</PEVButton>
+          </div>
         </PEVForm>
 
         <Popup {...popupData} />
@@ -156,7 +163,7 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
   switch (detailName) {
     case 'name':
     case 'category': {
-      return <p className={extras.className}>{detailValue}</p>;
+      return <PEVParagraph className={extras.className}>{detailValue}</PEVParagraph>;
     }
 
     // TODO: create price component, which will handle things like promotion and will format price according to locale and/or chosen currency
@@ -175,11 +182,11 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
 
     case 'shortDescription': {
       return (
-        <ul>
+        <List>
           {detailValue.map((description, index) => {
-            return <li key={`short-description-${index}`}>{description}</li>;
+            return <ListItem key={`short-description-${index}`}>{description}</ListItem>;
           })}
-        </ul>
+        </List>
       );
     }
 
@@ -236,34 +243,34 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
       const reviewsContent = detailValue.list.length ? (
         <>
           <RatingWidget presetValue={Math.round(detailValue.averageRating)} />
-          <p>
+          <PEVParagraph>
             {detailValue.averageRating} / {RATING_MAX_VALUE} [{detailValue.list.length}]
-          </p>
+          </PEVParagraph>
 
           {extras.showReviewsList && (
             /* TODO: [UX] refactor to pagination/"load more" */
             <details>
-              <MenuList>
+              <List>
                 {detailValue.list.map((reviewEntry, index) => {
                   return (
-                    <MenuItem divider={true} key={`review-${index}`}>
+                    <ListItem divider={true} key={`review-${index}`}>
                       <article>
                         <header>
                           <RatingWidget presetValue={reviewEntry.rating} />
-                          <p>
+                          <PEVParagraph>
                             <b>
-                              {productDetailsTranslations.author}: {reviewEntry.author}
+                              {productDetailsTranslations.reviewAuthor}: {reviewEntry.author}
                             </b>
                             &nbsp;
                             <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
-                          </p>
+                          </PEVParagraph>
                         </header>
                         <cite>{reviewEntry.content}</cite>
                       </article>
-                    </MenuItem>
+                    </ListItem>
                   );
                 })}
-              </MenuList>
+              </List>
             </details>
           )}
         </>
@@ -286,19 +293,19 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
       }
 
       return (
-        <MenuList ref={extras.listRef} className={extras.className}>
+        <List ref={extras.listRef} className={extras.className}>
           {detailValue.map((relatedProduct, index) => {
             return (
-              <MenuItem button={false} disableGutters={extras.disableListItemGutters} key={`related-product-${index}`}>
+              <ListItem button={false} disableGutters={extras.disableListItemGutters} key={`related-product-${index}`}>
                 {/*
                   TODO: ProductCard component in this case will not have full product info, 
                   so it has to somehow fetch it on its own
                 */}
                 <ProductCard product={relatedProduct} />
-              </MenuItem>
+              </ListItem>
             );
           })}
-        </MenuList>
+        </List>
       );
     }
 
@@ -489,7 +496,7 @@ export default function ProductDetails({ product }) {
             className: 'product-details__header-category',
           }}
         />
-        <p className="product-details__header-action-btns">
+        <PEVParagraph className="product-details__header-action-btns">
           <PEVButton size="small" startIcon={<EditIcon />} onClick={navigateToProductModify}>
             {productDetailsTranslations.editProduct}
           </PEVButton>
@@ -498,7 +505,7 @@ export default function ProductDetails({ product }) {
           </PEVButton>
           <ProductObservabilityToggler productId={product._id} />
           <ProductComparisonCandidatesToggler product={product} buttonVariant="outlined" />
-        </p>
+        </PEVParagraph>
 
         <div className="product-details__header-image">TODO: [UI] image should go here</div>
         {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-details__header-image" />*/}
@@ -506,6 +513,7 @@ export default function ProductDetails({ product }) {
         <PEVHeading level={2} className="product-details__header-name">
           <ProductSpecificDetail detailName="name" detailValue={productDetails.name} />
         </PEVHeading>
+        {/* TODO: [UX] clicking on rating here should scroll to this product ratings */}
         <RatingWidget
           presetValue={productDetails.reviews.averageRating}
           isBig={true}

@@ -107,7 +107,7 @@ export default function ProductCard({
     >
       <ProductCardLink className="product-card__link" productData={product}>
         <div className="product-card__image">TODO: [UI] image should go here</div>
-        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
+        {/* TODO: [UI] <img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
       </ProductCardLink>
       <div className="product-card__content">
         <dl className="product-card__metadata">

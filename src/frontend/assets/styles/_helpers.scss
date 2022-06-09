@@ -1,0 +1,27 @@
+.pev-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    &--columned {
+        flex-direction: column;
+    }
+}
+
+.pev-fixed-container {
+    max-width: 600px;
+    margin-inline: 1rem;
+}
+
+@media screen and (min-width: 769px /* TODO: [DX] find a way to use [S]CSS variable here */) {
+    .pev-fixed-container {
+        margin-inline: auto;
+    }
+}
+
+.pev-centered-padded-text {
+    text-align: center;
+    padding: 1rem;
+}

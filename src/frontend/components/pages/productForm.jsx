@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
+import SaveIcon from '@material-ui/icons/SaveOutlined';
 
 import {
   PEVForm,
@@ -21,10 +22,11 @@ import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTr
 import FormFieldError from '@frontend/components/utils/formFieldError';
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const translations = {
-  intro: 'Fill new product details',
+  getIntro(isProductUpdate) {
+    return isProductUpdate ? 'Update product details' : 'Fill new product details';
+  },
   baseInformation: 'Basic information',
   technicalSpecs: 'Technical specification',
   categoryChooser: 'Category',
@@ -64,10 +66,10 @@ const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP)
 
 function BaseInfo({ data: { initialData = {} } }) {
   return (
-    <PEVFieldset className="product-form__base-info">
+    <PEVFieldset className="pev-flex pev-flex--columned">
       <PEVLegend>{translations.baseInformation}</PEVLegend>
 
-      <div className="product-form__base-info-group">
+      <div className="product-form__base-info-group pev-flex">
         <PEVTextField
           name="name"
           identity="newProductName"
@@ -77,7 +79,7 @@ function BaseInfo({ data: { initialData = {} } }) {
         />
       </div>
 
-      <div className="product-form__base-info-group">
+      <div className="product-form__base-info-group pev-flex">
         <PEVTextField
           name="price"
           identity="newProductPrice"
@@ -274,7 +276,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
   }, [prepareInitialDataStructure.structure]);
 
   return (
-    <PEVFieldset className="product-form__technical-specs">
+    <PEVFieldset className="product-form__technical-specs pev-flex pev-flex--columned">
       <PEVLegend>{translations.technicalSpecs}</PEVLegend>
 
       {productCurrentSpecs.length > 0 ? (
@@ -285,28 +287,27 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
           const minValue = spec.fieldType === 'number' ? 0 : null;
           const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
           const isSpecDescriptionsArray = Array.isArray(spec.descriptions);
+          const specDefaultUnitContent = spec.defaultUnit && `(${spec.defaultUnit})`;
+          const legendOrLabelContent = `
+            ${spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+            ${SPEC_NAMES_SEPARATORS.SPACE}
+            ${specDefaultUnitContent}
+          `;
 
-          return (
-            <div
-              className={classNames(
-                { 'product-form__technical-specs-controls-group': !isSpecDescriptionsArray },
-                { 'product-form__technical-specs-controls-group--nested-container': isSpecDescriptionsArray }
-              )}
-              key={fieldIdentifier}
-            >
-              <InputLabel htmlFor={fieldIdentifier}>
-                {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-                {SPEC_NAMES_SEPARATORS.SPACE}
-                {spec.defaultUnit && `(${spec.defaultUnit})`}
-              </InputLabel>
+          if (isSpecDescriptionsArray) {
+            return (
+              <PEVFieldset
+                className="product-form__technical-specs-controls-group--nested-container pev-flex pev-flex--columned"
+                key={fieldIdentifier}
+              >
+                <PEVLegend>{legendOrLabelContent}</PEVLegend>
 
-              {isSpecDescriptionsArray ? (
-                spec.descriptions.map((specDescription, index) => {
+                {spec.descriptions.map((specDescription, index) => {
                   const groupFieldIdentifier = `${fieldIdentifier}${index}`;
                   const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
 
                   return (
-                    <div className="product-form__technical-specs-controls-group" key={groupFieldIdentifier}>
+                    <div className="product-form__technical-specs-controls-group pev-flex" key={groupFieldIdentifier}>
                       <PEVTextField
                         name={mergedName}
                         identity={groupFieldIdentifier}
@@ -320,22 +321,28 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
                       />
                     </div>
                   );
-                })
-              ) : (
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  name={BASE_NAME}
-                  type={spec.fieldType}
-                  inputProps={{ min: minValue }}
-                  id={fieldIdentifier}
-                  onChange={handleChange}
-                  defaultValue={
-                    prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
-                  }
-                  required
-                />
-              )}
+                })}
+              </PEVFieldset>
+            );
+          }
+
+          return (
+            <div className="product-form__technical-specs-controls-group pev-flex" key={fieldIdentifier}>
+              <InputLabel>{legendOrLabelContent}</InputLabel>
+
+              <TextField
+                variant="outlined"
+                size="small"
+                name={BASE_NAME}
+                type={spec.fieldType}
+                inputProps={{ min: minValue }}
+                id={fieldIdentifier}
+                onChange={handleChange}
+                defaultValue={
+                  prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
+                }
+                required
+              />
 
               <ErrorMessage
                 name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
@@ -479,7 +486,6 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 
     return _getNestedEntries;
   }, []);
-  const isMobileLayout = useMobileLayout();
 
   useEffect(() => {
     (async () => {
@@ -599,39 +605,57 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   };
 
   return (
-    <Paper component="section" className={classNames('product-form', { 'product-form--pc': !isMobileLayout })}>
-      <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
+    <section className={classNames('product-form pev-fixed-container')}>
+      <PEVForm
+        className="product-form__form"
+        onSubmit={onSubmitHandler}
+        initialValues={formInitials}
+        validate={validateHandler}
+      >
         {(formikProps) => (
           <>
-            <PEVHeading level={2}>{translations.intro}</PEVHeading>
+            <PEVHeading className="pev-centered-padded-text" level={2}>
+              {translations.getIntro(!!Object.keys(initialData).length)}
+            </PEVHeading>
 
-            <BaseInfo data={{ initialData: formikProps.values }} />
-            <Field name="shortDescription" data={{ initialData: formikProps.values }} component={ShortDescription} />
-            <CategorySelector
-              data={{ initialData: formikProps.values }}
-              methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
-            />
-            <TechnicalSpecs
-              data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
-              methods={{ handleChange: formikProps.handleChange, setFieldValue: formikProps.setFieldValue }}
-            />
-            <Field
-              name="relatedProductsNames"
-              data={{ initialData: formikProps.values }}
-              component={RelatedProductsNames}
-            />
+            <Paper className="product-form__fields-group">
+              <BaseInfo data={{ initialData: formikProps.values }} />
+            </Paper>
+            <Paper className="product-form__fields-group">
+              <Field name="shortDescription" data={{ initialData: formikProps.values }} component={ShortDescription} />
+            </Paper>
+            <Paper className="product-form__fields-group">
+              <CategorySelector
+                data={{ initialData: formikProps.values }}
+                methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
+              />
+            </Paper>
+            <Paper className="product-form__fields-group">
+              <TechnicalSpecs
+                data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
+                methods={{ handleChange: formikProps.handleChange, setFieldValue: formikProps.setFieldValue }}
+              />
+            </Paper>
+            <Paper className="product-form__fields-group">
+              <Field
+                name="relatedProductsNames"
+                data={{ initialData: formikProps.values }}
+                component={RelatedProductsNames}
+              />
+            </Paper>
 
             <PEVButton
               type="submit"
+              className="product-form__save-btn MuiButton-outlined"
+              a11y={translations.save}
               onClick={() => !formikProps.touched.category && formikProps.setFieldTouched('category')}
-              fullWidth
             >
-              {translations.save}
+              <SaveIcon fontSize="large" />
             </PEVButton>
           </>
         )}
       </PEVForm>
-    </Paper>
+    </section>
   );
 };
 ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 'relatedProductsNames'];

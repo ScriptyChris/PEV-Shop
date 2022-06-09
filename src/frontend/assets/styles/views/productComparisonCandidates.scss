@@ -1,5 +1,5 @@
 .product-comparison-candidates-pc-wrapper {
-  flex-basis: 60%;
+  flex-basis: 100%;
 }
 
 .product-comparison-candidates-container {
@@ -75,15 +75,6 @@
         vertical-align: middle;
       }
     }
-  }
-}
-
-.product-comparison-candidate-toggler {
-  margin-inline: 0;
-
-  // TODO: [DX] improve overwriting MUI default style
-  .MuiFormControlLabel-label {
-    font-size: 0.8125rem;
   }
 }
 

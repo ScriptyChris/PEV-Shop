@@ -1,7 +1,6 @@
 import { toJS } from 'mobx';
 import React, { useRef, useEffect, useCallback } from 'react';
 
-import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -93,7 +92,7 @@ export default function Compare() {
     };
 
   return comparisonData ? (
-    <Paper className="product-comparison-container" component="section" elevation={0}>
+    <article className="product-comparison-container" elevation={0}>
       <header ref={scrollerBtnsParentRef} className="product-comparison__header">
         <PEVHeading level={3}>
           {translations.productsAmountLabelPrefix}{' '}
@@ -102,7 +101,7 @@ export default function Compare() {
         </PEVHeading>
       </header>
 
-      <TableContainer component={Paper} className="product-comparison">
+      <TableContainer component="section" className="product-comparison">
         <Table ref={tableRef} component="div" className="product-comparison__table" role="table">
           <Scroller
             scrollerBaseValueMeta={{
@@ -134,7 +133,7 @@ export default function Compare() {
           />
         </Table>
       </TableContainer>
-    </Paper>
+    </article>
   ) : (
     translations.lackOfData
   );

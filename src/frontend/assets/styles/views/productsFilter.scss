@@ -1,5 +1,21 @@
 .products-filter {
+    &__header {
+        position: relative;
+        width: 100%;
+    }
+
+    &__close-btn {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+    }
+
     &__form {
+        align-items: stretch;
+        margin: 1rem;
+        margin-top: 0;
+
         &-field-legend {}
 
         &-field-controls {
@@ -30,4 +46,14 @@
             justify-self: center;
         }
     }
+
+    &__submit-btn {
+        align-self: center;
+        width: max-content;
+        margin-top: 1rem;
+    }
+}
+
+.products-filter__form--pc {
+    margin-top: 1rem;
 }

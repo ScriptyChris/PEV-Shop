@@ -24,14 +24,3 @@
     transform: $basicHorizontalTranslation translateY(-50%);
   }
 }
-
-.scroller-btn {
-  position: relative;
-  z-index: $scrollerZIndex;
-  width: 2rem;
-  height: 2rem;
-
-  &:not([disabled]):hover {
-    cursor: pointer;
-  }
-}

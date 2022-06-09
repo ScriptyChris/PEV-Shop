@@ -11,7 +11,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVButton, PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
+import { PEVButton, PEVIconButton, PEVLink, PEVParagraph } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES } from '@frontend/components/pages/_routes';
@@ -125,7 +125,7 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
                 >
                   {productComparisonState.map((product, index) => (
                     <li className="product-comparison-candidates__list-item" key={product._id}>
-                      <p>{product.name}</p>
+                      <PEVParagraph>{product.name}</PEVParagraph>
                       <PEVIconButton
                         onClick={() => handleRemoveComparableProduct(index)}
                         className="product-comparison-candidates__list-item-remove-button"

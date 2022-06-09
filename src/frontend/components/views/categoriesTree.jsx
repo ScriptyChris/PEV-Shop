@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import Drawer from '@material-ui/core/Drawer';
 import AccountTree from '@material-ui/icons/AccountTree';
-import ArrowBack from '@material-ui/icons/ArrowBack';
+import CloseIcon from '@material-ui/icons/Close';
 import List from '@material-ui/core/List';
 import TextField from '@material-ui/core/TextField';
 
@@ -294,16 +294,20 @@ function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultisel
         <AccountTree />
       </PEVIconButton>
       <Drawer anchor="left" open={!isTreeHidden} onClose={handleCategoriesTreeToggle}>
-        <section>
-          <PEVIconButton
-            onClick={handleCategoriesTreeToggle}
-            className="MuiButton-fullWidth"
-            a11y={translations.toggleCategoriesTree}
-          >
-            <ArrowBack />
-          </PEVIconButton>
+        <section className="categories-tree-menu pev-flex pev-flex--columned">
+          <header className="categories-tree-menu__header">
+            <PEVIconButton
+              onClick={handleCategoriesTreeToggle}
+              className="categories-tree-menu__close-btn"
+              a11y={translations.toggleCategoriesTree}
+            >
+              <CloseIcon />
+            </PEVIconButton>
 
-          <PEVHeading level={3}>{translations.treeHeader}</PEVHeading>
+            <PEVHeading className="pev-centered-padded-text" level={3}>
+              {translations.treeHeader}
+            </PEVHeading>
+          </header>
 
           <Tree
             treeData={treeData}

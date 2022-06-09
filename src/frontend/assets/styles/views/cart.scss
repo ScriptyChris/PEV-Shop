@@ -1,4 +1,22 @@
-.cart-action-buttons {
-  display: flex;
-  justify-content: space-evenly;
+.cart {
+  &__header {
+    position: relative;
+    width: 100%;
+  }
+
+  &__back-btn {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: max-content;
+  }
+
+  &__table {}
+
+  &__action-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+  }
 }
