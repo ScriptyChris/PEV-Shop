@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Field } from 'formik';
 import classNames from 'classnames';
@@ -159,7 +159,10 @@ export function getProductDetailsHeaders(ignoredHeadersList = []) {
   }, {});
 }
 
-export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) {
+export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
+  { detailName, detailValue, extras = {} },
+  forwardedRef
+) {
   switch (detailName) {
     case 'name':
     case 'category': {
@@ -293,7 +296,7 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
       }
 
       return (
-        <List ref={extras.listRef} className={extras.className}>
+        <List ref={forwardedRef} className={extras.className}>
           {detailValue.map((relatedProduct, index) => {
             return (
               <ListItem button={false} disableGutters={extras.disableListItemGutters} key={`related-product-${index}`}>
@@ -313,7 +316,7 @@ export function ProductSpecificDetail({ detailName, detailValue, extras = {} }) 
       throw TypeError(`detailName '${detailName}' was not matched!`);
     }
   }
-}
+});
 
 const useSectionsObserver = () => {
   const [activatedNavMenuItemIndex, setActivatedNavMenuItemIndex] = useState(-1);
@@ -540,10 +543,9 @@ export default function ProductDetails({ product }) {
           scrollerBaseValueMeta={{
             useDefault: true,
           }}
-          render={({ elementRef }) => (
-            <div /* this `div` is hooked with a `ref` by Scroller component */>
+          render={({ ScrollerHookingParent }) => (
+            <ScrollerHookingParent>
               <MenuList
-                ref={elementRef}
                 className="product-details__nav-menu-list"
                 component="ol"
                 disablePadding={true}
@@ -567,7 +569,7 @@ export default function ProductDetails({ product }) {
                   );
                 })}
               </MenuList>
-            </div>
+            </ScrollerHookingParent>
           )}
         />
       </aside>
@@ -643,17 +645,16 @@ export default function ProductDetails({ product }) {
                 selector: '.product-details__nav-section-related-products',
                 varName: '--related-product-card-width',
               }}
-              render={({ elementRef }) => (
-                <div /* this `div` is hooked with a `ref` by Scroller component */>
+              render={({ ScrollerHookingParent }) => (
+                <ScrollerHookingParent>
                   <ProductSpecificDetail
                     detailName="relatedProducts"
                     detailValue={productDetails.relatedProducts}
                     extras={{
-                      listRef: elementRef,
                       disableListItemGutters: true,
                     }}
                   />
-                </div>
+                </ScrollerHookingParent>
               )}
             />
           </div>

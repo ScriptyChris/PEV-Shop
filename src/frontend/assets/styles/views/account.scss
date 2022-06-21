@@ -11,10 +11,6 @@
         display: flex;
         align-items: flex-start;
         border-block: 1px solid lightgrey;
-
-        [data-scrollable-parent] {
-            height: 3rem;
-        }
     }
 
     &__menu-nav-list {

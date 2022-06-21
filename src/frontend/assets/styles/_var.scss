@@ -19,8 +19,4 @@ $productDetailsNavMenuZIndex: 1;
 .product-comparison-candidates,
 .product-comparison {
   --product-list-item-width: 200px;
-
-  [data-scrollable-parent] {
-    min-height: 5.5rem;
-  }
 }

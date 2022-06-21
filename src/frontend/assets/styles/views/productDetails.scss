@@ -34,7 +34,7 @@
             "action-buttons action-buttons"
             "image image"
             "name ."
-            "rating ."
+            "rating rating"
             ". price"
             "buy-btn buy-btn";
         row-gap: 0.5rem;
@@ -91,10 +91,6 @@
 
         button {
             width: 2rem;
-        }
-
-        [data-scrollable-parent] {
-            height: 3rem;
         }
     }
 
@@ -154,7 +150,7 @@
         }
 
         [data-scrollable-parent] {
-            height: 14rem;
+            --scrollable-min-height: 8rem;
         }
 
         ul {

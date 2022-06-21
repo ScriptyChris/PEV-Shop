@@ -114,28 +114,29 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
               varName: '--product-list-item-width',
             }}
             forwardProps={{ trackedChanges: toJS(storeService.productComparisonState) }}
-            render={({ elementRef, forwardProps: { trackedChanges: productComparisonState } }) => (
-              // TODO: [UX] adjust element's width according to children count (and container free space)
-              <div /* this `div` is hooked with a `ref` by Scroller component */>
-                <ol
-                  ref={elementRef}
-                  className="product-comparison-candidates__list vertically-centered"
-                  // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
-                  aria-labelledby="compareProductCandidatesListCounter"
-                >
-                  {productComparisonState.map((product, index) => (
-                    <li className="product-comparison-candidates__list-item" key={product._id}>
-                      <PEVParagraph>{product.name}</PEVParagraph>
-                      <PEVIconButton
-                        onClick={() => handleRemoveComparableProduct(index)}
-                        className="product-comparison-candidates__list-item-remove-button"
-                        a11y={translations.removeComparableProduct}
-                      >
-                        <DeleteIcon />
-                      </PEVIconButton>
-                    </li>
-                  ))}
-                </ol>
+            render={({ ScrollerHookingParent, forwardProps: { trackedChanges: productComparisonState } }) => (
+              <div className="pev-flex pev-flex--columned product-comparison-candidates__scroller">
+                {/* TODO: [UX] adjust element's width according to children count (and container free space) */}
+                <ScrollerHookingParent>
+                  <ol
+                    className="product-comparison-candidates__list vertically-centered"
+                    // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
+                    aria-labelledby="compareProductCandidatesListCounter"
+                  >
+                    {productComparisonState.map((product, index) => (
+                      <li className="product-comparison-candidates__list-item" key={product._id}>
+                        <PEVParagraph>{product.name}</PEVParagraph>
+                        <PEVIconButton
+                          onClick={() => handleRemoveComparableProduct(index)}
+                          className="product-comparison-candidates__list-item-remove-button"
+                          a11y={translations.removeComparableProduct}
+                        >
+                          <DeleteIcon />
+                        </PEVIconButton>
+                      </li>
+                    ))}
+                  </ol>
+                </ScrollerHookingParent>
                 <ComparisonCandidatesCounter amount={storeService.productComparisonState.length} />
               </div>
             )}

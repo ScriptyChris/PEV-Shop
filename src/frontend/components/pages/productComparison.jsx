@@ -109,7 +109,7 @@ export default function Compare() {
               varName: '--product-list-item-width',
             }}
             btnsParentRef={scrollerBtnsParentRef}
-            render={({ elementRef, multipleRefsGetter }) => {
+            render={({ ScrollerHookingParent, multipleRefsGetter }) => {
               const { createRefGetter, REF_TYPE } = multipleRefsGetter;
               const [headRowRefGetter, bodyRowRefGetter] = [
                 createRefGetter(REF_TYPE.HEAD),
@@ -122,11 +122,11 @@ export default function Compare() {
                     {comparisonData.productDetailsHeadersKeys.map(getTableHeadContent(headRowRefGetter))}
                   </TableHead>
 
-                  <div /* this `div` is hooked with a `ref` by Scroller component */>
-                    <TableBody component="div" className="product-comparison__body" ref={elementRef} role="rowgroup">
+                  <ScrollerHookingParent>
+                    <TableBody component="div" className="product-comparison__body" role="rowgroup">
                       {comparisonData.productDetailsHeadersKeys.map(getTableBodyContent(bodyRowRefGetter))}
                     </TableBody>
-                  </div>
+                  </ScrollerHookingParent>
                 </>
               );
             }}

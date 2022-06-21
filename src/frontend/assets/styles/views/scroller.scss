@@ -3,6 +3,7 @@
 [data-scrollable-parent] {
   overflow: hidden;
   width: 100%;
+  min-height: var(--scrollable-min-height, 3rem);
   position: relative;
 }
 
@@ -13,11 +14,8 @@
   margin: 0; // remove margin to correctly calculate offset to parent
   height: 100%;
   $basicHorizontalTranslation: translateX(calc(var(--scrollValue, 0) * 1px));
-
-  &:not(.initial-render) {
-    transition: transform 0.25s;
-    transform: $basicHorizontalTranslation;
-  }
+  transition: transform 0.25s;
+  transform: $basicHorizontalTranslation;
 
   &.vertically-centered {
     top: 50%;

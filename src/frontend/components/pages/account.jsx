@@ -223,10 +223,9 @@ export default function Account() {
             scrollerBaseValueMeta={{
               useDefault: true,
             }}
-            render={({ elementRef }) => (
-              <div /* this `div` is hooked with a `ref` by Scroller component */>
+            render={({ ScrollerHookingParent }) => (
+              <ScrollerHookingParent>
                 <MenuList
-                  ref={elementRef}
                   className="account__menu-nav-list"
                   component="ul"
                   disablePadding={true}
@@ -244,7 +243,7 @@ export default function Account() {
                     </MenuItem>
                   ))}
                 </MenuList>
-              </div>
+              </ScrollerHookingParent>
             )}
           />
         ) : (
