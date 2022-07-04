@@ -24,7 +24,7 @@ import {
 } from '@frontend/components/utils/pevElements';
 import productSpecsService from '@frontend/features/productSpecsService';
 import FormFieldError from '@frontend/components/utils/formFieldError';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   filtersHeader: 'Filters',
@@ -246,7 +246,7 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
   const cachedValidationErrors = useRef({});
   const [productSpecsPerSelectedCategory, setProductSpecsPerSelectedCategory] = useState([]);
   const [formInitials, setFormInitials] = useState({});
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   const lastChangedInputMeta = useRef({
     name: CHARS.EMPTY,
     min: Number.NEGATIVE_INFINITY,
@@ -463,6 +463,10 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
   };
 
   if (!Object.keys(productsSpecsPerCategory.current).length || !Object.keys(formInitials).length) {
+    /*
+      TODO: [UX] on mobile this rather should be implemented as disabled filtering button or one showing regarding tooltip.
+      Otherwise, layout is misaligned by the feedback text.
+    */
     return translations.filterUnavailable;
   }
 
@@ -482,12 +486,7 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
         };
 
         return (
-          <form
-            className={classNames('products-filter__form pev-flex pev-flex--columned', {
-              'products-filter__form--pc': !isMobileLayout,
-            })}
-            onSubmit={handleSubmit}
-          >
+          <form className="products-filter__form pev-flex pev-flex--columned" onSubmit={handleSubmit}>
             {getFormControls(formikRestProps)}
             <PEVButton
               type="button"

@@ -54,6 +54,8 @@
     }
 }
 
-.products-filter__form--pc {
-    margin-top: 1rem;
+@include createMediaQuery(min-width, tablet) {
+    .products-filter__form {
+        margin-top: 1rem;
+    }
 }

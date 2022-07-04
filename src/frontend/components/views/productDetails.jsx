@@ -33,7 +33,6 @@ import { ROUTES } from '@frontend/components/pages/_routes';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
 import { ProductComparisonCandidatesToggler } from '@frontend/components/views/productComparisonCandidates';
 import Scroller from '@frontend/components/utils/scroller';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -403,7 +402,6 @@ export default function ProductDetails({ product }) {
 
   console.log('[ProductDetails] product received from navigation: ', product);
 
-  const isMobileLayout = useMobileLayout();
   const [productDetails, setProductDetails] = useState(null);
   const [popupData, setPopupData] = useState(null);
   const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
@@ -477,15 +475,7 @@ export default function ProductDetails({ product }) {
   }
 
   return (
-    <article className={classNames('product-details', { 'product-details--pc': !isMobileLayout })}>
-      <aside className="product-details__aside">
-        <ProductComparisonCandidatesList
-          collapsibleAnimation={true}
-          forceHideWhenEmpty={true}
-          compensateOuterTopMargin={true}
-        />
-      </aside>
-
+    <article className="product-details">
       <Paper
         component="header"
         elevation={0}
@@ -663,6 +653,7 @@ export default function ProductDetails({ product }) {
 
       <Divider />
 
+      <ProductComparisonCandidatesList />
       <Popup {...popupData} />
     </article>
   );

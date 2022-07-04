@@ -5,7 +5,7 @@ import { StylesProvider } from '@material-ui/core/styles';
 import Header from './components/views/header';
 import Main from './components/views/main';
 import Footer from './components/views/footer';
-import { MobileLayoutProvider } from './contexts/mobile-layout';
+import { RWDLayoutProvider } from './contexts/rwd-layout';
 import { MUIThemeProvider } from './contexts/mui-theme';
 
 const App = () => (
@@ -17,11 +17,11 @@ const App = () => (
         // disableGeneration={true}
       >
         <MUIThemeProvider>
-          <MobileLayoutProvider>
+          <RWDLayoutProvider>
             <Header />
             <Main />
             <Footer />
-          </MobileLayoutProvider>
+          </RWDLayoutProvider>
         </MUIThemeProvider>
       </StylesProvider>
     </BrowserRouter>

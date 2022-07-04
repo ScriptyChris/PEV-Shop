@@ -10,7 +10,7 @@ import { ROUTES } from '@frontend/components/pages/_routes';
 import Nav from './nav';
 import Cart from './cart';
 import { SearchProductsByName } from '@frontend/components/views/search';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   appMainHeader: 'PEV Shop',
@@ -19,7 +19,7 @@ const translations = Object.freeze({
 
 export default function Header() {
   const history = useHistory();
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   const [isHeadingSmall, setIsHeadingSmall] = useState(false);
 
   useEffect(() => setIsHeadingSmall(false), [isMobileLayout]);

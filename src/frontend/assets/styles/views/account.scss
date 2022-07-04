@@ -67,14 +67,14 @@
     }
 }
 
-.account--pc {
-    grid-template-areas:
-        "nav header"
-        "nav tab";
-    grid-template-columns: 1fr 3fr;
-    grid-column-gap: 2rem;
-
+@include createMediaQuery(min-width, tablet) {
     .account {
+        grid-template-areas:
+            "nav header"
+            "nav tab";
+        grid-template-columns: 1fr 3fr;
+        grid-column-gap: 2rem;
+
         &__header {
             grid-area: header;
         }

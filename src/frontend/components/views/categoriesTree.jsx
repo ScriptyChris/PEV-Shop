@@ -10,7 +10,7 @@ import TextField from '@material-ui/core/TextField';
 
 import { PEVIconButton, PEVHeading } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   treeHeader: 'Categories',
@@ -224,7 +224,7 @@ function Tree({
 }
 
 function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultiselect, formField, forceCombinedView }) {
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   const isSeparatedView = isMobileLayout && !forceCombinedView;
   const [isTreeHidden, setIsTreeHidden] = useState(isSeparatedView);
   const { treeData, treeInitials, updateTreeInitials } = useTreeMetaData({

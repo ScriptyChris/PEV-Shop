@@ -89,12 +89,12 @@ function getScrollerHookingParent(getScrollerElementRef) {
 // TODO: [UX] implement automatic scrolling to the currently clicked and focused list item
 export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, btnsParentRef }) {
   const scrollerElementRef = useRef();
-  const getScrollerElementRef = useCallback((node) => {
-    if (node) {
-      scrollerElementRef.current = node;
+  const getScrollerElementRef = useCallback((scrollerNode) => {
+    if (scrollerNode) {
+      scrollerElementRef.current = scrollerNode;
       window.addEventListener('resize', handleElementOverflow);
-      node.addEventListener('transitionend', handleElementToParentOffsetChange);
-      node.dataset.scrollable = 'true';
+      scrollerNode.addEventListener('transitionend', handleElementToParentOffsetChange);
+      scrollerNode.dataset.scrollable = 'true';
     }
   }, []);
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);

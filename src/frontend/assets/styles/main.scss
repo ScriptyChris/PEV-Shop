@@ -3,6 +3,7 @@
   especially for `_var`, because it creates globals
 */
 @import '_var';
+@import '_mixins';
 @import '_helpers';
 @import 'views/app';
 @import 'views/shop';
@@ -35,6 +36,8 @@
   padding: 0;
 }
 
-html {
+:root {
   font-size: 16px;
+
+  @include getMediaQueriesMappedToVars;
 }

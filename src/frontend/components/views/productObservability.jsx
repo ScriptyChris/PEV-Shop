@@ -8,7 +8,7 @@ import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 import { PEVButton, PEVIconButton } from '@frontend/components/utils/pevElements';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout.tsx';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
 import storageService from '@frontend/features/storageService';
@@ -108,7 +108,7 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
 });
 
 export default observer(function ObservedProducts() {
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   const [observedProducts, setObservedProducts] = useState([]);
   const [popupData, setPopupData] = useState(null);
   const [canUnobserveAllProducts, setCanUnobserveAllProducts] = useState(false);

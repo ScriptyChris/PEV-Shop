@@ -51,16 +51,16 @@
 .main {
     grid-area: main;
     justify-self: center;
-    max-width: 768px;
+    max-width: getBreakpointPXValue(fixed-container);
     width: 100%;
 }
   
 .footer {
     grid-area: footer;
 }
-  
-@media screen and (min-width: 769px /* TODO: [DX] find a way to use [S]CSS variable here */) {
-    .main {
-      max-width: 1280px;
-    }
+
+@include createMediaQuery(min-width, tablet) {
+  .main {
+    max-width: getBreakpointPXValue(main-container);
+  }
 }

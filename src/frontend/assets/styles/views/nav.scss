@@ -8,15 +8,14 @@
     margin-inline: auto;
 }
 
-.nav-menu {
-    &--is-mobile {
-        .nav-menu__links {
-            flex-direction: column;
-        }
-    }
+.nav-menu__links {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
 
-    &__links {
-        display: flex;
-        justify-content: space-evenly;
+@include createMediaQuery(min-width, tablet) {
+    .nav-menu__links {
+        flex-direction: initial;
     }
 }

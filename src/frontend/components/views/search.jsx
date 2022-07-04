@@ -10,7 +10,7 @@ import SearchIcon from '@material-ui/icons/Search';
 
 import { PEVForm, PEVIconButton, PEVCheckbox } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   defaultLabel: 'Search for:',
@@ -97,7 +97,7 @@ const ForwardedSearch = forwardRef(function ForwardedSearch(props, ref) {
 });
 
 function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMainHeadingSize, ...restProps }) {
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   const [isCaseSensitive, setCaseSensitive] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(!isMobileLayout);
   const [isSearchBtnHidden, setIsSearchBtnHidden] = useState(!isMobileLayout);

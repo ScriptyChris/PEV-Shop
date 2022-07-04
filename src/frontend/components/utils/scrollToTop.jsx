@@ -4,14 +4,14 @@ import Zoom from '@material-ui/core/Zoom';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Fab from '@material-ui/core/Fab';
 
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   scrollToTopBtn: 'scroll to top',
 };
 
 function ScrollToTop() {
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   const [isScrollBtnVisible, setIsScrollBtnVisible] = useState(false);
 
   useEffect(() => {

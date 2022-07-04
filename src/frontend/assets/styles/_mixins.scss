@@ -1,0 +1,34 @@
+@mixin useMediaQuery($breakpointName) {
+    @media #{map-get($mediaQueriesMap, $breakpointName)} {
+        @content;
+    }
+}
+
+@mixin createMediaQuery($mediaFeatureName, $breakpointName, $offset: 0) {
+    @if ($offset < -1 or $offset > 1) {
+        @error "$offset needs to be between -1 and 1 range!"
+    }
+
+    $mediaFeatureValue: "#{map-get($mergedBreakpointsMap, $breakpointName) + $offset}px";
+    $mediaQuery: "screen and (#{$mediaFeatureName}: #{$mediaFeatureValue})";
+
+    @media #{$mediaQuery} {
+        @content;
+    }
+}
+
+@mixin getMediaQueriesMappedToVars() {
+    $varNames: "";
+    
+    @each $key, $value in $mediaQueriesMap {
+        $singleBreakpointVarName: "--" + $key + "-query";
+        #{$singleBreakpointVarName}: $value;
+        $varNames: $varNames + " " + $singleBreakpointVarName;
+    }
+
+    --media-queries-var-names: #{$varNames};
+}
+
+@function getBreakpointPXValue($breakpointName) {
+    @return map-get($mergedBreakpointsMap, $breakpointName) * 1px;
+}

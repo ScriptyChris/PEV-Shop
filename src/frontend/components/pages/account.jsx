@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, Route, Switch } from 'react-router-dom';
-import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -13,7 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
 import { PEVButton, PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/pevElements';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout.tsx';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout.tsx';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';
 import { SetNewPassword } from '@frontend/components/views/password';
@@ -178,7 +177,7 @@ function Orders() {
 }
 
 export default function Account() {
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   // TODO: [PERFORMANCE]? fix rendering component twice when redirected from LogIn page
   const MENU_ITEMS = Object.freeze([
     {
@@ -212,7 +211,7 @@ export default function Account() {
   }, []);
 
   return (
-    <article className={classNames('account', { 'account--pc': !isMobileLayout })}>
+    <article className="account">
       <PEVHeading level={2} className="account__header">
         {translations.accountHeader}
       </PEVHeading>

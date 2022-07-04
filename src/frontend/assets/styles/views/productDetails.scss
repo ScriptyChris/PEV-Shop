@@ -1,42 +1,16 @@
-.product-details--pc {
-    .product-details {
-        &__header {
-            grid-template-areas:
-                "category action-buttons"
-                "image name"
-                "image rating"
-                "image price"
-                "image buy-btn";
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem 3rem;
-        }
-
-        &__nav-menu-list {
-            width: 100%;
-            justify-content: center;
-        }
-
-        &__nav-section-specs {
-            & > dt {
-                margin-left: 10rem;
-            }
-        }
-    }
-}
-
 .product-details {
     margin: 1rem;
     
     &__header {
         display: grid;
         grid-template-areas:
-            "category category"
-            "action-buttons action-buttons"
-            "image image"
-            "name ."
-            "rating rating"
-            ". price"
-            "buy-btn buy-btn";
+            "category"
+            "action-buttons"
+            "image"
+            "name"
+            "rating"
+            "price"
+            "buy-btn";
         row-gap: 0.5rem;
     }
 
@@ -156,6 +130,32 @@
         ul {
             display: flex;
             gap: 1rem;
+        }
+    }
+}
+
+@include createMediaQuery(min-width, tablet) {
+    .product-details {
+        &__header {
+            grid-template-areas:
+                "category action-buttons action-buttons action-buttons"
+                "image image name name"
+                "image image rating rating"
+                "image image price price"
+                "image image buy-btn buy-btn";
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem 3rem;
+        }
+
+        &__nav-menu-list {
+            width: 100%;
+            justify-content: center;
+        }
+
+        &__nav-section-specs {
+            & > dt {
+                margin-left: 10rem;
+            }
         }
     }
 }

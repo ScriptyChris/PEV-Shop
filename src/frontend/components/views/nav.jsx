@@ -1,7 +1,6 @@
 import { useHistory } from 'react-router-dom';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import classNames from 'classnames';
 
 import Menu from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,7 +12,7 @@ import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from '@frontend/components/pages/_routes';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   toggleNavMenu: 'Menu',
@@ -30,9 +29,9 @@ const translations = Object.freeze({
   TODO: [UX/a11y] implement (interactive - so i.e. user can go back a few levels) mini nav widget 
         located under main header to indicate where user currently is
 */
-const NavMenu = observer(({ logOutUser, isMobile }) => {
+const NavMenu = observer(({ logOutUser }) => {
   return (
-    <nav className={classNames('nav-menu', { 'nav-menu--is-mobile': isMobile })}>
+    <nav className="nav-menu">
       <MenuList className="nav-menu__links">
         <MenuItem>
           <PEVLink to={ROUTES.SHOP}>{translations.shop}</PEVLink>
@@ -70,7 +69,7 @@ const NavMenu = observer(({ logOutUser, isMobile }) => {
 
 export default function Nav() {
   const history = useHistory();
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout } = useRWDLayout();
   const [isMobileMenuOpened, setIsMobileMenuOpened] = useState(false);
 
   const handleToggleNavMenu = () => setIsMobileMenuOpened(!isMobileMenuOpened);
@@ -114,7 +113,7 @@ export default function Nav() {
           <CloseIcon />
         </PEVIconButton>
 
-        <NavMenu logOutUser={logOutUser} isMobile={true} />
+        <NavMenu logOutUser={logOutUser} />
       </Drawer>
     </>
   ) : (

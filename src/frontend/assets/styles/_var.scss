@@ -20,3 +20,28 @@ $productDetailsNavMenuZIndex: 1;
 .product-comparison {
   --product-list-item-width: 200px;
 }
+
+// breakpoints
+$mediaBreakpointsMap: (
+  /* "mobile" is not included, because styles are written mobile-first */
+  "tablet": 600,
+  "desktop": 960,
+);
+$containerBreakpointsMap: (
+  "fixed-container": 768,
+  "main-container": 1280,
+);
+$mergedBreakpointsMap: map-merge(
+  $mediaBreakpointsMap,
+  $containerBreakpointsMap,
+);
+
+$mediaQueriesMap: (
+  "mobile": unquote("(max-width: #{map-get($mediaBreakpointsMap, tablet)}px)"),
+  "tablet": unquote("
+    (min-width: #{(map-get($mediaBreakpointsMap, tablet) + 1)}px) 
+    and 
+    (max-width: #{(map-get($mediaBreakpointsMap, desktop))}px)"
+  ),
+  "desktop": unquote("(min-width: #{(map-get($mediaBreakpointsMap, desktop) + 1)}px)"),
+)
