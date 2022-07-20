@@ -1,23 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import Zoom from '@material-ui/core/Zoom';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Fab from '@material-ui/core/Fab';
 
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import { subscribeToBodyMutations, unSubscribeFromBodyMutations } from '@frontend/components/utils/bodyObserver';
 
 const translations = {
   scrollToTopBtn: 'scroll to top',
 };
 
+const useBtnInfo = () => {
+  const originalBtnStyleRight = useRef();
+  const getBtnRef = useCallback((btnNode) => {
+    if (btnNode) {
+      originalBtnStyleRight.current = window.getComputedStyle(btnNode).right;
+    }
+  }, []);
+
+  return { getBtnRef, originalBtnStyleRight };
+};
+
 function ScrollToTop() {
   const { isMobileLayout } = useRWDLayout();
   const [isScrollBtnVisible, setIsScrollBtnVisible] = useState(false);
+  const [btnPosCorrection, setBtnPosCorrection] = useState({});
+  const { getBtnRef, originalBtnStyleRight } = useBtnInfo();
+  const onBodyMutation = useRef(({ paddingRight }) => {
+    const currentCorrections = {};
+    const originalBtnRight = Number.parseFloat(originalBtnStyleRight.current);
+    const targetBtnRight = Number.parseFloat(paddingRight) || 0;
+    currentCorrections.right = targetBtnRight ? originalBtnRight + targetBtnRight : null;
+    const correction = {
+      right: currentCorrections.right,
+    };
+
+    setBtnPosCorrection((prevPos) => ({ ...prevPos, ...correction }));
+  });
 
   useEffect(() => {
+    const subscriptionID = subscribeToBodyMutations(onBodyMutation.current);
     document.addEventListener('scroll', toggleScrollBtnVisibility, { passive: true });
 
-    return () => document.removeEventListener('scroll', toggleScrollBtnVisibility, { passive: true });
+    return () => {
+      unSubscribeFromBodyMutations(subscriptionID);
+      document.removeEventListener('scroll', toggleScrollBtnVisibility, { passive: true });
+    };
   }, []);
 
   const toggleScrollBtnVisibility = () => setIsScrollBtnVisible(window.scrollY > 0);
@@ -30,7 +59,7 @@ function ScrollToTop() {
   };
 
   return (
-    <Zoom in={isScrollBtnVisible}>
+    <Zoom in={isScrollBtnVisible} ref={getBtnRef} style={btnPosCorrection}>
       <Fab
         onClick={handleScrollToTop}
         color="primary"
