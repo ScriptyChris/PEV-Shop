@@ -285,8 +285,6 @@ export default function ProductList() {
           </div>
 
           <Divider variant="fullWidth" />
-
-          <ProductComparisonCandidatesList />
         </aside>
       ) : (
         <>
@@ -312,8 +310,6 @@ export default function ProductList() {
                 {translations.sortingMode}
               </PEVButton>
             </div>
-
-            <ProductComparisonCandidatesList />
           </Toolbar>
         </>
       )}
@@ -342,6 +338,8 @@ export default function ProductList() {
           onItemPageChange={onProductPageChange}
         />
       </Toolbar>
+
+      <ProductComparisonCandidatesList />
     </article>
   );
 }

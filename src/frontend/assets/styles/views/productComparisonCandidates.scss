@@ -1,17 +1,36 @@
-.product-comparison-candidates-pc-wrapper {
-  flex-basis: 100%;
-}
-
 .product-comparison-candidates-container {
-  margin: 0.3rem;
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  z-index: 1;
+  background-color: white;
+  // TODO: [UI] set MUI's blue color
+  border-top: 2px solid;
+  overflow: visible;
 }
 
 .product-comparison-candidates {
   display: flex;
   align-items: center;
+  width: clamp(
+    var(--product-list-item-width),
+    calc(var(--desktop-width) * 1px),
+    calc(100vw - 1rem)
+  );
+  margin: 0.5rem auto;
 
-  &--hidden {
-    height: 0;
+  &__toogle-expand-btn {
+    position: fixed;
+    --toggle-expand-btn-left: 50%;
+    left: var(--toggle-expand-btn-left);
+    transform: translate(-50%, -200%);
+    width: max-content;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    
+    &--force-visibility {
+      visibility: visible;
+    }
   }
 
   &__scroller {
@@ -20,10 +39,11 @@
 
   &__list {
     list-style: none;
-    display: inline-flex;
+    display: flex;
     justify-content: space-around;
-    margin: 1rem 0 1rem 1rem;
-    padding-right: 1rem;
+    // use `unqoute` and pass CSS expression as a string to override SCSS `min` function, 
+    // because it has problem to recognize `var`
+    min-width: unquote("min(var(--product-list-item-width), 100vw)");
   }
 
   &__list-counter {
@@ -57,7 +77,7 @@
     flex-direction: column;
     justify-content: space-between;
     margin: 0 0.5rem;
-    width: var(--product-list-item-width);
+    min-width: var(--product-list-item-width);
   }
 
   &__list-item-remove-button {

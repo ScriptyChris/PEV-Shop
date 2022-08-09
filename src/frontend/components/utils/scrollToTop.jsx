@@ -27,12 +27,15 @@ function ScrollToTop() {
   const [isScrollBtnVisible, setIsScrollBtnVisible] = useState(false);
   const [btnPosCorrection, setBtnPosCorrection] = useState({});
   const { getBtnRef, originalBtnStyleRight } = useBtnInfo();
-  const onBodyMutation = useRef(({ paddingRight }) => {
+  const onBodyMutation = useRef(({ paddingRight, marginBottom }) => {
     const currentCorrections = {};
     const originalBtnRight = Number.parseFloat(originalBtnStyleRight.current);
     const targetBtnRight = Number.parseFloat(paddingRight) || 0;
     currentCorrections.right = targetBtnRight ? originalBtnRight + targetBtnRight : null;
+    const targetBtnBottom = Number.parseFloat(marginBottom) || 0;
+    currentCorrections.bottom = targetBtnBottom ? targetBtnBottom : null;
     const correction = {
+      transform: `translateY(${-currentCorrections.bottom}px)`,
       right: currentCorrections.right,
     };
 
