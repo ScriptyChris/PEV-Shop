@@ -17,6 +17,13 @@
     }
 }
 
+@mixin getBreakpointsMappedToVars {
+    @each $key, $value in $mergedBreakpointsMap {
+        $singleBreakpointVarName: "--" + $key + "-width";
+        #{$singleBreakpointVarName}: $value;
+    }
+}
+
 @mixin getMediaQueriesMappedToVars() {
     $varNames: "";
     

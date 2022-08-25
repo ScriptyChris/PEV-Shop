@@ -39,5 +39,6 @@
 :root {
   font-size: 16px;
 
+  @include getBreakpointsMappedToVars;
   @include getMediaQueriesMappedToVars;
 }

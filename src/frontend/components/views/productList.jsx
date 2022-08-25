@@ -10,6 +10,9 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListIcon from '@material-ui/icons/List';
 import Toolbar from '@material-ui/core/Toolbar';
+import SettingsIcon from '@material-ui/icons/Settings';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 import { PEVButton, PEVIconButton } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
@@ -18,12 +21,13 @@ import Pagination from '@frontend/components/utils/pagination';
 import CategoriesTree from './categoriesTree';
 import { ProductComparisonCandidatesList } from './productComparisonCandidates';
 import ProductsFilter from './productsFilter';
-import { useMobileLayout } from '@frontend/contexts/mobile-layout';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   lackOfProducts: 'Lack of products...',
   typeProductName: 'Type product name:',
   sortingMode: 'choose sorting mode',
+  sidebarToggleBtn: 'Toggle sidebar',
 };
 const viewModeTranslations = {
   changeToDetails: 'details view',
@@ -32,38 +36,40 @@ const viewModeTranslations = {
 
 function ViewModeBtn({ viewModeType, onClick, isMobileLayout }) {
   const color = isMobileLayout ? 'inherit' : 'primary';
+  const btnClassNamePart = isMobileLayout ? 'control' : 'top';
+  const viewModeBtnDetails = {
+    className: `product-list-${btnClassNamePart}-bar__view-mode-btn`,
+  };
 
   switch (viewModeType) {
     case 'details': {
-      return (
-        <PEVButton
-          onClick={onClick}
-          startIcon={<ListIcon />}
-          className="product-list-control-bar__buttons-view-mode"
-          variant="contained"
-          color={color}
-        >
-          {viewModeTranslations.changeToDetails}
-        </PEVButton>
-      );
+      viewModeBtnDetails.startIcon = ListIcon;
+      viewModeBtnDetails.translation = viewModeTranslations.changeToDetails;
+
+      break;
     }
     case 'tiles': {
-      return (
-        <PEVButton
-          onClick={onClick}
-          startIcon={<ViewModuleIcon />}
-          className="product-list-control-bar__buttons-view-mode"
-          variant="contained"
-          color={color}
-        >
-          {viewModeTranslations.changeToTiles}
-        </PEVButton>
-      );
+      viewModeBtnDetails.startIcon = ViewModuleIcon;
+      viewModeBtnDetails.translation = viewModeTranslations.changeToTiles;
+
+      break;
     }
     default: {
       throw TypeError(`Unrecognized viewModeType: '${viewModeType}'!`);
     }
   }
+
+  return (
+    <PEVButton
+      onClick={onClick}
+      startIcon={<viewModeBtnDetails.startIcon />}
+      className={viewModeBtnDetails.className}
+      variant="contained"
+      color={color}
+    >
+      {viewModeBtnDetails.translation}
+    </PEVButton>
+  );
 }
 
 const paginationTranslations = {
@@ -151,6 +157,7 @@ const listViewModeToProductCardLayoutMap = {
 
 export default function ProductList() {
   const { state: locationState } = useLocation();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [productsList, setProductsList] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -158,7 +165,7 @@ export default function ProductList() {
   // TODO: set initial products per page limit based on device that runs app (f.e. mobile should have lowest limit and PC highest)
   const [currentProductsPerPageLimit, setCurrentProductsPerPageLimit] = useState(productsPerPageLimits[0]);
   const [filterBtnDisabled, setFilterBtnDisabled] = useState(false);
-  const isMobileLayout = useMobileLayout();
+  const { isMobileLayout, isTabletLayout } = useRWDLayout();
   const isListControlBarSticky = useHandleListControlBarStickiness(isMobileLayout);
   const { currentListViewModeClassName, switchListViewMode, listViewModeType } = useListViewModes();
 
@@ -169,6 +176,8 @@ export default function ProductList() {
       }
     );
   }, [locationState]);
+
+  const onSidebarToggle = () => setIsSidebarCollapsed((prevState) => !prevState);
 
   const updateProductsList = async ({
     pageNumber = currentProductPage,
@@ -253,42 +262,52 @@ export default function ProductList() {
   return (
     <article
       className={classNames('product-list-container', {
-        'product-list-container--pc': !isMobileLayout,
-        'product-list-control-bar--mobile': isMobileLayout,
+        'product-list-container--extended': isSidebarCollapsed,
       })}
     >
       {isMobileLayout ? (
         <aside
-          className={classNames('product-list-control-bar', {
+          className={classNames('product-list-control-bar pev-flex', {
             'product-list-control-bar--sticky': isListControlBarSticky,
           })}
         >
-          <div className="product-list-control-bar__buttons pev-flex">
-            <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} isMobileLayout={isMobileLayout} />
+          <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} isMobileLayout={isMobileLayout} />
 
-            <div>
-              {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
-              <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
+          {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
+          <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
 
-              <ProductsFilter
-                selectedCategories={productCategories}
-                onFiltersUpdate={handleFiltersUpdate}
-                doFilterProducts={filterProducts}
-                filterBtnDisabled={filterBtnDisabled}
-              />
+          <ProductsFilter
+            selectedCategories={productCategories}
+            onFiltersUpdate={handleFiltersUpdate}
+            doFilterProducts={filterProducts}
+            filterBtnDisabled={filterBtnDisabled}
+          />
 
-              {/* TODO: [UX] add sorting */}
-              <PEVIconButton onClick={handleSorting} a11y={translations.sortingMode}>
-                <SortIcon />
-              </PEVIconButton>
-            </div>
-          </div>
-
-          <Divider variant="fullWidth" />
+          {/* TODO: [UX] add sorting */}
+          <PEVIconButton onClick={handleSorting} a11y={translations.sortingMode}>
+            <SortIcon />
+          </PEVIconButton>
         </aside>
       ) : (
         <>
-          <Paper component="aside" variant="outlined" className="product-list-control-sidebar">
+          <Paper
+            component="aside"
+            variant="outlined"
+            className={classNames('product-list-control-sidebar', {
+              'product-list-control-sidebar--collapsed': isSidebarCollapsed,
+            })}
+          >
+            {isTabletLayout && (
+              <PEVIconButton
+                onClick={onSidebarToggle}
+                className="product-list-control-sidebar__extend-toggle-btn"
+                a11y={translations.sidebarToggleBtn}
+              >
+                {isSidebarCollapsed && <SettingsIcon fontSize="small" />}
+                {isSidebarCollapsed ? <ChevronRightIcon fontSize="small" /> : <ChevronLeftIcon fontSize="small" />}
+              </PEVIconButton>
+            )}
+
             {/* TODO: [UX] presumably move CategoriesTree into ProductsFilter component */}
             <CategoriesTree onCategorySelect={onCategorySelect} isMultiselect={true} />
 
@@ -301,15 +320,13 @@ export default function ProductList() {
               filterBtnDisabled={filterBtnDisabled}
             />
           </Paper>
-          <Toolbar className="product-list-control-topbar" component="aside">
-            <div className="product-list-control-topbar__buttons">
-              <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} />
+          <Toolbar className="product-list-control-topbar pev-flex" component="aside">
+            <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} />
 
-              {/* TODO: [UX] add sorting */}
-              <PEVButton onClick={handleSorting} startIcon={<SortIcon />} variant="contained" color="primary">
-                {translations.sortingMode}
-              </PEVButton>
-            </div>
+            {/* TODO: [UX] add sorting */}
+            <PEVButton onClick={handleSorting} startIcon={<SortIcon />} variant="contained" color="primary">
+              {translations.sortingMode}
+            </PEVButton>
           </Toolbar>
         </>
       )}
