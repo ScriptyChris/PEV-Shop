@@ -110,6 +110,7 @@ function ComparisonCandidatesCounter({ amount }) {
           <output
             onAnimationEnd={removeAmountBlinking}
             className={classNames({ 'product-comparison-candidates__list-counter--blinking': isAmountBlinking })}
+            data-cy="counter:product-comparison-candidates__list-counter"
           >
             {amount}
           </output>
@@ -220,14 +221,18 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
                   className="product-comparison-candidates__list vertically-centered"
                   // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
                   aria-labelledby="compareProductCandidatesListCounter"
+                  data-cy="container:product-comparison-candidates__list"
                 >
                   {productComparisonState.map((product, index) => (
                     <li className="product-comparison-candidates__list-item" key={product._id}>
-                      <PEVParagraph>{product.name}</PEVParagraph>
+                      <PEVParagraph data-cy="label:product-comparison-candidates__list-item-name">
+                        {product.name}
+                      </PEVParagraph>
                       <PEVIconButton
                         onClick={() => handleRemoveComparableProduct(index)}
                         className="product-comparison-candidates__list-item-remove-button"
                         a11y={translations.removeComparableProduct}
+                        data-cy={`button:product-comparison-candidates__list-item-remove-btn--${index}`}
                       >
                         <DeleteIcon />
                       </PEVIconButton>
@@ -246,13 +251,19 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
             to={{ pathname: ROUTES.COMPARE }}
             onClick={showOptionalWarning}
             a11y={translations.proceedComparison}
+            data-cy="link:product-comparison-candidates__actions-proceed"
           >
             <DoneIcon />
           </PEVIconButton>
 
           <Divider orientation="vertical" flexItem />
 
-          <PEVIconButton onClick={handleClearCompareProducts} size="small" a11y={translations.clearComparableProducts}>
+          <PEVIconButton
+            onClick={handleClearCompareProducts}
+            size="small"
+            a11y={translations.clearComparableProducts}
+            data-cy="button:product-comparison-candidates__actions-clear"
+          >
             <ClearIcon />
           </PEVIconButton>
         </div>
@@ -268,6 +279,7 @@ export const ProductComparisonCandidatesToggler = observer(function ToggleProduc
   buttonVariant,
 }) {
   const [isProductComparable, setIsProductComparable] = useState(false);
+  const btnDataCy = isProductComparable ? 'button:remove-product-from-comparison' : 'button:add-product-to-comparison';
 
   useEffect(() =>
     reaction(
@@ -292,6 +304,7 @@ export const ProductComparisonCandidatesToggler = observer(function ToggleProduc
       variant={buttonVariant}
       size="small"
       startIcon={<CompareIcon isChecked={isProductComparable} />}
+      data-cy={btnDataCy}
     >
       {isProductComparable ? translations.removeFromCompare : translations.addToCompare}
     </PEVButton>

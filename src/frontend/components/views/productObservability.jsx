@@ -43,6 +43,7 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
     );
   });
   const buttonContent = isProductObserved ? translations.unObserveProduct : translations.observeProduct;
+  const buttonDataCy = `button:product-${isProductObserved ? 'remove-from-compare' : 'add-to-compare'}`;
 
   const toggleProductObserve = (event, shouldObserve) => {
     if (!storeService.userAccountState) {
@@ -97,6 +98,7 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
           size="small"
           startIcon={isProductObserved ? <RemoveFromQueueIcon /> : <AddToQueueIcon />}
           onClick={toggleProductObserve}
+          data-cy={buttonDataCy}
         >
           {buttonContent}
         </PEVButton>
@@ -181,7 +183,7 @@ export default observer(function ObservedProducts() {
                     </PEVIconButton>
                   )}
                 />
-                <ProductCard product={product} layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED} />
+                <ProductCard product={product} entryNo={index} layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED} />
               </ListItem>
             ))
           : translations.lackOfData}

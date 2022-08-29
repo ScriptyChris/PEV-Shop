@@ -23,8 +23,6 @@ const mediaQueryList = (() => {
     return mql;
   });
 
-  console.log('mqls:', mqls);
-
   return mqls;
 })();
 

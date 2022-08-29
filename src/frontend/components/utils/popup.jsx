@@ -24,6 +24,7 @@ const getClosePopupBtn = (setPopupData) => {
     onClick: () => setPopupData(null),
     // TODO: [UX] use translation
     text: 'Close',
+    dataCy: 'button:popup-close',
   };
 };
 

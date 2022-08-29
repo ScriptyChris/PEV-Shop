@@ -58,6 +58,7 @@ export function ProductCardLink({
         pathname: `${ROUTES.PRODUCT}/${productData.url}`,
         state: productData,
       }}
+      data-cy="link:product-card__link"
     >
       {children || (isTextVisible && translations.detailsBtn)}
     </Link>
@@ -79,11 +80,17 @@ export default function ProductCard({
   RenderedComponent,
   layoutType = PRODUCT_CARD_LAYOUT_TYPES.DETAILED,
   hasCompactBasicDesc = true,
+  entryNo,
 }) {
   if (!PRODUCT_CARD_LAYOUT_TYPES[layoutType]) {
     throw TypeError(`layoutType prop '${layoutType}' doesn't match PRODUCT_CARD_LAYOUT_TYPES!`);
   }
 
+  if (entryNo !== undefined && entryNo !== null && typeof entryNo !== 'number') {
+    throw TypeError(`entryNo prop - if provided - has to be a number! Receieved "${entryNo}".`);
+  }
+
+  const dataCySuffix = Number.isNaN(entryNo) ? 'unique' : entryNo;
   const [menuBtnRef, setMenuBtnRef] = useState(null);
   const { name, price, _id } = product;
   const elevation = layoutType === PRODUCT_CARD_LAYOUT_TYPES.COMPACT ? 0 : 1;
@@ -102,7 +109,7 @@ export default function ProductCard({
     <Paper
       component={RenderedComponent || 'div'}
       className={classNames('product-card', `product-card--${productCardLayoutTypesClassModifiers[layoutType]}`)}
-      data-cy="container:product-card"
+      data-cy={`container:product-card_${dataCySuffix}`}
       elevation={elevation}
     >
       <ProductCardLink className="product-card__link" productData={product}>
@@ -115,7 +122,7 @@ export default function ProductCard({
             <ProductCardBasicDesc
               isCompact={hasCompactBasicDesc}
               compactLabel={translations.descriptiveProductName}
-              dataCy="label:product-name"
+              dataCy="label:product-card__name"
               label={translations.productName}
               value={name}
             />
@@ -154,8 +161,9 @@ export default function ProductCard({
         }}
         MenuListProps={{
           className: 'product-card__actions-bar',
-          'data-cy': 'container:product-card__action-bar',
+          'data-cy': 'container:product-card__actions-bar',
         }}
+        data-cy="popup:product-card__actions-bar"
       >
         <MenuItem button={false} className="product-card__actions-bar-item">
           <AddToCartButton productInfoForCart={{ name, price, _id }} />

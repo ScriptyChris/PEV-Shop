@@ -332,9 +332,10 @@ export default function ProductList() {
       )}
       <List className={classNames('product-list', currentListViewModeClassName)}>
         {productsList.length > 0
-          ? productsList.map((product) => (
+          ? productsList.map((product, index) => (
               <ProductCard
                 key={product.name}
+                entryNo={index}
                 product={product}
                 layoutType={listViewModeToProductCardLayoutMap[listViewModeType]}
                 RenderedComponent={ListItem}

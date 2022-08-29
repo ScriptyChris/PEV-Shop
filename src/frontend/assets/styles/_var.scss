@@ -24,8 +24,8 @@ $productDetailsNavMenuZIndex: 1;
 // breakpoints
 $mediaBreakpointsMap: (
   /* "mobile" is not included, because styles are written mobile-first */
-  "tablet": 600,
-  "desktop": 960,
+  "tablet": 601,
+  "desktop": 961,
 );
 $containerBreakpointsMap: (
   "fixed-container": 768,
@@ -39,9 +39,9 @@ $mergedBreakpointsMap: map-merge(
 $mediaQueriesMap: (
   "mobile": unquote("(max-width: #{map-get($mediaBreakpointsMap, tablet)}px)"),
   "tablet": unquote("
-    (min-width: #{(map-get($mediaBreakpointsMap, tablet) + 1)}px) 
+    (min-width: #{(map-get($mediaBreakpointsMap, tablet))}px) 
     and 
-    (max-width: #{(map-get($mediaBreakpointsMap, desktop))}px)"
+    (max-width: #{(map-get($mediaBreakpointsMap, desktop) - 1)}px)"
   ),
-  "desktop": unquote("(min-width: #{(map-get($mediaBreakpointsMap, desktop) + 1)}px)"),
+  "desktop": unquote("(min-width: #{(map-get($mediaBreakpointsMap, desktop))}px)"),
 )

@@ -19,16 +19,16 @@ describe('order', () => {
     cy.loginTestUserByUI(exampleUser);
     cy.visit(ROUTES.SHOP);
 
-    cy.get('[data-cy="container:product-card"]')
+    cy.get('[data-cy="container:product-card_0"]')
       .first()
       .as('productCardContainer')
-      .find('[data-cy="label:product-name"], [data-cy="label:product-price"]')
+      .find('[data-cy="label:product-card__name"], [data-cy="label:product-price"]')
       .then(([productNameElem, productPriceElem]) => {
         cy.wrap([productNameElem, productPriceElem]).as('productNameAndPriceElems');
       });
 
     cy.get('@productCardContainer').find('[data-cy="button:toggle-action-bar"]').click();
-    cy.get('[data-cy="container:product-card__action-bar"]').as('productCardActionBar');
+    cy.get('[data-cy="container:product-card__actions-bar"]').as('productCardActionBar');
     cy.get('@productCardActionBar').find('[data-cy="button:add-product-to-cart"]').click();
 
     // close menu overlay

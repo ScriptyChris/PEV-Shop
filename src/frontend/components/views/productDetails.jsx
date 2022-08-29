@@ -165,7 +165,11 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
   switch (detailName) {
     case 'name':
     case 'category': {
-      return <PEVParagraph className={extras.className}>{detailValue}</PEVParagraph>;
+      return (
+        <PEVParagraph className={extras.className} data-cy={`label:product-detail__${detailName}`}>
+          {detailValue}
+        </PEVParagraph>
+      );
     }
 
     // TODO: create price component, which will handle things like promotion and will format price according to locale and/or chosen currency
@@ -303,7 +307,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
                   TODO: ProductCard component in this case will not have full product info, 
                   so it has to somehow fetch it on its own
                 */}
-                <ProductCard product={relatedProduct} />
+                <ProductCard product={relatedProduct} entryNo={index} />
               </ListItem>
             );
           })}

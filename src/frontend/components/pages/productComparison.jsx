@@ -96,7 +96,9 @@ export default function Compare() {
       <header ref={scrollerBtnsParentRef} className="product-comparison__header">
         <PEVHeading level={3}>
           {translations.productsAmountLabelPrefix}{' '}
-          <output id="comparedProductsListCounter">{comparisonData.comparableProductsData.length}</output>{' '}
+          <output id="comparedProductsListCounter" data-cy="label:product-comparison__header-counter">
+            {comparisonData.comparableProductsData.length}
+          </output>{' '}
           {translations.productsAmountLabelSuffix}
         </PEVHeading>
       </header>
