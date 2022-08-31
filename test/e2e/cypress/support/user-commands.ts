@@ -2,6 +2,7 @@ import { cy, Cypress, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import type { TE2E } from '@src/types';
 import type { IUserPublic } from '@database/models/_user';
+import { makeCyDataSelector } from '../synchronous-helpers';
 
 const userAPIReq = (urlSuffix: string, method: string, payload: unknown, canFail = true) => {
   if (!urlSuffix || !method || !payload) {
@@ -26,15 +27,15 @@ Cypress.Commands.add('registerTestUserByUI', ({ login, email }) => {
   const password = 'test password';
 
   cy.visit(ROUTES.REGISTER);
-  cy.get('[data-cy="input:register-login"]').type(login);
-  cy.get('[data-cy="input:register-password"]').type(password);
-  cy.get('[data-cy="input:register-repeated-password"]').type(password);
-  cy.get('[data-cy="input:register-email"]').type(email);
-  cy.get('[data-cy="input:register-account-client-type"]').check();
-  cy.get('[data-cy="button:submit-register"]').click();
-  cy.get('[data-cy="popup:user-successfully-registered"]')
+  cy.get(makeCyDataSelector('input:register-login')).type(login);
+  cy.get(makeCyDataSelector('input:register-password')).type(password);
+  cy.get(makeCyDataSelector('input:register-repeated-password')).type(password);
+  cy.get(makeCyDataSelector('input:register-email')).type(email);
+  cy.get(makeCyDataSelector('input:register-account-client-type')).check();
+  cy.get(makeCyDataSelector('button:submit-register')).click();
+  cy.get(makeCyDataSelector('popup:user-successfully-registered'))
     .should('be.visible')
-    .find(`[data-cy="button:resend-register-email"]`)
+    .find(makeCyDataSelector(`button:resend-register-email`))
     .should('be.visible');
 });
 
@@ -49,7 +50,7 @@ Cypress.Commands.add('confirmTestUserRegistrationByUI', (email) => {
     cy.visit(`${link.pathname}${link.search}`);
     cy.wait('@confirmRegistration');
     cy.contains(
-      '[data-cy="message:registration-confirmation-succeeded-hint"]',
+      makeCyDataSelector('message:registration-confirmation-succeeded-hint'),
       'You can now click here to log in to your new account.'
     );
   });
@@ -91,8 +92,8 @@ Cypress.Commands.add('loginTestUser', (testUser, canFail) => {
 });
 
 Cypress.Commands.add('loginTestUserByUI', (testUser) => {
-  cy.get('[data-cy="input:login"]').type(testUser.login);
-  cy.get('[data-cy="input:password"]').type(testUser.password);
+  cy.get(makeCyDataSelector('input:login')).type(testUser.login);
+  cy.get(makeCyDataSelector('input:password')).type(testUser.password);
   cy.intercept('/api/users/login', (req) => {
     req.continue((res) => {
       expect(res.body.payload).to.include({
@@ -101,7 +102,7 @@ Cypress.Commands.add('loginTestUserByUI', (testUser) => {
       });
     });
   }).as('loginUser');
-  cy.get('[data-cy="button:submit-login"]').click();
+  cy.get(makeCyDataSelector('button:submit-login')).click();
   cy.wait('@loginUser');
 });
 

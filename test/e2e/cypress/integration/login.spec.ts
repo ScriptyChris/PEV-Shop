@@ -1,6 +1,7 @@
 import { cy, describe, beforeEach, it, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
+import { makeCyDataSelector } from '../synchronous-helpers';
 import * as users from '@database/populate/initial-users.json';
 
 const exampleUser = (users as TE2EUser[])[0];
@@ -11,10 +12,12 @@ describe('#login', () => {
   });
 
   it('should login to default user account', () => {
-    cy.get(`[data-cy="link:${ROUTES.LOG_IN}"]`).should('exist').click();
+    cy.get(makeCyDataSelector(`link:${ROUTES.LOG_IN}`))
+      .should('exist')
+      .click();
 
-    cy.get('[data-cy="input:login"]').type(exampleUser.login);
-    cy.get('[data-cy="input:password"]').type(exampleUser.password);
+    cy.get(makeCyDataSelector('input:login')).type(exampleUser.login);
+    cy.get(makeCyDataSelector('input:password')).type(exampleUser.password);
     cy.intercept('/api/users/login', (req) => {
       req.continue((res) => {
         expect(res.body.payload).to.include({
@@ -23,24 +26,24 @@ describe('#login', () => {
         });
       });
     });
-    cy.get('[data-cy="button:submit-login"]').click();
+    cy.get(makeCyDataSelector('button:submit-login')).click();
 
     cy.location('pathname').should('eq', ROUTES.ROOT);
-    cy.get(`[data-cy="link:${ROUTES.LOG_IN}"]`).should('not.exist');
+    cy.get(makeCyDataSelector(`link:${ROUTES.LOG_IN}`)).should('not.exist');
   });
 
   it('should handle invalid credentials case', () => {
     cy.visit(ROUTES.LOG_IN);
-    cy.get('[data-cy="input:login"]').type('non existing user');
-    cy.get('[data-cy="input:password"]').type('non existing password');
+    cy.get(makeCyDataSelector('input:login')).type('non existing user');
+    cy.get(makeCyDataSelector('input:password')).type('non existing password');
     cy.intercept('/api/users/login', (req) => {
       req.continue((res) => {
         expect(res.statusCode).to.equal(HTTP_STATUS_CODE.UNAUTHORIZED);
         expect(res.body.error).to.equal('Invalid credentials!');
       });
     });
-    cy.get('[data-cy="button:submit-login"]').click();
-    cy.get('[data-cy="popup:message"]').should('have.text', 'Sorry, but an unexpected error occured :(');
+    cy.get(makeCyDataSelector('button:submit-login')).click();
+    cy.get(makeCyDataSelector('popup:message')).should('have.text', 'Sorry, but an unexpected error occured :(');
   });
 
   it('should handle non-confirmed user account', () => {
@@ -55,15 +58,15 @@ describe('#login', () => {
     cy.get('@registerNonConfirmedUser');
 
     cy.visit(ROUTES.LOG_IN);
-    cy.get('[data-cy="input:login"]').type(TEST_USER.login);
-    cy.get('[data-cy="input:password"]').type(TEST_USER.password);
+    cy.get(makeCyDataSelector('input:login')).type(TEST_USER.login);
+    cy.get(makeCyDataSelector('input:password')).type(TEST_USER.password);
     cy.intercept('/api/users/login', (req) => {
       req.continue((res) => {
         expect(res.statusCode).to.be.eq(HTTP_STATUS_CODE.UNAUTHORIZED);
         expect(res.body.error).to.be.eq('User registration is not confirmed!');
       });
     }).as('loginNonConfirmedUser');
-    cy.get('[data-cy="button:submit-login"]').click();
+    cy.get(makeCyDataSelector('button:submit-login')).click();
     cy.wait('@loginNonConfirmedUser');
   });
 
@@ -84,14 +87,14 @@ describe('#login', () => {
       password: TEST_USER.password,
     }).then((res) => expect(res.status).to.be.eq(HTTP_STATUS_CODE.OK));
 
-    cy.get(`[data-cy="link:${ROUTES.RESET_PASSWORD}"]`).click();
-    cy.get('[data-cy="input:reset-email"]').type(TEST_USER.email);
+    cy.get(makeCyDataSelector(`link:${ROUTES.RESET_PASSWORD}`)).click();
+    cy.get(makeCyDataSelector('input:reset-email')).type(TEST_USER.email);
     cy.intercept('/api/users/reset-password', (req) => {
       req.continue((res) => {
         expect(res.body.message).to.be.eq('Password resetting process began! Check your email.');
       });
     }).as('resetPassword');
-    cy.get('[data-cy="button:submit-reset"]').should('have.text', 'Reset').click();
+    cy.get(makeCyDataSelector('button:submit-reset')).should('have.text', 'Reset').click();
     cy.wait('@resetPassword');
 
     cy.getLinkFromEmail(TEST_USER.email, 'Reset password', '/pages/set-new-password').then((link) => {
@@ -103,12 +106,12 @@ describe('#login', () => {
       }).as('setNewPassword');
       cy.visit(`${link.pathname}${link.search}`);
     });
-    cy.get('[data-cy="input:new-password"]').type(TEST_USER_NEW_PASSWORD);
-    cy.get('[data-cy="input:repeated-new-password"]').type(TEST_USER_NEW_PASSWORD);
-    cy.get('[data-cy="button:submit-new-password"]').should('have.text', 'Update password').click();
+    cy.get(makeCyDataSelector('input:new-password')).type(TEST_USER_NEW_PASSWORD);
+    cy.get(makeCyDataSelector('input:repeated-new-password')).type(TEST_USER_NEW_PASSWORD);
+    cy.get(makeCyDataSelector('button:submit-new-password')).should('have.text', 'Update password').click();
     cy.wait('@setNewPassword');
 
-    cy.get('[data-cy="button:go-to-login-from-new-password"]').should('have.text', 'Go to log in').click();
+    cy.get(makeCyDataSelector('button:go-to-login-from-new-password')).should('have.text', 'Go to log in').click();
     cy.location('pathname').should('eq', ROUTES.LOG_IN);
     cy.loginTestUser({
       login: TEST_USER.login,

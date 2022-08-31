@@ -2,6 +2,7 @@ import { cy, Cypress, it, describe, context, beforeEach, expect } from 'local-cy
 import type { IUserPublic } from '@database/models/_user';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
+import { makeCyDataSelector } from '../synchronous-helpers';
 
 const ACCOUNT_TEST_USER: TE2EUser = Object.freeze({
   login: 'account test user',
@@ -41,16 +42,16 @@ describe('#account', () => {
       },
       { name: 'Orders', url: ACCOUNT_URLS.ORDERS, dataCySection: 'section:orders' },
     ].forEach(({ name, url, dataCySection }) => {
-      cy.get('[data-cy="link:account-feature"]').contains(name).and('have.attr', 'href', url).click();
+      cy.get(makeCyDataSelector('link:account-feature')).contains(name).and('have.attr', 'href', url).click();
       cy.location('pathname').should('eq', url);
-      cy.get(`[data-cy="${dataCySection}"]`).should('be.visible');
+      cy.get(makeCyDataSelector(`${dataCySection}`)).should('be.visible');
     });
   });
 
   it('should show profile details', () => {
     goToNewUserAccount();
 
-    cy.get(`[data-cy="link:account-feature"][href="${ACCOUNT_URLS.USER_PROFILE}"]`).click();
+    cy.get(`${makeCyDataSelector('link:account-feature')}[href="${ACCOUNT_URLS.USER_PROFILE}"]`).click();
     cy.getFromStorage<IUserPublic>('userAccount').then((user) => {
       const profileDetails = [
         { header: 'login', data: user.login },
@@ -58,7 +59,7 @@ describe('#account', () => {
         // TODO: [UI] add this check when UI will render it as a list instead array
         // { header: 'observedProductsIDs', data: user.observedProductsIDs },
       ];
-      cy.get('[data-cy="section:user-profile"] tr').each(($tr, index) => {
+      cy.get(`${makeCyDataSelector('section:user-profile')} tr`).each(($tr, index) => {
         const detail = profileDetails[index];
 
         if (detail) {
@@ -118,8 +119,8 @@ describe('#account', () => {
 
       cy.contains('Security').click();
       // end all sessions
-      cy.get('[data-cy="button:logout-from-all-sessions"]').click();
-      cy.get('[data-cy="button:confirm-logging-out-from-multiple-sessions"]').click();
+      cy.get(makeCyDataSelector('button:logout-from-all-sessions')).click();
+      cy.get(makeCyDataSelector('button:confirm-logging-out-from-multiple-sessions')).click();
 
       cy.location('pathname').should('eq', ROUTES.ROOT);
       cy.getFromStorage('userAuthToken').should('eq', null);
@@ -131,17 +132,17 @@ describe('#account', () => {
 
       cy.contains('Security').click();
       // end other sessions
-      cy.get('[data-cy="button:logout-from-other-sessions"]').click();
-      cy.get('[data-cy="button:confirm-logging-out-from-multiple-sessions"]').click();
+      cy.get(makeCyDataSelector('button:logout-from-other-sessions')).click();
+      cy.get(makeCyDataSelector('button:confirm-logging-out-from-multiple-sessions')).click();
 
       cy.location('pathname').should('eq', `${ROUTES.ACCOUNT}/security`);
       cy.getFromStorage('userAuthToken').should('have.length.gte', 0);
       confirmEndedAlternativeSession();
 
-      cy.get('[data-cy="popup:message"]')
+      cy.get(makeCyDataSelector('popup:message'))
         .as('loggedOutConfirmationPopup')
         .should('have.text', 'Logged out from other sessions!');
-      cy.get('[data-cy="button:close-ended-other-sessions-confirmation"]').click();
+      cy.get(makeCyDataSelector('button:close-ended-other-sessions-confirmation')).click();
       cy.get('@loggedOutConfirmationPopup').should('not.exist');
     });
   });

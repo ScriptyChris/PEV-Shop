@@ -1,11 +1,11 @@
 import { cy, describe, beforeEach, it, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
+import { makeCyDataSelector } from '../synchronous-helpers';
 
 describe('product-comparing', () => {
   const addProductsToCandidatesList = () => {
-    const productCardSelectors = Array.from(
-      { length: 4 },
-      (_, index) => `[data-cy="container:product-card_${index}"]`
+    const productCardSelectors = Array.from({ length: 4 }, (_, index) =>
+      makeCyDataSelector(`container:product-card_${index}`)
     ).join(',');
 
     // add a few products to compare
@@ -14,8 +14,7 @@ describe('product-comparing', () => {
       .then(($productCards) => {
         const $listOfProductLabelsAndActionBarTogglerBtns = $productCards.map((_, card) =>
           card.querySelectorAll(
-            `[data-cy="label:product-card__name"],
-            [data-cy="button:toggle-action-bar"]`
+            `${makeCyDataSelector('label:product-card__name')},${makeCyDataSelector('button:toggle-action-bar')}`
           )
         );
 
@@ -25,12 +24,12 @@ describe('product-comparing', () => {
 
             cy.wrap(togglerBtn).click();
             // add product to compare
-            cy.get('[data-cy="button:add-product-to-comparison"]')
+            cy.get(makeCyDataSelector('button:add-product-to-comparison'))
               .click()
               // assert button update after removal
               .should(($btn) => expect($btn.attr('data-cy')).to.eq('button:remove-product-from-comparison'))
               // close action bar overlay
-              .closest('[data-cy="popup:product-card__actions-bar"]')
+              .closest(makeCyDataSelector('popup:product-card__actions-bar'))
               .children('[aria-hidden="true"]')
               .first()
               .click();
@@ -41,10 +40,10 @@ describe('product-comparing', () => {
       })
       // assert if added products are correct
       .then(($productLabels) => {
-        cy.get('[data-cy="counter:product-comparison-candidates__list-counter"]').should(($counter) => {
+        cy.get(makeCyDataSelector('counter:product-comparison-candidates__list-counter')).should(($counter) => {
           expect(Number($counter.text())).to.equal($productLabels.length);
         });
-        cy.get('[data-cy="label:product-comparison-candidates__list-item-name"]').should(
+        cy.get(makeCyDataSelector('label:product-comparison-candidates__list-item-name')).should(
           ($productComparisonCandidatesNameEls) => {
             expect($productLabels.length).to.equal($productComparisonCandidatesNameEls.length);
 
@@ -61,8 +60,8 @@ describe('product-comparing', () => {
 
   beforeEach(() => {
     cy.visit(ROUTES.SHOP);
-    cy.get('[data-cy="button:product-comparison-candidates__actions-clear"]').click({ force: true });
-    cy.get('[data-cy="container:product-comparison-candidates__list"]').children().should('have.length', 0);
+    cy.get(makeCyDataSelector('button:product-comparison-candidates__actions-clear')).click({ force: true });
+    cy.get(makeCyDataSelector('container:product-comparison-candidates__list')).children().should('have.length', 0);
   });
 
   it('should add products to candidates list', addProductsToCandidatesList);
@@ -71,18 +70,18 @@ describe('product-comparing', () => {
     addProductsToCandidatesList();
 
     // assert current state and prepare for removal
-    cy.get('[data-cy="container:product-comparison-candidates__list"]')
+    cy.get(makeCyDataSelector('container:product-comparison-candidates__list'))
       .children()
       .as('candidatesListChildren')
       .should('have.length', 4);
-    cy.get('[data-cy="counter:product-comparison-candidates__list-counter"]')
+    cy.get(makeCyDataSelector('counter:product-comparison-candidates__list-counter'))
       .as('candidatesCounter')
       .invoke('text')
       .should('be.equal', '4');
-    cy.get('[data-cy="button:product-comparison-candidates__list-item-remove-btn--0"]')
+    cy.get(makeCyDataSelector('button:product-comparison-candidates__list-item-remove-btn--0'))
       .as('firstCandidateRemoveBtn')
       .parent()
-      .find('[data-cy="label:product-comparison-candidates__list-item-name"]')
+      .find(makeCyDataSelector('label:product-comparison-candidates__list-item-name'))
       .first()
       .as('firstCandidateNameElement')
       .invoke('text')
@@ -103,12 +102,12 @@ describe('product-comparing', () => {
       .invoke('text')
       .then((currentFirstCandidateName) => {
         // open product's action bar
-        cy.get(`[data-cy="label:product-card__name"]:contains(${currentFirstCandidateName})`)
+        cy.get(`${makeCyDataSelector('label:product-card__name')}:contains(${currentFirstCandidateName})`)
           .closest('[data-cy^="container:product-card_"]')
-          .find('[data-cy="button:toggle-action-bar"]')
+          .find(makeCyDataSelector('button:toggle-action-bar'))
           .click();
 
-        cy.get('[data-cy="button:remove-product-from-comparison"]')
+        cy.get(makeCyDataSelector('button:remove-product-from-comparison'))
           // click to remove
           .click()
           // assert button update after removal
@@ -135,18 +134,22 @@ describe('product-comparing', () => {
 
     function assertAddingProductToComparisonViaItsPage(productIndex: number) {
       // setup state
-      cy.get('[data-cy="container:product-comparison-candidates__list"]').as('candidatesList');
+      cy.get(makeCyDataSelector('container:product-comparison-candidates__list')).as('candidatesList');
 
       // go to product page
-      cy.get(`[data-cy="container:product-card_${productIndex}"] [data-cy="label:product-card__name"]`)
-        .closest('[data-cy="link:product-card__link"]')
+      cy.get(
+        `${makeCyDataSelector(`container:product-card_${productIndex}`)} ${makeCyDataSelector(
+          'label:product-card__name'
+        )}`
+      )
+        .closest(makeCyDataSelector('link:product-card__link'))
         .click();
 
       // assert certain amount of candidates
       cy.get('@candidatesList').children().should('have.length', productIndex);
 
       // add product
-      cy.get('[data-cy="button:add-product-to-comparison"]')
+      cy.get(makeCyDataSelector('button:add-product-to-comparison'))
         .click()
         .should('have.attr', 'data-cy', 'button:remove-product-from-comparison');
 
@@ -155,14 +158,14 @@ describe('product-comparing', () => {
         .children()
         .should('have.length', productIndex + 1)
         .then(($candidatesListChildren) => {
-          cy.get('[data-cy="label:product-detail__name"]').contains(
+          cy.get(makeCyDataSelector('label:product-detail__name')).contains(
             $candidatesListChildren
               .eq(productIndex)
-              .find('[data-cy="label:product-comparison-candidates__list-item-name"]')
+              .find(makeCyDataSelector('label:product-comparison-candidates__list-item-name'))
               .text()
           );
         });
-      cy.get('[data-cy="counter:product-comparison-candidates__list-counter"]').contains(productIndex + 1);
+      cy.get(makeCyDataSelector('counter:product-comparison-candidates__list-counter')).contains(productIndex + 1);
 
       // go back to products list
       cy.get(`a[href="${ROUTES.SHOP}"]`).click();
@@ -173,8 +176,12 @@ describe('product-comparing', () => {
 
     function assertRemovingProductFromComparisonViaItsPage(productIndex: number, shouldRemoveByToggler = false) {
       // go to product page
-      cy.get(`[data-cy="container:product-card_${productIndex}"] [data-cy="label:product-card__name"]`)
-        .closest('[data-cy="link:product-card__link"]')
+      cy.get(
+        `${makeCyDataSelector(`container:product-card_${productIndex}`)} ${makeCyDataSelector(
+          'label:product-card__name'
+        )}`
+      )
+        .closest(makeCyDataSelector('link:product-card__link'))
         .click();
 
       // assert certain amount of candidates
@@ -183,14 +190,14 @@ describe('product-comparing', () => {
         .should('have.length', productIndex + 1);
 
       // prepare removal
-      cy.get('[data-cy="button:remove-product-from-comparison"]').as('togglerRemoveBtn');
-      cy.get(`[data-cy="button:product-comparison-candidates__list-item-remove-btn--${productIndex}"]`)
+      cy.get(makeCyDataSelector('button:remove-product-from-comparison')).as('togglerRemoveBtn');
+      cy.get(makeCyDataSelector(`button:product-comparison-candidates__list-item-remove-btn--${productIndex}`))
         .then(($candidateListItemRemoveBtn) => {
-          cy.get('[data-cy="label:product-detail__name"]')
+          cy.get(makeCyDataSelector('label:product-detail__name'))
             .invoke('text')
             .then((productDetailName) => {
               const $candidatesListProductLabelText = $candidateListItemRemoveBtn
-                .prev('[data-cy="label:product-comparison-candidates__list-item-name"]')
+                .prev(makeCyDataSelector('label:product-comparison-candidates__list-item-name'))
                 .text();
 
               expect($candidatesListProductLabelText).to.equal(productDetailName);
@@ -224,10 +231,10 @@ describe('product-comparing', () => {
             expect($candidatesListElements.find(`:contains(${candidatesListProductLabelText})`)).to.have.lengthOf(0);
           });
         });
-      cy.get('[data-cy="counter:product-comparison-candidates__list-counter"]').contains(productIndex);
+      cy.get(makeCyDataSelector('counter:product-comparison-candidates__list-counter')).contains(productIndex);
 
       if (!shouldRemoveByToggler) {
-        cy.get('[data-cy="button:add-product-to-comparison"]').should('exist');
+        cy.get(makeCyDataSelector('button:add-product-to-comparison')).should('exist');
       }
 
       // go back to products list
@@ -237,60 +244,63 @@ describe('product-comparing', () => {
 
   it('should show warning when user tries to compare less than two products', () => {
     // assert popup does not exist
-    cy.get('[data-cy="popup:message"]').should('not.exist');
+    cy.get(makeCyDataSelector('popup:message')).should('not.exist');
 
     // add first comparison candidate
-    cy.get('[data-cy="button:toggle-action-bar"]').first().click();
-    cy.get('[data-cy="button:add-product-to-comparison"]').click();
-    cy.get('[data-cy="popup:product-card__actions-bar"]').children('[aria-hidden="true"]').click();
+    cy.get(makeCyDataSelector('button:toggle-action-bar')).first().click();
+    cy.get(makeCyDataSelector('button:add-product-to-comparison')).click();
+    cy.get(makeCyDataSelector('popup:product-card__actions-bar')).children('[aria-hidden="true"]').click();
 
     // trigger warning popup
-    cy.get('[data-cy="link:product-comparison-candidates__actions-proceed"]').click();
-    cy.contains('[data-cy="popup:message"]', 'At least 2 products needs to be selected to do a comparison.');
-    cy.get('[data-cy="button:popup-close"]').click();
+    cy.get(makeCyDataSelector('link:product-comparison-candidates__actions-proceed')).click();
+    cy.contains(makeCyDataSelector('popup:message'), 'At least 2 products needs to be selected to do a comparison.');
+    cy.get(makeCyDataSelector('button:popup-close')).click();
 
     // add second comparison candidate
-    cy.get('[data-cy="button:toggle-action-bar"]').eq(2).click();
-    cy.get('[data-cy="button:add-product-to-comparison"]').click();
-    cy.get('[data-cy="popup:product-card__actions-bar"]').children('[aria-hidden="true"]').click();
+    cy.get(makeCyDataSelector('button:toggle-action-bar')).eq(2).click();
+    cy.get(makeCyDataSelector('button:add-product-to-comparison')).click();
+    cy.get(makeCyDataSelector('popup:product-card__actions-bar')).children('[aria-hidden="true"]').click();
 
     // assert warning popup doesn't show up
-    cy.get('[data-cy="link:product-comparison-candidates__actions-proceed"]').click();
-    cy.get('[data-cy="popup:message"]').should('not.exist');
+    cy.get(makeCyDataSelector('link:product-comparison-candidates__actions-proceed')).click();
+    cy.get(makeCyDataSelector('popup:message')).should('not.exist');
     cy.location('pathname').should('eq', ROUTES.COMPARE);
 
     // go to third product's page
     cy.get(`a[href="${ROUTES.SHOP}"]`).click();
-    cy.get('[data-cy="label:product-card__name"]').eq(3).closest('[data-cy="link:product-card__link"]').click();
+    cy.get(makeCyDataSelector('label:product-card__name'))
+      .eq(3)
+      .closest(makeCyDataSelector('link:product-card__link'))
+      .click();
 
     // cleanup comparison candidates list
-    cy.get('[data-cy="button:product-comparison-candidates__actions-clear"]').click();
+    cy.get(makeCyDataSelector('button:product-comparison-candidates__actions-clear')).click();
 
     // add third product as a single comparison candidates
-    cy.get('[data-cy="container:product-comparison-candidates__list"]')
+    cy.get(makeCyDataSelector('container:product-comparison-candidates__list'))
       .as('comparisonCandidatesList')
       .children()
       .should('not.exist');
-    cy.get('[data-cy="button:add-product-to-comparison"]').click();
+    cy.get(makeCyDataSelector('button:add-product-to-comparison')).click();
     cy.get('@comparisonCandidatesList').children().should('have.length', 1);
 
     // assert warning popup doesn't show up again
-    cy.get('[data-cy="popup:message"]').should('not.exist');
-    cy.get('[data-cy="link:product-comparison-candidates__actions-proceed"]').click();
-    cy.contains('[data-cy="popup:message"]', 'At least 2 products needs to be selected to do a comparison.');
-    cy.get('[data-cy="button:popup-close"]').click();
+    cy.get(makeCyDataSelector('popup:message')).should('not.exist');
+    cy.get(makeCyDataSelector('link:product-comparison-candidates__actions-proceed')).click();
+    cy.contains(makeCyDataSelector('popup:message'), 'At least 2 products needs to be selected to do a comparison.');
+    cy.get(makeCyDataSelector('button:popup-close')).click();
   });
 
   it('should redirect to comparison page with candidated products listed', () => {
     addProductsToCandidatesList();
 
     // confirm the comparison and redirect to it's page
-    cy.get('[data-cy="link:product-comparison-candidates__actions-proceed"]').click();
+    cy.get(makeCyDataSelector('link:product-comparison-candidates__actions-proceed')).click();
 
     // assertions
     cy.location('pathname').should('eq', ROUTES.COMPARE);
-    cy.contains('[data-cy="label:product-comparison__header-counter"]', '4');
-    cy.get('[data-cy="label:product-detail__name"]').then(($comparedProductsNameElements) => {
+    cy.contains(makeCyDataSelector('label:product-comparison__header-counter'), '4');
+    cy.get(makeCyDataSelector('label:product-detail__name')).then(($comparedProductsNameElements) => {
       const $comparedProductNames = $comparedProductsNameElements.map((_, { textContent }) => textContent);
 
       cy.get('@productLabelNames').then(($productLabelNames) =>

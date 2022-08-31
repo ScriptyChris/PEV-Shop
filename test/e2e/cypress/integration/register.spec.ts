@@ -1,6 +1,7 @@
 import { cy, describe, it, beforeEach, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
+import { makeCyDataSelector } from '../synchronous-helpers';
 
 describe('#register', () => {
   const testUsers: Pick<TE2EUser, 'login' | 'email'>[] = [
@@ -23,7 +24,9 @@ describe('#register', () => {
   });
 
   it('should register a new user', () => {
-    cy.get(`[data-cy="link:${ROUTES.REGISTER}"]`).should('exist').click();
+    cy.get(makeCyDataSelector(`link:${ROUTES.REGISTER}`))
+      .should('exist')
+      .click();
     cy.registerTestUserByUI(testUsers[0]);
     cy.confirmTestUserRegistrationByUI(testUsers[0].email);
   });
@@ -35,7 +38,7 @@ describe('#register', () => {
       });
     };
 
-    cy.get(`[data-cy="link:${ROUTES.REGISTER}"]`).click();
+    cy.get(makeCyDataSelector(`link:${ROUTES.REGISTER}`)).click();
     cy.registerTestUserByUI(testUsers[1]);
 
     expectMatchingEmailsCount(1);
@@ -45,7 +48,7 @@ describe('#register', () => {
         expect(res.body.message).to.be.eq('User account created! Check your email.');
       });
     }).as('reSendConfirmation');
-    cy.get('[data-cy="button:resend-register-email"]').should('have.text', 'Re-send email').click();
+    cy.get(makeCyDataSelector('button:resend-register-email')).should('have.text', 'Re-send email').click();
     cy.wait('@reSendConfirmation');
     expectMatchingEmailsCount(2);
   });
@@ -56,7 +59,7 @@ describe('#register', () => {
     cy.getAccountActivationLinkFromEmail(testUsers[2].email).then((link) => {
       return cy.visit(`${link.pathname}${link.search}`);
     });
-    cy.get(`[data-cy="link:${ROUTES.LOG_IN}"]`).click();
+    cy.get(makeCyDataSelector(`link:${ROUTES.LOG_IN}`)).click();
     cy.location('pathname').should('eq', ROUTES.LOG_IN);
   });
 });
