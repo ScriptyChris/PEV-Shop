@@ -29,9 +29,17 @@ const flexibleListReducer = (state, action) => ({
   [flexibleListStates[action.type]]: action.value,
 });
 
-function FlexibleList({ initialListItems = [], NewItemComponent, EditItemComponent, emitUpdatedItemsList }) {
+function FlexibleList({
+  initialListItems = [],
+  NewItemComponent,
+  EditItemComponent,
+  emitUpdatedItemsList,
+  itemsContextName,
+}) {
   if (!NewItemComponent || !EditItemComponent) {
     throw ReferenceError('NewItemComponent and EditItemComponent must be provided!');
+  } else if (!itemsContextName || typeof itemsContextName !== 'string') {
+    throw ReferenceError(`itemsContextName must be provided as string! Received: "${itemsContextName}"`);
   }
 
   const EMPTY_LIST_ITEM = '';
@@ -177,7 +185,9 @@ function FlexibleList({ initialListItems = [], NewItemComponent, EditItemCompone
                 </EditItemComponent>
               ) : (
                 <>
-                  <InputLabel component="output">{item}</InputLabel>
+                  <InputLabel component="output" data-cy={`label:${itemsContextName}__${index}`}>
+                    {item}
+                  </InputLabel>
                   <div className="flexible-list__item-btns">
                     <PEVIconButton
                       type="button"

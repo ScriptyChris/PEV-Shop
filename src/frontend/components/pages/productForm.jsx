@@ -74,6 +74,9 @@ function BaseInfo({ data: { initialData = {} } }) {
           name="name"
           identity="newProductName"
           label={translations.name}
+          inputProps={{
+            'data-cy': 'input:base__name',
+          }}
           defaultValue={initialData.name}
           required
         />
@@ -88,6 +91,7 @@ function BaseInfo({ data: { initialData = {} } }) {
           inputProps={{
             step: '0.01',
             min: '0.01',
+            'data-cy': 'input:base__price',
           }}
           defaultValue={initialData.price}
           required
@@ -127,6 +131,7 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
           />
         )}
         emitUpdatedItemsList={setShortDescriptionList}
+        itemsContextName="product-descriptions"
       />
 
       <input {...formikField} type="hidden" />
@@ -335,7 +340,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
                 size="small"
                 name={BASE_NAME}
                 type={spec.fieldType}
-                inputProps={{ min: minValue }}
+                inputProps={{ min: minValue, 'data-cy': `input:spec__${spec.fieldName}` }}
                 id={fieldIdentifier}
                 onChange={handleChange}
                 defaultValue={
@@ -404,9 +409,11 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
           <BoundSearchSingleProductByName {...restProps} presetValue={relatedProductName} editedProductIndex={index} />
         )}
         emitUpdatedItemsList={setRelatedProductNamesList}
+        itemsContextName="related-product-names"
       />
 
       <input {...formikField} type="hidden" />
+      {/* TODO: [UX] show error when related product name was not found */}
     </PEVFieldset>
   );
 }

@@ -494,7 +494,12 @@ export default function ProductDetails({ product }) {
           }}
         />
         <PEVParagraph className="product-details__header-action-btns">
-          <PEVButton size="small" startIcon={<EditIcon />} onClick={navigateToProductModify}>
+          <PEVButton
+            size="small"
+            startIcon={<EditIcon />}
+            onClick={navigateToProductModify}
+            data-cy="button:product-details__edit-product"
+          >
             {productDetailsTranslations.editProduct}
           </PEVButton>
           <PEVButton size="small" startIcon={<DeleteIcon />} onClick={deleteProduct}>

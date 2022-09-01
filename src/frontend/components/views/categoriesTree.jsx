@@ -348,7 +348,13 @@ function CategoriesTreeFormField({ onCategorySelect, ...props }) {
       {...props}
       onCategorySelect={handleCategorySelect}
       formField={
-        <input type="text" {...props.field} className="categories-tree-form-field__proxy-input--hidden" required />
+        <input
+          type="text"
+          {...props.field}
+          className="categories-tree-form-field__proxy-input--hidden"
+          data-cy="input:category_names"
+          required
+        />
       }
     />
   );

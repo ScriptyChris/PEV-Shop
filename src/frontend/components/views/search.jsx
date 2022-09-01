@@ -81,6 +81,7 @@ const Search = memo(function Search({
             list: list,
             autoFocus: autoFocus,
             autoComplete: 'off',
+            'data-cy': 'input:the-search',
           }}
           InputProps={{
             endAdornment: customCheckbox && <InputAdornment position="end">{customCheckbox}</InputAdornment>,
