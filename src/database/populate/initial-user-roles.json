@@ -1,0 +1,12 @@
+[
+  {
+    "roleName": "client",
+    "permissions": [],
+    "owners": []
+  },
+  {
+    "roleName": "retailer",
+    "permissions": [],
+    "owners": []
+  }
+]

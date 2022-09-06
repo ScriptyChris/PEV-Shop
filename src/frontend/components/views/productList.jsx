@@ -330,7 +330,7 @@ export default function ProductList() {
           </Toolbar>
         </>
       )}
-      <List className={classNames('product-list', currentListViewModeClassName)}>
+      <List className={classNames('product-list', currentListViewModeClassName)} data-cy="list:product-list">
         {productsList.length > 0
           ? productsList.map((product, index) => (
               <ProductCard

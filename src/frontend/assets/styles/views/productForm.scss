@@ -43,12 +43,7 @@
     margin-inline: 1rem;
     align-items: center;
     align-self: stretch;
-  }
-
-  &__related-product-names {
-    li {
-      display: flex;
-    }
+    padding-block: 0;
   }
 
   &__save-btn {

@@ -4,12 +4,14 @@ const PARAMS = Object.freeze({
   JSON_FILE_PATH: {
     PRODUCTS: 'productsInputPath',
     USERS: 'usersInputPath',
+    'USER-ROLES': 'userRolesInputPath',
   },
 });
 const DEFAULT_PARAMS = Object.freeze({
   [PARAMS.CLEAN_ALL_BEFORE]: 'true',
   [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initial-products.json',
   [PARAMS.JSON_FILE_PATH.USERS]: './initial-users.json',
+  [PARAMS.JSON_FILE_PATH['USER-ROLES']]: './initial-user-roles.json',
 });
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
@@ -22,6 +24,7 @@ import getLogger from '@commons/logger';
 import { Model } from 'mongoose';
 import { ProductModel, IProduct } from '@database/models/_product';
 import { UserModel, IUser } from '@database/models/_user';
+import { UserRoleModel, IUserRole } from '@database/models/_userRole';
 import { TModelType } from '@database/models/models-index';
 import { hashPassword } from '@middleware/features/auth';
 import { connectWithDB } from '@database/connector';
@@ -88,6 +91,11 @@ const executeDBPopulation = async () => {
     await populateUsers(UserModel, usersSourceDataList);
   }
 
+  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH['USER-ROLES'])) {
+    const userRolesSourceDataList = getSourceData('User-Role');
+    await populateUserRoles(UserRoleModel, userRolesSourceDataList);
+  }
+
   const populationResults = {
     productsAmount: await ProductModel.find({}).countDocuments(),
     usersAmount: await UserModel.find({}).countDocuments(),
@@ -121,7 +129,7 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
 }
 
 function getSourceData(modelType: TModelType): TPopulatedData[] {
-  const normalizedModelType = `${modelType.toUpperCase()}S` as `${Uppercase<Exclude<TModelType, 'User-Role'>>}S`;
+  const normalizedModelType = `${modelType.toUpperCase()}S` as `${Uppercase<TModelType>}S`;
   const sourceDataPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH[normalizedModelType]);
 
   if (!sourceDataPath) {
@@ -175,6 +183,23 @@ function populateUsers(UserModel: Model<IUser>, usersSourceDataList: TPopulatedD
 
       return user.save().catch((err) => {
         logger.error('user save err:', err, ' /data:', data);
+
+        return err;
+      });
+    })
+  );
+}
+
+function populateUserRoles(
+  UserRoleModel: Model<IUserRole>,
+  userRolesSourceDataList: TPopulatedData[]
+): Promise<IUserRole[]> {
+  return Promise.all(
+    userRolesSourceDataList.map(async (data: TPopulatedData) => {
+      const userRole = new UserRoleModel(data) as IUserRole;
+
+      return userRole.save().catch((err) => {
+        logger.error('userRole save err:', err, ' /data:', data);
 
         return err;
       });

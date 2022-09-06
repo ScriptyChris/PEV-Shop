@@ -144,6 +144,11 @@ productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
 
 export const ProductModel = model<IProduct>('Product', productSchema);
 
+export type IProductPublic = Pick<
+  IProduct,
+  'name' | 'url' | 'category' | 'price' | 'shortDescription' | 'technicalSpecs' | 'relatedProductsNames'
+>;
+
 export interface IReviews extends Types.Subdocument {
   list: Record<string, string | number>[];
   averageRating: number;

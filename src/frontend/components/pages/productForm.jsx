@@ -4,6 +4,8 @@ import { Field, ErrorMessage } from 'formik';
 import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
 import SaveIcon from '@material-ui/icons/SaveOutlined';
@@ -193,6 +195,9 @@ ShortDescription.InputComponent = function InputComponent(props) {
             validateInput(value);
           }
         }}
+        inputProps={{
+          'data-cy': `input:product-descriptions__${props.editedIndex ?? 'new'}`,
+        }}
         autoFocus
         required
       />
@@ -285,79 +290,98 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
       <PEVLegend>{translations.technicalSpecs}</PEVLegend>
 
       {productCurrentSpecs.length > 0 ? (
-        productCurrentSpecs.map((spec) => {
-          const fieldIdentifier = `${spec.name
-            .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
-            .replace(/\s/g, '')}Field`;
-          const minValue = spec.fieldType === 'number' ? 0 : null;
-          const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
-          const isSpecDescriptionsArray = Array.isArray(spec.descriptions);
-          const specDefaultUnitContent = spec.defaultUnit && `(${spec.defaultUnit})`;
-          const legendOrLabelContent = `
+        <List className="pev-flex" disablePadding data-cy="list:product-technical-specs">
+          {productCurrentSpecs.map((spec) => {
+            const fieldIdentifier = `${spec.name
+              .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
+              .replace(/\s/g, '')}Field`;
+            const minValue = spec.fieldType === 'number' ? 0 : null;
+            const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
+            const isSpecDescriptionsArray = Array.isArray(spec.descriptions);
+            const specDefaultUnitContent = spec.defaultUnit && `(${spec.defaultUnit})`;
+            const legendOrLabelContent = `
             ${spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
             ${SPEC_NAMES_SEPARATORS.SPACE}
             ${specDefaultUnitContent}
           `;
 
-          if (isSpecDescriptionsArray) {
+            if (isSpecDescriptionsArray) {
+              return (
+                <ListItem className="product-form__technical-specs-controls-group" disableGutters key={fieldIdentifier}>
+                  <PEVFieldset className="product-form__technical-specs-controls-group--nested-container">
+                    <PEVLegend>{legendOrLabelContent}</PEVLegend>
+
+                    <List className="pev-flex" disablePadding>
+                      {spec.descriptions.map((specDescription, index) => {
+                        const groupFieldIdentifier = `${fieldIdentifier}${index}`;
+                        const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+                        const dataCy = `input:spec__${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+
+                        return (
+                          <ListItem
+                            className="product-form__technical-specs-controls-group pev-flex"
+                            disableGutters
+                            key={groupFieldIdentifier}
+                          >
+                            <PEVTextField
+                              name={mergedName}
+                              identity={groupFieldIdentifier}
+                              label={specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+                              type={spec.fieldType}
+                              inputProps={{ min: minValue, 'data-cy': dataCy }}
+                              defaultValue={
+                                prepareInitialDataStructure.isFilled
+                                  ? prepareInitialDataStructure.structure[mergedName]
+                                  : ''
+                              }
+                              required
+                            />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </PEVFieldset>
+                </ListItem>
+              );
+            }
+
             return (
-              <PEVFieldset
-                className="product-form__technical-specs-controls-group--nested-container pev-flex pev-flex--columned"
+              <ListItem
+                className="product-form__technical-specs-controls-group pev-flex"
+                disableGutters
                 key={fieldIdentifier}
               >
-                <PEVLegend>{legendOrLabelContent}</PEVLegend>
+                <InputLabel>{legendOrLabelContent}</InputLabel>
 
-                {spec.descriptions.map((specDescription, index) => {
-                  const groupFieldIdentifier = `${fieldIdentifier}${index}`;
-                  const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  name={BASE_NAME}
+                  type={spec.fieldType}
+                  inputProps={{ min: minValue, 'data-cy': `input:spec__${spec.fieldName}` }}
+                  id={fieldIdentifier}
+                  onChange={handleChange}
+                  defaultValue={
+                    prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
+                  }
+                  required
+                />
 
-                  return (
-                    <div className="product-form__technical-specs-controls-group pev-flex" key={groupFieldIdentifier}>
-                      <PEVTextField
-                        name={mergedName}
-                        identity={groupFieldIdentifier}
-                        label={specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-                        type={spec.fieldType}
-                        inputProps={{ min: minValue }}
-                        defaultValue={
-                          prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[mergedName] : ''
-                        }
-                        required
-                      />
-                    </div>
-                  );
-                })}
-              </PEVFieldset>
+                <ErrorMessage
+                  name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
+                  component={FormFieldError}
+                />
+              </ListItem>
             );
-          }
-
-          return (
-            <div className="product-form__technical-specs-controls-group pev-flex" key={fieldIdentifier}>
-              <InputLabel>{legendOrLabelContent}</InputLabel>
-
-              <TextField
-                variant="outlined"
-                size="small"
-                name={BASE_NAME}
-                type={spec.fieldType}
-                inputProps={{ min: minValue, 'data-cy': `input:spec__${spec.fieldName}` }}
-                id={fieldIdentifier}
-                onChange={handleChange}
-                defaultValue={
-                  prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
-                }
-                required
-              />
-
-              <ErrorMessage
-                name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
-                component={FormFieldError}
-              />
-            </div>
-          );
-        })
+          })}
+        </List>
       ) : (
-        <em className="product-form__technical-specs-category-choice-reminder">{translations.chooseCategoryFirst}</em>
+        <em
+          className="product-form__technical-specs-category-choice-reminder"
+          data-cy="label:product-technical-specs__category-choice-reminder"
+        >
+          {translations.chooseCategoryFirst}
+        </em>
       )}
     </PEVFieldset>
   );
@@ -405,8 +429,12 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
       <FlexibleList
         initialListItems={initialData[formikField.name]}
         NewItemComponent={(props) => <BoundSearchSingleProductByName {...props} />}
-        EditItemComponent={({ item: relatedProductName, index, ...restProps }) => (
-          <BoundSearchSingleProductByName {...restProps} presetValue={relatedProductName} editedProductIndex={index} />
+        EditItemComponent={({ item: relatedProductName, editedIndex, ...restProps }) => (
+          <BoundSearchSingleProductByName
+            {...restProps}
+            presetValue={relatedProductName}
+            editedProductIndex={editedIndex}
+          />
         )}
         emitUpdatedItemsList={setRelatedProductNamesList}
         itemsContextName="related-product-names"
@@ -656,6 +684,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
               className="product-form__save-btn MuiButton-outlined"
               a11y={translations.save}
               onClick={() => !formikProps.touched.category && formikProps.setFieldTouched('category')}
+              data-cy="button:product-form__save"
             >
               <SaveIcon fontSize="large" />
             </PEVButton>

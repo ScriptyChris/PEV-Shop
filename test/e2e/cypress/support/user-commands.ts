@@ -4,25 +4,6 @@ import type { TE2E } from '@src/types';
 import type { IUserPublic } from '@database/models/_user';
 import { makeCyDataSelector } from '../synchronous-helpers';
 
-const userAPIReq = (urlSuffix: string, method: string, payload: unknown, canFail = true) => {
-  if (!urlSuffix || !method || !payload) {
-    throw ReferenceError(
-      `'urlSuffix', 'method' and 'payload' must be defined! 
-          Received accordingly: '${urlSuffix}', '${method}' and '${JSON.stringify(payload)}'.`
-    );
-  }
-
-  return cy.request({
-    failOnStatusCode: canFail,
-    url: `/api/users/${urlSuffix}`,
-    method: method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-};
-
 Cypress.Commands.add('registerTestUserByUI', ({ login, email }) => {
   const password = 'test password';
 
@@ -56,8 +37,13 @@ Cypress.Commands.add('confirmTestUserRegistrationByUI', (email) => {
   });
 });
 
-Cypress.Commands.add('registerTestUser', (testUser, canFail?) => {
-  return userAPIReq('register', 'POST', testUser, canFail);
+Cypress.Commands.add('registerTestUser', (testUser, canFail) => {
+  return cy.sendAPIReq({
+    endpoint: 'users/register',
+    method: 'POST',
+    payload: testUser,
+    canFail,
+  });
 });
 
 Cypress.Commands.add('confirmTestUserRegistration', (email) => {
@@ -66,7 +52,11 @@ Cypress.Commands.add('confirmTestUserRegistration', (email) => {
     .then((link) => {
       const token = (new URLSearchParams(link.search).get('token') as string).replace(/\s/g, '+');
 
-      return userAPIReq('confirm-registration', 'POST', { token });
+      return cy.sendAPIReq({
+        endpoint: 'users/confirm-registration',
+        method: 'POST',
+        payload: { token },
+      });
     })
     .then((res) => expect(res.body.payload.isUserConfirmed).to.be.true);
 });
@@ -88,7 +78,12 @@ Cypress.Commands.add('registerAndLoginTestUser', (testUser) => {
 });
 
 Cypress.Commands.add('loginTestUser', (testUser, canFail) => {
-  return userAPIReq('login', 'POST', testUser, canFail);
+  return cy.sendAPIReq({
+    endpoint: 'users/login',
+    method: 'POST',
+    payload: testUser,
+    canFail,
+  });
 });
 
 Cypress.Commands.add('loginTestUserByUI', (testUser) => {
@@ -107,13 +102,13 @@ Cypress.Commands.add('loginTestUserByUI', (testUser) => {
 });
 
 Cypress.Commands.add('removeTestUsers', (canFail) => {
-  return userAPIReq(
-    'delete',
-    'DELETE',
-    {
+  return cy.sendAPIReq({
+    endpoint: 'users/delete',
+    method: 'DELETE',
+    payload: {
       queryType: 'regex',
       rawQuery: 'test user',
     },
-    canFail
-  );
+    canFail,
+  });
 });

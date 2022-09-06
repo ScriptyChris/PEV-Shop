@@ -12,3 +12,30 @@ Cypress.Commands.add('cleanupTestUsersAndEmails', () => {
   cy.get('@deleteEmails');
   cy.get('@removeTestUsers');
 });
+
+// TODO: remove it when `TAPIEndpointGroup` will be fixed, so type will be checked at compile time instead of runtime
+const _endpointGroups = ['users', 'products'];
+Cypress.Commands.add('sendAPIReq', ({ endpoint, method, payload, extraHeaders = {}, canFail = true }) => {
+  if (!endpoint || !method) {
+    throw ReferenceError(
+      `'endpoint', 'method' must be defined!
+        Received accordingly: '${endpoint}', '${method}'.`
+    );
+  } else if (endpoint.includes('/') && !_endpointGroups.some((group) => !endpoint.startsWith(group))) {
+    throw TypeError(
+      `endpoint containing a slash should start with either of _endpointGroups!
+      Received: "${endpoint}".`
+    );
+  }
+
+  return cy.request({
+    failOnStatusCode: canFail,
+    url: `/api/${endpoint}`,
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...extraHeaders,
+    },
+    body: payload && JSON.stringify(payload),
+  });
+});

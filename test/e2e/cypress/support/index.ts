@@ -2,7 +2,20 @@
 
 import { TMessage } from './email-commands';
 import type { TE2EUser } from '@src/types';
-import type { IUserPublic } from '@database/models/_user';
+import type { IUserPublic, IUser } from '@database/models/_user';
+import type { IProductPublic } from '@database/models/_product';
+import type { HeadersInit } from 'node-fetch';
+
+// type TAPIEndpointGroup = 'users' | 'products'; // basically any API group used in tests
+type TAPIReqOptions = {
+  // TODO: [TS] use template interpolation with `TAPIEndpointGroup` after updating TS - it errors now
+  // https://github.com/microsoft/TypeScript/issues/41651
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  payload?: any;
+  extraHeaders?: HeadersInit;
+  canFail?: boolean;
+};
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -22,11 +35,14 @@ declare global {
       loginTestUser(
         testUser: Pick<TE2EUser, 'login' | 'password'>,
         canFail?: boolean
-      ): Cypress.Chainable<Cypress.Response<IUserPublic>>;
+      ): Cypress.Chainable<Cypress.Response<IUserPublic & { authToken: NonNullable<IUser['tokens']['auth']>[number] }>>;
       loginTestUserByUI(testUser: Pick<TE2EUser, 'login' | 'password' | 'email'>): void;
       removeTestUsers(canFail?: boolean): Cypress.Chainable<Cypress.Response<void>>;
       getFromStorage<T = any>(key: string): Cypress.Chainable<T>;
       cleanupTestUsersAndEmails(): void;
+      addTestProductByAPI(productData: IProductPublic): Cypress.Chainable<any>;
+      removeTestProducts(productName: string, authToken: string): Cypress.Chainable<Cypress.Response<void>>;
+      sendAPIReq(apiReqOptions: TAPIReqOptions): Cypress.Chainable<Cypress.Response<any>>;
     }
   }
 }
@@ -34,4 +50,5 @@ declare global {
 // side effects only
 import './email-commands';
 import './user-commands';
+import './product-commands';
 import './misc-commands';

@@ -1,4 +1,4 @@
-import React, { memo, useRef, createRef, useState, useEffect, forwardRef } from 'react';
+import React, { memo, useRef, useCallback, useState, useEffect, forwardRef } from 'react';
 import classNames from 'classnames';
 
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
@@ -81,6 +81,7 @@ const Search = memo(function Search({
             list: list,
             autoFocus: autoFocus,
             autoComplete: 'off',
+            // TODO: [E2E] set more precise value
             'data-cy': 'input:the-search',
           }}
           InputProps={{
@@ -198,14 +199,18 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
 }) {
   const [searchResults, setSearchResults] = useState([]);
   const [searchRecentValues, setSearchRecentValues] = useState({ oldValue: '', newValue: '' });
-  const dataListRef = createRef();
+  const getDataListRef = useCallback(
+    async (dataListNode) => {
+      if (!dataListNode) {
+        return;
+      }
 
-  useEffect(() => {
-    (async () => {
+      const dataListChildren = dataListNode.children;
+
       if (
         searchRecentValues.newValue &&
-        dataListRef.current.children.length === 1 &&
-        dataListRef.current.children[0].value === searchRecentValues.newValue
+        dataListChildren.length === 1 &&
+        dataListChildren[0].value === searchRecentValues.newValue
       ) {
         onSelectedProductName(searchRecentValues.newValue);
       } else if (searchRecentValues.oldValue !== searchRecentValues.newValue) {
@@ -231,8 +236,9 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
 
         setSearchResults(products);
       }
-    })();
-  }, [dataListRef]);
+    },
+    [searchRecentValues, searchResults]
+  );
 
   const handleInputSearchChange = async (searchValue) => {
     setSearchRecentValues((prev) => ({ oldValue: prev.newValue, newValue: searchValue }));
@@ -242,7 +248,7 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
     <>
       <Search {...restProps} onInputChange={handleInputSearchChange} />
 
-      <datalist ref={dataListRef} id={restProps.list}>
+      <datalist ref={getDataListRef} id={restProps.list} data-cy="datalist:the-search-options">
         {searchResults.map((relatedProductName) => (
           <option key={relatedProductName} value={relatedProductName}></option>
         ))}

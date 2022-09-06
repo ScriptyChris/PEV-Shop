@@ -210,7 +210,7 @@ function Tree({
               placeholder={translations.categoriesSearchAriaLabel}
             />
 
-            <List className="rstm-tree-item-group">
+            <List className="rstm-tree-item-group" data-cy="list:categories_names">
               {items.map((props) => (
                 // TODO: [UX] use MUI here. That would probably require to get rid of whole react-simple-tree-menu module in favor of MUI's <TreeView /> component
                 <ItemComponent key={props.key} {...props} />

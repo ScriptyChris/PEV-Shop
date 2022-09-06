@@ -1,3 +1,7 @@
+.flexible-list-container {
+    align-items: stretch;
+}
+
 .flexible-list {
     list-style: disc;
 
@@ -11,10 +15,6 @@
             display: list-item;
         }
 
-        &--is-add-btn::before {
-            content: none;
-        }
-
         &--is-editable {
             list-style: none;
             margin-left: -1rem;
@@ -23,11 +23,6 @@
 
         & > :first-child {
             margin-right: auto;
-        }
-        
-        &--is-add-btn {
-            padding-bottom: 0;
-            margin-left: 0;
         }
     }
 

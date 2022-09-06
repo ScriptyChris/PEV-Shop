@@ -25,54 +25,59 @@ type TTokensKeys = keyof IUser['tokens'];
 type TDeclaredTokens = { [k in TTokensKeys]: string };
 type TSingleTokensKeys = Exclude<keyof TDeclaredTokens, 'auth'>;
 
-const userSchema = new Schema<IUser>({
-  login: {
-    type: String,
-    unique: true,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  email: {
-    // @ts-ignore
-    type: Schema.Types.Email,
-    unique: true,
-    required: true,
-  },
-  accountType: {
-    type: String,
-    required: true,
-    enum: {
-      values: ACCOUNT_TYPES,
-      message: '{VALUE} is not a proper account type!',
-    },
-  },
-  isConfirmed: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  observedProductsIDs: {
-    type: [Schema.Types.ObjectId],
-    default: undefined,
-  },
-  tokens: {
-    auth: {
-      type: [String],
-      default: undefined,
-    },
-    confirmRegistration: {
+const userSchema = new Schema<IUser>(
+  {
+    login: {
       type: String,
+      unique: true,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    email: {
+      // @ts-ignore
+      type: Schema.Types.Email,
+      unique: true,
+      required: true,
+    },
+    accountType: {
+      type: String,
+      required: true,
+      enum: {
+        values: ACCOUNT_TYPES,
+        message: '{VALUE} is not a proper account type!',
+      },
+    },
+    isConfirmed: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    observedProductsIDs: {
+      type: [Schema.Types.ObjectId],
       default: undefined,
     },
-    resetPassword: {
-      type: String,
-      default: undefined,
+    tokens: {
+      auth: {
+        type: [String],
+        default: undefined,
+      },
+      confirmRegistration: {
+        type: String,
+        default: undefined,
+      },
+      resetPassword: {
+        type: String,
+        default: undefined,
+      },
     },
   },
-});
+  {
+    toObject: { virtuals: true },
+  }
+);
 
 userSchema.virtual('roleName', {
   ref: 'User-Role',
