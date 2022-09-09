@@ -100,7 +100,6 @@ const GetControlsForSpecs = (() => {
 
     return (
       <PEVFieldset key={`spec${name}Filter`}>
-        {/* TODO: [UX] fix layout to prevent vertical overflow (especially when accordion is fully expanded) */}
         {/* TODO: [UX] accordion should rather be fully expanded by default on PC */}
         <Accordion
           onChange={(event, expanded) => {
@@ -112,7 +111,7 @@ const GetControlsForSpecs = (() => {
           }}
         >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={<ExpandMoreIcon data-cy={`button:product-filter__${name}`} />}
             aria-controls={`spec-${name}-content`}
             id={`spec-${name}-header`}
           >
@@ -176,7 +175,9 @@ const GetControlsForSpecs = (() => {
                 name: specRangeName[0],
                 value: minValue,
               }}
-              onChange={formikRestProps.handleChange}
+              overrideProps={{
+                onChange: formikRestProps.handleChange,
+              }}
             />
 
             <span className="products-filter__form-range-separator">-</span>
@@ -192,7 +193,9 @@ const GetControlsForSpecs = (() => {
                 name: specRangeName[1],
                 value: maxValue,
               }}
-              onChange={formikRestProps.handleChange}
+              overrideProps={{
+                onChange: formikRestProps.handleChange,
+              }}
             />
 
             {errorList.length > 0 &&
@@ -315,7 +318,11 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
         spec._normalizedName = spec.name.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP);
         spec._namesRangeMapping = getNameRangeMapping(spec._normalizedName, spec.descriptions);
 
-        return <GetControlsForSpecs formikRestProps={formikRestProps} spec={spec} key={spec.name} />;
+        return (
+          spec._namesRangeMapping[spec._normalizedName]?.length && (
+            <GetControlsForSpecs formikRestProps={formikRestProps} spec={spec} key={spec.name} />
+          )
+        );
       });
     },
     [productSpecsPerSelectedCategory, formInitials]
@@ -486,7 +493,11 @@ function ProductsFilter({ selectedCategories, onFiltersUpdate, doFilterProducts,
         };
 
         return (
-          <form className="products-filter__form pev-flex pev-flex--columned" onSubmit={handleSubmit}>
+          <form
+            className="products-filter__form pev-flex pev-flex--columned"
+            onSubmit={handleSubmit}
+            data-cy="container:products-filter"
+          >
             {getFormControls(formikRestProps)}
             <PEVButton
               type="button"

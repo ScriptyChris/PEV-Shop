@@ -54,8 +54,25 @@
     }
 }
 
+@include useMediaQuery(tablet) {
+    .products-filter__form-field-controls-level {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 0.75fr 1fr;
+    }
+}
+
 @include createMediaQuery(min-width, tablet) {
     .products-filter__form {
         margin-top: 1rem;
+    }
+}
+
+@include useMediaQuery(desktop) {
+    .products-filter__form {
+        margin-inline: 0;
+
+        &-field-controls-nested {
+            margin-inline-end: 0;
+        }
     }
 }

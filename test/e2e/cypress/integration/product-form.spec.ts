@@ -1,4 +1,4 @@
-import { describe, it, cy, beforeEach, context, expect } from 'local-cypress';
+import { describe, it, cy, beforeEach, context, expect, after } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
 import { HTTP_STATUS_CODE } from '@root/src/types';
@@ -52,6 +52,10 @@ describe('product-form', () => {
       authToken = res.body.authToken;
       cy.removeTestProducts(testProductDataForAPI.name, res.body.authToken);
     });
+  });
+
+  after(() => {
+    cy.removeTestProducts(testProductDataForAPI.name, authToken);
   });
 
   context('modify existing product', () => {

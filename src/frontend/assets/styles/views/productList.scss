@@ -39,6 +39,7 @@
   .product-list-container {
     display: grid;
     grid-template-columns: 1fr 3.5fr;
+    grid-template-rows: 4rem auto 4rem;
     grid-template-areas: 
       "sidebar topbar"
       "sidebar list"
@@ -71,6 +72,7 @@
 
     .product-list {
       grid-area: list;
+      height: max-content;
     }
 
     .product-list-pagination {
@@ -116,5 +118,11 @@
         background-color: #303f9f;
       }
     }
+  }
+}
+
+@include useMediaQuery(desktop) {
+  .product-list-container {
+    grid-template-columns: clamp(15rem, 25%, 17rem) auto;
   }
 }

@@ -22,13 +22,13 @@ const useFieldsetStyles = makeStyles({
 
 const FormikTextFieldForwarder = ({ field: _field, form, defaultValue, ...props }) => {
   const { value: fieldValue, ...field } = _field;
-  const { value: propsValue, ...restProps } = props;
+  const { value: propsValue, overrideProps, ...restProps } = props;
   const value = propsValue ?? fieldValue;
   const valueOrDefaultValue = {
     [defaultValue === null || defaultValue === undefined ? 'value' : 'defaultValue']: defaultValue ?? value,
   };
 
-  return <TextField {...restProps} {...field} {...valueOrDefaultValue} />;
+  return <TextField {...restProps} {...field} {...overrideProps} {...valueOrDefaultValue} />;
 };
 
 export const PEVButton = forwardRef(function PEVButton(props, ref) {

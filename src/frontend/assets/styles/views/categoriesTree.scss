@@ -28,7 +28,14 @@
 }
 
 .rstm-tree-item-group {
-  .rstm-tree-item--active {
-    background: blue;
+  .rstm-tree-item {
+    margin-block: 0.25rem;
+    
+    &--active {
+      // TODO: [UI] reuse MUI color
+      background: #3f51b5;
+      color: white;
+      border-radius: 0.25rem;
+    }
   }
 }
