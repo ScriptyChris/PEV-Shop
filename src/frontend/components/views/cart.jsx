@@ -88,7 +88,8 @@ export default observer(function Cart() {
     );
   }, []);
 
-  const handleTogglingCart = () => setIsCartOpen(!isCartOpen);
+  const handleOpenCart = () => setIsCartOpen(true);
+  const handleCloseCart = () => setIsCartOpen(false);
 
   const handleRemoveProductFromCart = ({ name, price, _id }) =>
     storeService.removeProductFromUserCartState(
@@ -105,27 +106,28 @@ export default observer(function Cart() {
 
   const handleCartSubmission = () => {
     history.push(ROUTES.ORDER);
+    handleCloseCart();
   };
 
   return (
     <>
       <PEVIconButton
         color="inherit"
-        onClick={handleTogglingCart}
+        onClick={handleOpenCart}
         a11y={translations.cartLabel}
         data-cy="button:toggle-cart"
       >
         <ShoppingCart />
       </PEVIconButton>
 
-      <Drawer anchor="right" open={isCartOpen} onClose={handleTogglingCart}>
+      <Drawer anchor="right" open={isCartOpen} onClose={handleCloseCart}>
         <section className="cart pev-flex pev-flex--columned" data-cy="container:cart">
           <header className="cart__header">
             <PEVHeading className="pev-centered-padded-text" level={3}>
               {translations.header}
             </PEVHeading>
 
-            <PEVIconButton onClick={handleTogglingCart} className="cart__back-btn" a11y={translations.goBackLabel}>
+            <PEVIconButton onClick={handleCloseCart} className="cart__back-btn" a11y={translations.goBackLabel}>
               <CloseIcon />
             </PEVIconButton>
           </header>
@@ -167,23 +169,29 @@ export default observer(function Cart() {
 
               <TableFooter>
                 <TableRow>
-                  <TableCell component="th">{translations.productsTotals}</TableCell>
-                  <TableCell>{storeService.userCartProductsCount}</TableCell>
-                  <TableCell>{storeService.userCartTotalPrice}</TableCell>
+                  <TableCell component="th">
+                    <strong>{translations.productsTotals}</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>{storeService.userCartProductsCount}</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>{storeService.userCartTotalPrice}</strong>
+                  </TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
           </TableContainer>
 
-          <div className="cart__action-buttons">
+          <footer className="cart__action-buttons">
             <PEVButton onClick={handleCartSubmission} disabled={isCartEmpty}>
               {translations.submitCart}
             </PEVButton>
             <PEVButton onClick={handleCartCleanup} disabled={isCartEmpty}>
               {translations.cleanupCart}
             </PEVButton>
-          </div>
+          </footer>
         </section>
       </Drawer>
     </>

@@ -1,0 +1,228 @@
+.order {
+    align-items: stretch;
+    flex-wrap: nowrap;
+
+    &-heading {
+        margin: 1rem;
+    }
+
+    &__form {
+        align-items: stretch;
+        flex-wrap: nowrap;
+        justify-content: normal;
+    }
+
+    &__form-submit-btn {
+        align-self: center;
+    }
+
+    &__basic-receiver-info,
+    &__shipment,
+    &__payment,
+    &__summary {
+        padding: 0.5rem;
+    }
+
+    &__shipment-tabs {
+        display: flex;
+        align-items: center;
+        --scrollable-min-height: 4.5rem;
+    }
+
+    &__shipment-tab {
+        min-width: 10rem;
+
+        &::before {
+            content: attr(data-presented-price);
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: block;
+            border: 1px solid;
+            border-radius: 0.5rem;
+            padding: 0 0.5rem;
+        }
+
+        &[aria-selected="true"]::before {
+            // TODO: [UI] set proper MUI color
+            background: #3f51b5;
+            color: white;
+            border-color: transparent;
+        }
+    }
+    
+    &__shipment--parcel-locker {
+        display: grid;
+        grid-template-areas: 
+            "parcel-name show-map-btn"
+            "parcel-address .";
+        align-items: center;
+        grid-row-gap: 1rem;
+    }
+
+    &__payment-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 8rem);
+        gap: 1rem 0.5rem;
+        justify-content: space-evenly;
+        margin-bottom: 1rem;
+    }
+}
+
+.basic-receiver-info {
+    &__legend {
+        padding-block: 1rem;
+    }
+
+    &__field {
+        margin-inline: 1rem;
+    }
+}
+
+.shipment-in-person {
+    &__address {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.basic-receiver-info,
+.shipment-home {
+    &__fieldset {
+        align-items: stretch;
+    }
+
+    &__field :nth-child(2) {
+        width: 100%;
+    }
+}
+
+.basic-receiver-info__fieldset {
+    margin-inline: 1rem;
+}
+
+.shipment-home__fieldset {
+    margin-inline: 2rem;
+}
+
+.shipment-parcel {
+    &__name {
+        grid-area: parcel-name;
+    }
+
+    &__address {
+        grid-area: parcel-address;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__show-map-btn {
+        justify-self: flex-end;
+    }
+
+    &__map-popup {
+        gap: 1rem;
+    }
+
+    &__map-close-btn {
+        justify-self: flex-start;
+        width: max-content;
+    }
+
+    &__locker-map {
+        height: 90vh;
+        border: none;
+    }
+}
+
+.payment-option {
+    &__label {
+        position: relative;
+        height: 5rem;
+        border: 1px solid;
+        border-radius: 0.5rem;
+        // TODO: [UI] set proper MUI color
+        --chosen-payment-color: #3f51b5;
+
+        &--checked {
+            background: var(--chosen-payment-color);
+            color: white;
+
+            svg {
+                fill: white;
+            }
+        }
+    }
+
+    &__input {
+        width: 100%;
+        height: 100%;
+        align-items: flex-start;
+        border-radius: inherit;
+    }
+
+    &__label-content {
+        position: absolute;
+        bottom: 0.8rem;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    &__content {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.summary {
+    border: 2px solid #3f51b5;
+
+    &__heading {
+        align-self: start;
+        padding: 1rem;
+        font-weight: bold;
+    }
+
+    &__table-container {
+        padding-inline: 2rem;
+
+        tbody {
+            th, td {
+                border: none;
+            }
+        }
+
+        tfoot {
+            th, td {
+                border-block: 1px solid;
+            }
+        }
+    }
+
+    &__total-value {
+        th, td {
+            font-size: 1.3rem;
+            padding-block: 1rem;
+        }
+    }
+}
+
+@include createMediaQuery(min-width, tablet) {
+    .basic-receiver-info,
+    .shipment-home {
+        &__field {
+            flex-direction: row;
+            flex-wrap: nowrap;
+
+            & > :first-child {
+                flex-basis: 35%;
+            }
+
+            & > :nth-child(2) {
+                flex-basis: 65%;
+                width: auto;
+            }
+        }
+    }
+}
