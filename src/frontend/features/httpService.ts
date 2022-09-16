@@ -7,7 +7,7 @@ import type {
   TServerErrorHTTPStatusCodesToData,
 } from '@middleware/helpers/middleware-response-wrapper';
 import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
-import { HTTP_STATUS_CODE, IUserCart, TPagination } from '@src/types';
+import { HTTP_STATUS_CODE, IOrder, TPagination } from '@src/types';
 
 type TResDataType<T> = T[keyof T];
 
@@ -300,8 +300,8 @@ const httpService = new (class HttpService extends Ajax {
     return this.getRequest(`${this.USERS_URL}/${userId}`, true);
   }
 
-  makeOrder(cart: IUserCart['products']) {
-    return this.postRequest(this.ORDERS_URL, { products: cart });
+  makeOrder(orderDetails: IOrder) {
+    return this.postRequest(this.ORDERS_URL, orderDetails);
   }
 
   loginUser(loginCredentials: { login: IUser['login']; password: IUser['password'] }) {

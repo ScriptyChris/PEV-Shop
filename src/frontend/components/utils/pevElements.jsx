@@ -31,12 +31,12 @@ const FormikTextFieldForwarder = ({ field: _field, form, defaultValue, ...props 
   return <TextField {...restProps} {...field} {...overrideProps} {...valueOrDefaultValue} />;
 };
 
-export const PEVButton = forwardRef(function PEVButton(props, ref) {
-  if (!props.children) {
+export const PEVButton = forwardRef(function PEVButton({ children, ...props }, ref) {
+  if (!children) {
     throw ReferenceError('`children` prop must be provided!');
   }
 
-  const a11y = props.a11y || props.children;
+  const a11y = props.a11y || children;
 
   if (typeof a11y === 'object') {
     throw TypeError('`a11y` or `children` prop must not be an object!');
@@ -44,7 +44,7 @@ export const PEVButton = forwardRef(function PEVButton(props, ref) {
 
   return (
     <Button {...props} variant={props.variant || 'outlined'} aria-label={a11y} title={a11y} ref={ref}>
-      {props.children}
+      {children}
     </Button>
   );
 });
@@ -165,7 +165,7 @@ export const PEVRadio = forwardRef(function PEVRadio(props, ref) {
 });
 
 export const PEVForm = forwardRef(function PEVForm(
-  { initialValues = {}, children, overrideRenderFn, className, ...props },
+  { initialValues = {}, children, overrideRenderFn, className, id, ...props },
   ref
 ) {
   // TODO: consider if providing `onSubmit` and `initialViews` is required or just optional
@@ -184,7 +184,11 @@ export const PEVForm = forwardRef(function PEVForm(
           return overrideRenderFn(formikProps);
         }
 
-        return <Form className={className}>{typeof children === 'function' ? children(formikProps) : children}</Form>;
+        return (
+          <Form id={id} className={className}>
+            {typeof children === 'function' ? children(formikProps) : children}
+          </Form>
+        );
       }}
     </Formik>
   );

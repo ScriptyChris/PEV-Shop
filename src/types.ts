@@ -39,6 +39,25 @@ export interface IUserCart {
   totalPrice: number;
 }
 
+export interface IOrder {
+  receiver: {
+    baseInfo: {
+      name: string;
+      email: string;
+      phone: string;
+    };
+    address: string;
+  };
+  shipmentType: 'inPerson' | 'home' | 'parcelLocker';
+  // TODO: [DX] get that from PayU API
+  paymentType: 'Cash' | 'Card' | 'Transfer' | 'BLIK';
+  products: (IUserCart['products'] & { count: number })[];
+  price: {
+    shipment: number;
+    total: number;
+  };
+}
+
 export type TPagination = { pageNumber: number; productsPerPage: number };
 
 export type TE2E = {
