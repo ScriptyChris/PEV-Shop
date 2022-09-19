@@ -8,8 +8,8 @@ import {
   PEVTextField,
   PEVFieldset,
   PEVLegend,
+  PEVFormFieldError,
 } from '@frontend/components/utils/pevElements';
-import FormFieldError from '@frontend/components/utils/formFieldError';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { ROUTES } from '@frontend/components/pages/_routes';
@@ -67,7 +67,7 @@ function PasswordField({ identity, label, error, dataCy }) {
         required
       />
 
-      {error && <FormFieldError>{error}</FormFieldError>}
+      {error && <PEVFormFieldError>{error}</PEVFormFieldError>}
     </div>
   );
 }

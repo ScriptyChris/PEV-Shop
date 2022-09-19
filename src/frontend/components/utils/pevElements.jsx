@@ -194,6 +194,11 @@ export const PEVForm = forwardRef(function PEVForm(
   );
 });
 
+// TODO: [DX] use Formik's `<ErrorMessage>` component
+export const PEVFormFieldError = ({ children, customMessage }) => {
+  return <PEVParagraph className="form-field-error">{customMessage || children}</PEVParagraph>;
+};
+
 export const PEVHeading = forwardRef(function PEVHeading({ level, children, withMargin, ...restProps }, ref) {
   const isLevelANumberBetween1And6 = typeof level === 'number' && level >= 1 && level <= 6;
 

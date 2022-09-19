@@ -21,9 +21,9 @@ import {
   PEVLegend,
   PEVParagraph,
   PEVTextField,
+  PEVFormFieldError,
 } from '@frontend/components/utils/pevElements';
 import productSpecsService from '@frontend/features/productSpecsService';
-import FormFieldError from '@frontend/components/utils/formFieldError';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
@@ -212,7 +212,7 @@ const GetControlsForSpecs = (() => {
                   <ErrorMessage
                     name={errorObj._name}
                     key={`${ariaLabelledBy}-error${index}`}
-                    component={FormFieldError}
+                    component={PEVFormFieldError}
                     customMessage={errorMessage}
                   />
                 );

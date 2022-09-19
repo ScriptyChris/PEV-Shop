@@ -17,11 +17,11 @@ import {
   PEVTextField,
   PEVFieldset,
   PEVLegend,
+  PEVFormFieldError,
 } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
-import FormFieldError from '@frontend/components/utils/formFieldError';
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
 
@@ -219,7 +219,7 @@ ShortDescription.InputComponent = function InputComponent(props) {
           },
         })}
 
-      {error && <FormFieldError>{error}</FormFieldError>}
+      {error && <PEVFormFieldError>{error}</PEVFormFieldError>}
     </>
   );
 };
@@ -244,7 +244,7 @@ function CategorySelector({
         preSelectedCategory={initialData.category}
         forceCombinedView={true}
       />
-      <ErrorMessage name="category" component={FormFieldError} />
+      <ErrorMessage name="category" component={PEVFormFieldError} />
     </PEVFieldset>
   );
 }
@@ -369,7 +369,7 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
 
                 <ErrorMessage
                   name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
-                  component={FormFieldError}
+                  component={PEVFormFieldError}
                 />
               </ListItem>
             );
@@ -796,7 +796,7 @@ const ModifyProduct = () => {
   return productData ? (
     <>
       <ProductForm initialData={productData} doSubmit={doSubmit} />
-      {modificationError && <FormFieldError>{translations.modificationError}</FormFieldError>}
+      {modificationError && <PEVFormFieldError>{translations.modificationError}</PEVFormFieldError>}
     </>
   ) : (
     translations.lackOfData

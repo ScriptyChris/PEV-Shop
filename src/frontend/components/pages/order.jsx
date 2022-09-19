@@ -36,8 +36,8 @@ import {
   PEVLegend,
   PEVTextField,
   PEVRadio,
+  PEVFormFieldError,
 } from '@frontend/components/utils/pevElements';
-import FormFieldError from '@frontend/components/utils/formFieldError';
 import Scroller from '@frontend/components/utils/scroller';
 
 const translations = Object.freeze({
@@ -324,7 +324,7 @@ function PackageShipment({ formInitialsShipmentExtender }) {
         <ParcelsMap setParcelLocker={setParcelLocker} isRendered={isMapRendered} mapOpenerSetterRef={mapOpener} />
       </div>
       {errors.receiver?.address?.parcelLocker && (
-        <FormFieldError customMessage={errors.receiver.address.parcelLocker} />
+        <PEVFormFieldError customMessage={errors.receiver.address.parcelLocker} />
       )}
     </>
   );
@@ -463,7 +463,7 @@ const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateCh
           {content}
         </TabPanel>
       ))}
-      {errors.shipmentType && <FormFieldError customMessage={errors.shipmentType} />}
+      {errors.shipmentType && <PEVFormFieldError customMessage={errors.shipmentType} />}
     </Paper>
   );
 });
