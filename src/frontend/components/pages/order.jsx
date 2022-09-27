@@ -63,11 +63,17 @@ const translations = Object.freeze({
   receiverAddress2: 'Postal code',
   receiverAddress3: 'City',
   forFree: 'free',
+  paymentMethods: {
+    cash: 'Cash',
+    card: 'Card',
+    transfer: 'Transfer',
+    blik: 'BLIK',
+  },
   productsValue: 'Products',
   shipmentValue: 'Shipment',
   totalValue: 'Total',
   makeOrder: 'Make order',
-  errorUnchosenShipmentType: 'Choose shipment type!',
+  errorUnchosenShipmentMethod: 'Choose shipment method!',
   errorUnchosenParcelLocker: 'Choose parcel locker location!',
 });
 
@@ -124,7 +130,11 @@ const ParcelsMap = memo(
         >
           {translations.closeParcelsMap}
         </PEVButton>
-        <iframe src="/embedded/shipment-map.html" className="shipment-parcel__locker-map"></iframe>
+        <iframe
+          src="/embedded/shipment-map.html"
+          className="shipment-parcel__locker-map"
+          data-cy="iframe:parcel-locker-map"
+        ></iframe>
       </Dialog>
     );
   },
@@ -298,11 +308,12 @@ function PackageShipment({ formInitialsShipmentExtender }) {
           <>
             <PEVParagraph className="shipment-parcel__name">
               <strong>
-                {translations.chosenParcelLocker}: {parcelLocker.name && <em>{parcelLocker.name}</em>}
+                {translations.chosenParcelLocker}:{' '}
+                {parcelLocker.name && <em data-cy="output:parcel-locker-name">{parcelLocker.name}</em>}
               </strong>
             </PEVParagraph>
             {parcelLocker.location && (
-              <address className="shipment-parcel__address">
+              <address className="shipment-parcel__address" data-cy="output:parcel-locker-address">
                 {parcelLocker.location.map((addressLine) => (
                   <span key={addressLine}>{addressLine}</span>
                 ))}
@@ -317,6 +328,7 @@ function PackageShipment({ formInitialsShipmentExtender }) {
           startIcon={parcelLocker ? <EditLocationIcon /> : <AddLocationIcon />}
           variant={parcelLocker ? 'outlined' : 'contained'}
           color={parcelLocker ? 'default' : 'primary'}
+          data-cy="button:shipment__parcelLocker-location-selector"
         >
           {parcelLocker ? translations.changeParcelLocker : translations.chooseParcelLocker}
         </PEVButton>
@@ -352,6 +364,7 @@ const tabsHelper = (tabsGroupName, tabsData) => {
         icon,
         shipmentPrice,
         shipmentPresentedPrice: getPresentedPrice(shipmentPrice),
+        dataCy: `button:choose-${name}-tab`,
       });
       output.tabPanels.push({
         content,
@@ -368,7 +381,7 @@ const tabsHelper = (tabsGroupName, tabsData) => {
 
 function TabPanel({ children, value, index, id, relatedTabId }) {
   return (
-    <div id={id} role="tabpanel" aria-labelledby={relatedTabId} hidden={value !== index}>
+    <div id={id} role="tabpanel" aria-labelledby={relatedTabId} hidden={value !== index} data-cy={`container:${id}`}>
       {value === index && <Box p={2}>{children}</Box>}
     </div>
   );
@@ -409,10 +422,10 @@ const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateCh
   const handleTabChange = (_, newTabValue) => {
     const tabChooser = shipmentMethods.tabChoosers[newTabValue];
 
-    setFieldValue('shipmentType', tabChooser.name);
+    setFieldValue('shipmentMethod', tabChooser.name);
     setTabValue(newTabValue);
     updateChosenShipmentPrice(tabChooser.shipmentPrice);
-    setFieldError('shipmentType', '');
+    setFieldError('shipmentMethod', '');
   };
 
   return (
@@ -437,13 +450,14 @@ const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateCh
                 textColor="primary"
                 aria-label={translations.orderShipmentChooser}
               >
-                {shipmentMethods.tabChoosers.map(({ id, icon, a11y, shipmentPresentedPrice }) => (
+                {shipmentMethods.tabChoosers.map(({ id, icon, a11y, shipmentPresentedPrice, dataCy }) => (
                   <Tab
                     className="order__shipment-tab"
                     data-presented-price={shipmentPresentedPrice}
                     icon={icon}
                     {...a11y}
                     id={id}
+                    data-cy={dataCy}
                     key={id}
                   />
                 ))}
@@ -463,7 +477,7 @@ const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateCh
           {content}
         </TabPanel>
       ))}
-      {errors.shipmentType && <PEVFormFieldError customMessage={errors.shipmentType} />}
+      {errors.shipmentMethod && <PEVFormFieldError customMessage={errors.shipmentMethod} />}
     </Paper>
   );
 });
@@ -472,17 +486,32 @@ function Payment() {
   const [chosenPayment, setChosenPayment] = useState('');
   // TODO: take it from backend
   const payments = [
-    { name: 'Cash', icon: <MonetizationOnIcon /> },
     {
-      name: 'Card',
+      name: 'cash',
+      get label() {
+        return translations.paymentMethods[this.name];
+      },
+      icon: <MonetizationOnIcon />,
+    },
+    {
+      name: 'card',
+      get label() {
+        return translations.paymentMethods[this.name];
+      },
       icon: <CreditCardIcon />,
     },
     {
-      name: 'Transfer',
+      name: 'transfer',
+      get label() {
+        return translations.paymentMethods[this.name];
+      },
       icon: <AccountBalanceIcon />,
     },
     {
-      name: 'BLIK',
+      name: 'blik',
+      get label() {
+        return translations.paymentMethods[this.name];
+      },
       icon: <div>?</div>,
     },
   ];
@@ -496,7 +525,7 @@ function Payment() {
       </header>
 
       <PEVFieldset className="order__payment-list" aria-labelledby="payment-heading">
-        {payments.map(({ name, icon }) => (
+        {payments.map(({ name, icon, label }) => (
           <InputLabel
             onChange={() => setChosenPayment(name)}
             className={classNames(`payment-option__label`, {
@@ -508,19 +537,20 @@ function Payment() {
           >
             <PEVRadio
               className="payment-option__input"
-              name="paymentType"
-              label={name}
+              name="paymentMethod"
+              label={label}
               icon={icon}
               checkedIcon={icon}
               color="primary"
               value={name}
               identity={name}
               id={name}
+              dataCy={`input:choose-${name}-payment`}
               required
               disableRipple
               noExplicitlyVisibleLabel
             />
-            <span className="payment-option__label-content">{name}</span>
+            <span className="payment-option__label-content">{label}</span>
           </InputLabel>
         ))}
       </PEVFieldset>
@@ -538,19 +568,19 @@ const useOrderFormInitials = () => {
       },
       address: '',
     },
-    shipmentType: '',
-    paymentType: '',
+    shipmentMethod: '',
+    paymentMethod: '',
   });
 
   const formInitialsExtender = {
-    shipment: (type, newAddress) => {
+    shipment: (method, newAddress) => {
       setFormInitials((prev) => ({
         ...prev,
         receiver: {
           ...prev.receiver,
           address: {
             ...prev.receiver.address,
-            [type]: newAddress,
+            [method]: newAddress,
           },
         },
       }));
@@ -570,7 +600,7 @@ export default function Order() {
       ...values,
       receiver: {
         ...values.receiver,
-        address: values.receiver.address[values.shipmentType],
+        address: values.receiver.address[values.shipmentMethod],
       },
       products: storeService.userCartProducts,
       price: {
@@ -592,11 +622,11 @@ export default function Order() {
   const handleValidate = (values) => {
     const errors = {};
 
-    if (!values.shipmentType) {
-      errors.shipmentType = translations.errorUnchosenShipmentType;
+    if (!values.shipmentMethod) {
+      errors.shipmentMethod = translations.errorUnchosenShipmentMethod;
     }
     // TODO: [DX] rather move to ParcelShipment component (and expose function), because "it should know" best how to validate itself
-    else if (values.shipmentType === 'parcelLocker') {
+    else if (values.shipmentMethod === 'parcelLocker') {
       const parcelLockerAddress = values.receiver?.address?.parcelLocker;
 
       if (
@@ -683,6 +713,7 @@ export default function Order() {
         startIcon={<ShopIcon />}
         form="order-form"
         type="submit"
+        data-cy="button:submit-order"
       >
         {translations.makeOrder}
       </PEVButton>

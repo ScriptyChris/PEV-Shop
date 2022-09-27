@@ -43,6 +43,7 @@ declare global {
       addTestProductByAPI(productData: IProductPublic): Cypress.Chainable<any>;
       removeTestProducts(productName: string, authToken: string): Cypress.Chainable<Cypress.Response<void>>;
       sendAPIReq(apiReqOptions: TAPIReqOptions): Cypress.Chainable<Cypress.Response<any>>;
+      cleanupCartState(): void;
     }
   }
 }

@@ -159,4 +159,8 @@ decorate(StoreService, {
 
 const storeService = new StoreService();
 
+if (window.Cypress) {
+  window.__E2E__.storeService = storeService;
+}
+
 export default storeService;

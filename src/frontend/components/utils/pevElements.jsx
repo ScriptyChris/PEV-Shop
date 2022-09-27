@@ -115,7 +115,7 @@ export const PEVTextField = ({ identity, label, labelInside, type = 'text', ...r
 };
 
 const PEVCheckboxOrRadio = forwardRef(function PEVCheckboxOrRadio(
-  { type, label, value, noExplicitlyVisibleLabel, identity, field, form, ...restProps },
+  { type, label, value, noExplicitlyVisibleLabel, identity, field, form, dataCy, ...restProps },
   ref
 ) {
   if (type !== 'checkbox' && type !== 'radio') {
@@ -138,6 +138,7 @@ const PEVCheckboxOrRadio = forwardRef(function PEVCheckboxOrRadio(
         inputProps={{
           'aria-label': label,
           title: label,
+          'data-cy': dataCy,
         }}
         ref={ref}
       />

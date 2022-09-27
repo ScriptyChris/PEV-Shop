@@ -1,9 +1,10 @@
 {
   "extends": "../../tsconfig.json",
+  "exclude": ["./src"],
   "include": ["./cypress/**/*.ts"],
   "compilerOptions": {
     "module": "ES2020",
-    "lib": ["es5", "ES2015", "dom"],
+    "lib": ["es5", "ES2015", "ES2020", "dom"],
     "types": ["cypress"],
     "allowJs": true,
     "resolveJsonModule": true,

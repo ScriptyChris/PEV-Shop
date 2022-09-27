@@ -185,7 +185,7 @@ export default observer(function Cart() {
           </TableContainer>
 
           <footer className="cart__action-buttons">
-            <PEVButton onClick={handleCartSubmission} disabled={isCartEmpty}>
+            <PEVButton onClick={handleCartSubmission} data-cy="button:submit-cart" disabled={isCartEmpty}>
               {translations.submitCart}
             </PEVButton>
             <PEVButton onClick={handleCartCleanup} disabled={isCartEmpty}>

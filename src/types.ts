@@ -1,3 +1,7 @@
+import userSessionService from '@frontend/features/userSessionService';
+import storageService from '@frontend/features/storageService';
+import storeService from '@frontend/features/storeService';
+
 export interface IProductInOrder {
   name: number;
   unitPrice: number;
@@ -61,9 +65,9 @@ export interface IOrder {
 export type TPagination = { pageNumber: number; productsPerPage: number };
 
 export type TE2E = {
-  [key: string]: {
-    [key: string]: (...args: any[]) => any;
-  };
+  userSessionService: typeof userSessionService;
+  storeService: typeof storeService;
+  storageService: typeof storageService;
 };
 
 export type TE2EUser = {

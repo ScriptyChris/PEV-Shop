@@ -66,14 +66,14 @@ Cypress.Commands.add('registerAndLoginTestUser', (testUser) => {
     .registerTestUser(testUser)
     .then(() => cy.confirmTestUserRegistration(testUser.email))
     .then(() => cy.window())
-    .then((win: Cypress.AUTWindow & { __E2E__: TE2E }): IUserPublic => win.__E2E__.userSessionService.logIn(testUser))
+    .then((win: Cypress.AUTWindow & { __E2E__: TE2E }) => win.__E2E__.userSessionService.logIn(testUser))
     .then((res) => {
       expect(res).to.include({
         login: testUser.login,
         email: testUser.email,
       });
 
-      return res;
+      return res as IUserPublic;
     });
 });
 

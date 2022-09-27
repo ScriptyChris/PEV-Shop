@@ -1,5 +1,6 @@
 import { cy, Cypress } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
+import type { TE2E } from '@src/types';
 
 Cypress.Commands.add('getFromStorage', (key) => {
   return cy.window().then((window) => JSON.parse(window.localStorage.getItem(key) as string));
@@ -37,5 +38,12 @@ Cypress.Commands.add('sendAPIReq', ({ endpoint, method, payload, extraHeaders = 
       ...extraHeaders,
     },
     body: payload && JSON.stringify(payload),
+  });
+});
+
+Cypress.Commands.add('cleanupCartState', () => {
+  cy.window().then((win: Cypress.AUTWindow & { __E2E__: TE2E }) => {
+    win.__E2E__.storeService.clearUserCartState();
+    win.__E2E__.storageService.userCart.remove();
   });
 });
