@@ -3,6 +3,17 @@ import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
 import { HTTP_STATUS_CODE } from '@root/src/types';
 
+function assertProductsFilterQueryParam(url: string, objectToAssertInclusion: { [key: string]: string }) {
+  const productsFilterQueryParams = Object.fromEntries(
+    new URLSearchParams(url)
+      .get('productsFilters')!
+      .split(',')
+      .map((queryParam) => queryParam.split(':'))
+  );
+
+  return expect(productsFilterQueryParams).to.include(objectToAssertInclusion);
+}
+
 describe('product-filters', () => {
   it('should find products regarding applied filters', () => {
     // prepare
@@ -13,6 +24,16 @@ describe('product-filters', () => {
       .its('length')
       .as('productsFiltersInitialAmount');
 
+    let productsFilterToCheck: string;
+    cy.intercept(/\/api\/products\?.*?productsFilters=.*/, (req) => {
+      expect(productsFilterToCheck).to.be.a('string').that.is.not.empty;
+
+      req.alias = productsFilterToCheck;
+      req.continue((res) => {
+        expect(res.statusCode).to.be.oneOf([HTTP_STATUS_CODE.OK, HTTP_STATUS_CODE.NOT_MODIFIED]);
+      });
+    });
+
     // change products category
     cy.get(makeCyDataSelector('list:categories_names')).children(':contains("Electric Scooters & eBikes")').click();
     cy.get('@productsFiltersInitialAmount').then((productsFiltersAmount) => {
@@ -21,42 +42,38 @@ describe('product-filters', () => {
 
     // apply color filter
     cy.get(makeCyDataSelector('button:product-filter__colour')).click();
-    cy.intercept('/api/products*', (req) => {
-      expect(req.url).to.contain('productsFilters=');
-      req.continue((res) => {
-        expect(res.statusCode).to.eq(HTTP_STATUS_CODE.OK);
-      });
-    }).as('productsFilterReq');
     cy.get(`${makeCyDataSelector('container:products-filter')} input[id="colour__red"]`).click();
 
-    // assert "color" filter works
-    cy.wait('@productsFilterReq');
-    cy.get(makeCyDataSelector('list:product-list')).as('filteredProductList').children().should('have.length', 4);
-    cy.get('@filteredProductList').then(($productList) => {
-      const filteredProductNames = [
-        ...$productList.find(makeCyDataSelector('label:product-card__name')).map((_, { textContent }) => textContent),
-      ];
-      expect(filteredProductNames).to.have.ordered.members([
-        'GW Monster: Pair of Shells',
-        'KS 14B: 174Wh Battery Pack',
-        'Protective Padding/Bumper Strip',
-        '18L/XL Bodyguard Protective Neoprene Covers Roll.nz',
-      ]);
-    });
+    // assert "color" filter
+    productsFilterToCheck = 'colour';
+    cy.wait('@colour')
+      .then((interception) => assertProductsFilterQueryParam(interception.request.url, { colour: 'red' }))
+      .then(() => (productsFilterToCheck = 'weight--min'));
+    cy.get(makeCyDataSelector('list:product-list'))
+      .should(($productList) => {
+        const filteredProductNames = [
+          ...$productList.find(makeCyDataSelector('label:product-card__name')).map((_, { textContent }) => textContent),
+        ];
+        expect(filteredProductNames).to.have.ordered.members([
+          'GW Monster: Pair of Shells',
+          'KS 14B: 174Wh Battery Pack',
+          'Protective Padding/Bumper Strip',
+          '18L/XL Bodyguard Protective Neoprene Covers Roll.nz',
+        ]);
+      })
+      .as('filteredProductList')
+      .children()
+      .should('have.length', 4);
 
-    // change minimum weight value filter to 1
+    // change minimum weight value filter
     cy.get(makeCyDataSelector('button:product-filter__weight')).click();
-    cy.intercept('/api/products*', (req) => {
-      expect(req.url).to.contain('productsFilters=');
-      req.continue((res) => {
-        expect(res.statusCode).to.eq(HTTP_STATUS_CODE.OK);
-      });
-    }).as('productsFilterReq');
     cy.get(`${makeCyDataSelector('container:products-filter')} input[id="weight--min"]`).type('1');
 
-    // assert "weight" filter works
-    cy.wait('@productsFilterReq');
-    cy.get('@filteredProductList').then(($productList) => {
+    // assert "weight" filter
+    cy.wait('@weight--min').then((interception) =>
+      assertProductsFilterQueryParam(interception.request.url, { 'weight--min': '1' })
+    );
+    cy.get('@filteredProductList').should(($productList) => {
       const filteredProductNames = [
         ...$productList.find(makeCyDataSelector('label:product-card__name')).map((_, { textContent }) => textContent),
       ];
