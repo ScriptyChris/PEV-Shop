@@ -9,6 +9,9 @@ npm install -g local-cypress;
 npm install -g typescript;
 npm install -g node-fetch;
 
+echo "??? typescript, cypress and local-cypress NPM package versions: $(npm ls typescript cypress local-cypress)"
+echo "??? mongo related NPM package versions: $(npm ls mongoose mongodb @types/mongoose @types/mongodb)"
+
 echo "[run-tests.sh] connecting to '$CYPRESS_BASE_URL'...";
 npx wait-on --interval 1000 --timeout 60000 "${CYPRESS_BASE_URL}";
 echo "[run-tests.sh] connection to '$CYPRESS_BASE_URL' succeeded!";
