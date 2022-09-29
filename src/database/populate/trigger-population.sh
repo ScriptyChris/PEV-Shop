@@ -6,7 +6,7 @@ call_api() {
   return $(curl -sw '%{http_code}' -o /dev/null http://pev-app:$APP_PORT/api/populate-db)
 }
 
-readonly max_attempts=15
+readonly max_attempts=30
 readonly sleep_time=1
 attempt=1
 

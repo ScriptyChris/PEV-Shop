@@ -10,7 +10,7 @@ npm install -g typescript;
 npm install -g node-fetch;
 
 echo "[run-tests.sh] connecting to '$CYPRESS_BASE_URL'...";
-npx wait-on "${CYPRESS_BASE_URL}";
+npx wait-on --interval 1000 --timeout 60000 "${CYPRESS_BASE_URL}";
 echo "[run-tests.sh] connection to '$CYPRESS_BASE_URL' succeeded!";
 
 echo "[run-tests.sh] CYPRESS_TEST_MODE: '$CYPRESS_TEST_MODE'";
