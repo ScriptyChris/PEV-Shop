@@ -36,6 +36,9 @@ async function tryToConnectWithDB(attempts = 1): Promise<Connection | Error> {
         }
 
         dbConnection = connection!;
+        dbConnection.on('error', (err) => logger.error('Connection error to DB occured!', err));
+        dbConnection.on('disconnecting', () => logger.log('Disconnecting from DB...'));
+        dbConnection.on('disconnected', () => logger.log('Disconnected from DB.'));
 
         return resolve();
       }
@@ -47,7 +50,7 @@ async function tryToConnectWithDB(attempts = 1): Promise<Connection | Error> {
       return tryToConnectWithDB(attempts + 1);
     }
 
-    logger.log('Connected to MongoDB.');
+    logger.log('Connected to MongoDB!');
 
     return dbConnection;
   });

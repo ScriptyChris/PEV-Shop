@@ -59,10 +59,14 @@ if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
 }
 
 const executeDBPopulation = async () => {
+  logger.log('executeDBPopulation() called.');
+
   const dbConnection = await connectWithDB();
 
   if (!dbConnection || dbConnection instanceof Error) {
     throw TypeError(`Database Population is not possible due to a problem with connection: \n${dbConnection}\n.`);
+  } else {
+    logger.log('`dbConnection` is ok.');
   }
 
   if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true') {
@@ -99,8 +103,10 @@ const executeDBPopulation = async () => {
   const populationResults = {
     productsAmount: await ProductModel.find({}).countDocuments(),
     usersAmount: await UserModel.find({}).countDocuments(),
+    userRolesAmount: await UserRoleModel.find({}).countDocuments(),
   };
 
+  // TODO: [DX] logging should be automated based on collections, which were actually indicated to be populated
   logger.log(
     'Population results:',
     '\n\t- products amount:',
@@ -108,7 +114,9 @@ const executeDBPopulation = async () => {
     '\n\t\t- relatedProductsErrors:',
     relatedProductsErrors,
     '\n\t- users amount:',
-    populationResults.usersAmount
+    populationResults.usersAmount,
+    '\n\t- user roles amount:',
+    populationResults.userRolesAmount
   );
 
   /*
@@ -138,7 +146,7 @@ function getSourceData(modelType: TModelType): TPopulatedData[] {
     );
   }
 
-  console.log('[getSourceData()] /sourceDataPath:', sourceDataPath);
+  logger.log('getSourceData() /sourceDataPath:', sourceDataPath);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const sourceDataFiles = require(sourceDataPath);
 
@@ -228,6 +236,7 @@ function updateRelatedProductsNames(
 function getScriptParamStringValue(paramName: string) {
   const paramValue = process.argv.find((arg: string) => arg.includes(paramName)) ?? DEFAULT_PARAMS[paramName];
 
+  // not using `logger`, because this function might be called before `logger` initialization (to resolve module aliases)
   console.log('[getScriptParamValue()] /paramName:', paramName, '/paramValue:', paramValue);
 
   return paramValue ? paramValue.split('=').pop() : '';

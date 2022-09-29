@@ -1,12 +1,12 @@
 [
   {
     "roleName": "client",
-    "permissions": [],
+    "permissions": ["buy"],
     "owners": []
   },
   {
     "roleName": "retailer",
-    "permissions": [],
+    "permissions": ["sell"],
     "owners": []
   }
 ]
