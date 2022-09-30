@@ -154,6 +154,7 @@ describe('order', () => {
       ).then(([cartProductNameElem, cartProductPriceElem]) => {
         expect(productNameElem.textContent).to.eq(cartProductNameElem.textContent);
         expect(productPriceElem.textContent).to.eq(cartProductPriceElem.textContent);
+        cy.wrap(cartProductNameElem.textContent).as('cartProductName');
       });
     });
   };
@@ -193,6 +194,13 @@ describe('order', () => {
       .check()
       .should(($input) => expect($input.prop('checked')).to.be.true);
 
+    let productIdInCart: string;
+    cy.get('@cartProductName').then((cartProductName) => {
+      cy.findProductByNameInCartStore(cartProductName as unknown as string).then(
+        (product) => (productIdInCart = product._id)
+      );
+    });
+
     // send order data
     cy.intercept('/api/orders', (req) => {
       expect(req.body).to.deep.equal({
@@ -210,7 +218,7 @@ describe('order', () => {
           {
             name: '12” x 9” Piece of Jessup Skate Grip Tape',
             price: 15,
-            _id: '62164ef6990f5d001b70a350',
+            _id: productIdInCart,
             count: 1,
           },
         ],

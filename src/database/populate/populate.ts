@@ -21,7 +21,7 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
 }
 
 import getLogger from '@commons/logger';
-import { Model } from 'mongoose';
+import { Model, Schema } from 'mongoose';
 import { ProductModel, IProduct } from '@database/models/_product';
 import { UserModel, IUser } from '@database/models/_user';
 import { UserRoleModel, IUserRole } from '@database/models/_userRole';
@@ -58,7 +58,7 @@ if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
   throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string`);
 }
 
-const executeDBPopulation = async () => {
+const executeDBPopulation = async (shouldCleanupAll = false) => {
   logger.log('executeDBPopulation() called.');
 
   const dbConnection = await connectWithDB();
@@ -69,7 +69,7 @@ const executeDBPopulation = async () => {
     logger.log('`dbConnection` is ok.');
   }
 
-  if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true') {
+  if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true' || shouldCleanupAll) {
     const removedData = await Promise.all(
       [
         { name: 'products', ctor: ProductModel },
@@ -97,6 +97,7 @@ const executeDBPopulation = async () => {
 
   if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH['USER-ROLES'])) {
     const userRolesSourceDataList = getSourceData('User-Role');
+    await prepareUserRolesJoinWithAlreadyExistingUsers(UserModel, userRolesSourceDataList);
     await populateUserRoles(UserRoleModel, userRolesSourceDataList);
   }
 
@@ -196,6 +197,22 @@ function populateUsers(UserModel: Model<IUser>, usersSourceDataList: TPopulatedD
       });
     })
   );
+}
+
+async function prepareUserRolesJoinWithAlreadyExistingUsers(
+  UserModel: Model<IUser>,
+  userRolesSourceDataList: TPopulatedData[]
+) {
+  try {
+    const usersAccountTypes = await UserModel.find({}, { _id: 1, accountType: 1 }).exec();
+
+    userRolesSourceDataList.forEach((userRole: TPopulatedData) => {
+      const roleOwners = usersAccountTypes.filter(({ accountType }) => userRole.roleName === accountType);
+      roleOwners.forEach(({ _id }) => (userRole.owners as Schema.Types.ObjectId[]).push(_id));
+    });
+  } catch (userRoleJoiningError) {
+    logger.error('userRoleJoiningError:', userRoleJoiningError);
+  }
 }
 
 function populateUserRoles(

@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 import { TMessage } from './email-commands';
-import type { TE2EUser } from '@src/types';
+import type { TE2EUser, IUserCart } from '@src/types';
 import type { IUserPublic, IUser } from '@database/models/_user';
 import type { IProductPublic } from '@database/models/_product';
 import type { HeadersInit } from 'node-fetch';
@@ -44,6 +44,7 @@ declare global {
       removeTestProducts(productName: string, authToken: string): Cypress.Chainable<Cypress.Response<void>>;
       sendAPIReq(apiReqOptions: TAPIReqOptions): Cypress.Chainable<Cypress.Response<any>>;
       cleanupCartState(): void;
+      findProductByNameInCartStore(productName: string): Cypress.Chainable<NonNullable<IUserCart['products'][number]>>;
     }
   }
 }
