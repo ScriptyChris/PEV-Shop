@@ -1,4 +1,24 @@
-import React, { createRef, useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+
+import Fade from '@material-ui/core/Fade';
+import Paper from '@material-ui/core/Paper';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+
+import { PEVIconButton } from '@frontend/components/utils/pevElements';
+
+const translations = {
+  scrollLeftBtn: 'scroll left',
+  scrollRightBtn: 'scroll right',
+};
+
+const REF_TYPE = Object.freeze({
+  HEAD: 'head',
+  BODY: 'body',
+});
+
+const SCROLL_DIRECTION = Object.freeze({ LEFT: 1, RIGHT: -1 });
 
 const getScrollBaseValue = ({ selector = '', varName = '' } = {}) => {
   if (typeof selector !== 'string' || selector.length === 0 || typeof varName !== 'string' || varName.length === 0) {
@@ -20,76 +40,109 @@ const getScrollBaseValue = ({ selector = '', varName = '' } = {}) => {
   );
 };
 
-function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, text }) {
-  return (
-    <button
-      onClick={() => handleClick(directionPointer)}
-      className={`scroller-btn ${isVisible ? 'scroller-btn--visible' : ''}`}
-      disabled={isDisabled}
-      dangerouslySetInnerHTML={{
-        __html: text,
-      }}
-    />
+const setParentHeightEqualToScrollable = (scrollableElement) => {
+  const remValueInPx = Number.parseInt(getComputedStyle(document.documentElement).fontSize) || 16;
+  const observer = new MutationObserver(() => {
+    const scrollableMinRemHeight = Math.ceil(scrollableElement.clientHeight / remValueInPx) || 3;
+
+    scrollableElement.parentNode.style.setProperty('--scrollable-min-height', `${scrollableMinRemHeight}rem`);
+  });
+  observer.observe(scrollableElement, { childList: true, subtree: true });
+
+  return observer;
+};
+
+function ScrollButton({ directionPointer, handleClick, isVisible, isDisabled, direction, portalTargetPlace }) {
+  if (direction !== 'left' && direction !== 'right') {
+    throw Error(`Property 'direction' must be either 'left' or 'right'! Received: '${direction}'.`);
+  }
+
+  const IS_LEFT = direction === 'left';
+  const TheScrollButton = (
+    <Fade in={isVisible} elevation={0}>
+      <Paper data-compare-btn-scroll-dir={direction}>
+        <PEVIconButton
+          onClick={() => handleClick(directionPointer)}
+          disabled={isDisabled}
+          a11y={IS_LEFT ? translations.scrollLeftBtn : translations.scrollRightBtn}
+        >
+          {IS_LEFT ? <ChevronLeft /> : <ChevronRight />}
+        </PEVIconButton>
+      </Paper>
+    </Fade>
   );
+
+  return portalTargetPlace?.current ? createPortal(TheScrollButton, portalTargetPlace.current) : TheScrollButton;
 }
 
-export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }) {
-  const [elementRef] = useState(createRef());
+function getScrollerHookingParent(getScrollerElementRef) {
+  return function ScrollerHookingParent({ children, ...restProps }) {
+    return (
+      <div data-scrollable-parent="true" {...restProps}>
+        {React.Children.map(children, (child) => React.cloneElement(child, { ref: getScrollerElementRef }))}
+      </div>
+    );
+  };
+}
+
+// TODO: [UX] implement swipe scroll for mobile
+// TODO: [UX] implement automatic scrolling to the currently clicked and focused list item
+export default function Scroller({ render, scrollerBaseValueMeta, forwardProps, btnsParentRef }) {
+  const scrollerElementRef = useRef();
+  const getScrollerElementRef = useCallback((scrollerNode) => {
+    if (scrollerNode) {
+      scrollerElementRef.current = scrollerNode;
+      window.addEventListener('resize', handleElementOverflow);
+      scrollerNode.addEventListener('transitionend', handleElementToParentOffsetChange);
+      scrollerNode.dataset.scrollable = 'true';
+    }
+  }, []);
   const [scrollingBtnVisible, setScrollingBtnVisible] = useState(false);
   const [leftBtnDisabled, setLeftBtnDisabled] = useState(true);
   const [rightBtnDisabled, setRightBtnDisabled] = useState(false);
   const headRowRefs = useRef([]);
   const bodyRowRefs = useRef([]);
   const resizeObserverRef = useRef(null);
-  // TODO: consider if useMemo is really needed if value is only used on first render
-  const handleInitialRender = useMemo(() => {
-    const initialRenderClassName = 'initial-render';
-
-    return {
-      on: () => elementRef.current.classList.add(initialRenderClassName),
-      off: () => {
-        elementRef.current.classList.remove(initialRenderClassName);
-        window.requestAnimationFrame(handleElementOverflow);
-      },
-    };
-  }, []);
   const [multipleRefsGetterUsed, setMultipleRefsGetterUsed] = useState(false);
-  // TODO: consider if useMemo is needed if scrollBaseValue is used just once
-  const scrollBaseValue = useMemo(() => getScrollBaseValue(scrollerBaseValueMeta), []);
-
-  const REF_TYPE = Object.freeze({
-    HEAD: 'head',
-    BODY: 'body',
-  });
+  // TODO: [DX] consider if useMemo is needed if scrollBaseValue is used just once
+  const scrollBaseValue = scrollerBaseValueMeta.useDefault
+    ? 50
+    : useMemo(() => getScrollBaseValue(scrollerBaseValueMeta), []);
   const SCROLL_VARIABLE = {
     NAME: '--scrollValue',
-    BASE_VALUE: scrollBaseValue || 15,
+    BASE_VALUE: scrollBaseValue,
     LEFT_EDGE: 0,
   };
-  const SCROLL_DIRECTION = { LEFT: 1, RIGHT: -1 };
-
-  useLayoutEffect(handleInitialRender.on, []);
 
   useEffect(() => {
-    window.addEventListener('resize', handleElementOverflow);
-    elementRef.current.addEventListener('transitionend', handleElementToParentOffsetChange);
-    elementRef.current.dataset.scrollable = 'true';
-    elementRef.current.parentNode.dataset.scrollableParent = 'true';
+    if (!scrollerElementRef.current) {
+      return;
+    }
 
-    setupResizeObserver();
-    handleInitialRender.off();
+    const scrollableSubtreeObserver = setParentHeightEqualToScrollable(scrollerElementRef.current);
 
     return () => {
       window.removeEventListener('resize', handleElementOverflow);
-      elementRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
-
-      if (multipleRefsGetterUsed) {
-        resizeObserverRef.current.disconnect();
-      }
+      scrollerElementRef.current.removeEventListener('transitionend', handleElementToParentOffsetChange);
+      scrollableSubtreeObserver.disconnect();
     };
   }, []);
 
-  useEffect(() => handleElementOverflow(), [forwardProps && forwardProps.trackedChanges]);
+  useEffect(() => {
+    if (!multipleRefsGetterUsed) {
+      return;
+    }
+
+    setupResizeObserver();
+
+    return () => resizeObserverRef.current.disconnect();
+  }, [multipleRefsGetterUsed]);
+
+  useEffect(() => {
+    if (scrollerElementRef.current) {
+      handleElementOverflow();
+    }
+  }, [forwardProps && forwardProps.trackedChanges]);
 
   const createRefGetter = (refType) => {
     return function refGetter(ref) {
@@ -116,36 +169,34 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
   };
 
   const setupResizeObserver = () => {
-    if (multipleRefsGetterUsed) {
-      if (
-        headRowRefs.current.length > 0 &&
-        bodyRowRefs.current.length > 0 &&
-        headRowRefs.current.length === bodyRowRefs.current.length
-      ) {
-        const equalizeTableHeaderRowsHeightToAssociatedBodyRows = (entries) => {
-          const refIndexes = bodyRowRefs.current
-            .map((ref) => entries.findIndex(({ target }) => target === ref))
-            .filter((refIndex) => refIndex > -1);
+    if (
+      headRowRefs.current.length > 0 &&
+      bodyRowRefs.current.length > 0 &&
+      headRowRefs.current.length === bodyRowRefs.current.length
+    ) {
+      const equalizeTableHeaderRowsHeightToAssociatedBodyRows = (entries) => {
+        const refIndexes = bodyRowRefs.current
+          .map((ref) => entries.findIndex(({ target }) => target === ref))
+          .filter((refIndex) => refIndex > -1);
 
-          refIndexes.forEach((refIndex) => {
-            headRowRefs.current[refIndex].style.height = `${bodyRowRefs.current[refIndex].clientHeight}px`;
-          });
-        };
+        refIndexes.forEach((refIndex) => {
+          headRowRefs.current[refIndex].style.height = `${bodyRowRefs.current[refIndex].clientHeight}px`;
+        });
+      };
 
-        resizeObserverRef.current = new window.ResizeObserver(equalizeTableHeaderRowsHeightToAssociatedBodyRows);
-        bodyRowRefs.current.forEach((bodyRow) => resizeObserverRef.current.observe(bodyRow));
-      } else {
-        throw Error(
-          `headRowRefs or bodyRowRefs are empty or have different sizes. headRowRefs: ${[
-            ...headRowRefs.current,
-          ]}, bodyRowRefs: ${[...bodyRowRefs.current]}`
-        );
-      }
+      resizeObserverRef.current = new window.ResizeObserver(equalizeTableHeaderRowsHeightToAssociatedBodyRows);
+      bodyRowRefs.current.forEach((bodyRow) => resizeObserverRef.current.observe(bodyRow));
+    } else {
+      throw Error(
+        `headRowRefs or bodyRowRefs are empty or have different sizes. headRowRefs: ${[
+          ...headRowRefs.current,
+        ]}, bodyRowRefs: ${[...bodyRowRefs.current]}`
+      );
     }
   };
 
   const handleElementOverflow = () => {
-    const target = elementRef.current.parentNode;
+    const target = scrollerElementRef.current.parentNode;
     const doesElementOverflow = target.clientWidth < target.scrollWidth;
 
     scrollToDirection(null, SCROLL_VARIABLE.LEFT_EDGE);
@@ -158,8 +209,9 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
   };
 
   const handleElementToParentOffsetChange = () => {
-    const { left: elementLeftOffset, right: elementRightOffset } = elementRef.current.getBoundingClientRect();
-    const { left: parentLeftOffset, right: parentRightOffset } = elementRef.current.parentNode.getBoundingClientRect();
+    const { left: elementLeftOffset, right: elementRightOffset } = scrollerElementRef.current.getBoundingClientRect();
+    const { left: parentLeftOffset, right: parentRightOffset } =
+      scrollerElementRef.current.parentNode.getBoundingClientRect();
     const leftOffsetGreaterThanParent = Math.round(elementLeftOffset) >= Math.round(parentLeftOffset);
     const rightOffsetLessThanParent = Math.round(elementRightOffset) <= Math.round(parentRightOffset);
 
@@ -169,18 +221,30 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
     if (leftOffsetGreaterThanParent) {
       scrollToDirection(null, SCROLL_VARIABLE.LEFT_EDGE);
     } else if (rightOffsetLessThanParent) {
-      const rightEdge = elementRef.current.parentNode.offsetWidth - elementRef.current.offsetWidth;
+      const rightEdge = scrollerElementRef.current.parentNode.offsetWidth - scrollerElementRef.current.offsetWidth;
       scrollToDirection(null, rightEdge);
     }
   };
 
   const scrollToDirection = (direction, value) => {
-    const oldScrollValue = Number(elementRef.current.style.getPropertyValue(SCROLL_VARIABLE.NAME));
+    const oldScrollValue = Number(scrollerElementRef.current.style.getPropertyValue(SCROLL_VARIABLE.NAME));
     const newScrollValue = oldScrollValue + SCROLL_VARIABLE.BASE_VALUE * direction;
 
     const scrollValue = direction === null ? value : newScrollValue;
 
-    elementRef.current.style.setProperty(SCROLL_VARIABLE.NAME, scrollValue);
+    scrollerElementRef.current.style.setProperty(SCROLL_VARIABLE.NAME, scrollValue);
+  };
+
+  const childRenderingArgs = {
+    ScrollerHookingParent: React.useMemo(() => getScrollerHookingParent(getScrollerElementRef), []),
+    forwardProps,
+    get multipleRefsGetter() {
+      if (!multipleRefsGetterUsed) {
+        setMultipleRefsGetterUsed(true);
+      }
+
+      return { createRefGetter, REF_TYPE };
+    },
   };
 
   return (
@@ -189,25 +253,19 @@ export default function Scroller({ render, scrollerBaseValueMeta, forwardProps }
         directionPointer={SCROLL_DIRECTION.LEFT}
         isVisible={scrollingBtnVisible}
         isDisabled={leftBtnDisabled}
-        text={'&larr;'}
+        direction="left"
+        portalTargetPlace={btnsParentRef}
         handleClick={scrollToDirection}
       />
-      {render({
-        elementRef,
-        forwardProps,
-        get multipleRefsGetter() {
-          if (!multipleRefsGetterUsed) {
-            setMultipleRefsGetterUsed(true);
-          }
 
-          return { createRefGetter, REF_TYPE };
-        },
-      })}
+      {render(childRenderingArgs)}
+
       <ScrollButton
         directionPointer={SCROLL_DIRECTION.RIGHT}
         isVisible={scrollingBtnVisible}
         isDisabled={rightBtnDisabled}
-        text={'&rarr;'}
+        direction="right"
+        portalTargetPlace={btnsParentRef}
         handleClick={scrollToDirection}
       />
     </>

@@ -1,0 +1,19 @@
+.login {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &__root-fieldset {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    &__submit-button {
+        align-self: center;
+    }
+
+    &__reset-password-hint {
+        text-align: center;
+    }
+}

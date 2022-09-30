@@ -79,6 +79,7 @@ const authMiddlewareFn = (
   };
 };
 
+// TODO: `roleName` is temporarily not used, until user roles refactoring
 const userRoleMiddlewareFn = (roleName: string): any => {
   return async (req: Request & { user: any; userPermissions: string[] }, res: Response, next: NextFunction) => {
     try {
@@ -89,7 +90,7 @@ const userRoleMiddlewareFn = (roleName: string): any => {
       // TODO: improve selecting data while populating
       await req.user.execPopulate({
         path: 'roleName',
-        match: { roleName },
+        // match: { roleName: 'retailer' },
       });
 
       req.userPermissions = req.user.roleName[0].permissions;

@@ -1,0 +1,15 @@
+.register {
+    &__root-fieldset {
+        align-items: normal;
+    }
+
+    &__account-types {
+        text-align: center;
+        margin: 1rem 2rem 0;
+    }
+
+    &__submit-button {
+        width: max-content;
+        align-self: center;
+    }
+}

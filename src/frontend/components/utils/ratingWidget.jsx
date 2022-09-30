@@ -1,21 +1,29 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 
 const RATING_NUMBER_INCREASEMENT = 0.5;
-const RATING_MAX_VALUE = 5; /* TODO: get this from API */
+const RATING_MAX_VALUE = 5; /* TODO: [DX] get this from API */
 const CLASS_NAMES = Object.freeze({
   WIDGET: 'rating-widget',
   BUTTON: 'rating-widget__btn',
   ICON: 'rating-widget__icon',
 });
 
+// TODO: [UX] refactor this to MUI's Rating component
 export default function RatingWidget({
+  isBig = false,
   presetValue = 0,
   scale = RATING_MAX_VALUE,
+  externalClassName = '',
   field: formikField,
   form: { setFieldValue } = {},
 }) {
   if (Number.parseInt(scale) !== scale) {
     throw TypeError(`'scale' prop must be an integer! Received '${scale}'`);
+  } else if (typeof presetValue !== 'number') {
+    throw TypeError(`'presetValue' prop must be a number! Received '${presetValue}'`);
+  } else if (typeof isBig !== 'boolean') {
+    throw TypeError(`'isBig' prop must be a boolean! Received '${isBig}'`);
   }
 
   const [lastActiveRatingValue, setLastActiveRatingValue] = useState(presetValue);
@@ -48,11 +56,10 @@ export default function RatingWidget({
       iconClasses.push(`${CLASS_NAMES.ICON}--odd`);
     }
 
-    if (presetValue) {
-      iconClasses.push(`${CLASS_NAMES.ICON}--small`);
-    } else {
-      iconClasses.push(`${CLASS_NAMES.ICON}--big`);
+    const smallOrBig = isBig ? 'big' : 'small';
+    iconClasses.push(`${CLASS_NAMES.ICON}--${smallOrBig}`);
 
+    if (!presetValue) {
       if (ratingValue <= lastHoverRatingValue) {
         iconClasses.push(`${CLASS_NAMES.ICON}--hover`);
       }
@@ -66,7 +73,7 @@ export default function RatingWidget({
   };
 
   return (
-    <div className={CLASS_NAMES.WIDGET}>
+    <div className={classNames(CLASS_NAMES.WIDGET, externalClassName)}>
       {ratingValues.map((ratingValue, index) => {
         const { iconClasses, btnEventHandlers } = getRatingsMetadata(ratingValue, index);
 

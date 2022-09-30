@@ -67,6 +67,10 @@ Cypress.Commands.add('getLinkFromEmail', (receiver, subject, linkSelectorMatcher
     .then((emailContent) => getLinkFromEmailContent(emailContent, linkSelectorMatcher));
 });
 
+Cypress.Commands.add('getAccountActivationLinkFromEmail', (receiver) => {
+  return cy.getLinkFromEmail(receiver, 'Account activation', '/pages/confirm-registration');
+});
+
 export type TMessage = {
   Content: {
     Headers: {

@@ -1,8 +1,9 @@
 require('dotenv').config();
 
+const { DefinePlugin } = require('webpack');
 const { resolve } = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const preparedModulePathsAliases = require('./commons/moduleAliasesResolvers').frontend();
@@ -10,7 +11,8 @@ const preparedModulePathsAliases = require('./commons/moduleAliasesResolvers').f
 module.exports = (env) => {
   // TODO: handle it in better way
   process.env.NODE_ENV = env;
-  const middleware = env === 'development' ? require('./dist/src/middleware/middleware-index').default : () => {};
+  const IS_DEVELOPMENT_MODE = env === 'development';
+  const middleware = IS_DEVELOPMENT_MODE ? require('./dist/src/middleware/middleware-index').default : () => {};
 
   return {
     mode: env,
@@ -32,12 +34,14 @@ module.exports = (env) => {
         {
           test: /\.scss$/,
           use: [
-            {
-              loader: MiniCssExtractPlugin.loader,
-              options: {
-                hmr: env === 'development',
-              },
-            },
+            /* TODO: [build code redundancy] find a way for MUI to pre-export it's styles to external CSS */
+            // {
+            //   loader: MiniCssExtractPlugin.loader,
+            //   options: {
+            //     hmr: IS_DEVELOPMENT_MODE,
+            //   },
+            // },
+            'style-loader',
             'css-loader',
             'sass-loader',
           ],
@@ -45,15 +49,19 @@ module.exports = (env) => {
       ],
     },
     plugins: [
+      new DefinePlugin({
+        __IS_DEV_MODE__: JSON.stringify(IS_DEVELOPMENT_MODE)
+      }),
       new ForkTsCheckerWebpackPlugin({
         typescript: {
           configFile: 'tsconfig.frontend.json',
         },
       }),
-      new MiniCssExtractPlugin({
-        filename: 'styles.css',
-        chunkFilename: '[id].css',
-      }),
+      /* TODO: [refactor] improve MUI integration regarding attaching CSS */
+      // new MiniCssExtractPlugin({
+      //   filename: 'styles.css',
+      //   chunkFilename: '[id].css',
+      // }),
       new HtmlWebpackPlugin({
         template: './src/frontend/index.html',
       }),

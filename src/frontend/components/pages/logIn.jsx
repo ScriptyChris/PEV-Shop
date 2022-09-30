@@ -1,7 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
+
+import {
+  PEVForm,
+  PEVButton,
+  PEVLink,
+  PEVParagraph,
+  PEVHeading,
+  PEVTextField,
+  PEVFieldset,
+  PEVLegend,
+} from '@frontend/components/utils/pevElements';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from './_routes';
+import { PasswordField } from '@frontend/components/views/password';
 
 const translations = Object.freeze({
   logInHeader: 'Login to shop',
@@ -13,22 +25,14 @@ const translations = Object.freeze({
 });
 
 export default function LogIn() {
-  const [userLogin, setUserLogin] = useState('');
-  const [userPassword, setUserPassword] = useState('');
+  const formInitials = {
+    login: '',
+    password: '',
+  };
   const history = useHistory();
 
-  const onInputChange = ({ target }) => {
-    if (target.id === 'login') {
-      setUserLogin(target.value);
-    } else if (target.id === 'password') {
-      setUserPassword(target.value);
-    }
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    userSessionService.logIn({ login: userLogin, password: userPassword }).then((res) => {
+  const onSubmitHandler = (values) => {
+    userSessionService.logIn(values).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
@@ -42,46 +46,31 @@ export default function LogIn() {
   };
 
   return (
-    <section>
-      {/* TODO: [REFACTOR] use <Formik /> */}
-      <form onSubmit={handleSubmit}>
-        <fieldset>
-          <legend>
-            <h2>{translations.logInHeader}</h2>
-          </legend>
+    <section className="login pev-fixed-container">
+      <PEVForm onSubmit={onSubmitHandler} validateOnChange={false} initialValues={formInitials}>
+        <PEVFieldset className="login__root-fieldset">
+          <PEVLegend className="pev-centered-padded-text">
+            <PEVHeading level={2}>{translations.logInHeader}</PEVHeading>
+          </PEVLegend>
 
-          <div>
-            <label htmlFor="login">{translations.logInField}</label>
-            <input id="login" type="text" value={userLogin} onChange={onInputChange} required data-cy="input:login" />
+          <div className="pev-flex">
+            <PEVTextField identity="login" label={translations.logInField} required data-cy="input:login" />
           </div>
 
-          {/* TODO: [REFACTOR] use `recoverAccount.PasswordField` component */}
-          <div>
-            <label htmlFor="password">{translations.passwordField}</label>
-            <input
-              id="password"
-              type="password"
-              value={userPassword}
-              onChange={onInputChange}
-              minLength="8"
-              maxLength="20"
-              required
-              data-cy="input:password"
-            />
-          </div>
+          <PasswordField identity="password" label={translations.passwordField} dataCy="input:password" />
 
-          <button type="submit" data-cy="button:submit-login">
+          <PEVButton className="login__submit-button" size="small" type="submit" data-cy="button:submit-login">
             {translations.submitLogIn}
-          </button>
-        </fieldset>
-      </form>
+          </PEVButton>
+        </PEVFieldset>
+      </PEVForm>
 
-      <div>
-        <p>{translations.resetPasswordHint}</p>
-        <Link to={ROUTES.RESET_PASSWORD} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
-          {translations.resetPasswordLink}
-        </Link>
-      </div>
+      <PEVParagraph className="login__reset-password-hint">
+        {translations.resetPasswordHint}{' '}
+        <PEVLink to={ROUTES.RESET_PASSWORD} data-cy={`link:${ROUTES.RESET_PASSWORD}`}>
+          <em>{translations.resetPasswordLink}</em>
+        </PEVLink>
+      </PEVParagraph>
 
       {/* TODO: [UX] if User account is not confirmed, show an info with hint to re-send activation email */}
       {/* TODO: [UX] if User credentials are invalid, show regarding info instead of redirecting to /account  */}

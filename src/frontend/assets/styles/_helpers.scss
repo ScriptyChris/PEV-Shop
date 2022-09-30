@@ -1,0 +1,31 @@
+.pev-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    &--columned {
+        flex-direction: column;
+    }
+}
+
+.pev-fixed-container {
+    max-width: getBreakpointPXValue(tablet);
+    margin-inline: 1rem;
+}
+
+@include createMediaQuery(min-width, fixed-container) {
+    .pev-fixed-container {
+        margin-inline: auto;
+    }
+}
+
+.pev-centered-padded-text {
+    text-align: center;
+    padding: 1rem;
+}
+
+.pev-form-field-error {
+    color: red;
+}

@@ -51,7 +51,7 @@ const middleware = (app: Application): void => {
 
 if (process.env.BACKEND_ONLY === 'true') {
   if (!existsSync(getFrontendPath())) {
-    console.error(`App's frontend is not available! Build it first.`);
+    logger.error(`App's frontend is not available! Build it first.`);
   }
 
   wrappedMiddleware();
@@ -69,7 +69,7 @@ function wrappedMiddleware(): void {
 
   // TODO: [REFACTOR] this probably should detect what resource the URL wants and maybe not always return index.html
   app.use('/', (req: Request, res: Response) => {
-    console.log('global (404?) req.url:', req.url);
+    logger.log('global (404?) req.url:', req.url);
 
     return res.sendFile(`${frontendPath}/index.html`);
   });
@@ -84,7 +84,7 @@ function getDatabaseReadinessHandler() {
   return async function handleDatabaseReadiness(req: Request, res: Response, next: NextFunction) {
     if (!isDatabaseReady) {
       isDatabaseReady = await getPopulationState();
-      console.log('[handleDatabaseReadiness()] isDatabaseReady:', isDatabaseReady);
+      logger.log('handleDatabaseReadiness() isDatabaseReady:', isDatabaseReady);
 
       if (isDatabaseReady) {
         return next();

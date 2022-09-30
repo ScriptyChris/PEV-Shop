@@ -1,25 +1,111 @@
 .account {
-    &__menu {
-        display: grid;
-        grid-template-columns: 1fr 3fr;
+    display: grid;
+    grid-template-rows: 3rem auto auto;
 
-        &-nav {
-            justify-self: center;
+    &__header {
+        align-self: center;
+        justify-self: center;
+    }
+
+    &__menu-nav {
+        display: flex;
+        align-items: flex-start;
+        border-block: 1px solid lightgrey;
+    }
+
+    &__menu-nav-list {
+        display: flex;
+
+        .activeClassName {
+            background: green;
+        }
+    }
+
+    &__menu-tab-profile-table-container {
+        tbody {
+            display: flex;
+            flex-direction: column;
+        }
+
+        tr {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            word-break: break-all;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        &-edit-btn {
+            align-self: center;
+        }
+    }
+
+    &__menu-tab {
+        align-items: normal;
+
+        &-logout-from-sessions {
+            justify-content: space-evenly;
+        }
+
+        &-observed-products-list {
             list-style: none;
 
-            .activeClassName {
-                background: green;
+            &-item-summary > div {
+                align-items: center;
             }
         }
 
-        &-tab {
-            &.observed-products-list {
-                list-style: none;
+        &-divider {
+            margin-inline: 1rem;
+        }
+
+        button {
+            align-self: center;
+        }
+    }
+}
+
+@include createMediaQuery(min-width, tablet) {
+    .account {
+        grid-template-areas:
+            "nav header"
+            "nav tab";
+        grid-template-columns: 1fr 3fr;
+        grid-column-gap: 2rem;
+
+        &__header {
+            grid-area: header;
+        }
+
+        &__menu-nav {
+            grid-area: nav;
+            border-block: none;
+        }
+
+        &__menu-nav-list {
+            flex-direction: column;
+
+            li {
+                padding: 0;
             }
 
-            &.logout-from-sessions {
-                display: flex;
-                justify-content: space-around;
+            a {
+                width: 100%;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        &__menu-tabs {
+            padding-bottom: 1rem;
+        }
+
+        &__menu-tab {
+            grid-area: tab;
+
+            &-observed-products-list li {
+                gap: 1rem;
             }
         }
     }

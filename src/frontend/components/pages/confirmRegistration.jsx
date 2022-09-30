@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import httpService from '@frontend/features/httpService';
 import { ROUTES } from './_routes';
+
+import { PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/pevElements';
 
 const translations = Object.freeze({
   header: 'Registration confirmation',
@@ -10,7 +12,15 @@ const translations = Object.freeze({
   waitingIndicator: '...',
   succeededIndicator: 'confirmed :)',
   failedIndicator: 'failed :(',
-  succeededHint: 'You can now log in to your new account.',
+  succeededHint: (
+    <>
+      You can now{' '}
+      <PEVLink to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
+        click here
+      </PEVLink>{' '}
+      to log in to your new account.
+    </>
+  ),
   failedHint: `
     Provided token is invalid or has expired! 
     Please, ensure you used the exact token from received email or try to register again.
@@ -38,7 +48,6 @@ const REG_CONFIRM_STATES = Object.freeze({
 });
 
 export default function ConfirmRegistration() {
-  const history = useHistory();
   const { search: searchParam } = useLocation();
   const [regConfirmStatus, setRegConfirmStatus] = useState(REG_CONFIRM_STATUS.WAITING);
 
@@ -57,25 +66,22 @@ export default function ConfirmRegistration() {
     }
   }, []);
 
-  const logIn = () => history.push(ROUTES.LOG_IN);
-
   return (
-    <section>
-      <h2>{translations.header}</h2>
+    <section className="pev-flex pev-flex--columned">
+      <PEVHeading level={2} withMargin>
+        {translations.header}
+      </PEVHeading>
 
-      <p>
-        {translations.status}: {REG_CONFIRM_STATES[regConfirmStatus].INDICATOR}
-      </p>
+      <PEVParagraph>
+        {translations.status}: <strong>{REG_CONFIRM_STATES[regConfirmStatus].INDICATOR}</strong>
+      </PEVParagraph>
 
       {regConfirmStatus === REG_CONFIRM_STATUS.SUCCEEDED && (
-        <>
-          <p data-cy="message:registration-confirmation-succeeded-hint">{REG_CONFIRM_STATES.SUCCEEDED.HINT}</p>
-          <button onClick={logIn} data-cy="button:log-in-after-confirmed-registration">
-            {translations.logIn}
-          </button>
-        </>
+        <PEVParagraph data-cy="message:registration-confirmation-succeeded-hint">
+          {REG_CONFIRM_STATES.SUCCEEDED.HINT}
+        </PEVParagraph>
       )}
-      {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <p>{REG_CONFIRM_STATES.FAILED.HINT}</p>}
+      {regConfirmStatus === REG_CONFIRM_STATUS.FAILED && <PEVParagraph>{REG_CONFIRM_STATES.FAILED.HINT}</PEVParagraph>}
     </section>
   );
 }

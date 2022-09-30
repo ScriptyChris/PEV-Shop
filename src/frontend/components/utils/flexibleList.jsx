@@ -1,30 +1,82 @@
 import React, { useState, useEffect, useReducer, useMemo } from 'react';
+import classNames from 'classnames';
+
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import InputLabel from '@material-ui/core/InputLabel';
+import AddIcon from '@material-ui/icons/AddCircleOutline';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
+import DoneIcon from '@material-ui/icons/Done';
+
+import { PEVIconButton } from '@frontend/components/utils/pevElements';
 
 const translations = {
   add: 'Add',
+  confirm: 'Confirm',
   edit: 'Edit',
   delete: 'Delete',
   cancel: 'Cancel',
 };
 
-const flexibleListReducer = (state, action) => ({
-  ...state,
-  [flexibleListStates[action.type]]: action.value,
-});
 const flexibleListStates = Object.freeze({
   ADD_BTN_VISIBILITY: 'ADD_BTN_VISIBILITY',
   EDITING_INDEX: 'EDITING_INDEX',
 });
+const flexibleListReducer = (state, action) => ({
+  ...state,
+  [flexibleListStates[action.type]]: action.value,
+});
 
-function FlexibleList({ initialListItems = [], newItemComponent, editItemComponent, emitUpdatedItemsList }) {
-  if (!newItemComponent || !editItemComponent) {
-    throw ReferenceError('newItemComponent, editItemComponent and renderInput must be provided!');
+const getConfirmAndCancelButtons = (itemsContextName, features, indexOrNew = 'new') => {
+  return function ConfirmAndCancelButtons({ inputItemRef = {}, onConfirmBtnClick, isConfirmBtnDisabled } = {}) {
+    return (
+      <>
+        {inputItemRef.current && (
+          <PEVIconButton
+            className="MuiButton-outlined"
+            type="button"
+            a11y={translations.confirm}
+            onClick={onConfirmBtnClick}
+            disabled={isConfirmBtnDisabled}
+            data-cy={`button:${itemsContextName}__confirm-${indexOrNew}`}
+          >
+            <DoneIcon />
+          </PEVIconButton>
+        )}
+
+        <PEVIconButton
+          className="MuiButton-outlined"
+          type="button"
+          a11y={translations.cancel}
+          onClick={features.resetState}
+          data-cy={`button:${itemsContextName}__cancel-${indexOrNew}`}
+        >
+          <CloseIcon />
+        </PEVIconButton>
+      </>
+    );
+  };
+};
+
+const EMPTY_LIST_ITEM = '';
+const filterOutEmptyItemFromList = (prev) => prev.filter((prevItem) => prevItem !== EMPTY_LIST_ITEM);
+
+function FlexibleList({
+  initialListItems = [],
+  NewItemComponent,
+  EditItemComponent,
+  emitUpdatedItemsList,
+  itemsContextName,
+}) {
+  if (!NewItemComponent || !EditItemComponent) {
+    throw ReferenceError('NewItemComponent and EditItemComponent must be provided!');
+  } else if (!itemsContextName || typeof itemsContextName !== 'string') {
+    throw ReferenceError(`itemsContextName must be provided as string! Received: "${itemsContextName}"`);
   }
 
-  const EMPTY_LIST_ITEM = '';
-  const [listItems, setListItems] = useState(() =>
-    initialListItems.length ? initialListItems.concat(EMPTY_LIST_ITEM) : [EMPTY_LIST_ITEM]
-  );
+  const [listItems, setListItems] = useState(initialListItems.length ? initialListItems : []);
   const [state, dispatch] = useReducer(flexibleListReducer, {
     [flexibleListStates.ADD_BTN_VISIBILITY]: true,
     [flexibleListStates.EDITING_INDEX]: -1,
@@ -40,17 +92,20 @@ function FlexibleList({ initialListItems = [], newItemComponent, editItemCompone
     const resetState = () => {
       dispatchers.showAddBtn();
       dispatchers.cancelEditing();
+      setListItems(filterOutEmptyItemFromList);
     };
 
     return {
       prepareAddItem() {
         dispatchers.cancelEditing();
         dispatchers.hideAddBtn();
+        setListItems((prev) => [...prev, EMPTY_LIST_ITEM]);
       },
 
       prepareEditItem(index) {
         dispatchers.showAddBtn();
         dispatchers.editIndex(index);
+        setListItems(filterOutEmptyItemFromList);
       },
 
       deleteItem(index) {
@@ -58,21 +113,15 @@ function FlexibleList({ initialListItems = [], newItemComponent, editItemCompone
       },
 
       addItem(newItem) {
-        setListItems((prev) => {
-          const prevWithoutEmptyItem = prev.filter((newItem) => newItem !== EMPTY_LIST_ITEM);
-
-          return [...prevWithoutEmptyItem, newItem, EMPTY_LIST_ITEM];
-        });
-
+        setListItems((prev) => [...filterOutEmptyItemFromList(prev), newItem]);
         resetState();
       },
 
       editItem(newItem, index) {
         setListItems((prev) => {
-          const prevWithoutEmptyItem = prev.filter((item) => item !== EMPTY_LIST_ITEM);
-          prevWithoutEmptyItem.splice(index, 1, newItem);
+          prev.splice(index, 1, newItem);
 
-          return [...prevWithoutEmptyItem, EMPTY_LIST_ITEM];
+          return prev;
         });
 
         resetState();
@@ -86,61 +135,89 @@ function FlexibleList({ initialListItems = [], newItemComponent, editItemCompone
     emitUpdatedItemsList(listItems);
   }, [listItems]);
 
-  const CancelBtn = (
-    <button type="button" onClick={features.resetState}>
-      {translations.cancel}
-    </button>
-  );
-
-  const showList = () => {
-    return listItems.map((item, index) => {
-      if (item === EMPTY_LIST_ITEM) {
-        const addBtnVisible = state[flexibleListStates.ADD_BTN_VISIBILITY];
-
-        return (
-          <li key={item}>
-            {addBtnVisible ? (
-              <button type="button" onClick={features.prepareAddItem}>
-                {translations.add}
-              </button>
-            ) : (
-              <>
-                {newItemComponent(features)}
-                {CancelBtn}
-              </>
-            )}
-          </li>
-        );
-      } else {
-        const currentlyEdited = state[flexibleListStates.EDITING_INDEX] === index;
-
-        return (
-          <li key={item}>
-            {currentlyEdited ? (
-              <>
-                {editItemComponent(item, index, features)}
-                {CancelBtn}
-              </>
-            ) : (
-              <>
-                <output>{item}</output>
-                <div>
-                  <button type="button" onClick={() => features.prepareEditItem(index)}>
-                    {translations.edit}
-                  </button>
-                  <button type="button" onClick={() => features.deleteItem(index)}>
-                    {translations.delete}
-                  </button>
-                </div>
-              </>
-            )}
-          </li>
-        );
-      }
-    });
+  const updateItem = ({ updateValue, isEditMode, editedIndex }) => {
+    if (isEditMode) {
+      features.editItem(updateValue, editedIndex);
+    } else {
+      features.addItem(updateValue);
+    }
   };
 
-  return <ul>{showList()}</ul>;
+  const addBtnVisible = state[flexibleListStates.ADD_BTN_VISIBILITY];
+
+  // TODO: [UX] add manipulating list order via drag&drop
+  return (
+    <div className="pev-flex pev-flex--columned flexible-list-container">
+      <List className="flexible-list" disablePadding data-cy={`list:${itemsContextName}`}>
+        {listItems
+          .map((item, index) => {
+            const isCurrentlyEdited = state[flexibleListStates.EDITING_INDEX] === index;
+
+            if (item === EMPTY_LIST_ITEM) {
+              return (
+                <ListItem className="flexible-list__item flexible-list__item--is-editable" key={item}>
+                  <NewItemComponent listFeatures={features} updateItem={updateItem}>
+                    {getConfirmAndCancelButtons(itemsContextName, features)}
+                  </NewItemComponent>
+                </ListItem>
+              );
+            } else {
+              return (
+                <ListItem
+                  className={classNames('flexible-list__item', {
+                    'flexible-list__item--is-editable': isCurrentlyEdited,
+                  })}
+                  key={item}
+                >
+                  {isCurrentlyEdited ? (
+                    <EditItemComponent item={item} editedIndex={index} listFeatures={features} updateItem={updateItem}>
+                      {getConfirmAndCancelButtons(itemsContextName, features, index)}
+                    </EditItemComponent>
+                  ) : (
+                    <>
+                      <InputLabel component="output" data-cy={`label:${itemsContextName}__${index}`}>
+                        {item}
+                      </InputLabel>
+                      <div className="flexible-list__item-btns">
+                        <PEVIconButton
+                          type="button"
+                          a11y={translations.edit}
+                          onClick={() => features.prepareEditItem(index)}
+                          data-cy={`button:${itemsContextName}__edit-${index}`}
+                        >
+                          <EditIcon />
+                        </PEVIconButton>
+                        <PEVIconButton
+                          type="button"
+                          a11y={translations.delete}
+                          onClick={() => features.deleteItem(index)}
+                          data-cy={`button:${itemsContextName}__delete-${index}`}
+                        >
+                          <DeleteIcon />
+                        </PEVIconButton>
+                      </div>
+                    </>
+                  )}
+                </ListItem>
+              );
+            }
+          })
+          .filter(Boolean)}
+      </List>
+
+      {addBtnVisible && (
+        <PEVIconButton
+          className="flexible-list__item-add-btn"
+          type="button"
+          a11y={translations.add}
+          onClick={features.prepareAddItem}
+          data-cy={`button:${itemsContextName}__add-new`}
+        >
+          <AddIcon fontSize="large" />
+        </PEVIconButton>
+      )}
+    </div>
+  );
 }
 
 export default FlexibleList;

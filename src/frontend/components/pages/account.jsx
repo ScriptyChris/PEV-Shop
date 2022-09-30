@@ -1,22 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, NavLink, Route, Switch } from 'react-router-dom';
+import { useHistory, Route, Switch } from 'react-router-dom';
+
+import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
+import MenuList from '@material-ui/core/MenuList';
+import MenuItem from '@material-ui/core/MenuItem';
+import TableContainer from '@material-ui/core/TableContainer';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+
+import { PEVButton, PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/pevElements';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout.tsx';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';
 import { SetNewPassword } from '@frontend/components/views/password';
 import userSessionService from '@frontend/features/userSessionService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
-import ProductItem from '@frontend/components/views/productItem';
+import ObservedProducts from '@frontend/components/views/productObservability';
+import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES } from './_routes';
 
 const translations = Object.freeze({
   accountHeader: 'Account',
+  accountNavMenuLabel: 'account nav menu',
   goToUserProfile: 'Profile',
   goToSecurity: 'Security',
   goToObservedProducts: 'Observed products',
   goToOrders: 'Orders',
   editUserData: 'Edit',
-  removeAllObservedProducts: 'Remove all',
-  removeAllObservedProductsFailedMsg: 'Failed to remove all products :(',
   logOutFromAllSessions: 'Log out from all sessions',
   logOutFromOtherSessions: 'Log out from other sessions',
   logOutFromAllSessionsConfirmMsg: 'Are you sure you want to log out from all sessions?',
@@ -52,19 +65,23 @@ function UserProfile() {
   };
 
   return userData ? (
-    <section className="account__menu-tab" data-cy="section:user-profile">
-      <button onClick={edit}>{translations.editUserData}</button>
+    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:user-profile">
+      <TableContainer className="account__menu-tab-profile-table-container">
+        <Table>
+          <TableBody>
+            {Object.entries(userData).map(([key, value]) => (
+              <TableRow key={key}>
+                <TableCell component="th">{key}</TableCell>
+                <TableCell>{value}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      <table>
-        <tbody>
-          {Object.entries(userData).map(([key, value]) => (
-            <tr key={key}>
-              <th>{key}</th>
-              <td>{value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <PEVButton className="account__menu-tab-user-profile-edit-btn" onClick={edit}>
+        {translations.editUserData}
+      </PEVButton>
     </section>
   ) : (
     translations.lackOfData
@@ -128,98 +145,39 @@ function Security() {
   }, [logOutFromSessionsConfirmation, shouldPreserveCurrentSession]);
 
   return (
-    <section className="account__menu-tab" data-cy="section:security">
+    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:security">
       <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_IN} />
 
-      <div className="account__menu-tab logout-from-sessions">
-        <button onClick={() => logOutFromSessions(false)} data-cy="button:logout-from-all-sessions">
+      <Divider className="account__menu-tab-divider" light />
+
+      <div className="pev-flex account__menu-tab-logout-from-sessions">
+        {/* TODO: [feature] add list of active sessions and their selective removing */}
+        <PEVButton onClick={() => logOutFromSessions(false)} data-cy="button:logout-from-all-sessions">
           {translations.logOutFromAllSessions}
-        </button>
-        <button onClick={() => logOutFromSessions(true)} data-cy="button:logout-from-other-sessions">
+        </PEVButton>
+        <PEVButton onClick={() => logOutFromSessions(true)} data-cy="button:logout-from-other-sessions">
           {translations.logOutFromOtherSessions}
-        </button>
+        </PEVButton>
 
-        {popupData && <Popup {...popupData} />}
+        <Popup {...popupData} />
       </div>
-    </section>
-  );
-}
-
-function ObservedProducts() {
-  const [observedProducts, setObservedProducts] = useState([]);
-  const [canRemoveAllProducts, setCanRemoveAllProducts] = useState(
-    !!storeService.userAccountState?.observedProductsIDs?.length
-  );
-  const [popupData, setPopupData] = useState(null);
-
-  useEffect(() => {
-    httpService.getObservedProducts().then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
-        return;
-      }
-
-      setObservedProducts(res);
-    });
-  }, []);
-
-  const removeAll = () => {
-    httpService
-      .disableGenericErrorHandler()
-      .removeAllProductsFromObserved()
-      .then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
-          return;
-        } else if (res.__ERROR_TO_HANDLE) {
-          setPopupData({
-            type: POPUP_TYPES.FAILURE,
-            message: translations.removeAllObservedProductsFailedMsg,
-            buttons: [getClosePopupBtn(setPopupData)],
-          });
-        } else {
-          setCanRemoveAllProducts(false);
-          setObservedProducts(res);
-          storeService.updateUserAccountState({
-            ...storeService.userAccountState,
-            observedProductsIDs: res,
-          });
-        }
-      });
-  };
-
-  return (
-    <section className="account__menu-tab" data-cy="section:observed-products">
-      <div>
-        {/* TODO: [UX] add searching and filtering for observed products */}
-        <button onClick={removeAll} disabled={!canRemoveAllProducts}>
-          {translations.removeAllObservedProducts}
-        </button>
-      </div>
-
-      <ol className="account__menu-tab observed-products-list">
-        {observedProducts.length
-          ? observedProducts.map((product) => (
-              <li key={product.name}>
-                <ProductItem product={product} />
-              </li>
-            ))
-          : translations.lackOfData}
-      </ol>
-
-      {popupData && <Popup {...popupData} />}
     </section>
   );
 }
 
 function Orders() {
   return (
-    <section className="account__menu-tab" data-cy="section:orders">
+    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:orders">
       <input placeholder="TODO: [FEATURE] implement searching orders via name and date(?)" type="search" />
-      <p>TODO: [FEATURE] implement listing orders with options such as: status, invoice, review, refund</p>
+      <PEVParagraph>
+        TODO: [FEATURE] implement listing orders with options such as: status, invoice, review, refund
+      </PEVParagraph>
     </section>
   );
 }
 
 export default function Account() {
+  const { isMobileLayout } = useRWDLayout();
   // TODO: [PERFORMANCE]? fix rendering component twice when redirected from LogIn page
   const MENU_ITEMS = Object.freeze([
     {
@@ -243,22 +201,66 @@ export default function Account() {
       component: <Orders />,
     },
   ]);
+  const TabsLayoutWrapper = ({ children }) =>
+    isMobileLayout ? children : <Paper className="account__menu-tabs">{children}</Paper>;
+
+  useEffect(() => {
+    // TODO: [DX] automatically select first link (user profile) in a better way
+    const userProfileURL = MENU_ITEMS[0].url;
+    document.querySelector(`a[href$="/${userProfileURL}"]`).click();
+  }, []);
 
   return (
-    <section className="account">
-      <h2>{translations.accountHeader}</h2>
+    <article className="account">
+      <PEVHeading level={2} className="account__header">
+        {translations.accountHeader}
+      </PEVHeading>
 
-      <div className="account__menu">
-        <ul className="account__menu-nav">
-          {MENU_ITEMS.map((item) => (
-            <li key={item.url}>
-              <NavLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
-                {item.translation}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+      <nav className="account__menu-nav">
+        {isMobileLayout ? (
+          <Scroller
+            scrollerBaseValueMeta={{
+              useDefault: true,
+            }}
+            render={({ ScrollerHookingParent }) => (
+              <ScrollerHookingParent>
+                <MenuList
+                  className="account__menu-nav-list"
+                  component="ul"
+                  disablePadding={true}
+                  // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
+                  aria-label={translations.accountNavMenuLabel}
+                >
+                  {MENU_ITEMS.map((item) => (
+                    <MenuItem
+                      key={item.url}
+                      // TODO: [UX] highlight active link
+                    >
+                      <PEVLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
+                        {item.translation}
+                      </PEVLink>
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </ScrollerHookingParent>
+            )}
+          />
+        ) : (
+          <Paper>
+            <MenuList className="account__menu-nav-list">
+              {MENU_ITEMS.map((item) => (
+                <MenuItem disableGutters key={item.url}>
+                  <PEVLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
+                    {item.translation}
+                  </PEVLink>
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Paper>
+        )}
+      </nav>
 
+      <TabsLayoutWrapper>
         <Switch>
           {MENU_ITEMS.map((item) => (
             <Route path={`${ROUTES.ACCOUNT}/${item.url}`} key={item.url}>
@@ -266,7 +268,7 @@ export default function Account() {
             </Route>
           ))}
         </Switch>
-      </div>
-    </section>
+      </TabsLayoutWrapper>
+    </article>
   );
 }

@@ -1,17 +1,34 @@
+/*
+  TODO: [refactor/improvement] maybe `@import` is not the best utility, 
+  especially for `_var`, because it creates globals
+*/
+@import '_var';
+@import '_mixins';
+@import '_helpers';
+@import 'views/app';
 @import 'views/shop';
+@import 'views/nav';
 @import 'views/categoriesTree';
 @import 'views/productList';
+@import 'views/productCard';
+@import 'views/productDetails';
 @import 'views/cart';
 @import 'views/pagination';
-@import 'views/compareProducts';
+@import 'views/productComparisonCandidates';
+@import 'views/productComparison';
 @import 'views/scroller';
 @import 'views/search';
 @import 'views/productsFilter';
-@import 'views/formFieldError';
-@import 'views/newProduct';
+@import 'views/productForm';
 @import 'views/popup';
 @import 'views/ratingWidget';
+@import 'views/register.scss';
+@import 'views/login.scss';
 @import 'views/account';
+@import 'views/password';
+@import 'views/scrollToTop';
+@import 'views/flexibleList';
+@import 'views/order';
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -19,38 +36,9 @@
   padding: 0;
 }
 
-html {
+:root {
   font-size: 16px;
-}
 
-.app-root {
-  display: grid;
-  grid-template-rows: 10vh 80vh 10vh;
-  grid-template-areas:
-    "header"
-    "main"
-    "footer";
-
-  & > * {
-    border: 1px solid red;
-  }
-}
-
-.header {
-  grid-area: header;
-}
-
-.nav {
-  ul {
-    display: flex;
-    justify-content: space-evenly;
-  }
-}
-
-.main {
-  grid-area: main;
-}
-
-.footer {
-  grid-area: footer;
+  @include getBreakpointsMappedToVars;
+  @include getMediaQueriesMappedToVars;
 }

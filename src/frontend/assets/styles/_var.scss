@@ -1,1 +1,47 @@
+// colors
+$transparentGrey: rgba(0, 0, 0, 0.7);
+
+// time
+$transitionDuration: 0.125s;
+
+// dimensions
 $interactiveItemDimension: 2rem;
+
+// z-index
+$popupZIndex: 4;
+$navZIndex: 3;
+$cartZIndex: 2;
+$productListCtrlBarZIndex: 1;
+$scrollerZIndex: 1;
+$productDetailsNavMenuZIndex: 1;
+
+// commons
+.product-comparison-candidates,
+.product-comparison {
+  --product-list-item-width: 200px;
+}
+
+// breakpoints
+$mediaBreakpointsMap: (
+  /* "mobile" is not included, because styles are written mobile-first */
+  "tablet": 601,
+  "desktop": 961,
+);
+$containerBreakpointsMap: (
+  "fixed-container": 768,
+  "main-container": 1280,
+);
+$mergedBreakpointsMap: map-merge(
+  $mediaBreakpointsMap,
+  $containerBreakpointsMap,
+);
+
+$mediaQueriesMap: (
+  "mobile": unquote("(max-width: #{map-get($mediaBreakpointsMap, tablet)}px)"),
+  "tablet": unquote("
+    (min-width: #{(map-get($mediaBreakpointsMap, tablet))}px) 
+    and 
+    (max-width: #{(map-get($mediaBreakpointsMap, desktop) - 1)}px)"
+  ),
+  "desktop": unquote("(min-width: #{(map-get($mediaBreakpointsMap, desktop))}px)"),
+)

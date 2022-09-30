@@ -75,4 +75,8 @@ const storageService = (() => {
   };
 })();
 
+if (window.Cypress) {
+  window.__E2E__.storageService = storageService;
+}
+
 export default storageService;

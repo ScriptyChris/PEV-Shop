@@ -1,12 +1,28 @@
 <!-- code based on: https://geowidget.easypack24.net/examples/basic.html -->
 
 <!DOCTYPE html>
-<!-- TODO: [a11y] set 'lang' based on User settings and move style to CSS or remove it -->
-<html lang="pl" style="height: 100%;">
+<!-- TODO: [a11y] set 'lang' based on User settings -->
+<html lang="pl">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <title>Geo-Map</title>
+
+        <style>
+            html {
+                height: 100%;
+            }
+
+            body {
+                margin: 0;
+                height: 100%;
+            }
+
+            .map-list-row,
+            .view-chooser {
+                padding-inline: 1rem;
+            }
+        </style>
 
         <% if (webpackConfig.mode === 'development') { %>
             <script src="/embedded/shipment-map-3rd-party.js"></script>

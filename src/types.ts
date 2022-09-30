@@ -1,3 +1,7 @@
+import userSessionService from '@frontend/features/userSessionService';
+import storageService from '@frontend/features/storageService';
+import storeService from '@frontend/features/storeService';
+
 export interface IProductInOrder {
   name: number;
   unitPrice: number;
@@ -19,6 +23,8 @@ export enum HTTP_STATUS_CODE {
   OK = 200,
   CREATED = 201,
   NO_CONTENT = 204,
+  // TODO: update `middleware-response-wrapper.ts` accordingly
+  NOT_MODIFIED = 304,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
@@ -39,12 +45,31 @@ export interface IUserCart {
   totalPrice: number;
 }
 
+export interface IOrder {
+  receiver: {
+    baseInfo: {
+      name: string;
+      email: string;
+      phone: string;
+    };
+    address: string;
+  };
+  shipmentType: 'inPerson' | 'home' | 'parcelLocker';
+  // TODO: [DX] get that from PayU API
+  paymentType: 'Cash' | 'Card' | 'Transfer' | 'BLIK';
+  products: (IUserCart['products'] & { count: number })[];
+  price: {
+    shipment: number;
+    total: number;
+  };
+}
+
 export type TPagination = { pageNumber: number; productsPerPage: number };
 
 export type TE2E = {
-  [key: string]: {
-    [key: string]: (...args: any[]) => any;
-  };
+  userSessionService: typeof userSessionService;
+  storeService: typeof storeService;
+  storageService: typeof storageService;
 };
 
 export type TE2EUser = {

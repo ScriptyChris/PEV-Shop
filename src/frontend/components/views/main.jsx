@@ -16,6 +16,7 @@ import ConfirmRegistration from '@frontend/components/pages/confirmRegistration'
 import { SetNewPassword, ResetPassword } from './password';
 import NotFound from '@frontend/components/pages/notFound';
 import { GenericErrorPopup } from '@frontend/components/utils/popup';
+import { ScrollToTop } from '@frontend/components/utils/scrollToTop';
 
 export default observer(function Main() {
   /*
@@ -68,6 +69,7 @@ export default observer(function Main() {
         </Route>
       </Switch>
 
+      <ScrollToTop />
       <GenericErrorPopup />
     </main>
   );

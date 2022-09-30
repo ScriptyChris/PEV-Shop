@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Formik, Field } from 'formik';
-import FormFieldError from '@frontend/components/utils/formFieldError';
+
+import {
+  PEVForm,
+  PEVButton,
+  PEVHeading,
+  PEVTextField,
+  PEVFieldset,
+  PEVLegend,
+  PEVFormFieldError,
+} from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { ROUTES } from '@frontend/components/pages/_routes';
@@ -34,10 +42,10 @@ const translations = Object.freeze({
   popupGoToLogIn: 'Go to log in',
 });
 
-function PasswordField({ identity, translation, error, dataCy }) {
-  if (!identity || !translation) {
+function PasswordField({ identity, label, error, dataCy }) {
+  if (!identity || !label) {
     throw ReferenceError(
-      `'identity' and 'translation' props must be non-empty! Received subsequently: '${identity}' and '${translation}'`
+      `'identity' and 'label' props must be non-empty! Received subsequently: '${identity}' and '${label}'`
     );
   }
 
@@ -45,28 +53,29 @@ function PasswordField({ identity, translation, error, dataCy }) {
   const [passwordMinLength, passwordMaxLength] = [8, 20];
 
   return (
-    <div>
-      <label htmlFor={identity}>{translation}</label>
+    <div className="pev-flex">
       {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
-      <Field
+      <PEVTextField
         type="password"
-        name={identity}
-        id={identity}
-        minLength={passwordMinLength}
-        maxLength={passwordMaxLength}
+        identity={identity}
+        label={label}
+        inputProps={{
+          minLength: passwordMinLength,
+          maxLength: passwordMaxLength,
+          'data-cy': dataCy,
+        }}
         required
-        data-cy={dataCy}
       />
 
-      {error && <FormFieldError>{error}</FormFieldError>}
+      {error && <PEVFormFieldError>{error}</PEVFormFieldError>}
     </div>
   );
 }
 
 function ResetPassword() {
-  const [formInitials] = useState({
+  const formInitials = {
     email: '',
-  });
+  };
   const [popupData, setPopupData] = useState(null);
 
   // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time
@@ -104,27 +113,31 @@ function ResetPassword() {
   };
 
   return (
-    <section>
-      <Formik onSubmit={onSubmitHandler} initialValues={formInitials}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>
-                <h2>{translations.resetPasswordHeader}</h2>
-              </legend>
+    <section className="reset-password pev-fixed-container">
+      <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials}>
+        <PEVFieldset className="reset-password__root-fieldset">
+          <PEVLegend className="pev-centered-padded-text">
+            <PEVHeading level={2}>{translations.resetPasswordHeader}</PEVHeading>
+          </PEVLegend>
 
-              <div>
-                <label htmlFor="resettingEmail">{translations.resettingEmailField}</label>
-                <Field name="email" id="resettingEmail" type="email" required data-cy="input:reset-email" />
-              </div>
+          <div className="pev-flex">
+            <PEVTextField
+              type="email"
+              identity="resettingEmail"
+              name="email"
+              label={translations.resettingEmailField}
+              required
+              inputProps={{ 'data-cy': 'input:reset-email' }}
+            />
+          </div>
 
-              <button data-cy="button:submit-reset">{translations.submitReset}</button>
-            </fieldset>
-          </form>
-        )}
-      </Formik>
+          <PEVButton className="reset-password__submit-btn" type="submit" size="small" data-cy="button:submit-reset">
+            {translations.submitReset}
+          </PEVButton>
+        </PEVFieldset>
+      </PEVForm>
 
-      {popupData && <Popup {...popupData} />}
+      <Popup {...popupData} />
     </section>
   );
 }
@@ -137,11 +150,11 @@ function SetNewPassword({ contextType }) {
   }
 
   const [urlToken, setUrlToken] = useState(null);
-  const [formInitials] = useState({
+  const formInitials = {
     currentPassword: contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN ? '' : undefined,
     newPassword: '',
     repeatedNewPassword: '',
-  });
+  };
   const [popupData, setPopupData] = useState(null);
   const history = useHistory();
   const { search: searchParam } = useLocation();
@@ -223,44 +236,49 @@ function SetNewPassword({ contextType }) {
   };
 
   return (
-    <section>
-      <Formik onSubmit={onSubmitHandler} validateOnChange={false} validate={formValidator} initialValues={formInitials}>
-        {({ handleSubmit, ...formikRestProps }) => (
-          <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>
-                <h2>{translations.setNewPasswordHeader}</h2>
-              </legend>
+    <section className="set-new-password">
+      <PEVForm
+        onSubmit={onSubmitHandler}
+        validateOnChange={false}
+        validate={formValidator}
+        initialValues={formInitials}
+      >
+        {(formikProps) => (
+          <PEVFieldset className="pev-fixed-container pev-flex pev-flex--columned set-new-password__root-fieldset">
+            <PEVLegend className="pev-centered-padded-text">
+              <PEVHeading level={2}>{translations.setNewPasswordHeader}</PEVHeading>
+            </PEVLegend>
 
-              {contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN && (
-                <PasswordField
-                  identity="currentPassword"
-                  translation={translations.currentPasswordField}
-                  error={formikRestProps.errors.currentPassword}
-                />
-              )}
-
+            {contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_IN && (
               <PasswordField
-                identity="newPassword"
-                translation={translations.newPasswordField}
-                error={formikRestProps.errors.newPassword}
-                dataCy="input:new-password"
+                identity="currentPassword"
+                label={translations.currentPasswordField}
+                error={formikProps.errors.currentPassword}
               />
+            )}
 
-              <PasswordField
-                identity="repeatedNewPassword"
-                translation={translations.repeatedNewPasswordField}
-                error={formikRestProps.errors.repeatedNewPassword}
-                dataCy="input:repeated-new-password"
-              />
+            <PasswordField
+              identity="newPassword"
+              label={translations.newPasswordField}
+              error={formikProps.errors.newPassword}
+              dataCy="input:new-password"
+            />
 
-              <button data-cy="button:submit-new-password">{translations.submitNewPassword}</button>
-            </fieldset>
-          </form>
+            <PasswordField
+              identity="repeatedNewPassword"
+              label={translations.repeatedNewPasswordField}
+              error={formikProps.errors.repeatedNewPassword}
+              dataCy="input:repeated-new-password"
+            />
+
+            <PEVButton className="set-new-password__submit-btn" data-cy="button:submit-new-password" type="submit">
+              {translations.submitNewPassword}
+            </PEVButton>
+          </PEVFieldset>
         )}
-      </Formik>
+      </PEVForm>
 
-      {popupData && <Popup {...popupData} />}
+      <Popup {...popupData} />
     </section>
   );
 }

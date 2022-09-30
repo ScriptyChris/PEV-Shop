@@ -13,7 +13,12 @@ function Pagination(props) {
   const updateAriaLabelForPageBtn = (pageNr) => `${translations.page} ${pageNr}`;
 
   return (
-    <nav className="pagination-container">
+    <div className="pagination-container">
+      {/*
+        TODO: [UX] make it possible to use `<select>` and `<ReactPaginate />` separately, 
+        so i.e. selector can be used once on the top of page and pagination itself twice - on the top and the bottom.
+      */}
+
       <select onChange={props.onItemsPerPageLimitChange} className="pagination-container__limit-selector">
         {props.itemLimitsPerPage.map((limitPerPage, index, arrayContext) => {
           const limitText = `${limitPerPage} ${props.translations.itemsPerPageSuffix}`;
@@ -45,7 +50,7 @@ function Pagination(props) {
         nextAriaLabel={translations.nextAriaLabel}
         ariaLabelBuilder={updateAriaLabelForPageBtn}
       />
-    </nav>
+    </div>
   );
 }
 

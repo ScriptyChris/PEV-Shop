@@ -1,23 +1,43 @@
-import React, { useEffect, useState, useRef, createRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Formik, Field, ErrorMessage } from 'formik';
+import { Field, ErrorMessage } from 'formik';
+import classNames from 'classnames';
+
+import Paper from '@material-ui/core/Paper';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import TextField from '@material-ui/core/TextField';
+import InputLabel from '@material-ui/core/InputLabel';
+import SaveIcon from '@material-ui/icons/SaveOutlined';
+
+import {
+  PEVForm,
+  PEVButton,
+  PEVHeading,
+  PEVTextField,
+  PEVFieldset,
+  PEVLegend,
+  PEVFormFieldError,
+} from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
-import FormFieldError from '@frontend/components/utils/formFieldError';
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
 
 const translations = {
-  intro: 'Fill new product details',
+  getIntro(isProductUpdate) {
+    return isProductUpdate ? 'Update product details' : 'Fill new product details';
+  },
   baseInformation: 'Basic information',
   technicalSpecs: 'Technical specification',
   categoryChooser: 'Category',
-  chooseCategoryFirst: 'please, choose category first',
+  chooseCategoryFirst: 'A category needs to be chosen first...',
   name: 'Name',
   price: 'Price',
   addNewSpec: 'Add new spec',
   confirm: 'Confirm',
+  cancel: 'Cancel',
   save: 'Save',
   relatedProductsNames: 'Related products names',
   relatedProductName: 'Product name',
@@ -46,35 +66,41 @@ const FIELD_NAME_PREFIXES = Object.freeze({
 });
 const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP);
 
-function BaseInfo({ data: { initialData = {} }, methods: { handleChange, handleBlur } }) {
+function BaseInfo({ data: { initialData = {} } }) {
   return (
-    <fieldset>
-      <legend>{translations.baseInformation}</legend>
+    <PEVFieldset className="pev-flex pev-flex--columned">
+      <PEVLegend>{translations.baseInformation}</PEVLegend>
 
-      <label htmlFor="newProductName">{translations.name}</label>
-      <input
-        id="newProductName"
-        name="name"
-        type="text"
-        onChange={handleChange}
-        onBlur={handleBlur}
-        defaultValue={initialData.name}
-        required
-      />
+      <div className="product-form__base-info-group pev-flex">
+        <PEVTextField
+          name="name"
+          identity="newProductName"
+          label={translations.name}
+          inputProps={{
+            'data-cy': 'input:base__name',
+          }}
+          defaultValue={initialData.name}
+          required
+        />
+      </div>
 
-      <label htmlFor="newProductPrice">{translations.price}</label>
-      <input
-        id="newProductPrice"
-        name="price"
-        type="number"
-        step="0.01"
-        min="0.01"
-        onChange={handleChange}
-        onBlur={handleBlur}
-        defaultValue={initialData.price}
-        required
-      />
-    </fieldset>
+      <div className="product-form__base-info-group pev-flex">
+        <PEVTextField
+          name="price"
+          identity="newProductPrice"
+          label={translations.price}
+          type="number"
+          inputProps={{
+            step: '0.01',
+            min: '0.01',
+            'data-cy': 'input:base__price',
+          }}
+          defaultValue={initialData.price}
+          required
+        />
+        {/* TODO: [feature] add currency chooser */}
+      </div>
+    </PEVFieldset>
   );
 }
 
@@ -86,88 +112,114 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
   }, [shortDescriptionList]);
 
   return (
-    <fieldset>
-      <legend>{translations.shortDescription}</legend>
+    <PEVFieldset>
+      <PEVLegend>{translations.shortDescription}</PEVLegend>
 
       <FlexibleList
         initialListItems={initialData[formikField.name]}
-        newItemComponent={(listFeatures) => (
-          <ShortDescription.InputComponent shortDescriptionList={shortDescriptionList} listFeatures={listFeatures} />
-        )}
-        editItemComponent={(shortDescItem, index, listFeatures) => (
+        NewItemComponent={({ listFeatures, ...restProps }) => (
           <ShortDescription.InputComponent
+            {...restProps}
             shortDescriptionList={shortDescriptionList}
-            editedDescIndex={index}
-            presetValue={shortDescItem}
             listFeatures={listFeatures}
           />
         )}
+        EditItemComponent={({ item: shortDescItem, ...restProps }) => (
+          <ShortDescription.InputComponent
+            {...restProps}
+            shortDescriptionList={shortDescriptionList}
+            isEditMode={true}
+            presetValue={shortDescItem}
+          />
+        )}
         emitUpdatedItemsList={setShortDescriptionList}
+        itemsContextName="product-descriptions"
       />
 
       <input {...formikField} type="hidden" />
-    </fieldset>
+    </PEVFieldset>
   );
 }
 ShortDescription.InputComponent = function InputComponent(props) {
-  const inputRef = createRef();
-  const [isDisabled, setIsDisabled] = useState(false);
-  const updateItem = (updateValue, isEditMode) => {
-    if (isEditMode) {
-      props.listFeatures.editItem(updateValue, props.editedDescIndex);
-    } else {
-      props.listFeatures.addItem(updateValue);
+  const inputRef = useRef();
+  const [isChildrenVisible, setIsChildrenVisible] = useState(false);
+  const [isConfirmBtnDisabled, setIsConfirmBtnDisabled] = useState(props.isEditMode);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (inputRef.current && props.children) {
+      setIsChildrenVisible(true);
     }
-  };
-  const isEditMode = props.editedDescIndex > -1;
+  }, [inputRef.current, props.children]);
+
   const validateInput = (value) => {
     const isValid = !props.shortDescriptionList.some((descriptionItem) => value === descriptionItem);
-    setIsDisabled(!isValid);
+    setIsConfirmBtnDisabled(!isValid);
+    setError(isValid ? '' : translations.duplicatedDescription);
 
     return isValid;
   };
 
   return (
     <>
-      <input
-        ref={inputRef}
-        type="text"
+      <TextField
+        inputRef={inputRef}
+        variant="outlined"
+        size="small"
         defaultValue={props.presetValue || ''}
         onKeyDown={(event) => {
           if (event.key === 'Enter') {
             event.preventDefault();
 
+            if (isConfirmBtnDisabled) {
+              return;
+            }
+
             const inputValue = event.target.value;
 
             if (validateInput(inputValue)) {
-              updateItem(inputValue, isEditMode);
+              props.updateItem({
+                updateValue: inputValue,
+                isEditMode: props.isEditMode,
+                editedIndex: props.editedIndex,
+              });
             }
+          } else if (event.key === 'Escape') {
+            props.listFeatures.resetState();
           }
         }}
         onChange={({ target: { value } }) => {
-          if (isDisabled) {
+          setIsConfirmBtnDisabled(!!(props.presetValue && props.presetValue === value));
+
+          if (isConfirmBtnDisabled) {
             validateInput(value);
           }
+        }}
+        inputProps={{
+          'data-cy': `input:product-descriptions__${props.editedIndex ?? 'new'}`,
         }}
         autoFocus
         required
       />
 
-      <button
-        type="button"
-        onClick={() => {
-          const inputValue = inputRef.current.value;
+      {isChildrenVisible &&
+        props.children({
+          inputItemRef: inputRef,
+          isConfirmBtnDisabled,
+          onConfirmBtnClick: () => {
+            const inputValue = inputRef.current.value;
 
-          if (validateInput(inputValue)) {
-            updateItem(inputValue, isEditMode);
-          }
-        }}
-        disabled={isDisabled}
-      >
-        {translations.confirm}
-      </button>
+            if (validateInput(inputValue)) {
+              props.updateItem({
+                updateValue: inputValue,
+                isEditMode: props.isEditMode,
+                editedIndex: props.editedIndex,
+              });
+            }
+          },
+        })}
 
-      {isDisabled && <FormFieldError>{translations.duplicatedDescription}</FormFieldError>}
+      {error && <PEVFormFieldError>{error}</PEVFormFieldError>}
     </>
   );
 };
@@ -181,8 +233,8 @@ function CategorySelector({
   };
 
   return (
-    <fieldset>
-      <legend>{translations.categoryChooser}</legend>
+    <PEVFieldset>
+      <PEVLegend>{translations.categoryChooser}</PEVLegend>
 
       <Field
         name="category"
@@ -190,9 +242,10 @@ function CategorySelector({
         component={CategoriesTreeFormField}
         onCategorySelect={handleCategorySelect}
         preSelectedCategory={initialData.category}
+        forceCombinedView={true}
       />
-      <ErrorMessage name="category" component={FormFieldError} />
-    </fieldset>
+      <ErrorMessage name="category" component={PEVFormFieldError} />
+    </PEVFieldset>
   );
 }
 
@@ -232,77 +285,105 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
     }
   }, [prepareInitialDataStructure.structure]);
 
-  const getSpecsFields = () => {
-    return productCurrentSpecs.map((spec) => {
-      const fieldIdentifier = `${spec.name
-        .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
-        .replace(/\s/g, '')}Field`;
-      const minValue = spec.fieldType === 'number' ? 0 : null;
-      const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
-
-      return (
-        <div key={fieldIdentifier}>
-          <label htmlFor={fieldIdentifier}>
-            {spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-            {SPEC_NAMES_SEPARATORS.SPACE}
-            {spec.defaultUnit && `(${spec.defaultUnit})`}
-          </label>
-
-          {Array.isArray(spec.descriptions) ? (
-            spec.descriptions.map((specDescription, index) => {
-              const groupFieldIdentifier = `${fieldIdentifier}${index}`;
-              const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
-
-              return (
-                <div key={groupFieldIdentifier}>
-                  <label htmlFor={groupFieldIdentifier}>
-                    {specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-                  </label>
-
-                  <input
-                    name={mergedName}
-                    type={spec.fieldType}
-                    min={minValue}
-                    id={groupFieldIdentifier}
-                    onChange={handleChange}
-                    defaultValue={
-                      prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[mergedName] : ''
-                    }
-                    required
-                  />
-                </div>
-              );
-            })
-          ) : (
-            <input
-              name={BASE_NAME}
-              type={spec.fieldType}
-              min={minValue}
-              id={fieldIdentifier}
-              onChange={handleChange}
-              defaultValue={
-                prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
-              }
-              required
-            />
-          )}
-
-          <ErrorMessage name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`} component={FormFieldError} />
-        </div>
-      );
-    });
-  };
-
   return (
-    <fieldset>
-      <legend>
-        {translations.technicalSpecs}
-        {SPEC_NAMES_SEPARATORS.SPACE}
-        {productCurrentSpecs.length === 0 && <span>({translations.chooseCategoryFirst})</span>}
-      </legend>
+    <PEVFieldset className="product-form__technical-specs pev-flex pev-flex--columned">
+      <PEVLegend>{translations.technicalSpecs}</PEVLegend>
 
-      {productCurrentSpecs.length > 0 && getSpecsFields()}
-    </fieldset>
+      {productCurrentSpecs.length > 0 ? (
+        <List className="pev-flex" disablePadding data-cy="list:product-technical-specs">
+          {productCurrentSpecs.map((spec) => {
+            const fieldIdentifier = `${spec.name
+              .replace(/(?<=\s)\w/g, (match) => match.toUpperCase())
+              .replace(/\s/g, '')}Field`;
+            const minValue = spec.fieldType === 'number' ? 0 : null;
+            const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
+            const isSpecDescriptionsArray = Array.isArray(spec.descriptions);
+            const specDefaultUnitContent = spec.defaultUnit && `(${spec.defaultUnit})`;
+            const legendOrLabelContent = `
+            ${spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+            ${SPEC_NAMES_SEPARATORS.SPACE}
+            ${specDefaultUnitContent}
+          `;
+
+            if (isSpecDescriptionsArray) {
+              return (
+                <ListItem className="product-form__technical-specs-controls-group" disableGutters key={fieldIdentifier}>
+                  <PEVFieldset className="product-form__technical-specs-controls-group--nested-container">
+                    <PEVLegend>{legendOrLabelContent}</PEVLegend>
+
+                    <List className="pev-flex" disablePadding>
+                      {spec.descriptions.map((specDescription, index) => {
+                        const groupFieldIdentifier = `${fieldIdentifier}${index}`;
+                        const mergedName = `${BASE_NAME}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+                        const dataCy = `input:spec__${spec.fieldName}${SPEC_NAMES_SEPARATORS.LEVEL}${specDescription}`;
+
+                        return (
+                          <ListItem
+                            className="product-form__technical-specs-controls-group pev-flex"
+                            disableGutters
+                            key={groupFieldIdentifier}
+                          >
+                            <PEVTextField
+                              name={mergedName}
+                              identity={groupFieldIdentifier}
+                              label={specDescription.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
+                              type={spec.fieldType}
+                              inputProps={{ min: minValue, 'data-cy': dataCy }}
+                              defaultValue={
+                                prepareInitialDataStructure.isFilled
+                                  ? prepareInitialDataStructure.structure[mergedName]
+                                  : ''
+                              }
+                              required
+                            />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </PEVFieldset>
+                </ListItem>
+              );
+            }
+
+            return (
+              <ListItem
+                className="product-form__technical-specs-controls-group pev-flex"
+                disableGutters
+                key={fieldIdentifier}
+              >
+                <InputLabel>{legendOrLabelContent}</InputLabel>
+
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  name={BASE_NAME}
+                  type={spec.fieldType}
+                  inputProps={{ min: minValue, 'data-cy': `input:spec__${spec.fieldName}` }}
+                  id={fieldIdentifier}
+                  onChange={handleChange}
+                  defaultValue={
+                    prepareInitialDataStructure.isFilled ? prepareInitialDataStructure.structure[BASE_NAME] : ''
+                  }
+                  required
+                />
+
+                <ErrorMessage
+                  name={`${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`}
+                  component={PEVFormFieldError}
+                />
+              </ListItem>
+            );
+          })}
+        </List>
+      ) : (
+        <em
+          className="product-form__technical-specs-category-choice-reminder"
+          data-cy="label:product-technical-specs__category-choice-reminder"
+        >
+          {translations.chooseCategoryFirst}
+        </em>
+      )}
+    </PEVFieldset>
   );
 }
 
@@ -314,48 +395,54 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
   }, [relatedProductNamesList]);
 
   const BoundSearchSingleProductByName = useCallback(
-    (props) => (
-      <SearchSingleProductByName
-        {...props}
-        list="foundRelatedProductsNames"
-        debounceTimeMs={200}
-        label={translations.relatedProductName}
-        searchingTarget="relatedProductsNames"
-        ignoredProductNames={relatedProductNamesList.filter(
-          (productName) => productName && props.presetValue !== productName
-        )}
-        onSelectedProductName={(productName) => {
-          if (props.editedProductIndex > -1) {
-            props.listFeatures.editItem(productName, props.editedProductIndex);
-          } else {
-            props.listFeatures.addItem(productName);
-          }
-        }}
-        autoFocus={true}
-      />
+    ({ children = () => void 0, ...props }) => (
+      <>
+        <SearchSingleProductByName
+          {...props}
+          list="foundRelatedProductsNames"
+          debounceTimeMs={200}
+          InputLabel={translations.relatedProductName}
+          searchingTarget="relatedProductsNames"
+          ignoredProductNames={relatedProductNamesList.filter(
+            (productName) => productName && props.presetValue !== productName
+          )}
+          onSelectedProductName={(productName) => {
+            if (props.editedProductIndex > -1) {
+              props.listFeatures.editItem(productName, props.editedProductIndex);
+            } else {
+              props.listFeatures.addItem(productName);
+            }
+          }}
+          onEscapeBtn={() => props.listFeatures.resetState()}
+          autoFocus={true}
+        />
+        {children()}
+      </>
     ),
     [relatedProductNamesList]
   );
 
   return (
-    <fieldset className="new-product">
-      <legend>{translations.relatedProductsNames}</legend>
+    <PEVFieldset className="product-form__related-product-names">
+      <PEVLegend>{translations.relatedProductsNames}</PEVLegend>
 
       <FlexibleList
         initialListItems={initialData[formikField.name]}
-        newItemComponent={(listFeatures) => <BoundSearchSingleProductByName listFeatures={listFeatures} />}
-        editItemComponent={(relatedProductName, index, listFeatures) => (
+        NewItemComponent={(props) => <BoundSearchSingleProductByName {...props} />}
+        EditItemComponent={({ item: relatedProductName, editedIndex, ...restProps }) => (
           <BoundSearchSingleProductByName
+            {...restProps}
             presetValue={relatedProductName}
-            editedProductIndex={index}
-            listFeatures={listFeatures}
+            editedProductIndex={editedIndex}
           />
         )}
         emitUpdatedItemsList={setRelatedProductNamesList}
+        itemsContextName="related-product-names"
       />
 
       <input {...formikField} type="hidden" />
-    </fieldset>
+      {/* TODO: [UX] show error when related product name was not found */}
+    </PEVFieldset>
   );
 }
 
@@ -553,46 +640,57 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   };
 
   return (
-    <section>
-      <Formik onSubmit={onSubmitHandler} initialValues={formInitials} validate={validateHandler}>
-        {({ handleSubmit, ...formikRestProps }) => (
-          <form onSubmit={handleSubmit}>
-            <h2>{translations.intro}</h2>
+    <section className={classNames('product-form pev-fixed-container')}>
+      <PEVForm
+        className="product-form__form"
+        onSubmit={onSubmitHandler}
+        initialValues={formInitials}
+        validate={validateHandler}
+      >
+        {(formikProps) => (
+          <>
+            <PEVHeading className="pev-centered-padded-text" level={2}>
+              {translations.getIntro(!!Object.keys(initialData).length)}
+            </PEVHeading>
 
-            <BaseInfo
-              data={{ initialData: formikRestProps.values }}
-              methods={{ handleChange: formikRestProps.handleChange, handleBlur: formikRestProps.handleBlur }}
-            />
-            <Field
-              name="shortDescription"
-              data={{ initialData: formikRestProps.values }}
-              component={ShortDescription}
-            />
-            {Object.values(productSpecsMap.current).filter(Boolean).length && (
+            <Paper className="product-form__fields-group">
+              <BaseInfo data={{ initialData: formikProps.values }} />
+            </Paper>
+            <Paper className="product-form__fields-group">
+              <Field name="shortDescription" data={{ initialData: formikProps.values }} component={ShortDescription} />
+            </Paper>
+            <Paper className="product-form__fields-group">
               <CategorySelector
-                data={{ initialData: formikRestProps.values }}
+                data={{ initialData: formikProps.values }}
                 methods={{ setProductCurrentSpecs, getSpecsForSelectedCategory }}
               />
-            )}
-            <TechnicalSpecs
-              data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
-              methods={{ handleChange: formikRestProps.handleChange, setFieldValue: formikRestProps.setFieldValue }}
-            />
-            <Field
-              name="relatedProductsNames"
-              data={{ initialData: formikRestProps.values }}
-              component={RelatedProductsNames}
-            />
+            </Paper>
+            <Paper className="product-form__fields-group">
+              <TechnicalSpecs
+                data={{ productCurrentSpecs, initialData: initialData.technicalSpecs }}
+                methods={{ handleChange: formikProps.handleChange, setFieldValue: formikProps.setFieldValue }}
+              />
+            </Paper>
+            <Paper className="product-form__fields-group">
+              <Field
+                name="relatedProductsNames"
+                data={{ initialData: formikProps.values }}
+                component={RelatedProductsNames}
+              />
+            </Paper>
 
-            <button
+            <PEVButton
               type="submit"
-              onClick={() => !formikRestProps.touched.category && formikRestProps.setFieldTouched('category')}
+              className="product-form__save-btn MuiButton-outlined"
+              a11y={translations.save}
+              onClick={() => !formikProps.touched.category && formikProps.setFieldTouched('category')}
+              data-cy="button:product-form__save"
             >
-              {translations.save}
-            </button>
-          </form>
+              <SaveIcon fontSize="large" />
+            </PEVButton>
+          </>
         )}
-      </Formik>
+      </PEVForm>
     </section>
   );
 };
@@ -698,7 +796,7 @@ const ModifyProduct = () => {
   return productData ? (
     <>
       <ProductForm initialData={productData} doSubmit={doSubmit} />
-      {modificationError && <FormFieldError>{translations.modificationError}</FormFieldError>}
+      {modificationError && <PEVFormFieldError>{translations.modificationError}</PEVFormFieldError>}
     </>
   ) : (
     translations.lackOfData

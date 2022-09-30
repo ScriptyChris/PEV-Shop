@@ -1,0 +1,53 @@
+.product-form {
+  legend {
+    font-weight: bold;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  &__fields-group {
+    padding: 1rem;
+
+    &:first-of-type {
+      margin-top: -2rem;
+    }
+  }
+
+  &__base-info-group {
+    align-self: stretch;
+    margin-inline: 1rem;
+  }
+
+  &__technical-specs-category-choice-reminder {
+    display: block;
+    text-align: center;
+    margin: 1rem;
+  }
+
+  &__technical-specs-controls-group--nested-container {
+    .product-form__technical-specs-controls-group {
+      margin: 0;
+
+      label {
+        margin-left: 1rem;
+      }
+    }
+  }
+
+  &__technical-specs-controls-group,
+  &__technical-specs-controls-group--nested-container {
+    margin-inline: 1rem;
+    align-items: center;
+    align-self: stretch;
+    padding-block: 0;
+  }
+
+  &__save-btn {
+    margin-inline: auto;
+    width: 30%;
+  }
+}

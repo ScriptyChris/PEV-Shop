@@ -1,3 +1,30 @@
-.search {
+.search-wrapper {
   display: flex;
+
+  &__toggle-button--is-hidden {
+    width: 0;
+    padding: 0;
+    visibility: hidden;
+  }
+}
+
+.search-container {
+  display: flex;
+  grid-area: search;
+  margin-bottom: 10px;
+  visibility: hidden;
+
+  &--is-visible {
+    visibility: visible;
+  }
+
+  &__field-letter-case-toggler {
+    [class$="colorPrimary"] {
+      color: white;
+    }
+
+    [class$="colorSecondary"] {
+      color: gray;
+    }
+  }
 }

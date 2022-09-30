@@ -1,27 +1,22 @@
-.cart-toggle-button {
-
-}
-
-.cart-cleanup-button {
-
-}
-
-.cart-submit-button {
-
-}
-
-.cart-container {
-  display: none;
-  position: relative;
-  z-index: 1;
-
-  background: orange;
-
-  td, th {
-    border: 1px solid black;
+.cart {
+  &__header {
+    position: relative;
+    width: 100%;
   }
 
-  &--visible {
-    display: block;
+  &__back-btn {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: max-content;
+  }
+
+  &__table {}
+
+  &__action-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
   }
 }

@@ -5,8 +5,8 @@ import { Route, Switch } from 'react-router-dom';
 import { ROUTES } from './_routes';
 import ProductList from '@frontend/components/views/productList';
 import ProductDetails from '@frontend/components/views/productDetails';
-import { NewProduct, ModifyProduct } from './newProduct';
-import Compare from './compare';
+import { NewProduct, ModifyProduct } from './productForm';
+import ProductComparison from './productComparison';
 import Order from './order';
 import NotFound from './notFound';
 
@@ -60,8 +60,8 @@ function Shop() {
   // };
 
   return (
-    <section>
-      <h2>Shop!!!</h2>
+    <>
+      {/* <PEVHeading level={2}>Shop!!!</PEVHeading> */}
 
       {/*{showChooser()}*/}
 
@@ -74,7 +74,7 @@ function Shop() {
           <ProductDetails />
         </Route>
         <Route path={ROUTES.COMPARE}>
-          <Compare />
+          <ProductComparison />
         </Route>
         <Route path={ROUTES.ADD_NEW_PRODUCT}>
           <NewProduct />
@@ -90,7 +90,7 @@ function Shop() {
           <NotFound />
         </Route>
       </Switch>
-    </section>
+    </>
   );
 }
 
