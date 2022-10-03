@@ -1,7 +1,7 @@
 import type { IUserCart } from '@src/types';
-import type { IUser, IUserPublic } from '@database/models/_user';
+import type { IUser, TUserPublic } from '@database/models/_user';
 
-type TStorageValue = IUserCart | IUserPublic | NonNullable<IUser['tokens']['auth']>[number] | null;
+type TStorageValue = IUserCart | TUserPublic | NonNullable<IUser['tokens']['auth']>[number] | null;
 
 const storageService = (() => {
   class StorageService {
@@ -53,7 +53,7 @@ const storageService = (() => {
       super(key);
     }
 
-    update(accountState: IUserPublic) {
+    update(accountState: TUserPublic) {
       super.update(accountState, () => !accountState || typeof accountState !== 'object');
     }
   }

@@ -185,7 +185,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
           owners: new ObjectId(savedUser._id),
         },
       },
-      'User-Role'
+      'UserRole'
     );
 
     if (!updatedUser) {

@@ -1,4 +1,4 @@
-import type { IUser, IUserPublic, TUserRegistrationCredentials } from '@database/models/_user';
+import type { IUser, TUserPublic, TUserRegistrationCredentials } from '@database/models/_user';
 import type { IProduct } from '@database/models/_product';
 import type {
   IEmbracedResponse,
@@ -306,7 +306,7 @@ const httpService = new (class HttpService extends Ajax {
 
   loginUser(loginCredentials: { login: IUser['login']; password: IUser['password'] }) {
     return this.postRequest(`${this.USERS_URL}/login`, loginCredentials) as Promise<
-      IUserPublic | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
+      TUserPublic | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
     >;
   }
 

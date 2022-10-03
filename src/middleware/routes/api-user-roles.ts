@@ -51,7 +51,7 @@ async function saveUserRole(req: Request, res: Response, next: NextFunction) {
     };
     logger.log('userRole: ', userRole);
 
-    const savedUserRole = (await saveToDB(userRole, 'User-Role')) as IUserRole;
+    const savedUserRole = (await saveToDB(userRole, 'UserRole')) as IUserRole;
     await savedUserRole.save();
 
     logger.log('savedUserRole:', savedUserRole);
@@ -80,11 +80,7 @@ async function updateUserRole(req: Request, res: Response, next: NextFunction) {
       });
     }
 
-    const updatedUserRole = await updateOneModelInDB(
-      { roleName: req.body.roleName },
-      req.body.permissions,
-      'User-Role'
-    );
+    const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'UserRole');
     logger.log('updatedUserRole:', updatedUserRole);
 
     if (!updatedUserRole) {
@@ -111,7 +107,7 @@ async function getUserRole(req: Request, res: Response, next: NextFunction) {
       });
     }
 
-    const userRole = (await getFromDB({ roleName: req.params.roleName }, 'User-Role')) as IUserRole;
+    const userRole = (await getFromDB({ roleName: req.params.roleName }, 'UserRole')) as IUserRole;
 
     if (!userRole) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: `Role '${req.params.roleName}' not found!` });

@@ -18,7 +18,6 @@ const PASSWORD_METADATA = {
     errorMessage: 'password should has maximum of 20 chars!',
   },
 };
-const ACCOUNT_TYPES = ['client', 'retailer'] as const;
 const SINGLE_TOKEN_EXPIRE_TIME_MS = 1000 * 60 * 60;
 
 type TTokensKeys = keyof IUser['tokens'];
@@ -41,14 +40,6 @@ const userSchema = new Schema<IUser>(
       type: Schema.Types.Email,
       unique: true,
       required: true,
-    },
-    accountType: {
-      type: String,
-      required: true,
-      enum: {
-        values: ACCOUNT_TYPES,
-        message: '{VALUE} is not a proper account type!',
-      },
     },
     isConfirmed: {
       type: Boolean,
@@ -79,10 +70,11 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-userSchema.virtual('roleName', {
-  ref: 'User-Role',
+userSchema.virtual('accountType', {
+  ref: 'UserRole',
   localField: '_id',
   foreignField: 'owners',
+  justOne: true,
 });
 
 userSchema.methods.generateAuthToken = async function (): Promise<string> {
@@ -100,7 +92,7 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
   return authToken;
 };
 
-userSchema.methods.toJSON = function (): IUserPublic {
+userSchema.methods.toJSON = function (): TUserPublic {
   const user: IUser = this.toObject();
 
   return {
@@ -218,11 +210,13 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
   return user;
 };
 
-export const UserModel = model<IUser, IUserStatics>('User', userSchema);
+export const UserModel = model<IUser, IUserModel>('User', userSchema);
 
-export type IUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>;
+export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>;
 
-interface IUserStatics extends Model<IUser> {
+export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & { __accountType: string };
+
+interface IUserModel extends Model<IUser> {
   validatePassword(password: any): string;
 }
 
@@ -230,7 +224,6 @@ export interface IUser extends Document {
   login: string;
   password: string;
   email: string;
-  accountType: typeof ACCOUNT_TYPES[number];
   isConfirmed: boolean;
   observedProductsIDs: Schema.Types.ObjectId[] | undefined;
   tokens: {
@@ -239,7 +232,7 @@ export interface IUser extends Document {
     resetPassword: string | undefined;
   };
   generateAuthToken(): Promise<string>;
-  toJSON(): IUserPublic;
+  toJSON(): TUserPublic;
   matchPassword(password: string): Promise<boolean>;
   setSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
   deleteSingleToken(tokenName: TSingleTokensKeys): Promise<IUser>;
@@ -249,6 +242,6 @@ export interface IUser extends Document {
   removeAllProductsFromObserved(): string;
 }
 
-export type TUserRegistrationCredentials = Pick<IUser, 'login' | 'password' | 'email' | 'accountType'> & {
+export type TUserRegistrationCredentials = Pick<IUser, 'login' | 'password' | 'email'> & {
   repeatedPassword: IUser['password'];
 };

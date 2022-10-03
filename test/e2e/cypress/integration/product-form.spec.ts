@@ -45,7 +45,7 @@ describe('product-form', () => {
 
   beforeEach(() => {
     cy.loginTestUser({
-      login: 'test retailer',
+      login: 'test seller',
       password: 'password',
     }).then((res) => {
       // workaround non-UI based login, because frontend won't save a token received by Cypress

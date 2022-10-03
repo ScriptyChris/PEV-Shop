@@ -25,7 +25,7 @@ const translations = Object.freeze({
   email: 'Email',
   accountType: 'Account type',
   clientType: 'Client',
-  retailerType: 'Retailer',
+  sellerType: 'Seller',
   bothPasswordFieldsMustBeEqual: 'Both password fields must be equal!',
   registrationSuccessMsg: `
     Account registered! 
@@ -59,9 +59,9 @@ export default function Register() {
       identity: 'registrationAccountClientType',
     },
     {
-      value: 'retailer',
-      label: translations.retailerType,
-      identity: 'registrationAccountRetailerType',
+      value: 'seller',
+      label: translations.sellerType,
+      identity: 'registrationAccountSellerType',
     },
   ];
 

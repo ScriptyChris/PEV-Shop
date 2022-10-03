@@ -1,5 +1,5 @@
 import { cy, Cypress, it, describe, context, beforeEach, expect } from 'local-cypress';
-import type { IUserPublic } from '@database/models/_user';
+import type { TUserPublic } from '@database/models/_user';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
 import { makeCyDataSelector } from '../synchronous-helpers';
@@ -52,7 +52,7 @@ describe('#account', () => {
     goToNewUserAccount();
 
     cy.get(`${makeCyDataSelector('link:account-feature')}[href="${ACCOUNT_URLS.USER_PROFILE}"]`).click();
-    cy.getFromStorage<IUserPublic>('userAccount').then((user) => {
+    cy.getFromStorage<TUserPublic>('userAccount').then((user) => {
       const profileDetails = [
         { header: 'login', data: user.login },
         { header: 'email', data: user.email },
