@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
@@ -11,6 +11,7 @@ import {
   PEVTextField,
   PEVFieldset,
   PEVLegend,
+  PEVParagraph,
 } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
@@ -23,6 +24,7 @@ const translations = Object.freeze({
   repeatedPasswordField: 'Repeat password',
   submitRegistration: 'Register',
   email: 'Email',
+  loadingAccountTypes: 'Loading account types...',
   accountType: 'Account type',
   clientType: 'Client',
   sellerType: 'Seller',
@@ -52,18 +54,31 @@ export default function Register() {
       setFieldValue('accountType', value);
     };
   }, []);
-  const accountTypes = /* TODO: [DX] should be synced with API */ [
-    {
-      value: 'client',
-      label: translations.clientType,
-      identity: 'registrationAccountClientType',
-    },
-    {
-      value: 'seller',
-      label: translations.sellerType,
-      identity: 'registrationAccountSellerType',
-    },
-  ];
+  const [accountTypes, setAccountTypes] = useState();
+
+  useEffect(() => {
+    httpService.getUserRoles().then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED) {
+        return;
+      }
+
+      if (!Array.isArray(res) || !res.length) {
+        // TODO: [UX] show error popup
+        return;
+      }
+
+      setAccountTypes(
+        res.map((userRoleName) => {
+          const pascalCasedUserRoleName = userRoleName.replace(/./, (firstChar) => firstChar.toUpperCase());
+          return {
+            value: userRoleName,
+            label: translations[`${userRoleName}Type`],
+            identity: `registrationAccount${pascalCasedUserRoleName}Type`,
+          };
+        })
+      );
+    });
+  }, []);
 
   // TODO: [UX] show password related errors independently, based on recently blurred field
   const formValidator = (values) => {
@@ -162,32 +177,34 @@ export default function Register() {
               />
             </div>
 
-            <PEVFieldset>
-              <PEVLegend>{translations.accountType}</PEVLegend>
+            <div className="pev-flex" role="group">
+              <PEVParagraph id="account-type-label">{translations.accountType}</PEVParagraph>
               <RadioGroup
                 className="register__account-types"
-                aria-label={translations.accountType.toLowerCase()}
+                aria-labelledby="account-type-label"
                 name="accountType"
                 value={formikProps.values.accountType}
                 onChange={getAccountTypeChangeHandler(formikProps.setFieldValue)}
               >
-                {accountTypes.map((accountType) => (
-                  <FormControlLabel
-                    value={accountType.value}
-                    control={
-                      <Radio
-                        id={accountType.identity}
-                        inputProps={{ 'data-cy': `input:register-account-${accountType.value}-type` }}
-                        required
+                {accountTypes
+                  ? accountTypes.map((accountType) => (
+                      <FormControlLabel
+                        value={accountType.value}
+                        control={
+                          <Radio
+                            id={accountType.identity}
+                            inputProps={{ 'data-cy': `input:register-account-${accountType.value}-type` }}
+                            required
+                          />
+                        }
+                        label={accountType.label}
+                        htmlFor={accountType.identity}
+                        key={accountType.value}
                       />
-                    }
-                    label={accountType.label}
-                    htmlFor={accountType.identity}
-                    key={accountType.value}
-                  />
-                ))}
+                    ))
+                  : translations.loadingAccountTypes}
               </RadioGroup>
-            </PEVFieldset>
+            </div>
 
             <PEVButton className="register__submit-button" type="submit" data-cy="button:submit-register">
               {translations.submitRegistration}

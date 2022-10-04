@@ -40,7 +40,7 @@ declare global {
       removeTestUsers(canFail?: boolean): Cypress.Chainable<Cypress.Response<void>>;
       getFromStorage<T = any>(key: string): Cypress.Chainable<T>;
       cleanupTestUsersAndEmails(): void;
-      addTestProductByAPI(productData: TProductPublic): Cypress.Chainable<any>;
+      addTestProductByAPI(productData: TProductPublic, authToken: string): Cypress.Chainable<any>;
       removeTestProducts(productName: string, authToken: string): Cypress.Chainable<Cypress.Response<void>>;
       sendAPIReq(apiReqOptions: TAPIReqOptions): Cypress.Chainable<Cypress.Response<any>>;
       cleanupCartState(): void;

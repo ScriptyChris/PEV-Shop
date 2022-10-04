@@ -60,7 +60,7 @@ describe('product-form', () => {
 
   context('modify existing product', () => {
     beforeEach(() => {
-      cy.addTestProductByAPI(testProductDataForAPI);
+      cy.addTestProductByAPI(testProductDataForAPI, authToken);
     });
 
     it('form should contain proper data', () => {
@@ -206,6 +206,7 @@ describe('product-form', () => {
 
       // save new product
       cy.intercept('/api/products', (req) => {
+        req.headers.Authorization = `Bearer ${authToken}`;
         req.continue((res) => {
           expect(res.body).to.include({
             message: 'Success!',

@@ -72,7 +72,19 @@ export async function getPopulationState() {
   try {
     const collections = await dbConnection.db.listCollections().toArray();
     const requiredCollectionsReady = requiredCollectionNames.every((reqColName) =>
-      collections.find(({ name }) => reqColName === name)
+      collections.find(({ name }) => {
+        if (!reqColName) {
+          throw Error(`reqColName "${reqColName}" is missing!`);
+        }
+
+        if (reqColName.includes('-')) {
+          logger.log(`Compare reqColName "${reqColName}" without dashes.`);
+
+          return reqColName.replace(/-/g, '') === name;
+        }
+
+        return reqColName === name;
+      })
     );
 
     return requiredCollectionsReady;

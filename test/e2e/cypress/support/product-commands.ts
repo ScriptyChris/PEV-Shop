@@ -1,9 +1,12 @@
 import { Cypress, cy } from 'local-cypress';
 
-Cypress.Commands.add('addTestProductByAPI', (productData) => {
+Cypress.Commands.add('addTestProductByAPI', (productData, authToken) => {
   return cy.sendAPIReq({
     endpoint: 'products',
     method: 'POST',
+    extraHeaders: {
+      Authorization: `Bearer ${authToken}`,
+    },
     payload: productData,
   });
 });
