@@ -212,24 +212,20 @@ describe('#auth', () => {
   });
 
   describe('userRoleMiddlewareFn()', () => {
-    type TReqUser = { execPopulate?: TJestMock; roleName?: Array<{ permissions: [] }> };
+    type TReqUser = { execPopulate?: TJestMock; accountType?: { roleName: string } };
     // TODO: consider moving below mocks to separate file/module
     const getReqMock = () => {
-      const req: { user?: TReqUser; userPermissions?: [] } = {
+      const req: { user?: TReqUser } = {
         user: {},
       };
       (req.user as TReqUser).execPopulate = jest.fn(async () => {
-        (req.user as TReqUser).roleName = [
-          {
-            permissions: [],
-          },
-        ];
+        (req.user as TReqUser).accountType = { roleName: 'test account type' };
       });
 
       return req;
     };
     const getNextMock = () => jest.fn();
-    const ROLE_NAME = '';
+    const ROLE_NAME = 'test account type';
 
     it('should return a function, which returns a promise resolved to undefined', () => {
       // for success case
@@ -261,28 +257,24 @@ describe('#auth', () => {
     });
 
     describe('when req.user property is provided', () => {
-      it('should call req.user.execPopulate(..) with an object param', async () => {
+      it('should call req.user.execPopulate(..) with a string argument', async () => {
         const reqMock = getReqMock();
         const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
 
         await userRoleMiddlewareFnResult(reqMock, getResMock(), getNextMock());
 
-        expect((reqMock.user as TReqUser).execPopulate).toHaveBeenCalledWith({
-          path: 'roleName',
-          // TODO: [unit] auth regarding role names has to be refactored
-          // match: { roleName: ROLE_NAME },
-        });
+        expect((reqMock.user as TReqUser).execPopulate).toHaveBeenCalledWith('accountType');
       });
 
-      it('should assign userPermissions prop to req object', async () => {
+      it('should assign accountType prop to req.user object', async () => {
         const reqMock = getReqMock();
 
-        expect('userPermissions' in reqMock).toBe(false);
+        expect('accountType' in reqMock).toBe(false);
 
         const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
         await userRoleMiddlewareFnResult(reqMock, getResMock(), getNextMock());
 
-        expect(reqMock.userPermissions).toStrictEqual([]);
+        expect(reqMock).toHaveProperty('user.accountType.roleName', ROLE_NAME);
       });
 
       it('should call next() function', async () => {
@@ -294,17 +286,29 @@ describe('#auth', () => {
       });
     });
 
-    describe('when user is not provided in req param', () => {
-      it('should call res.status(..).json(..) with appropriate params', async () => {
+    describe('when failed', () => {
+      it('should call res.status(..).json(..) with correct args when `roleName` is not equal to req.user.accountType.roleName', async () => {
+        const resMock = getResMock();
+
+        const reqMock = getReqMock();
+        const userRoleMiddlewareFnResult = userRoleMiddlewareFn('different role name');
+
+        await userRoleMiddlewareFnResult(reqMock, resMock);
+
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: `You don't have permissions!` });
+      });
+
+      it("should call next with exception when req doesn't have `user` prop", async () => {
         const reqMock = getReqMock();
         delete reqMock.user;
 
         const resMock = getResMock();
         const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
+        const nextMock = getNextMock();
 
-        await userRoleMiddlewareFnResult(reqMock, resMock, getNextMock());
-        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: `You don't have permissions!` });
+        await userRoleMiddlewareFnResult(reqMock, resMock, nextMock);
+        expect(nextMock).toHaveBeenCalledWith(new TypeError("Cannot read property 'execPopulate' of undefined"));
       });
     });
   });

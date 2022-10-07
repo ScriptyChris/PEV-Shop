@@ -164,7 +164,7 @@ describe('#api-users', () => {
               owners: new ObjectIdMock(await saveToDBMock(reqMock.body)._id),
             },
           },
-          'User-Role'
+          'UserRole'
         );
       });
 

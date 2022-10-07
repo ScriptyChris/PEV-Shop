@@ -20,8 +20,10 @@ describe('#api-products', () => {
     authMiddlewareFnMock
       .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
       .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
+      .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
       .mockImplementationOnce(authMiddlewareFnMock._succeededCall);
     userRoleMiddlewareMock
+      .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall);
@@ -52,25 +54,38 @@ describe('#api-products', () => {
   it('should call router HTTP methods with correct params', () => {
     expect(apiProductsRouter.get).toHaveBeenCalledWith('/api/products', apiProductsRouter._getProducts);
     expect(apiProductsRouter.get).toHaveBeenCalledWith('/api/products/:id', apiProductsRouter._getProductById);
-    expect(apiProductsRouter.post).toHaveBeenCalledWith('/api/products', apiProductsRouter._addProduct);
+    expect(apiProductsRouter.post).toHaveBeenCalledWith(
+      '/api/products',
+      expect.any(Function),
+      expect.any(Function),
+      apiProductsRouter._addProduct
+    );
+    expect(authMiddlewareFnMock.mock.calls[0][0]).toBe(getFromDBMock);
+    expect(userRoleMiddlewareMock.mock.calls[0][0]).toBe('seller');
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
       '/api/products/:name/add-review',
       expect.any(Function),
       expect.any(Function),
       apiProductsRouter._addReview
     );
+    expect(authMiddlewareFnMock.mock.calls[1][0]).toBe(getFromDBMock);
+    expect(userRoleMiddlewareMock.mock.calls[1][0]).toBe('client');
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
       '/api/products/',
       expect.any(Function),
       expect.any(Function),
       apiProductsRouter._modifyProduct
     );
+    expect(authMiddlewareFnMock.mock.calls[2][0]).toBe(getFromDBMock);
+    expect(userRoleMiddlewareMock.mock.calls[2][0]).toBe('seller');
     expect(apiProductsRouter.delete).toHaveBeenCalledWith(
       '/api/products/:name',
       expect.any(Function),
       expect.any(Function),
       apiProductsRouter._deleteProduct
     );
+    expect(authMiddlewareFnMock.mock.calls[3][0]).toBe(getFromDBMock);
+    expect(userRoleMiddlewareMock.mock.calls[3][0]).toBe('seller');
     expect(apiProductsRouter.use).toHaveBeenCalledWith(expect.any(Function));
   });
 
@@ -490,18 +505,12 @@ describe('#api-products', () => {
         const resMock = getResMock();
 
         // null req.body case
-        await apiProductsRouter._modifyProduct({ userPermissions: true, body: null }, resMock);
+        await apiProductsRouter._modifyProduct({ body: null }, resMock);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({
           error: 'Request body is empty or not attached!',
         });
-
-        // no user permissions case
-        await apiProductsRouter._modifyProduct({ userPermissions: false, body: {} }, resMock);
-
-        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'User has no permissions!' });
 
         // product to modify not found
         updateOneModelInDBMock.mockImplementationOnce(updateOneModelInDBMock._failedCall);
@@ -557,23 +566,18 @@ describe('#api-products', () => {
         expect(resMock0._jsonMethod).toBeCalledWith({ error: 'Name param is empty or not attached!' });
 
         const resMock1 = getResMock();
-        await apiProductsRouter._deleteProduct({ params: { name: 'test name' } }, resMock1);
-        expect(resMock1.status).toBeCalledWith(HTTP_STATUS_CODE.FORBIDDEN);
-        expect(resMock1._jsonMethod).toBeCalledWith({ error: 'User has no permissions!' });
-
-        const resMock2 = getResMock();
         deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.general);
-        await apiProductsRouter._deleteProduct(reqMock, resMock2);
-        expect(resMock2.status).toBeCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
-        expect(resMock2._jsonMethod).toBeCalledWith({
+        await apiProductsRouter._deleteProduct(reqMock, resMock1);
+        expect(resMock1.status).toBeCalledWith(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+        expect(resMock1._jsonMethod).toBeCalledWith({
           exception: { message: expect.stringContaining('Failed to delete the product - ') },
         });
 
-        const resMock3 = getResMock();
+        const resMock2 = getResMock();
         deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.nothingFound);
-        await apiProductsRouter._deleteProduct(reqMock, resMock3);
-        expect(resMock3.status).toBeCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
-        expect(resMock3._jsonMethod).toBeCalledWith({ error: 'Could not find product to delete!' });
+        await apiProductsRouter._deleteProduct(reqMock, resMock2);
+        expect(resMock2.status).toBeCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+        expect(resMock2._jsonMethod).toBeCalledWith({ error: 'Could not find product to delete!' });
       });
     });
   });
