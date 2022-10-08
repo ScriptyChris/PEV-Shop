@@ -95,10 +95,15 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
 userSchema.methods.toJSON = function (): TUserPublic {
   const user: IUser = this.toObject();
 
+  if (!user.accountType?.roleName) {
+    throw new TypeError('User role was not successfully populated!');
+  }
+
   return {
     login: user.login,
     email: user.email,
     observedProductsIDs: user.observedProductsIDs || [],
+    accountType: user.accountType.roleName,
   };
 };
 
@@ -177,6 +182,22 @@ userSchema.methods.removeAllProductsFromObserved = function (): string {
   return '';
 };
 
+userSchema.statics.validateNewUserPayload = (newUser: any) => {
+  if (!newUser) {
+    return 'New user payload not provided!';
+  } else if (!newUser.login) {
+    return 'New user login not provided!';
+  } else if (!newUser.password) {
+    return 'New user password not provided!';
+  } else if (!newUser.email) {
+    return 'New user email not provided!';
+  } else if (!newUser.accountType) {
+    return 'New user accountType not provided!';
+  }
+
+  return '';
+};
+
 userSchema.statics.validatePassword = (password: any): string => {
   if (typeof password !== 'string') {
     return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE.errorMessage;
@@ -212,11 +233,14 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
 
 export const UserModel = model<IUser, IUserModel>('User', userSchema);
 
-export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>;
+export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'> & {
+  accountType: NonNullable<IUser['accountType']>['roleName'];
+};
 
 export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & { __accountType: string };
 
 interface IUserModel extends Model<IUser> {
+  validateNewUserPayload(newUser: any): string;
   validatePassword(password: any): string;
 }
 
@@ -231,6 +255,7 @@ export interface IUser extends Document {
     confirmRegistration: string | undefined;
     resetPassword: string | undefined;
   };
+  accountType?: { roleName: string };
   generateAuthToken(): Promise<string>;
   toJSON(): TUserPublic;
   matchPassword(password: string): Promise<boolean>;

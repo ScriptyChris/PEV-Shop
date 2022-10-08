@@ -61,7 +61,8 @@ const authMiddlewareFn = (
       const decodedToken = verifyToken(bearerToken);
       const user = (await getFromDB(
         { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
-        'User'
+        'User',
+        { population: 'accountType' }
       )) as IUser | IUser[];
 
       if (!user || (user as IUser[]).length === 0) {
@@ -86,11 +87,11 @@ const userRoleMiddlewareFn = (roleName: string /* TODO: [TS] use type from UserR
     next: NextFunction
   ) => {
     try {
-      await req.user.execPopulate('accountType');
+      if (!req.user.populated('accountType') || roleName !== req.user.accountType?.roleName) {
+        return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });
+      }
 
-      return roleName === req.user.accountType?.roleName
-        ? next()
-        : wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });
+      return next();
     } catch (exception) {
       return next(exception);
     }

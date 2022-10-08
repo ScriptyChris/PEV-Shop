@@ -4,7 +4,8 @@ import { ObjectId } from 'mongodb';
 import getLogger from '@commons/logger';
 import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '@database/database-index';
 import { authMiddlewareFn, hashPassword } from '@middleware/features/auth';
-import { UserModel, IUser } from '@database/models/_user';
+import { UserModel, IUser, TUserPublic } from '@database/models/_user';
+import { UserRoleModel, IUserRole } from '@database/models/_userRole';
 import sendMail, { EMAIL_TYPES } from '@middleware/helpers/mailer';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
@@ -93,13 +94,11 @@ const sendRegistrationEmail = async ({
   login,
   token,
   res,
-}: // next,
-{
+}: {
   email: string;
   login: string;
   token: string;
   res: Response;
-  // next: NextFunction;
 }) => {
   return sendMail(
     email,
@@ -125,7 +124,6 @@ const sendRegistrationEmail = async ({
 
       await deleteFromDB(login, 'User');
 
-      // next(new Error())
       return wrapRes(res, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR, {
         exception: {
           message: `Email sent error: '${emailSentError.message}'!`,
@@ -250,9 +248,12 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
   try {
     // TODO: [SECURITY] add some debounce for register amount per IP
 
-    // @ts-ignore
-    const validatedPasswordMsg = UserModel.validatePassword(req.body.password);
+    const validatedNewUserPayloadMsg = UserModel.validateNewUserPayload(req.body);
+    if (validatedNewUserPayloadMsg) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: validatedNewUserPayloadMsg });
+    }
 
+    const validatedPasswordMsg = UserModel.validatePassword(req.body.password);
     if (validatedPasswordMsg !== '') {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: validatedPasswordMsg });
     }
@@ -260,6 +261,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
     req.body.password = await hashPassword(req.body.password);
 
     const newUser = (await saveToDB(req.body, 'User')) as IUser;
+    await UserRoleModel.updateOne({ roleName: req.body.accountType }, { $push: { owners: newUser._id } });
     await newUser.setSingleToken('confirmRegistration');
 
     return await sendRegistrationEmail({
@@ -342,7 +344,9 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'User login is empty or not attached!' });
     }
 
-    const user = (await getFromDB({ login: req.body.login }, 'User')) as IUser;
+    const user: IUser = await getFromDB({ login: req.body.login }, 'User', {
+      population: 'accountType',
+    });
 
     if (!user) {
       return wrapRes(res, HTTP_STATUS_CODE.UNAUTHORIZED, { error: 'Invalid credentials!' });
@@ -506,13 +510,15 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'User id is empty or not attached!' });
     }
 
-    const user: IUser = await getFromDB(req.params.id, 'User');
+    const user: TUserPublic = await getFromDB(req.params.id, 'User', {
+      population: 'accountType',
+    });
 
     if (!user) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: `User not found!` });
     }
 
-    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: user as Record<keyof IUser, IUser[keyof IUser]> });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: user });
   } catch (exception) {
     return next(exception);
   }
@@ -635,8 +641,26 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
       }
     }
 
+    const usersToDeleteFromRoles = await UserModel.find({ login: query }, { _id: 1 });
+
+    if (!usersToDeleteFromRoles?.length) {
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to be deleted was not found!' });
+    }
+
+    const userIDsToDeleteFromRoles = Array.isArray(usersToDeleteFromRoles)
+      ? usersToDeleteFromRoles
+      : [usersToDeleteFromRoles].map(({ _id }: { _id: IUserRole['owners'][number] }) => _id);
+
     const deletedUser = await deleteFromDB(query, 'User');
     logger.log('deletedUser?', deletedUser, ' /query:', query);
+
+    await UserRoleModel.update(
+      // TODO: [TS] fix typing
+      // @ts-ignore
+      { owners: { $in: userIDsToDeleteFromRoles } },
+      { $pull: { owners: userIDsToDeleteFromRoles } },
+      { multi: true }
+    );
 
     return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
