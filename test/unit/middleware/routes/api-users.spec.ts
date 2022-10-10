@@ -12,8 +12,8 @@ const {
   updateOneModelInDB: updateOneModelInDBMock,
 } = mockAndRequireModule('src/database/database-index');
 
-// this should not be required?
 mockAndRequireModule('src/database/models/_user');
+mockAndRequireModule('src/database/models/_userRole');
 
 describe('#api-users', () => {
   const authMiddlewareReturnedFn = () => undefined;
@@ -209,7 +209,9 @@ describe('#api-users', () => {
 
         await apiUsersRouter._logInUser(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith({ login: reqMock.body.login }, 'User');
+        expect(getFromDBMock).toHaveBeenCalledWith({ login: reqMock.body.login }, 'User', {
+          population: 'accountType',
+        });
       });
 
       it('should call user.matchPassword(..) with correct param', async () => {
@@ -355,7 +357,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._getUser(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params.id, 'User');
+        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params.id, 'User', { population: 'accountType' });
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {

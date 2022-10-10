@@ -164,7 +164,8 @@ describe('#auth', () => {
             _id: expect.any(String),
             'tokens.auth': { $exists: true, $eq: 'test-token' },
           },
-          'User'
+          'User',
+          { population: 'accountType' }
         );
       });
 
@@ -212,13 +213,13 @@ describe('#auth', () => {
   });
 
   describe('userRoleMiddlewareFn()', () => {
-    type TReqUser = { execPopulate?: TJestMock; accountType?: { roleName: string } };
+    type TReqUser = { populated?: TJestMock; accountType?: { roleName: string } };
     // TODO: consider moving below mocks to separate file/module
     const getReqMock = () => {
       const req: { user?: TReqUser } = {
         user: {},
       };
-      (req.user as TReqUser).execPopulate = jest.fn(async () => {
+      (req.user as TReqUser).populated = jest.fn(async () => {
         (req.user as TReqUser).accountType = { roleName: 'test account type' };
       });
 
@@ -257,13 +258,13 @@ describe('#auth', () => {
     });
 
     describe('when req.user property is provided', () => {
-      it('should call req.user.execPopulate(..) with a string argument', async () => {
+      it('should call req.user.populated(..) with a string argument', async () => {
         const reqMock = getReqMock();
         const userRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
 
         await userRoleMiddlewareFnResult(reqMock, getResMock(), getNextMock());
 
-        expect((reqMock.user as TReqUser).execPopulate).toHaveBeenCalledWith('accountType');
+        expect((reqMock.user as TReqUser).populated).toHaveBeenCalledWith('accountType');
       });
 
       it('should assign accountType prop to req.user object', async () => {
@@ -308,7 +309,7 @@ describe('#auth', () => {
         const nextMock = getNextMock();
 
         await userRoleMiddlewareFnResult(reqMock, resMock, nextMock);
-        expect(nextMock).toHaveBeenCalledWith(new TypeError("Cannot read property 'execPopulate' of undefined"));
+        expect(nextMock).toHaveBeenCalledWith(new TypeError("Cannot read property 'populated' of undefined"));
       });
     });
   });
