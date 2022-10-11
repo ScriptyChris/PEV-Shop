@@ -1,3 +1,5 @@
+import type { TStoreService } from '@frontend/features/storeService';
+
 const ROUTE_GROUPS = Object.freeze({
   ROOT: '/',
   PAGES: '/pages',
@@ -15,6 +17,7 @@ export const ROUTES = Object.freeze({
   CONFIRM_REGISTRATION: `${ROUTE_GROUPS.PAGES}/confirm-registration`,
   LOG_IN: `${ROUTE_GROUPS.PAGES}/log-in`,
   NOT_LOGGED_IN: `${ROUTE_GROUPS.PAGES}/not-logged-in`,
+  NOT_AUTHORIZED: `${ROUTE_GROUPS.PAGES}/not-authorized`,
   RESET_PASSWORD: `${ROUTE_GROUPS.PAGES}/reset-password`,
   SET_NEW_PASSWORD: `${ROUTE_GROUPS.PAGES}/set-new-password`,
   ACCOUNT: `${ROUTE_GROUPS.PAGES}/account`,
@@ -23,3 +26,20 @@ export const ROUTES = Object.freeze({
   MODIFY_PRODUCT: `${ROUTE_GROUPS.SHOP}/modify-product`,
   ORDER: `${ROUTE_GROUPS.SHOP}/order`,
 });
+
+export const useRoutesGuards = (storeService: TStoreService) => {
+  return {
+    isGuest() {
+      return !storeService.userAccountState;
+    },
+    isUser() {
+      return !!storeService.userAccountState;
+    },
+    isClient() {
+      return storeService.userAccountState && storeService.userAccountState.accountType === 'client';
+    },
+    isSeller() {
+      return storeService.userAccountState && storeService.userAccountState.accountType === 'seller';
+    },
+  };
+};

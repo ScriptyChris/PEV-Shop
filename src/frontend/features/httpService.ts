@@ -289,7 +289,7 @@ const httpService = new (class HttpService extends Ajax {
   }
 
   deleteProduct(productName: IProduct['name']) {
-    return this.deleteRequest(`${this.URLS.PRODUCTS}/${productName}`);
+    return this.deleteRequest(`${this.URLS.PRODUCTS}/${productName}`, true);
   }
 
   getUser() {

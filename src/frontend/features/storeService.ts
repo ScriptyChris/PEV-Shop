@@ -90,8 +90,6 @@ class StoreService {
     add: TUserCartProduct;
     remove: Partial<{ index: number; _id: TUserCartProduct['_id'] }>;
   }) {
-    console.log('(updateProductComparisonState) /add:', add, ' /remove:', remove);
-
     if (add) {
       this._productComparisonState.push(add);
     } else if (typeof remove.index === 'number') {
@@ -164,3 +162,5 @@ if (window.Cypress) {
 }
 
 export default storeService;
+
+export type TStoreService = typeof storeService;

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 
 import { PEVLink, PEVHeading } from '@frontend/components/utils/pevElements';
-import { ROUTES } from '@frontend/components/pages/_routes';
+import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
+import storeService from '@frontend/features/storeService';
 import Nav from './nav';
 import Cart from './cart';
 import { SearchProductsByName } from '@frontend/components/views/search';
@@ -17,7 +19,8 @@ const translations = Object.freeze({
   typeProductName: 'Search for a product',
 });
 
-export default function Header() {
+export default observer(function Header() {
+  const routesGuards = useRoutesGuards(storeService);
   const history = useHistory();
   const { isMobileLayout } = useRWDLayout();
   const [isHeadingSmall, setIsHeadingSmall] = useState(false);
@@ -54,8 +57,8 @@ export default function Header() {
           toggleMainHeadingSize={setIsHeadingSmall}
         />
         <Nav />
-        <Cart />
+        {(routesGuards.isGuest() || routesGuards.isClient()) && <Cart />}
       </Toolbar>
     </AppBar>
   );
-}
+});

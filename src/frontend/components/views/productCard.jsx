@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 
 import Paper from '@material-ui/core/Paper';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -9,10 +10,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Divider from '@material-ui/core/Divider';
 
 import { PEVIconButton } from '@frontend/components/utils/pevElements';
-import { ROUTES } from '@frontend/components/pages/_routes';
+import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
+import storeService from '@frontend/features/storeService';
 import { AddToCartButton } from '@frontend/components/views/cart';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
 import { ProductComparisonCandidatesToggler } from './productComparisonCandidates';
+import { DeleteProductFeature, NavigateToModifyProduct } from '@frontend/components/shared';
 
 const translations = {
   productName: 'Name',
@@ -23,6 +26,14 @@ const translations = {
   actionsBarTogglerLabel: 'toggle actions bar',
   descriptiveProductPrice: 'product price',
   detailsBtn: 'Check details!',
+  editProduct: 'Edit',
+  deleteProduct: 'Delete',
+  promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
+  promptProductDeletion: 'Are you sure you want to delete this product?',
+  confirmProductDeletion: 'Yes',
+  abortProductDeletion: 'No',
+  productDeletionSuccess: 'Product successfully deleted!',
+  productDeletionFailed: 'Deleting product failed :(',
 };
 
 function ProductCardBasicDesc({ isCompact, compactLabel, dataCy, label, value }) {
@@ -75,7 +86,7 @@ const productCardLayoutTypesClassModifiers = {
   COMPACT: 'compact-layout',
 };
 
-export default function ProductCard({
+export default observer(function ProductCard({
   product,
   RenderedComponent,
   layoutType = PRODUCT_CARD_LAYOUT_TYPES.DETAILED,
@@ -90,6 +101,7 @@ export default function ProductCard({
     throw TypeError(`entryNo prop - if provided - has to be a number! Receieved "${entryNo}".`);
   }
 
+  const routesGuards = useRoutesGuards(storeService);
   const dataCySuffix = Number.isNaN(entryNo) ? 'unique' : entryNo;
   const [menuBtnRef, setMenuBtnRef] = useState(null);
   const { name, price, _id } = product;
@@ -99,11 +111,20 @@ export default function ProductCard({
     return ({ currentTarget }) => setMenuBtnRef(shouldShow ? currentTarget : null);
   };
 
-  const MenuItemDivider = (
-    <MenuItem button={false} disableGutters={true} className="product-card__actions-bar-item">
-      <Divider orientation="vertical" flexItem />
-    </MenuItem>
-  );
+  /* eslint-disable react/jsx-key */
+  const menuItems = [
+    routesGuards.isSeller()
+      ? [<NavigateToModifyProduct productName={name} />, <DeleteProductFeature productName={name} />]
+      : [],
+    routesGuards.isGuest() || routesGuards.isClient() ? (
+      <AddToCartButton productInfoForCart={{ name, price, _id }} />
+    ) : (
+      []
+    ),
+    <ProductComparisonCandidatesToggler product={product} />,
+    <ProductObservabilityToggler productId={_id} />,
+  ].flat();
+  /* eslint-enable react/jsx-key */
 
   return (
     <Paper
@@ -165,19 +186,32 @@ export default function ProductCard({
         }}
         data-cy="popup:product-card__actions-bar"
       >
-        <MenuItem button={false} className="product-card__actions-bar-item">
-          <AddToCartButton productInfoForCart={{ name, price, _id }} />
-        </MenuItem>
-        {MenuItemDivider}
-        <MenuItem button={false} className="product-card__actions-bar-item">
-          <ProductComparisonCandidatesToggler product={product} />
-        </MenuItem>
-        {MenuItemDivider}
-        <MenuItem button={false} className="product-card__actions-bar-item">
-          <ProductObservabilityToggler productId={product._id} />
-        </MenuItem>
+        {menuItems.flatMap((item, index) => {
+          const result = [
+            <MenuItem button={false} className="product-card__actions-bar-item" key={`menu-item-${index}`}>
+              {item}
+            </MenuItem>,
+          ];
+
+          if (index < menuItems.length - 1) {
+            const MenuItemDivider = (
+              <MenuItem
+                button={false}
+                disableGutters={true}
+                className="product-card__actions-bar-item"
+                key={`menu-divider-${index}`}
+              >
+                <Divider orientation="vertical" flexItem />
+              </MenuItem>
+            );
+            result.push(MenuItemDivider);
+          }
+
+          return result;
+        })}
+
         {/* TODO: [UX] add (un)observing product */}
       </Menu>
     </Paper>
   );
-}
+});
