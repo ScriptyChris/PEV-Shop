@@ -1,6 +1,6 @@
-import { cy, Cypress } from 'local-cypress';
+import { cy, Cypress, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
-import type { TE2E, IUserCart } from '@src/types';
+import { TE2E, IUserCart, HTTP_STATUS_CODE } from '@src/types';
 
 Cypress.Commands.add('getFromStorage', (key) => {
   return cy.window().then((window) => JSON.parse(window.localStorage.getItem(key) as string));
@@ -9,7 +9,11 @@ Cypress.Commands.add('getFromStorage', (key) => {
 Cypress.Commands.add('cleanupTestUsersAndEmails', () => {
   cy.visit(ROUTES.ROOT);
   cy.deleteEmails().as('deleteEmails');
-  cy.removeTestUsers().as('removeTestUsers');
+  cy.removeTestUsers(false)
+    .then((res) => {
+      expect(res.status).to.be.oneOf([HTTP_STATUS_CODE.NO_CONTENT, HTTP_STATUS_CODE.NOT_FOUND]);
+    })
+    .as('removeTestUsers');
   cy.get('@deleteEmails');
   cy.get('@removeTestUsers');
 });

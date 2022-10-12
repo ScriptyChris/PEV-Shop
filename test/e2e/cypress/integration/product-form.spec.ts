@@ -1,7 +1,10 @@
 import { describe, it, cy, beforeEach, context, expect, after } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
-import { HTTP_STATUS_CODE } from '@root/src/types';
+import { TE2EUser, HTTP_STATUS_CODE } from '@root/src/types';
+import * as users from '@database/populate/initial-users.json';
+
+const exampleSellerUser = (users as TE2EUser[])[1];
 
 describe('product-form', () => {
   const { forForm: testProductDataForForm, forAPI: testProductDataForAPI } = getTestProductData();
@@ -44,18 +47,18 @@ describe('product-form', () => {
   };
 
   beforeEach(() => {
-    cy.loginTestUser({
-      login: 'test seller',
-      password: 'password',
-    }).then((res) => {
-      // workaround non-UI based login, because frontend won't save a token received by Cypress
-      authToken = res.body.authToken;
-      cy.removeTestProducts(testProductDataForAPI.name, res.body.authToken);
+    cy.visit(ROUTES.LOG_IN);
+    cy.loginTestUserByUI(exampleSellerUser);
+    cy.get('@_authToken').then((_authToken) => {
+      // cache `authToken` for each test
+      authToken = _authToken as unknown as string;
+      cy.removeTestProducts(testProductDataForAPI.name, authToken);
     });
   });
 
   after(() => {
     cy.removeTestProducts(testProductDataForAPI.name, authToken);
+    cy.logoutUserFromAllSessions(authToken);
   });
 
   context('modify existing product', () => {

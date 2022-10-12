@@ -32,7 +32,7 @@ const fetchErrorHandler = (errorLogMessage: string) => {
   };
 };
 
-const plugin: Cypress.PluginConfig = (on) => {
+const plugin: Cypress.PluginConfig = (on, config) => {
   on('task', {
     startAlternativeSession(userLoginCredentials: TUserLoginCredentials) {
       return loginUserByAPI(userLoginCredentials)
@@ -55,6 +55,15 @@ const plugin: Cypress.PluginConfig = (on) => {
           .catch(fetchErrorHandler('checkAltSessionError'))
       );
     },
+  });
+
+  on('before:browser:launch', (browser, launchOptions) => {
+    // auto open devtools in development mode
+    if (config.env.TEST_MODE === 'development' && browser.name === 'electron') {
+      launchOptions.preferences.devTools = true;
+    }
+
+    return launchOptions;
   });
 };
 

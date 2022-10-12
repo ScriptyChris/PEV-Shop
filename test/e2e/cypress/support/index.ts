@@ -36,6 +36,9 @@ declare global {
         testUser: Pick<TE2EUser, 'login' | 'password'>,
         canFail?: boolean
       ): Cypress.Chainable<Cypress.Response<TUserPublic & { authToken: NonNullable<IUser['tokens']['auth']>[number] }>>;
+      logoutUserFromAllSessions(
+        authToken: NonNullable<IUser['tokens']['auth']>[number]
+      ): Cypress.Chainable<Cypress.Response<void>>;
       loginTestUserByUI(testUser: Pick<TE2EUser, 'login' | 'password' | 'email'>): void;
       removeTestUsers(canFail?: boolean): Cypress.Chainable<Cypress.Response<void>>;
       getFromStorage<T = any>(key: string): Cypress.Chainable<T>;
