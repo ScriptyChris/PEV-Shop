@@ -4,7 +4,7 @@ import { sign, verify, Secret } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { config as dotenvConfig } from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { IUser } from '@database/models/_user';
+import { IUser, UserModel } from '@database/models/_user';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 
@@ -61,7 +61,8 @@ const authMiddlewareFn = (
       const decodedToken = verifyToken(bearerToken);
       const user = (await getFromDB(
         { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
-        'User'
+        'User',
+        { population: 'accountType' }
       )) as IUser | IUser[];
 
       if (!user || (user as IUser[]).length === 0) {
@@ -79,21 +80,16 @@ const authMiddlewareFn = (
   };
 };
 
-// TODO: `roleName` is temporarily not used, until user roles refactoring
-const userRoleMiddlewareFn = (roleName: string): any => {
-  return async (req: Request & { user: any; userPermissions: string[] }, res: Response, next: NextFunction) => {
+const userRoleMiddlewareFn = (roleName: string /* TODO: [TS] use type from UserRole */): any => {
+  return async (
+    req: Request & { user: typeof UserModel & { accountType?: { roleName: string } } },
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      if (!req.user) {
+      if (!req.user.populated('accountType') || roleName !== req.user.accountType?.roleName) {
         return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });
       }
-
-      // TODO: improve selecting data while populating
-      await req.user.execPopulate({
-        path: 'roleName',
-        // match: { roleName: 'retailer' },
-      });
-
-      req.userPermissions = req.user.roleName[0].permissions;
 
       return next();
     } catch (exception) {

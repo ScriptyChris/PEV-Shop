@@ -5,12 +5,12 @@ import { UserRoleModel, IUserRole } from './_userRole';
 const MODELS = {
   Product: ProductModel,
   User: UserModel,
-  'User-Role': UserRoleModel,
+  UserRole: UserRoleModel,
 } as const;
 
-export type IModel = IProduct | IUser | IUserRole;
-export type TModelType = keyof typeof MODELS;
+export type TModel = IProduct | IUser | IUserRole;
+export type TModelName = keyof typeof MODELS;
 
-export function getModel(modelType: TModelType): typeof MODELS[TModelType] {
-  return MODELS[modelType];
+export function getModel(modelName: TModelName) {
+  return MODELS[modelName];
 }

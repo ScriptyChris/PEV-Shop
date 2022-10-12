@@ -1,7 +1,7 @@
 import { cy, Cypress, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import type { TE2E } from '@src/types';
-import type { IUserPublic } from '@database/models/_user';
+import type { TUserPublic } from '@database/models/_user';
 import { makeCyDataSelector } from '../synchronous-helpers';
 
 Cypress.Commands.add('registerTestUserByUI', ({ login, email }) => {
@@ -73,7 +73,7 @@ Cypress.Commands.add('registerAndLoginTestUser', (testUser) => {
         email: testUser.email,
       });
 
-      return res as IUserPublic;
+      return res as TUserPublic;
     });
 });
 
@@ -95,10 +95,24 @@ Cypress.Commands.add('loginTestUserByUI', (testUser) => {
         login: testUser.login,
         email: testUser.email,
       });
+      expect(res.body).to.have.property('authToken').to.be.a('string').that.is.not.empty;
     });
   }).as('loginUser');
   cy.get(makeCyDataSelector('button:submit-login')).click();
-  cy.wait('@loginUser');
+  cy.wait('@loginUser').then((interception) => {
+    // expose `authToken` to whatever caller, which may potentially need it
+    cy.wrap(interception.response!.body.authToken).as('_authToken');
+  });
+});
+
+Cypress.Commands.add('logoutUserFromAllSessions', (authToken) => {
+  return cy.sendAPIReq({
+    endpoint: 'users/logout-all',
+    method: 'POST',
+    extraHeaders: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
 });
 
 Cypress.Commands.add('removeTestUsers', (canFail) => {

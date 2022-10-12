@@ -18,10 +18,12 @@ import TableCell from '@material-ui/core/TableCell';
 import { PEVButton, PEVIconButton, PEVHeading } from '@frontend/components/utils/pevElements';
 import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
-import { ROUTES } from '@frontend/components/pages/_routes';
+import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 
 const translations = {
   addToCartBtn: 'Add to cart',
+  addingToCartAuthFailure: 'Adding product to cart is not available for your account type.',
   header: 'Cart',
   cartLabel: 'cart',
   goBackLabel: 'go back',
@@ -48,26 +50,39 @@ export function AddToCartButton({ productInfoForCart, startOrEndIcon = null, cla
       Received: '${JSON.stringify(startOrEndIcon)}'.`
     );
   }
-
+  const [popupData, setPopupData] = useState(null);
+  const routesGuards = useRoutesGuards(storeService);
   const ButtonTag = startOrEndIcon ? PEVButton : PEVIconButton;
 
   const handleAddToCartClick = () => {
+    if (!routesGuards.isGuest() && !routesGuards.isClient()) {
+      return setPopupData({
+        type: POPUP_TYPES.FAILURE,
+        message: translations.addingToCartAuthFailure,
+        buttons: [getClosePopupBtn(setPopupData)],
+      });
+    }
+
     storeService.addProductToUserCartState(productInfoForCart /* TODO: [TS] `as IUserCart['products']` */);
   };
 
+  // TODO: [UX] add list of product's amount to be added to cart (defaulted to 1) with an option to type custom amount
+  // TODO: [UX] add info tooltip after product is added to cart
+  // TODO: [UX] set different color for button depending on it's usage availability
   return (
-    // TODO: [UX] add list of product's amount to be added to cart (defaulted to 1) with an option to type custom amount
-    // TODO: [UX] add info tooltip after product is added to cart
-    <ButtonTag
-      onClick={handleAddToCartClick}
-      a11y={translations.addToCartBtn}
-      className={className}
-      {...{ [startOrEndIcon]: startOrEndIcon ? <AddShoppingCart /> : null }}
-      variant={startOrEndIcon ? 'contained' : null}
-      data-cy="button:add-product-to-cart"
-    >
-      {startOrEndIcon ? translations.addToCartBtn : <AddShoppingCart />}
-    </ButtonTag>
+    <>
+      <ButtonTag
+        onClick={handleAddToCartClick}
+        a11y={translations.addToCartBtn}
+        className={className}
+        {...{ [startOrEndIcon]: startOrEndIcon ? <AddShoppingCart /> : null }}
+        variant={startOrEndIcon ? 'contained' : null}
+        data-cy="button:add-product-to-cart"
+      >
+        {startOrEndIcon ? translations.addToCartBtn : <AddShoppingCart />}
+      </ButtonTag>
+      <Popup {...popupData} />
+    </>
   );
 }
 

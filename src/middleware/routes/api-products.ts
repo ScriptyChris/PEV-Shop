@@ -35,8 +35,7 @@ const router: Router &
 router.get('/api/products/specs', getProductsSpecs);
 router.get('/api/products', getProducts);
 router.get('/api/products/:id', getProductById);
-// TODO: add auth and user-role middlewares
-router.post('/api/products', addProduct);
+router.post('/api/products', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), addProduct);
 router.patch('/api/products/:name/add-review', authMiddleware(getFromDB), userRoleMiddlewareFn('client'), addReview);
 router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
 router.delete('/api/products/:name', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), deleteProduct);
@@ -241,14 +240,12 @@ addReview.isIntOrDecimalHalf = (value: number): boolean => {
   return isInt || isDecimalHalf;
 };
 
-async function modifyProduct(req: Request & { userPermissions?: any }, res: Response, next: NextFunction) {
+async function modifyProduct(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('(products PATCH) req.body:', req.body);
 
     if (!req.body) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request body is empty or not attached!' });
-    } else if (!req.userPermissions) {
-      return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: 'User has no permissions!' });
     }
 
     // TODO: prepare to be used with various product properties
@@ -270,14 +267,12 @@ async function modifyProduct(req: Request & { userPermissions?: any }, res: Resp
   }
 }
 
-async function deleteProduct(req: Request & { userPermissions?: any }, res: Response, next: NextFunction) {
+async function deleteProduct(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('[products DELETE] req.params:', req.params);
 
     if (!req.params || !req.params.name) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Name param is empty or not attached!' });
-    } else if (!req.userPermissions) {
-      return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: 'User has no permissions!' });
     }
 
     const deletionResult = await deleteFromDB(req.params.name, 'Product');

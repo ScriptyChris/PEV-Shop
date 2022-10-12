@@ -1,7 +1,7 @@
 import storeService from './storeService';
 import storageService from './storageService';
 import httpService, { CUSTOM_RES_EXT_DICT } from './httpService';
-import type { IUser, IUserPublic } from '@database/models/_user';
+import type { IUser, TUserPublic } from '@database/models/_user';
 
 type TLogInCredentials = Pick<IUser, 'login' | 'password'>;
 
@@ -12,7 +12,7 @@ const userSessionService = Object.freeze({
         return res;
       }
 
-      const userAccount = res as IUserPublic;
+      const userAccount = res as TUserPublic;
       const authToken = httpService.getAuthToken();
 
       if (!userAccount || !authToken) {

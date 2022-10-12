@@ -18,12 +18,12 @@ hashPassword._succeededCall = (password: string) => Promise.resolve(Buffer.from(
 hashPassword._failedCall = () => Promise.reject(Error('hashing failed'));
 
 const userRoleMiddlewareFn: TJestMock & {
-  _succeededCall?: () => () => Promise<void>;
-  _failedCall?: () => () => Promise<boolean>;
+  _succeededCall?: (roleName: string) => () => Promise<void>;
+  _failedCall?: (roleName: string) => () => Promise<boolean>;
 } = jest.fn(() => {
   throw getMockImplementationError('userRoleMiddlewareFn');
 });
-userRoleMiddlewareFn._succeededCall = () => async () => undefined;
-userRoleMiddlewareFn._failedCall = () => () => Promise.reject(false);
+userRoleMiddlewareFn._succeededCall = (roleName: string) => async () => undefined;
+userRoleMiddlewareFn._failedCall = (roleName: string) => () => Promise.reject(false);
 
 export { authMiddlewareFn, hashPassword, userRoleMiddlewareFn };

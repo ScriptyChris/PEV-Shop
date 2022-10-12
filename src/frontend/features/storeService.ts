@@ -1,5 +1,5 @@
 import { observable, decorate, action } from 'mobx';
-import { IUserPublic } from '@database/models/_user';
+import { TUserPublic } from '@database/models/_user';
 import type { IUserCart } from '@src/types';
 
 const USER_CART_STATE: IUserCart = {
@@ -13,12 +13,12 @@ const INITIAL_USER_ACCOUNT_STATE = null;
 type TUserCartProduct = IUserCart['products'][number] & { count: number };
 
 class StoreService {
-  _userAccountState: IUserPublic | null;
+  _userAccountState: TUserPublic | null;
   _userCartState: IUserCart;
   _productComparisonState: TUserCartProduct[];
 
   constructor() {
-    // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's IUserPublic
+    // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's TUserPublic
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
     this._userCartState = { ...USER_CART_STATE };
     this._productComparisonState = [];
@@ -28,7 +28,7 @@ class StoreService {
     return this._userCartState.products.findIndex((productItem) => productItem.name === newUserCartStateName);
   }
 
-  updateUserAccountState(userAccountState: IUserPublic) {
+  updateUserAccountState(userAccountState: TUserPublic) {
     this._userAccountState = userAccountState;
   }
 
@@ -90,8 +90,6 @@ class StoreService {
     add: TUserCartProduct;
     remove: Partial<{ index: number; _id: TUserCartProduct['_id'] }>;
   }) {
-    console.log('(updateProductComparisonState) /add:', add, ' /remove:', remove);
-
     if (add) {
       this._productComparisonState.push(add);
     } else if (typeof remove.index === 'number') {
@@ -106,12 +104,12 @@ class StoreService {
     this._productComparisonState.length = 0;
   }
 
-  updateProductObservedState(observedProductsIDs: IUserPublic['observedProductsIDs']) {
-    this.updateUserAccountState({ ...this._userAccountState, observedProductsIDs } as IUserPublic);
+  updateProductObservedState(observedProductsIDs: TUserPublic['observedProductsIDs']) {
+    this.updateUserAccountState({ ...this._userAccountState, observedProductsIDs } as TUserPublic);
   }
 
   clearProductObservedState() {
-    this.updateUserAccountState({ ...this._userAccountState, observedProductsIDs: [] } as IUserPublic);
+    this.updateUserAccountState({ ...this._userAccountState, observedProductsIDs: [] } as TUserPublic);
   }
 
   get userCartState() {
@@ -164,3 +162,5 @@ if (window.Cypress) {
 }
 
 export default storeService;
+
+export type TStoreService = typeof storeService;

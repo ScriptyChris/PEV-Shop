@@ -11,7 +11,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import userSessionService from '@frontend/features/userSessionService';
-import { ROUTES } from '@frontend/components/pages/_routes';
+import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
@@ -30,20 +30,24 @@ const translations = Object.freeze({
         located under main header to indicate where user currently is
 */
 const NavMenu = observer(({ logOutUser }) => {
+  const routesGuards = useRoutesGuards(storeService);
+
   return (
     <nav className="nav-menu">
       <MenuList className="nav-menu__links">
         <MenuItem>
           <PEVLink to={ROUTES.SHOP}>{translations.shop}</PEVLink>
         </MenuItem>
+        {routesGuards.isSeller() && [
+          <MenuItem key="ROUTES.ADD_NEW_PRODUCT">
+            <PEVLink to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</PEVLink>
+          </MenuItem>,
+          <MenuItem key="ROUTES.MODIFY_PRODUCT">
+            <PEVLink to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</PEVLink>
+          </MenuItem>,
+        ]}
         <MenuItem>
-          <PEVLink to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</PEVLink>
-        </MenuItem>
-        <MenuItem>
-          <PEVLink to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</PEVLink>
-        </MenuItem>
-        <MenuItem>
-          {storeService.userAccountState ? (
+          {routesGuards.isUser() ? (
             <PEVLink to={ROUTES.ROOT} onClick={logOutUser}>
               {translations.logOut}
             </PEVLink>
@@ -54,7 +58,7 @@ const NavMenu = observer(({ logOutUser }) => {
           )}
         </MenuItem>
         <MenuItem>
-          {storeService.userAccountState ? (
+          {routesGuards.isUser() ? (
             <PEVLink to={ROUTES.ACCOUNT}>{translations.account}</PEVLink>
           ) : (
             <PEVLink to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>

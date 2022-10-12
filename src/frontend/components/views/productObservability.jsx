@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
 import List from '@material-ui/core/List';
@@ -9,7 +10,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 import { PEVButton, PEVIconButton } from '@frontend/components/utils/pevElements';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout.tsx';
-import { ROUTES } from '@frontend/components/pages/_routes';
+import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
 import storageService from '@frontend/features/storageService';
 import httpService from '@frontend/features/httpService';
@@ -24,7 +25,7 @@ const translations = {
   unobserveAllProductsFailedMsg: 'Failed to unobserve all products :(',
   observingProductFailed: 'Failed adding product to observed!',
   unObservingProductFailed: 'Failed removing product from observed!',
-  promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
+  promptToLoginBeforeProductObserveToggling: 'You need to log in as a client to toggle product observing state.',
   goTologIn: 'Log in',
 };
 
@@ -34,6 +35,9 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
   } else if (getCustomButton !== null && typeof getCustomButton !== 'function') {
     throw TypeError(`getCustomButton '${getCustomButton}' should be null or function!'`);
   }
+
+  const routesGuards = useRoutesGuards(storeService);
+  const history = useHistory();
 
   const [popupData, setPopupData] = useState(null);
   // TODO: [BUG] update `isProductObserved` when component is re-rendered due to `product` prop param change
@@ -46,7 +50,7 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
   const buttonDataCy = `button:product-${isProductObserved ? 'remove-from-compare' : 'add-to-compare'}`;
 
   const toggleProductObserve = (event, shouldObserve) => {
-    if (!storeService.userAccountState) {
+    if (routesGuards.isGuest()) {
       return setPopupData({
         type: POPUP_TYPES.NEUTRAL,
         message: translations.promptToLoginBeforeProductObserveToggling,

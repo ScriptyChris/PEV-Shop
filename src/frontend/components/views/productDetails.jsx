@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Field } from 'formik';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 
 import Paper from '@material-ui/core/Paper';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import List from '@material-ui/core/List';
@@ -29,10 +28,12 @@ import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils
 import RatingWidget from '@frontend/components/utils/ratingWidget';
 import { getLocalizedDate } from '@frontend/features/localization';
 import { AddToCartButton } from '@frontend/components/views/cart';
-import { ROUTES } from '@frontend/components/pages/_routes';
+import { useRoutesGuards } from '@frontend/components/pages/_routes';
+import storeService from '@frontend/features/storeService';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
 import { ProductComparisonCandidatesToggler } from '@frontend/components/views/productComparisonCandidates';
 import Scroller from '@frontend/components/utils/scroller';
+import { DeleteProductFeature, NavigateToModifyProduct } from '@frontend/components/shared';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -43,10 +44,6 @@ const productDetailsTranslations = Object.freeze({
   reviews: 'Reviews',
   reviewAuthor: 'Author',
   reviewNewAuthor: 'Add review as',
-  editProduct: 'Edit',
-  deleteProduct: 'Delete',
-  promptToLoginBeforeProductObserveToggling: 'You need to log in to toggle product observing state',
-  goTologIn: 'Log in',
   productDetailsNavMenuLabel: 'product details nav menu',
   descriptionNavLabel: 'Description',
   technicalSpecsNavLabel: 'Specification',
@@ -398,16 +395,15 @@ const useSectionsObserver = () => {
   return { productDetailsNavSections, activatedNavMenuItemIndex };
 };
 
-export default function ProductDetails({ product }) {
+export default observer(function ProductDetails({ product }) {
   // TODO: fetch product data independently when page is loaded explicitly (not navigated to from other page)
   const location = useLocation();
   product = product || location.state;
-  const history = useHistory();
+  const routesGuards = useRoutesGuards(storeService);
 
   console.log('[ProductDetails] product received from navigation: ', product);
 
   const [productDetails, setProductDetails] = useState(null);
-  const [popupData, setPopupData] = useState(null);
   const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
 
   useEffect(() => {
@@ -440,40 +436,6 @@ export default function ProductDetails({ product }) {
     }
   }, [location.hash]);
 
-  const navigateToProductModify = () => {
-    history.push(ROUTES.MODIFY_PRODUCT, productDetails.name);
-  };
-
-  const deleteProduct = () => {
-    httpService
-      .disableGenericErrorHandler()
-      .deleteProduct(productDetails.name)
-      .then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
-          return;
-        } else if (res.__NO_CONTENT) {
-          setPopupData({
-            type: POPUP_TYPES.SUCCESS,
-            message: 'Product successfully deleted!',
-            buttons: [
-              {
-                onClick: () => history.push(ROUTES.SHOP),
-                text: 'Go back to shop',
-              },
-            ],
-          });
-        } else {
-          console.error('(deleteProduct) failed res:', res);
-
-          setPopupData({
-            type: POPUP_TYPES.FAILURE,
-            message: 'Deleting product failed :(',
-            buttons: [getClosePopupBtn(setPopupData)],
-          });
-        }
-      });
-  };
-
   if (!productDetails) {
     return null;
   }
@@ -494,17 +456,12 @@ export default function ProductDetails({ product }) {
           }}
         />
         <PEVParagraph className="product-details__header-action-btns">
-          <PEVButton
-            size="small"
-            startIcon={<EditIcon />}
-            onClick={navigateToProductModify}
-            data-cy="button:product-details__edit-product"
-          >
-            {productDetailsTranslations.editProduct}
-          </PEVButton>
-          <PEVButton size="small" startIcon={<DeleteIcon />} onClick={deleteProduct}>
-            {productDetailsTranslations.deleteProduct}
-          </PEVButton>
+          {routesGuards.isSeller() && (
+            <>
+              <NavigateToModifyProduct productName={productDetails.name} />
+              <DeleteProductFeature productName={productDetails.name} />
+            </>
+          )}
           <ProductObservabilityToggler productId={product._id} />
           <ProductComparisonCandidatesToggler product={product} buttonVariant="outlined" />
         </PEVParagraph>
@@ -663,7 +620,6 @@ export default function ProductDetails({ product }) {
       <Divider />
 
       <ProductComparisonCandidatesList />
-      <Popup {...popupData} />
     </article>
   );
-}
+});

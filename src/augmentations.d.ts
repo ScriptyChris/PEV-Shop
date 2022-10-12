@@ -16,6 +16,14 @@ declare module 'mongoose' {
     deleteMany(
       conditions: FilterQuery<unknown>
     ): Query<DeleteWriteOpResultObject['result'] & { deletedCount?: number }> & QueryHelpers;
+    execPopulate(callback: (err: any, res: this) => void): this;
+    execPopulate(path: string, callback?: (err: any, res: this) => void): this;
+    execPopulate(path: string, names: string, callback?: (err: any, res: this) => void): this;
+    execPopulate(
+      options: ModelPopulateOptions | ModelPopulateOptions[],
+      callback?: (err: any, res: this) => void
+    ): this;
+    populated(path: string): any;
   }
 }
 

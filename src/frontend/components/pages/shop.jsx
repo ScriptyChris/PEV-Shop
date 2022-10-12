@@ -1,8 +1,10 @@
 import React, { memo /*, useState*/ } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 
 // import CategoriesTree from '@frontend/components/views/categoriesTree';
-import { ROUTES } from './_routes';
+import { ROUTES, useRoutesGuards } from './_routes';
+import storeService from '@frontend/features/storeService';
 import ProductList from '@frontend/components/views/productList';
 import ProductDetails from '@frontend/components/views/productDetails';
 import { NewProduct, ModifyProduct } from './productForm';
@@ -25,6 +27,8 @@ import NotFound from './notFound';
 // });
 
 function Shop() {
+  const routesGuards = useRoutesGuards(storeService);
+
   // const [chosenProductsView, setChosenProductsView] = useState('');
   //
   // const viewsMap = [
@@ -77,13 +81,13 @@ function Shop() {
           <ProductComparison />
         </Route>
         <Route path={ROUTES.ADD_NEW_PRODUCT}>
-          <NewProduct />
+          {routesGuards.isSeller() ? <NewProduct /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
         </Route>
         <Route path={ROUTES.MODIFY_PRODUCT}>
-          <ModifyProduct />
+          {routesGuards.isSeller() ? <ModifyProduct /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
         </Route>
         <Route path={ROUTES.ORDER}>
-          <Order />
+          {routesGuards.isClient() ? <Order /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
         </Route>
 
         <Route>
@@ -94,4 +98,4 @@ function Shop() {
   );
 }
 
-export default memo(Shop);
+export default memo(observer(Shop));

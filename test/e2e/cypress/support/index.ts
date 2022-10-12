@@ -2,8 +2,8 @@
 
 import { TMessage } from './email-commands';
 import type { TE2EUser, IUserCart } from '@src/types';
-import type { IUserPublic, IUser } from '@database/models/_user';
-import type { IProductPublic } from '@database/models/_product';
+import type { TUserPublic, IUser } from '@database/models/_user';
+import type { TProductPublic } from '@database/models/_product';
 import type { HeadersInit } from 'node-fetch';
 
 // type TAPIEndpointGroup = 'users' | 'products'; // basically any API group used in tests
@@ -31,16 +31,19 @@ declare global {
       confirmTestUserRegistrationByUI(email: string): Cypress.Chainable<URL>;
       registerTestUser(testUser: TE2EUser, canFail?: boolean): Cypress.Chainable<Cypress.Response<TE2EUser>>;
       confirmTestUserRegistration(email: string): Cypress.Chainable<Chai.Assertion>;
-      registerAndLoginTestUser(testUser: TE2EUser): Cypress.Chainable<IUserPublic>;
+      registerAndLoginTestUser(testUser: TE2EUser): Cypress.Chainable<TUserPublic>;
       loginTestUser(
         testUser: Pick<TE2EUser, 'login' | 'password'>,
         canFail?: boolean
-      ): Cypress.Chainable<Cypress.Response<IUserPublic & { authToken: NonNullable<IUser['tokens']['auth']>[number] }>>;
+      ): Cypress.Chainable<Cypress.Response<TUserPublic & { authToken: NonNullable<IUser['tokens']['auth']>[number] }>>;
+      logoutUserFromAllSessions(
+        authToken: NonNullable<IUser['tokens']['auth']>[number]
+      ): Cypress.Chainable<Cypress.Response<void>>;
       loginTestUserByUI(testUser: Pick<TE2EUser, 'login' | 'password' | 'email'>): void;
       removeTestUsers(canFail?: boolean): Cypress.Chainable<Cypress.Response<void>>;
       getFromStorage<T = any>(key: string): Cypress.Chainable<T>;
       cleanupTestUsersAndEmails(): void;
-      addTestProductByAPI(productData: IProductPublic): Cypress.Chainable<any>;
+      addTestProductByAPI(productData: TProductPublic, authToken: string): Cypress.Chainable<any>;
       removeTestProducts(productName: string, authToken: string): Cypress.Chainable<Cypress.Response<void>>;
       sendAPIReq(apiReqOptions: TAPIReqOptions): Cypress.Chainable<Cypress.Response<any>>;
       cleanupCartState(): void;

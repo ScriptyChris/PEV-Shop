@@ -3,14 +3,14 @@
     "login": "test client",
     "password": "password",
     "email": "test_client@example.org",
-    "accountType": "client",
+    "__accountType": "client",
     "isConfirmed": true
   },
   {
-    "login": "test retailer",
+    "login": "test seller",
     "password": "password",
-    "email": "test_retailer@example.org",
-    "accountType": "retailer",
+    "email": "test_seller@example.org",
+    "__accountType": "seller",
     "isConfirmed": true
   }
 ]

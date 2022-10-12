@@ -1,16 +1,15 @@
 import { Schema, Document, model } from 'mongoose';
 
+// TODO: [feature] add `admin` role
+const ROLE_NAMES = ['client', 'seller'] as const;
+type TRoleName = typeof ROLE_NAMES[number];
+
 const userRoleSchema = new Schema<IUserRole>({
   roleName: {
     type: String,
     required: true,
-  },
-  permissions: {
-    type: [String],
-    required: true,
-    // TODO: use validation in all other database Schemas
-    validate(value: /* TODO: declare more strict type than string */ string[]) {
-      return Array.isArray(value) && value.length > 0;
+    validate(value: TRoleName) {
+      return ROLE_NAMES.includes(value);
     },
   },
   owners: {
@@ -25,17 +24,14 @@ userRoleSchema.methods.toJSON = function () {
   delete userRole._id;
   delete userRole.__v;
 
-  if (userRole.owners?.login) {
-    userRole.owners = userRole.owners.login;
-  }
-
   return userRole;
 };
 
-export const UserRoleModel = model<IUserRole>('User-Role', userRoleSchema);
+export const UserRoleModel = model<IUserRole>('UserRole', userRoleSchema);
 
 export interface IUserRole extends Document {
-  roleName: string;
-  permissions: string[];
+  roleName: TRoleName;
   owners: Schema.Types.ObjectId[];
 }
+
+export type TUserRoleToPopulate = Omit<IUserRole, keyof Document>;

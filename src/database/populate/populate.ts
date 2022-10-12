@@ -4,14 +4,14 @@ const PARAMS = Object.freeze({
   JSON_FILE_PATH: {
     PRODUCTS: 'productsInputPath',
     USERS: 'usersInputPath',
-    'USER-ROLES': 'userRolesInputPath',
+    USER_ROLES: 'userRolesInputPath',
   },
 });
 const DEFAULT_PARAMS = Object.freeze({
   [PARAMS.CLEAN_ALL_BEFORE]: 'true',
   [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initial-products.json',
   [PARAMS.JSON_FILE_PATH.USERS]: './initial-users.json',
-  [PARAMS.JSON_FILE_PATH['USER-ROLES']]: './initial-user-roles.json',
+  [PARAMS.JSON_FILE_PATH.USER_ROLES]: './initial-user-roles.json',
 });
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
@@ -21,15 +21,15 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
 }
 
 import getLogger from '@commons/logger';
-import { Model, Schema } from 'mongoose';
-import { ProductModel, IProduct } from '@database/models/_product';
-import { UserModel, IUser } from '@database/models/_user';
-import { UserRoleModel, IUserRole } from '@database/models/_userRole';
-import { TModelType } from '@database/models/models-index';
+import { model } from 'mongoose';
+import { ProductModel, IProduct, TProductToPopulate } from '@database/models/_product';
+import { UserModel, IUser, TUserToPopulate } from '@database/models/_user';
+import { UserRoleModel, IUserRole, TUserRoleToPopulate } from '@database/models/_userRole';
 import { hashPassword } from '@middleware/features/auth';
 import { connectWithDB } from '@database/connector';
 
 const logger = getLogger(module.filename);
+logger.log('process.argv:', process.argv);
 
 let relatedProductsErrors = 0;
 
@@ -50,9 +50,10 @@ let relatedProductsErrors = 0;
 //   },
 // })
 
-type TPopulatedData = Record<string, unknown>;
-
-logger.log('process.argv:', process.argv);
+type TDataToPopulate = TUserRoleToPopulate | TUserToPopulate | TProductToPopulate;
+type TProductModel = typeof ProductModel;
+type TUserModel = typeof UserModel;
+type TUserRoleModel = typeof UserRoleModel;
 
 if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
   throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string`);
@@ -74,8 +75,8 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
       [
         { name: 'products', ctor: ProductModel },
         { name: 'users', ctor: UserModel },
+        { name: 'userRoles', ctor: UserRoleModel },
       ].map(async ({ name, ctor }) => {
-        // @ts-ignore
         const deletionRes = await ctor.deleteMany({});
         return `\n\t-${name}: ${deletionRes.deletedCount}`;
       })
@@ -84,21 +85,20 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
     logger.log(`Cleaning done. Removed: ${removedData}`);
   }
 
-  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-    const productsSourceDataList = getSourceData('Product');
-    await populateProducts(ProductModel, productsSourceDataList);
-    await updateRelatedProductsNames(ProductModel, productsSourceDataList);
+  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USER_ROLES)) {
+    const userRolesSourceDataList = getSourceData<TUserRoleToPopulate>('USER_ROLES');
+    await populateUserRoles(UserRoleModel, userRolesSourceDataList);
   }
 
   if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USERS)) {
-    const usersSourceDataList = getSourceData('User');
+    const usersSourceDataList = getSourceData<TUserToPopulate>('USERS');
     await populateUsers(UserModel, usersSourceDataList);
   }
 
-  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH['USER-ROLES'])) {
-    const userRolesSourceDataList = getSourceData('User-Role');
-    await prepareUserRolesJoinWithAlreadyExistingUsers(UserModel, userRolesSourceDataList);
-    await populateUserRoles(UserRoleModel, userRolesSourceDataList);
+  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
+    const productsSourceDataList = getSourceData<TProductToPopulate>('PRODUCTS');
+    await populateProducts(ProductModel, productsSourceDataList);
+    await updateRelatedProductsNames(ProductModel, productsSourceDataList);
   }
 
   const populationResults = {
@@ -137,13 +137,12 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   executeDBPopulation();
 }
 
-function getSourceData(modelType: TModelType): TPopulatedData[] {
-  const normalizedModelType = `${modelType.toUpperCase()}S` as `${Uppercase<TModelType>}S`;
-  const sourceDataPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH[normalizedModelType]);
+function getSourceData<T = keyof TDataToPopulate>(modelName: keyof typeof PARAMS.JSON_FILE_PATH): T[] {
+  const sourceDataPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH[modelName]);
 
   if (!sourceDataPath) {
     throw ReferenceError(
-      `Path to data for "${modelType}" was not provided! You must pass "${PARAMS.JSON_FILE_PATH[normalizedModelType]}" parameter.`
+      `Path to data for "${modelName}" was not provided! You must pass "${PARAMS.JSON_FILE_PATH[modelName]}" parameter.`
     );
   }
 
@@ -167,16 +166,16 @@ function getSourceData(modelType: TModelType): TPopulatedData[] {
 }
 
 function populateProducts(
-  ProductModel: Model<IProduct>,
-  productsSourceDataList: TPopulatedData[]
+  ProductModel: TProductModel,
+  productsSourceDataList: TProductToPopulate[]
 ): Promise<IProduct[]> {
   return Promise.all(
-    productsSourceDataList.map((data: TPopulatedData) => {
-      const product = new ProductModel(data) as IProduct;
+    productsSourceDataList.map((productData) => {
+      const product = new ProductModel(productData);
       product.set('relatedProductsNames', undefined);
 
       return product.save().catch((err) => {
-        logger.error('product save err:', err, ' /data:', data);
+        logger.error('product save err:', err, ' /productData:', productData);
 
         return err;
       });
@@ -184,47 +183,36 @@ function populateProducts(
   );
 }
 
-function populateUsers(UserModel: Model<IUser>, usersSourceDataList: TPopulatedData[]): Promise<IUser[]> {
+function populateUsers(UserModel: TUserModel, usersSourceDataList: TUserToPopulate[]): Promise<IUser[]> {
   return Promise.all(
-    usersSourceDataList.map(async (data: TPopulatedData) => {
-      data.password = await hashPassword(data.password as string);
-      const user = new UserModel(data) as IUser;
+    usersSourceDataList.map(async (userDataToPopulate) => {
+      userDataToPopulate.password = await hashPassword(userDataToPopulate.password);
+      const user = new UserModel(userDataToPopulate);
+
+      // assign User to UserRole indicated by `__accountType`
+      await model('UserRole')
+        .updateOne({ roleName: userDataToPopulate.__accountType }, { $push: { owners: user._id } })
+        .exec();
 
       return user.save().catch((err) => {
-        logger.error('user save err:', err, ' /data:', data);
+        logger.error('user save err:', err, ' /userDataToPopulate:', userDataToPopulate);
 
         return err;
       });
     })
   );
-}
-
-async function prepareUserRolesJoinWithAlreadyExistingUsers(
-  UserModel: Model<IUser>,
-  userRolesSourceDataList: TPopulatedData[]
-) {
-  try {
-    const usersAccountTypes = await UserModel.find({}, { _id: 1, accountType: 1 }).exec();
-
-    userRolesSourceDataList.forEach((userRole: TPopulatedData) => {
-      const roleOwners = usersAccountTypes.filter(({ accountType }) => userRole.roleName === accountType);
-      roleOwners.forEach(({ _id }) => (userRole.owners as Schema.Types.ObjectId[]).push(_id));
-    });
-  } catch (userRoleJoiningError) {
-    logger.error('userRoleJoiningError:', userRoleJoiningError);
-  }
 }
 
 function populateUserRoles(
-  UserRoleModel: Model<IUserRole>,
-  userRolesSourceDataList: TPopulatedData[]
+  UserRoleModel: TUserRoleModel,
+  userRolesSourceDataList: TUserRoleToPopulate[]
 ): Promise<IUserRole[]> {
   return Promise.all(
-    userRolesSourceDataList.map(async (data: TPopulatedData) => {
-      const userRole = new UserRoleModel(data) as IUserRole;
+    userRolesSourceDataList.map(async (userRoleData) => {
+      const userRole = new UserRoleModel(userRoleData);
 
       return userRole.save().catch((err) => {
-        logger.error('userRole save err:', err, ' /data:', data);
+        logger.error('userRole save err:', err, ' /userRoleData:', userRoleData);
 
         return err;
       });
@@ -233,17 +221,17 @@ function populateUserRoles(
 }
 
 function updateRelatedProductsNames(
-  ProductModel: Model<IProduct>,
-  sourceDataList: TPopulatedData[]
+  ProductModel: TProductModel,
+  sourceDataList: TProductToPopulate[]
 ): Promise<Array<IProduct | void>> {
   return Promise.all(
-    sourceDataList.map((data: TPopulatedData) => {
+    sourceDataList.map((productData) => {
       return ProductModel.updateOne(
-        { name: data.name as string },
-        { relatedProductsNames: data.relatedProductsNames as string[] },
+        { name: productData.name },
+        { relatedProductsNames: productData.relatedProductsNames },
         { runValidators: true }
       ).catch((error) => {
-        logger.error(error);
+        logger.error('updating related product names error:', error, ' /productData:', productData);
         relatedProductsErrors++;
       });
     })
@@ -251,7 +239,7 @@ function updateRelatedProductsNames(
 }
 
 function getScriptParamStringValue(paramName: string) {
-  const paramValue = process.argv.find((arg: string) => arg.includes(paramName)) ?? DEFAULT_PARAMS[paramName];
+  const paramValue = process.argv.find((arg) => arg.includes(paramName)) ?? DEFAULT_PARAMS[paramName];
 
   // not using `logger`, because this function might be called before `logger` initialization (to resolve module aliases)
   console.log('[getScriptParamValue()] /paramName:', paramName, '/paramValue:', paramValue);

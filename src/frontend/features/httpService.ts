@@ -1,4 +1,4 @@
-import type { IUser, IUserPublic, TUserRegistrationCredentials } from '@database/models/_user';
+import type { IUser, TUserPublic, TUserRegistrationCredentials } from '@database/models/_user';
 import type { IProduct } from '@database/models/_product';
 import type {
   IEmbracedResponse,
@@ -184,20 +184,17 @@ class Ajax {
 }
 
 const httpService = new (class HttpService extends Ajax {
-  PRODUCTS_URL: string;
-  PRODUCT_CATEGORIES_URL: string;
-  PRODUCTS_SPECS_URL: string;
-  USERS_URL: string;
-  ORDERS_URL: string;
+  private URLS = {
+    PRODUCTS: 'products',
+    PRODUCT_CATEGORIES: 'productCategories',
+    PRODUCTS_SPECS: 'products/specs',
+    USERS: 'users',
+    USER_ROLES: 'user-roles',
+    ORDERS: 'orders',
+  } as const;
 
   constructor() {
     super();
-
-    this.PRODUCTS_URL = 'products';
-    this.PRODUCT_CATEGORIES_URL = 'productCategories';
-    this.PRODUCTS_SPECS_URL = 'products/specs';
-    this.USERS_URL = 'users';
-    this.ORDERS_URL = 'orders';
   }
 
   _preparePaginationParams(searchParams: URLSearchParams, pagination?: TPagination) {
@@ -212,7 +209,7 @@ const httpService = new (class HttpService extends Ajax {
   }
 
   addProduct(product: IProduct) {
-    return this.postRequest(this.PRODUCTS_URL, product);
+    return this.postRequest(this.URLS.PRODUCTS, product, true);
   }
 
   getProducts({
@@ -236,18 +233,18 @@ const httpService = new (class HttpService extends Ajax {
       searchParams.append('productsFilters', productsFilters as unknown as string);
     }
 
-    return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
+    return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });
   }
 
   getProductsById(idList: string[]) {
-    return this.getRequest(`${this.PRODUCTS_URL}?idList=${idList}`);
+    return this.getRequest(`${this.URLS.PRODUCTS}?idList=${idList}`);
   }
 
   getProductsByNames(nameList: string[]) {
     const searchParams = new URLSearchParams({ nameList: JSON.stringify(nameList) });
 
     return this.getRequest({
-      url: this.PRODUCTS_URL,
+      url: this.URLS.PRODUCTS,
       searchParams,
     });
   }
@@ -259,19 +256,19 @@ const httpService = new (class HttpService extends Ajax {
 
     this._preparePaginationParams(searchParams, pagination);
 
-    return this.getRequest({ url: this.PRODUCTS_URL, searchParams });
+    return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });
   }
 
   // getProduct(id) {
-  //   return this.getRequest(`${this.PRODUCTS_URL}/${id}`);
+  //   return this.getRequest(`${this.URLS.PRODUCTS}/${id}`);
   // }
 
   getProductCategories() {
-    return this.getRequest(this.PRODUCT_CATEGORIES_URL);
+    return this.getRequest(this.URLS.PRODUCT_CATEGORIES);
   }
 
   getProductsSpecifications() {
-    return this.getRequest(this.PRODUCTS_SPECS_URL) as Promise<
+    return this.getRequest(this.URLS.PRODUCTS_SPECS) as Promise<
       TProductTechnicalSpecs | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
     >;
   }
@@ -284,82 +281,86 @@ const httpService = new (class HttpService extends Ajax {
         data: productModifications,
       },
     };
-    return this.patchRequest(this.PRODUCTS_URL, modifiedProductData);
+    return this.patchRequest(this.URLS.PRODUCTS, modifiedProductData);
   }
 
   addProductReview(productName: IProduct['name'], productReview: IProduct['reviews']) {
-    return this.patchRequest(`${this.PRODUCTS_URL}/${productName}/add-review`, productReview);
+    return this.patchRequest(`${this.URLS.PRODUCTS}/${productName}/add-review`, productReview);
   }
 
   deleteProduct(productName: IProduct['name']) {
-    return this.deleteRequest(`${this.PRODUCTS_URL}/${productName}`);
+    return this.deleteRequest(`${this.URLS.PRODUCTS}/${productName}`, true);
   }
 
   getUser() {
     const userId = '5f5a8dce154f830fd840dc7b';
-    return this.getRequest(`${this.USERS_URL}/${userId}`, true);
+    return this.getRequest(`${this.URLS.USERS}/${userId}`, true);
   }
 
   makeOrder(orderDetails: IOrder) {
-    return this.postRequest(this.ORDERS_URL, orderDetails);
+    return this.postRequest(this.URLS.ORDERS, orderDetails);
   }
 
   loginUser(loginCredentials: { login: IUser['login']; password: IUser['password'] }) {
-    return this.postRequest(`${this.USERS_URL}/login`, loginCredentials) as Promise<
-      IUserPublic | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
+    return this.postRequest(`${this.URLS.USERS}/login`, loginCredentials) as Promise<
+      TUserPublic | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
     >;
   }
 
   resetPassword(email: IUser['email']) {
-    return this.postRequest(`${this.USERS_URL}/reset-password`, { email });
+    return this.postRequest(`${this.URLS.USERS}/reset-password`, { email });
   }
 
   resendResetPassword(email: IUser['email']) {
-    return this.postRequest(`${this.USERS_URL}/resend-reset-password`, { email });
+    return this.postRequest(`${this.URLS.USERS}/resend-reset-password`, { email });
   }
 
   logoutUser() {
-    return this.postRequest(`${this.USERS_URL}/logout`, null, true);
+    return this.postRequest(`${this.URLS.USERS}/logout`, null, true);
   }
 
   logOutUserFromSessions(preseveCurrentSession = false) {
-    return this.postRequest(`${this.USERS_URL}/logout-all`, { preseveCurrentSession }, true);
+    return this.postRequest(`${this.URLS.USERS}/logout-all`, { preseveCurrentSession }, true);
+  }
+
+  getUserRoles() {
+    return this.getRequest(`${this.URLS.USER_ROLES}`);
   }
 
   registerUser(registrationCredentials: TUserRegistrationCredentials) {
-    return this.postRequest(`${this.USERS_URL}/register`, registrationCredentials);
+    return this.postRequest(`${this.URLS.USERS}/register`, registrationCredentials);
   }
 
   confirmRegistration(token: NonNullable<IUser['tokens']['confirmRegistration']>) {
-    return this.postRequest(`${this.USERS_URL}/confirm-registration`, { token });
+    return this.postRequest(`${this.URLS.USERS}/confirm-registration`, { token });
   }
 
   resendConfirmRegistration(email: IUser['email']) {
-    return this.postRequest(`${this.USERS_URL}/resend-confirm-registration`, { email });
+    return this.postRequest(`${this.URLS.USERS}/resend-confirm-registration`, { email });
   }
 
   setNewPassword(newPassword: IUser['password'], token: NonNullable<IUser['tokens']['auth']>[number]) {
-    return this.patchRequest(`${this.USERS_URL}/set-new-password`, { newPassword, token });
+    return this.patchRequest(`${this.URLS.USERS}/set-new-password`, { newPassword, token });
   }
 
   changePassword(password: IUser['password'], newPassword: IUser['password']) {
-    return this.patchRequest(`${this.USERS_URL}/change-password`, { password, newPassword }, true);
+    return this.patchRequest(`${this.URLS.USERS}/change-password`, { password, newPassword }, true);
   }
 
   addProductToObserved(productId: string) {
-    return this.postRequest(`${this.USERS_URL}/add-product-to-observed`, { productId }, true);
+    return this.postRequest(`${this.URLS.USERS}/add-product-to-observed`, { productId }, true);
   }
 
   removeProductFromObserved(productId: string) {
-    return this.deleteRequest(`${this.USERS_URL}/remove-product-from-observed/${productId}`, true);
+    return this.deleteRequest(`${this.URLS.USERS}/remove-product-from-observed/${productId}`, true);
   }
 
   removeAllProductsFromObserved() {
-    return this.deleteRequest(`${this.USERS_URL}/remove-all-products-from-observed`, true);
+    return this.deleteRequest(`${this.URLS.USERS}/remove-all-products-from-observed`, true);
   }
 
   getObservedProducts() {
-    return this.getRequest(`${this.USERS_URL}/observed-products`, true);
+    return this.getRequest(`${this.URLS.USERS}/observed-products`, true);
   }
 })();
 
