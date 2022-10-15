@@ -1,7 +1,7 @@
 import { cy, Cypress, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import type { TE2E } from '@src/types';
-import type { TUserPublic } from '@database/models/_user';
+import type { TUserPublic } from '@database/models';
 import { makeCyDataSelector } from '../synchronous-helpers';
 
 Cypress.Commands.add('registerTestUserByUI', ({ login, email }) => {

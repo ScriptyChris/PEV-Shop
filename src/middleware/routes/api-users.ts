@@ -4,8 +4,7 @@ import { ObjectId } from 'mongodb';
 import getLogger from '@commons/logger';
 import { saveToDB, getFromDB, updateOneModelInDB, deleteFromDB } from '@database/database-index';
 import { authMiddlewareFn, hashPassword } from '@middleware/features/auth';
-import { UserModel, IUser, TUserPublic } from '@database/models/_user';
-import { UserRoleModel, IUserRole } from '@database/models/_userRole';
+import { UserModel, IUser, TUserPublic, UserRoleModel, IUserRole, COLLECTION_NAMES } from '@database/models';
 import sendMail, { EMAIL_TYPES } from '@middleware/helpers/mailer';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
@@ -110,7 +109,7 @@ const sendRegistrationEmail = async ({
       if (emailSentInfo.rejected.length) {
         logger.error('emailSentInfo.rejected:', emailSentInfo.rejected);
 
-        await deleteFromDB(login, 'User');
+        await deleteFromDB(login, COLLECTION_NAMES.User);
 
         return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
           error: `Sending email rejected: ${emailSentInfo.rejected}!`,
@@ -122,7 +121,7 @@ const sendRegistrationEmail = async ({
     .catch(async (emailSentError: Error) => {
       logger.error('emailSentError:', emailSentError);
 
-      await deleteFromDB(login, 'User');
+      await deleteFromDB(login, COLLECTION_NAMES.User);
 
       return wrapRes(res, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR, {
         exception: {
@@ -170,7 +169,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
 
     // TODO: [error-handling] validate password before hashing it, as in `registerUser` function
     req.body.password = await hashPassword(req.body.password);
-    const savedUser = (await saveToDB(req.body, 'User')) as IUser;
+    const savedUser = (await saveToDB(req.body, COLLECTION_NAMES.User)) as IUser;
 
     logger.log('User saved:', savedUser);
 
@@ -183,7 +182,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
           owners: new ObjectId(savedUser._id),
         },
       },
-      'UserRole'
+      COLLECTION_NAMES.User_Role
     );
 
     if (!updatedUser) {
@@ -217,7 +216,7 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
       [`tokens.resetPassword`]: req.body.token.replace(/\s/g, '+'),
     };
 
-    const userToSetNewPassword = (await getFromDB(tokenQuery, 'User')) as IUser;
+    const userToSetNewPassword = (await getFromDB(tokenQuery, COLLECTION_NAMES.User)) as IUser;
 
     if (userToSetNewPassword) {
       await updateOneModelInDB(
@@ -228,7 +227,7 @@ async function setNewPassword(req: Request, res: Response, next: NextFunction) {
             password: hashedPassword,
           },
         },
-        'User'
+        COLLECTION_NAMES.User
       );
 
       await userToSetNewPassword.deleteSingleToken('resetPassword');
@@ -260,7 +259,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
 
     req.body.password = await hashPassword(req.body.password);
 
-    const newUser = (await saveToDB(req.body, 'User')) as IUser;
+    const newUser = (await saveToDB(req.body, COLLECTION_NAMES.User)) as IUser;
     await UserRoleModel.updateOne({ roleName: req.body.accountType }, { $push: { owners: newUser._id } });
     await newUser.setSingleToken('confirmRegistration');
 
@@ -285,7 +284,7 @@ async function confirmRegistration(req: Request, res: Response, next: NextFuncti
 
     const userToConfirm = (await getFromDB(
       { 'tokens.confirmRegistration': req.body.token.replace(/\s/g, '+') },
-      'User'
+      COLLECTION_NAMES.User
     )) as IUser;
 
     if (userToConfirm) {
@@ -316,7 +315,7 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
         isConfirmed: false,
         'tokens.confirmRegistration': { $exists: true },
       },
-      'User'
+      COLLECTION_NAMES.User
     )) as IUser;
 
     if (userToResendConfirmation) {
@@ -344,7 +343,7 @@ async function logInUser(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'User login is empty or not attached!' });
     }
 
-    const user: IUser = await getFromDB({ login: req.body.login }, 'User', {
+    const user: IUser = await getFromDB({ login: req.body.login }, COLLECTION_NAMES.User, {
       population: 'accountType',
     });
 
@@ -408,7 +407,7 @@ async function resetPassword(req: Request, res: Response, next: NextFunction) {
       {
         email: req.body.email,
       },
-      'User'
+      COLLECTION_NAMES.User
     )) as IUser;
 
     if (userToResetPassword) {
@@ -443,7 +442,7 @@ async function resendResetPassword(req: Request, res: Response, next: NextFuncti
         email: req.body.email,
         'tokens.resetPassword': { $exists: true },
       },
-      'User'
+      COLLECTION_NAMES.User
     )) as IUser;
 
     if (userToResendResetPassword) {
@@ -510,7 +509,7 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'User id is empty or not attached!' });
     }
 
-    const user: TUserPublic = await getFromDB(req.params.id, 'User', {
+    const user: TUserPublic = await getFromDB(req.params.id, COLLECTION_NAMES.User, {
       population: 'accountType',
     });
 
@@ -604,7 +603,7 @@ async function getObservedProducts(
       return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: emptyObservedProductsResponse });
     }
 
-    const observedProducts = await getFromDB({ _id: req.user!.observedProductsIDs }, 'Product');
+    const observedProducts = await getFromDB({ _id: req.user!.observedProductsIDs }, COLLECTION_NAMES.Product);
 
     if (res._OMIT_HTTP) {
       return observedProducts;
@@ -647,17 +646,17 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to be deleted was not found!' });
     }
 
-    const userIDsToDeleteFromRoles = Array.isArray(usersToDeleteFromRoles)
-      ? usersToDeleteFromRoles
-      : [usersToDeleteFromRoles].map(({ _id }: { _id: IUserRole['owners'][number] }) => _id);
+    const userIDsToDeleteFromRoles = (
+      Array.isArray(usersToDeleteFromRoles) ? usersToDeleteFromRoles : [usersToDeleteFromRoles]
+    ).map(({ _id }: { _id: IUserRole['owners'][number] }) => _id);
 
-    const deletedUser = await deleteFromDB(query, 'User');
+    const deletedUser = await deleteFromDB(query, COLLECTION_NAMES.User);
     logger.log('deletedUser?', deletedUser, ' /query:', query);
 
     await UserRoleModel.update(
+      { owners: { $in: userIDsToDeleteFromRoles } },
       // TODO: [TS] fix typing
       // @ts-ignore
-      { owners: { $in: userIDsToDeleteFromRoles } },
       { $pull: { owners: userIDsToDeleteFromRoles } },
       { multi: true }
     );

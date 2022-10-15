@@ -4,7 +4,7 @@ import { sign, verify, Secret } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { config as dotenvConfig } from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { IUser, UserModel } from '@database/models/_user';
+import { IUser, TRoleName, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 
@@ -61,7 +61,7 @@ const authMiddlewareFn = (
       const decodedToken = verifyToken(bearerToken);
       const user = (await getFromDB(
         { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
-        'User',
+        COLLECTION_NAMES.User,
         { population: 'accountType' }
       )) as IUser | IUser[];
 
@@ -80,12 +80,8 @@ const authMiddlewareFn = (
   };
 };
 
-const userRoleMiddlewareFn = (roleName: string /* TODO: [TS] use type from UserRole */): any => {
-  return async (
-    req: Request & { user: typeof UserModel & { accountType?: { roleName: string } } },
-    res: Response,
-    next: NextFunction
-  ) => {
+const userRoleMiddlewareFn = (roleName: TRoleName): any => {
+  return async (req: Request & { user: IUser }, res: Response, next: NextFunction) => {
     try {
       if (!req.user.populated('accountType') || roleName !== req.user.accountType?.roleName) {
         return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });

@@ -1,5 +1,4 @@
-import type { IUser, TUserPublic, TUserRegistrationCredentials } from '@database/models/_user';
-import type { IProduct } from '@database/models/_product';
+import type { IUser, TUserPublic, TUserRegistrationCredentials, IProduct } from '@database/models';
 import type {
   IEmbracedResponse,
   TSuccessfulHTTPStatusCodesToData,

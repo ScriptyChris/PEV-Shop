@@ -46,14 +46,9 @@ const EMAIL_TYPES_CONFIG = Object.freeze({
 } as const);
 type emailTypesConfigKeys = keyof typeof EMAIL_TYPES_CONFIG;
 
-export const EMAIL_TYPES = Object
-  // @ts-ignore
-  .fromEntries(
-    (Object.entries(EMAIL_TYPES_CONFIG) as Array<[emailTypesConfigKeys, any]>).map(([emailType]) => [
-      emailType,
-      emailType,
-    ])
-  ) as Record<emailTypesConfigKeys, emailTypesConfigKeys>;
+export const EMAIL_TYPES = Object.fromEntries(
+  Object.entries(EMAIL_TYPES_CONFIG).map(([emailType]) => [emailType, emailType])
+) as Record<emailTypesConfigKeys, emailTypesConfigKeys>;
 
 export default async function sendMail(
   receiver: string,

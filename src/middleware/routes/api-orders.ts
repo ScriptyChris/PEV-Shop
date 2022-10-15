@@ -7,6 +7,7 @@ import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '@src/types'
 import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '@middleware/helpers/payu-api';
 import { wrapRes, TypeOfHTTPStatusCodes } from '@middleware/helpers/middleware-response-wrapper';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
+import { COLLECTION_NAMES } from '@database/models';
 
 const router: Router &
   Partial<{
@@ -45,7 +46,7 @@ async function makeOrder(req: Request, res: Response, next: NextFunction) {
     const products: IProductInOrder[] = await Promise.all(
       req.body.products.map(
         (product: { _id: string; count: number }): Promise<IProductInOrder> =>
-          getFromDB(product._id, 'Product').then(({ name, price }) => ({
+          getFromDB(product._id, COLLECTION_NAMES.Product).then(({ name, price }) => ({
             name,
             unitPrice: price * 100,
             quantity: product.count,

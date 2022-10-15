@@ -1,5 +1,5 @@
 import { observable, decorate, action } from 'mobx';
-import { TUserPublic } from '@database/models/_user';
+import type { TUserPublic } from '@database/models';
 import type { IUserCart } from '@src/types';
 
 const USER_CART_STATE: IUserCart = {

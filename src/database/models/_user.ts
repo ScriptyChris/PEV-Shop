@@ -1,4 +1,12 @@
-import { model, Schema, Types, Document, Model } from 'mongoose';
+import {
+  model,
+  Schema,
+  Types,
+  Document,
+  Model,
+  TRoleName,
+  COLLECTION_NAMES,
+} from '@database/models/__core-and-commons';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '@middleware/features/auth';
 
@@ -71,7 +79,7 @@ const userSchema = new Schema<IUser>(
 );
 
 userSchema.virtual('accountType', {
-  ref: 'UserRole',
+  ref: COLLECTION_NAMES.User_Role,
   localField: '_id',
   foreignField: 'owners',
   justOne: true,
@@ -198,7 +206,7 @@ userSchema.statics.validateNewUserPayload = (newUser: any) => {
   return '';
 };
 
-userSchema.statics.validatePassword = (password: any): string => {
+userSchema.statics.validatePassword = (password: unknown): string => {
   if (typeof password !== 'string') {
     return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE.errorMessage;
   }
@@ -231,17 +239,20 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
   return user;
 };
 
-export const UserModel = model<IUser, IUserModel>('User', userSchema);
+export const UserModel = model<IUser, IUserModel>(COLLECTION_NAMES.User, userSchema);
+export type TUserModel = typeof UserModel;
 
 export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'> & {
   accountType: NonNullable<IUser['accountType']>['roleName'];
 };
 
-export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & { __accountType: string };
+export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & {
+  __accountType: TRoleName;
+};
 
 interface IUserModel extends Model<IUser> {
   validateNewUserPayload(newUser: any): string;
-  validatePassword(password: any): string;
+  validatePassword(password: unknown): string;
 }
 
 export interface IUser extends Document {
@@ -255,7 +266,7 @@ export interface IUser extends Document {
     confirmRegistration: string | undefined;
     resetPassword: string | undefined;
   };
-  accountType?: { roleName: string };
+  accountType?: { roleName: TRoleName };
   generateAuthToken(): Promise<string>;
   toJSON(): TUserPublic;
   matchPassword(password: string): Promise<boolean>;

@@ -1,7 +1,7 @@
 import storeService from './storeService';
 import storageService from './storageService';
 import httpService, { CUSTOM_RES_EXT_DICT } from './httpService';
-import type { IUser, TUserPublic } from '@database/models/_user';
+import type { IUser, TUserPublic } from '@database/models';
 
 type TLogInCredentials = Pick<IUser, 'login' | 'password'>;
 

@@ -1,8 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import getLogger from '@commons/logger';
-import { authMiddlewareFn as authMiddleware } from '@middleware/features/auth';
-import { saveToDB, getFromDB, updateOneModelInDB } from '@database/database-index';
-import type { IUserRole } from '@database/models/_userRole';
+import { getFromDB } from '@database/database-index';
+import { IUserRole, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
@@ -129,7 +128,7 @@ async function getUserRoles(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('(getUserRoles)');
 
-    const userRoles: IUserRole = await getFromDB({}, 'UserRole', {}, { roleName: true });
+    const userRoles: IUserRole = await getFromDB({}, COLLECTION_NAMES.User_Role, {}, { roleName: true });
 
     if (!userRoles) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: `User roles not found!` });

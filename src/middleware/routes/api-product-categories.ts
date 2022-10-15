@@ -4,6 +4,7 @@ import { getFromDB } from '@database/database-index';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
+import { COLLECTION_NAMES } from '@database/models';
 
 const router = Router();
 const logger = getLogger(module.filename);
@@ -51,7 +52,7 @@ async function getProductCategoriesHierarchy(req: Request, res: Response, next: 
   try {
     logger.log('(getProductCategoriesHierarchy) req.params:', req.params);
 
-    const productCategories = (await getFromDB('category', 'Product', { isDistinct: true })) as string[];
+    const productCategories = (await getFromDB('category', COLLECTION_NAMES.Product, { isDistinct: true })) as string[];
 
     if (!productCategories) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product categories not found!' });

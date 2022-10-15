@@ -1,10 +1,9 @@
-import { getModel, TModel, TModelName } from './models/models-index';
+import { getModel, TCOLLECTION_NAMES, MongooseDocument, COLLECTION_NAMES } from './models';
 import { queryBuilder } from './utils/queryBuilder';
 import getPaginatedItems, { TPaginationConfig } from './utils/paginateItemsFromDB';
 import { config as dotenvConfig } from 'dotenv';
 import getLogger from '@commons/logger';
 import { connectWithDB } from './connector';
-import type { MongooseDocument } from 'mongoose';
 
 dotenvConfig();
 
@@ -12,7 +11,7 @@ const logger = getLogger(module.filename);
 
 connectWithDB();
 
-function saveToDB(itemData: any, modelName: TModelName): Promise<TModel | string> {
+function saveToDB(itemData: unknown, modelName: TCOLLECTION_NAMES) {
   // TODO: improve validation
   if (!itemData || typeof itemData !== 'object') {
     return Promise.reject('itemData must be an object!');
@@ -26,7 +25,7 @@ function saveToDB(itemData: any, modelName: TModelName): Promise<TModel | string
 
 async function getFromDB(
   itemQuery: any,
-  modelName: TModelName,
+  modelName: TCOLLECTION_NAMES,
   options: {
     pagination?: TPaginationConfig;
     isDistinct?: boolean;
@@ -84,8 +83,8 @@ async function getFromDB(
 // TODO: consider making this function either specific to update case or generic dependent on params
 async function updateOneModelInDB(
   itemQuery: any,
-  updateData: any,
-  modelName: TModelName
+  updateData: { action: string; data: unknown },
+  modelName: TCOLLECTION_NAMES
 ): Promise<ReturnType<typeof Model.findOneAndUpdate> | null> {
   const Model = getModel(modelName);
 
@@ -123,15 +122,15 @@ async function updateOneModelInDB(
   return await Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 }
 
-async function deleteFromDB(fieldValue: string | RegExp, modelName: TModelName) {
+async function deleteFromDB(fieldValue: string | RegExp, modelName: TCOLLECTION_NAMES) {
   let fieldName = '';
 
   switch (modelName) {
-    case 'User': {
+    case COLLECTION_NAMES.User: {
       fieldName = 'login';
       break;
     }
-    case 'Product': {
+    case COLLECTION_NAMES.Product: {
       fieldName = 'name';
       break;
     }

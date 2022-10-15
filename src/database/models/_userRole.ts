@@ -1,8 +1,4 @@
-import { Schema, Document, model } from 'mongoose';
-
-// TODO: [feature] add `admin` role
-const ROLE_NAMES = ['client', 'seller'] as const;
-type TRoleName = typeof ROLE_NAMES[number];
+import { Schema, model, Document, ROLE_NAMES, TRoleName, COLLECTION_NAMES } from '@database/models/__core-and-commons';
 
 const userRoleSchema = new Schema<IUserRole>({
   roleName: {
@@ -14,7 +10,7 @@ const userRoleSchema = new Schema<IUserRole>({
   },
   owners: {
     type: [Schema.Types.ObjectId],
-    ref: 'User',
+    ref: COLLECTION_NAMES.User,
   },
 });
 
@@ -27,7 +23,8 @@ userRoleSchema.methods.toJSON = function () {
   return userRole;
 };
 
-export const UserRoleModel = model<IUserRole>('UserRole', userRoleSchema);
+export const UserRoleModel = model<IUserRole>(COLLECTION_NAMES.User_Role, userRoleSchema);
+export type TUserRoleModel = typeof UserRoleModel;
 
 export interface IUserRole extends Document {
   roleName: TRoleName;

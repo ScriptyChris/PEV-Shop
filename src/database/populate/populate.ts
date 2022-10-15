@@ -1,17 +1,32 @@
+// TODO: [DX] activate `moduleAliasesResolvers.js` beforehand, so module alias can be used here
+import { COLLECTION_NAMES, TCOLLECTION_NAMES } from '../models/__core-and-commons';
+
+type TUpperCasedPluralCollectionNames = `${Uppercase<TCOLLECTION_NAMES>}S`;
+type TCapitalizedPluralCollectionsMap = {
+  [CollectionName in TUpperCasedPluralCollectionNames]: CollectionName;
+};
+
+const CAPITALIZED_PLURAL_COLLECTION_NAMES = Object.fromEntries(
+  Object.keys(COLLECTION_NAMES).map((name) => {
+    const capitalPluralName = `${name.toUpperCase()}S`;
+    return [capitalPluralName, capitalPluralName];
+  })
+) as TCapitalizedPluralCollectionsMap;
+
 const PARAMS = Object.freeze({
   EXECUTED_FROM_CLI: 'executedFromCLI',
   CLEAN_ALL_BEFORE: 'cleanAllBefore',
   JSON_FILE_PATH: {
-    PRODUCTS: 'productsInputPath',
-    USERS: 'usersInputPath',
-    USER_ROLES: 'userRolesInputPath',
+    [CAPITALIZED_PLURAL_COLLECTION_NAMES.PRODUCTS]: 'products__InputPath',
+    [CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS]: 'users__InputPath',
+    [CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES]: 'user_roles__InputPath',
   },
 });
 const DEFAULT_PARAMS = Object.freeze({
   [PARAMS.CLEAN_ALL_BEFORE]: 'true',
-  [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initial-products.json',
-  [PARAMS.JSON_FILE_PATH.USERS]: './initial-users.json',
-  [PARAMS.JSON_FILE_PATH.USER_ROLES]: './initial-user-roles.json',
+  [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initialData/products.json',
+  [PARAMS.JSON_FILE_PATH.USERS]: './initialData/users.json',
+  [PARAMS.JSON_FILE_PATH.USER_ROLES]: './initialData/user_roles.json',
 });
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
@@ -21,12 +36,19 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
 }
 
 import getLogger from '@commons/logger';
-import { model } from 'mongoose';
-import { ProductModel, IProduct, TProductToPopulate } from '@database/models/_product';
-import { UserModel, IUser, TUserToPopulate } from '@database/models/_user';
-import { UserRoleModel, IUserRole, TUserRoleToPopulate } from '@database/models/_userRole';
 import { hashPassword } from '@middleware/features/auth';
 import { connectWithDB } from '@database/connector';
+import {
+  ProductModel,
+  UserModel,
+  UserRoleModel,
+  IProduct,
+  TProductToPopulate,
+  IUser,
+  TUserToPopulate,
+  IUserRole,
+  TUserRoleToPopulate,
+} from '@database/models';
 
 const logger = getLogger(module.filename);
 logger.log('process.argv:', process.argv);
@@ -51,12 +73,14 @@ let relatedProductsErrors = 0;
 // })
 
 type TDataToPopulate = TUserRoleToPopulate | TUserToPopulate | TProductToPopulate;
-type TProductModel = typeof ProductModel;
-type TUserModel = typeof UserModel;
-type TUserRoleModel = typeof UserRoleModel;
+const COLLECTIONS_TO_REMOVE = [
+  { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.PRODUCTS, ctor: ProductModel },
+  { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS, ctor: UserModel },
+  { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES, ctor: UserRoleModel },
+] as const;
 
 if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-  throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string`);
+  throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string!`);
 }
 
 const executeDBPopulation = async (shouldCleanupAll = false) => {
@@ -72,11 +96,7 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
 
   if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true' || shouldCleanupAll) {
     const removedData = await Promise.all(
-      [
-        { name: 'products', ctor: ProductModel },
-        { name: 'users', ctor: UserModel },
-        { name: 'userRoles', ctor: UserRoleModel },
-      ].map(async ({ name, ctor }) => {
+      COLLECTIONS_TO_REMOVE.map(async ({ name, ctor }) => {
         const deletionRes = await ctor.deleteMany({});
         return `\n\t-${name}: ${deletionRes.deletedCount}`;
       })
@@ -86,19 +106,19 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
   }
 
   if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USER_ROLES)) {
-    const userRolesSourceDataList = getSourceData<TUserRoleToPopulate>('USER_ROLES');
-    await populateUserRoles(UserRoleModel, userRolesSourceDataList);
+    const userRolesSourceDataList = getSourceData<TUserRoleToPopulate>(CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES);
+    await populateUserRoles(userRolesSourceDataList);
   }
 
   if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USERS)) {
-    const usersSourceDataList = getSourceData<TUserToPopulate>('USERS');
-    await populateUsers(UserModel, usersSourceDataList);
+    const usersSourceDataList = getSourceData<TUserToPopulate>(CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS);
+    await populateUsers(usersSourceDataList);
   }
 
   if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-    const productsSourceDataList = getSourceData<TProductToPopulate>('PRODUCTS');
-    await populateProducts(ProductModel, productsSourceDataList);
-    await updateRelatedProductsNames(ProductModel, productsSourceDataList);
+    const productsSourceDataList = getSourceData<TProductToPopulate>(CAPITALIZED_PLURAL_COLLECTION_NAMES.PRODUCTS);
+    await populateProducts(productsSourceDataList);
+    await updateRelatedProductsNames(productsSourceDataList);
   }
 
   const populationResults = {
@@ -137,7 +157,7 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   executeDBPopulation();
 }
 
-function getSourceData<T = keyof TDataToPopulate>(modelName: keyof typeof PARAMS.JSON_FILE_PATH): T[] {
+function getSourceData<T extends TDataToPopulate>(modelName: keyof typeof PARAMS.JSON_FILE_PATH): T[] {
   const sourceDataPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH[modelName]);
 
   if (!sourceDataPath) {
@@ -165,73 +185,65 @@ function getSourceData<T = keyof TDataToPopulate>(modelName: keyof typeof PARAMS
   }
 }
 
-function populateProducts(
-  ProductModel: TProductModel,
-  productsSourceDataList: TProductToPopulate[]
-): Promise<IProduct[]> {
+function populateProducts(productsSourceDataList: TProductToPopulate[]): Promise<IProduct[]> {
   return Promise.all(
     productsSourceDataList.map((productData) => {
       const product = new ProductModel(productData);
       product.set('relatedProductsNames', undefined);
 
-      return product.save().catch((err) => {
-        logger.error('product save err:', err, ' /productData:', productData);
+      return product.save().catch((productSaveError) => {
+        logger.error('productSaveError:', productSaveError, ' /productData:', productData);
 
-        return err;
+        return productSaveError;
       });
     })
   );
 }
 
-function populateUsers(UserModel: TUserModel, usersSourceDataList: TUserToPopulate[]): Promise<IUser[]> {
+function populateUsers(usersSourceDataList: TUserToPopulate[]): Promise<IUser[]> {
   return Promise.all(
     usersSourceDataList.map(async (userDataToPopulate) => {
       userDataToPopulate.password = await hashPassword(userDataToPopulate.password);
       const user = new UserModel(userDataToPopulate);
 
       // assign User to UserRole indicated by `__accountType`
-      await model('UserRole')
-        .updateOne({ roleName: userDataToPopulate.__accountType }, { $push: { owners: user._id } })
-        .exec();
+      await UserRoleModel.updateOne(
+        { roleName: userDataToPopulate.__accountType },
+        { $push: { owners: user._id } }
+      ).exec();
 
-      return user.save().catch((err) => {
-        logger.error('user save err:', err, ' /userDataToPopulate:', userDataToPopulate);
+      return user.save().catch((userSaveError) => {
+        logger.error('userSaveError:', userSaveError, ' /userDataToPopulate:', userDataToPopulate);
 
-        return err;
+        return userSaveError;
       });
     })
   );
 }
 
-function populateUserRoles(
-  UserRoleModel: TUserRoleModel,
-  userRolesSourceDataList: TUserRoleToPopulate[]
-): Promise<IUserRole[]> {
+function populateUserRoles(userRolesSourceDataList: TUserRoleToPopulate[]): Promise<IUserRole[]> {
   return Promise.all(
     userRolesSourceDataList.map(async (userRoleData) => {
       const userRole = new UserRoleModel(userRoleData);
 
-      return userRole.save().catch((err) => {
-        logger.error('userRole save err:', err, ' /userRoleData:', userRoleData);
+      return userRole.save().catch((userRoleSaveError) => {
+        logger.error('userRoleSaveError:', userRoleSaveError, ' /userRoleData:', userRoleData);
 
-        return err;
+        return userRoleSaveError;
       });
     })
   );
 }
 
-function updateRelatedProductsNames(
-  ProductModel: TProductModel,
-  sourceDataList: TProductToPopulate[]
-): Promise<Array<IProduct | void>> {
+function updateRelatedProductsNames(sourceDataList: TProductToPopulate[]): Promise<(IProduct | void)[]> {
   return Promise.all(
     sourceDataList.map((productData) => {
       return ProductModel.updateOne(
         { name: productData.name },
         { relatedProductsNames: productData.relatedProductsNames },
         { runValidators: true }
-      ).catch((error) => {
-        logger.error('updating related product names error:', error, ' /productData:', productData);
+      ).catch((relatedProductUpdateError) => {
+        logger.error('relatedProductUpdateError:', relatedProductUpdateError, ' /productData:', productData);
         relatedProductsErrors++;
       });
     })

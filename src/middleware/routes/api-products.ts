@@ -13,7 +13,7 @@ import {
 } from '@database/utils/queryBuilder';
 import { TPaginationConfig } from '@database/utils/paginateItemsFromDB';
 import mapProductsTechnicalSpecs from '@middleware/helpers/api-products-specs-mapper';
-import { IProduct, IReviews } from '@database/models/_product';
+import { IProduct, IReviews, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
@@ -64,7 +64,9 @@ async function getProductsSpecs(req: Request, res: Response, next: NextFunction)
       'technicalSpecs.data': 1,
       'technicalSpecs.defaultUnit': 1,
     };
-    const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
+    const productsSpec = mapProductsTechnicalSpecs(
+      await getFromDB(specQuery, COLLECTION_NAMES.Product, {}, projection)
+    );
 
     if (!productsSpec) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products specs not found!' });
@@ -119,7 +121,7 @@ async function getProducts(
       options.pagination = paginationConfig;
     }
 
-    const paginatedProducts = await getFromDB(query, 'Product', options);
+    const paginatedProducts = await getFromDB(query, COLLECTION_NAMES.Product, options);
 
     if (!paginatedProducts) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products not found!' });
@@ -139,7 +141,7 @@ async function getProductById(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Id params is empty or not attached!' });
     }
 
-    const product = await getFromDB(req.params._id, 'Product');
+    const product = await getFromDB(req.params._id, COLLECTION_NAMES.Product);
 
     if (!product) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product not found!' });
@@ -159,7 +161,7 @@ async function addProduct(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Product data is empty or not attached!' });
     }
 
-    await saveToDB(req.body, 'Product');
+    await saveToDB(req.body, COLLECTION_NAMES.Product);
 
     return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Success!' });
   } catch (exception) {
@@ -205,7 +207,7 @@ async function addReview(req: Request, res: Response, next: NextFunction) {
     } /* TODO: [DUP] check if review is not a duplicate */
 
     // TODO: [DX] refactor update process to use some Mongo (declarative) aggregation atomicly
-    const productToUpdate: IProduct = (await getFromDB({ name: req.params.name }, 'Product', {}))[0];
+    const productToUpdate: IProduct = (await getFromDB({ name: req.params.name }, COLLECTION_NAMES.Product, {}))[0];
 
     if (!productToUpdate) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Reviewed product not found!' });
@@ -252,7 +254,7 @@ async function modifyProduct(req: Request, res: Response, next: NextFunction) {
     const modifiedProduct = await updateOneModelInDB(
       req.body.productId || { name: req.body.name },
       req.body.modifications,
-      'Product'
+      COLLECTION_NAMES.Product
     );
 
     if (!modifiedProduct) {
@@ -275,7 +277,7 @@ async function deleteProduct(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Name param is empty or not attached!' });
     }
 
-    const deletionResult = await deleteFromDB(req.params.name, 'Product');
+    const deletionResult = await deleteFromDB(req.params.name, COLLECTION_NAMES.Product);
 
     if (!deletionResult.ok) {
       logger.error('Deletion error occured...', deletionResult);
