@@ -31,4 +31,10 @@ const mockAndRequireModule = (path: string) => {
   return jest.mock(relativePath).requireMock(relativePath);
 };
 
+export const mockAndRequireDBModelsModules = () => {
+  return ['product', 'user', 'userRole'].map((modelName) =>
+    mockAndRequireModule(`src/database/models/_${modelName}.ts`)
+  );
+};
+
 export { findAssociatedSrcModulePath, getRootRelativePath, mockAndRequireModule };

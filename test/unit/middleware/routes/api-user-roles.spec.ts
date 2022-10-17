@@ -1,6 +1,10 @@
-import { findAssociatedSrcModulePath, mockAndRequireModule } from '@unitTests/utils';
+import { findAssociatedSrcModulePath, mockAndRequireModule, mockAndRequireDBModelsModules } from '@unitTests/utils';
+
+mockAndRequireDBModelsModules();
+
 import { getResMock, TJestMock } from '@unitTests/inline-mocks';
 import { HTTP_STATUS_CODE } from '@src/types';
+import { COLLECTION_NAMES } from '@database/models';
 
 const { Router, _router } = mockAndRequireModule('express');
 const { authMiddlewareFn: authMiddlewareFnMock } = mockAndRequireModule('src/middleware/features/auth');
@@ -150,7 +154,7 @@ describe('#api-user-roles', () => {
       await apiUserRolesRouter._getUserRoles(reqMock, getResMock());
 
       expect(getFromDBMock).toHaveBeenCalledTimes(1);
-      expect(getFromDBMock).toHaveBeenCalledWith({}, 'UserRole', {}, { roleName: true });
+      expect(getFromDBMock).toHaveBeenCalledWith({}, COLLECTION_NAMES.User_Role, {}, { roleName: true });
       getFromDBMock.mockClear();
     });
 

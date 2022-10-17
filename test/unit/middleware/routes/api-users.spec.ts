@@ -1,6 +1,10 @@
-import { mockAndRequireModule, findAssociatedSrcModulePath } from '@unitTests/utils';
+import { mockAndRequireModule, findAssociatedSrcModulePath, mockAndRequireDBModelsModules } from '@unitTests/utils';
+
+mockAndRequireDBModelsModules();
+
 import { HTTP_STATUS_CODE } from '@src/types';
 import { getResMock, getNextFnMock, TJestMock } from '@unitTests/inline-mocks';
+import { COLLECTION_NAMES } from '@database/models';
 
 const { ObjectId: ObjectIdMock } = mockAndRequireModule('mongodb');
 const { Router, _router } = mockAndRequireModule('express');
@@ -11,9 +15,6 @@ const {
   saveToDB: saveToDBMock,
   updateOneModelInDB: updateOneModelInDBMock,
 } = mockAndRequireModule('src/database/database-index');
-
-mockAndRequireModule('src/database/models/_user');
-mockAndRequireModule('src/database/models/_userRole');
 
 describe('#api-users', () => {
   const authMiddlewareReturnedFn = () => undefined;
@@ -147,7 +148,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._updateUser(reqMock, getResMock());
 
-        expect(saveToDBMock).toHaveBeenCalledWith(reqMock.body, 'User');
+        expect(saveToDBMock).toHaveBeenCalledWith(reqMock.body, COLLECTION_NAMES.User);
       });
 
       it('should call updateOneModelInDB(..) with correct params', async () => {
@@ -164,7 +165,7 @@ describe('#api-users', () => {
               owners: new ObjectIdMock(await saveToDBMock(reqMock.body)._id),
             },
           },
-          'UserRole'
+          COLLECTION_NAMES.User_Role
         );
       });
 
@@ -209,7 +210,7 @@ describe('#api-users', () => {
 
         await apiUsersRouter._logInUser(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith({ login: reqMock.body.login }, 'User', {
+        expect(getFromDBMock).toHaveBeenCalledWith({ login: reqMock.body.login }, COLLECTION_NAMES.User, {
           population: 'accountType',
         });
       });
@@ -357,7 +358,9 @@ describe('#api-users', () => {
 
         await apiUsersRouter._getUser(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params.id, 'User', { population: 'accountType' });
+        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params.id, COLLECTION_NAMES.User, {
+          population: 'accountType',
+        });
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {

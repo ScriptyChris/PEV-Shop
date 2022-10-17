@@ -1,6 +1,10 @@
-import { findAssociatedSrcModulePath, mockAndRequireModule } from '@unitTests/utils';
+import { findAssociatedSrcModulePath, mockAndRequireModule, mockAndRequireDBModelsModules } from '@unitTests/utils';
+
+mockAndRequireDBModelsModules();
+
 import { HTTP_STATUS_CODE } from '@src/types';
 import { getNextFnMock, getResMock, TJestMock } from '@unitTests/inline-mocks';
+import { COLLECTION_NAMES } from '@database/models';
 
 const { Router, _router } = mockAndRequireModule('express');
 const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMiddlewareMock } =
@@ -151,7 +155,7 @@ describe('#api-products', () => {
           queryBuilderMock.getPaginationConfig._succeededCall
         );
 
-        expect(getFromDBMock).toHaveBeenCalledWith(queryBuilderMock.getIdListConfig(), 'Product', {
+        expect(getFromDBMock).toHaveBeenCalledWith(queryBuilderMock.getIdListConfig(), COLLECTION_NAMES.Product, {
           pagination: queryBuilderMock.getPaginationConfig(),
         });
       });
@@ -209,7 +213,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._getProductById(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params._id, 'Product');
+        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params._id, COLLECTION_NAMES.Product);
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {
@@ -265,7 +269,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._addProduct(reqMock, getResMock());
 
-        expect(saveToDBMock).toHaveBeenCalledWith(reqMock.body, 'Product');
+        expect(saveToDBMock).toHaveBeenCalledWith(reqMock.body, COLLECTION_NAMES.Product);
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {
@@ -333,7 +337,7 @@ describe('#api-products', () => {
         getFromDBMock.mockImplementationOnce(() => reviewsMock);
         await apiProductsRouter._addReview(reqMock, getResMock());
 
-        expect(getFromDBMock).toBeCalledWith({ name: reqMock.params.name }, 'Product', {});
+        expect(getFromDBMock).toBeCalledWith({ name: reqMock.params.name }, COLLECTION_NAMES.Product, {});
       });
 
       it('should call .save(..) with correct params', async () => {
@@ -476,7 +480,7 @@ describe('#api-products', () => {
         expect(updateOneModelInDBMock).toHaveBeenCalledWith(
           reqMock.body.productId,
           reqMock.body.modifications,
-          'Product'
+          COLLECTION_NAMES.Product
         );
       });
 
@@ -544,7 +548,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._deleteProduct(reqMock, getResMock());
 
-        expect(deleteFromDBMock).toBeCalledWith(reqMock.params.name, 'Product');
+        expect(deleteFromDBMock).toBeCalledWith(reqMock.params.name, COLLECTION_NAMES.Product);
       });
 
       it('should call res.sendStatus(..) with correct params', async () => {

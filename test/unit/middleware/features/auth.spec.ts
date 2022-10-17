@@ -1,6 +1,9 @@
-import { mockAndRequireModule, findAssociatedSrcModulePath } from '@unitTests/utils';
+import { mockAndRequireModule, findAssociatedSrcModulePath, mockAndRequireDBModelsModules } from '@unitTests/utils';
+
+mockAndRequireDBModelsModules();
+
 import { getResMock, TJestMock } from '@unitTests/inline-mocks';
-import type { IUser } from '@database/models/_user';
+import { IUser, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getType from 'jest-get-type';
 import { getFromDB } from '@database/__mocks__/database-index';
@@ -164,7 +167,7 @@ describe('#auth', () => {
             _id: expect.any(String),
             'tokens.auth': { $exists: true, $eq: 'test-token' },
           },
-          'User',
+          COLLECTION_NAMES.User,
           { population: 'accountType' }
         );
       });
