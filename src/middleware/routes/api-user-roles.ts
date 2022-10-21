@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import getLogger from '@commons/logger';
-import { getFromDB } from '@database/database-index';
+import { getFromDB } from '@database/api';
 import { IUserRole, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
@@ -107,7 +107,7 @@ export default router;
 //       // }
 //     }
 
-//     const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'UserRole');
+//     const updatedUserRole = await updateOneModelInDB(COLLECTION_NAMES.User_Role, { roleName: req.body.roleName }, req.body.permissions);
 //     logger.log('updatedUserRole:', updatedUserRole);
 
 //     if (!updatedUserRole) {
@@ -128,14 +128,18 @@ async function getUserRoles(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('(getUserRoles)');
 
-    const userRoles: IUserRole = await getFromDB({}, COLLECTION_NAMES.User_Role, {}, { roleName: true });
+    const userRoles = await getFromDB(
+      { modelName: COLLECTION_NAMES.User_Role, findMultiple: true },
+      {},
+      { roleName: true }
+    );
 
     if (!userRoles) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: `User roles not found!` });
     }
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, {
-      payload: Object.values(userRoles).map(({ roleName }) => roleName),
+      payload: (userRoles as IUserRole[]).map(({ roleName }) => roleName),
     });
   } catch (exception) {
     return next(exception);

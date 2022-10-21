@@ -163,7 +163,11 @@ export interface IProduct extends Document {
   category: string;
   price: number;
   shortDescription: string[];
-  technicalSpecs: Record<string, unknown>[];
+  technicalSpecs: {
+    heading: string;
+    defaultUnit: string;
+    data: unknown;
+  }[];
   images: Record<string, unknown>[];
   relatedProductsNames: Array<string>;
   reviews: IReviews;

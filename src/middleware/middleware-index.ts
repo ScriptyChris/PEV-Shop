@@ -1,3 +1,6 @@
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
+
 /*
   This module is located under `/dist` folder at runtime, but at "author time" (TypeScript compilation) 
   no `/dist` wrapper is up there - during unit tests, this module is ran as TypeScript by Jest. 
@@ -21,12 +24,9 @@ import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
 import apiOrders from './routes/api-orders';
-import { config as dotenvConfig } from 'dotenv';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getPopulationState } from '@database/connector';
-
-dotenvConfig();
 
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';

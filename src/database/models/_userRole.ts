@@ -1,11 +1,18 @@
-import { Schema, model, Document, ROLE_NAMES, TRoleName, COLLECTION_NAMES } from '@database/models/__core-and-commons';
+import {
+  Schema,
+  model,
+  Document,
+  USER_ROLES_MAP,
+  TUserRoleName,
+  COLLECTION_NAMES,
+} from '@database/models/__core-and-commons';
 
 const userRoleSchema = new Schema<IUserRole>({
   roleName: {
     type: String,
     required: true,
-    validate(value: TRoleName) {
-      return ROLE_NAMES.includes(value);
+    validate(value: TUserRoleName) {
+      return Object.keys(USER_ROLES_MAP).includes(value);
     },
   },
   owners: {
@@ -27,7 +34,7 @@ export const UserRoleModel = model<IUserRole>(COLLECTION_NAMES.User_Role, userRo
 export type TUserRoleModel = typeof UserRoleModel;
 
 export interface IUserRole extends Document {
-  roleName: TRoleName;
+  roleName: TUserRoleName;
   owners: Schema.Types.ObjectId[];
 }
 

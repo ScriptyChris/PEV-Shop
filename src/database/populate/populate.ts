@@ -30,6 +30,10 @@ const DEFAULT_PARAMS = Object.freeze({
 });
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const dotenvConfig = require('dotenv').config;
+  dotenvConfig();
+
   // TODO: [DX] that might need to be refactored to avoid unnecessary CJS usage and relative path
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   require('../../../commons/moduleAliasesResolvers.js').backend();

@@ -32,11 +32,11 @@ function getTotalPrice(products: IProductInOrder[]) {
 }
 
 export function getOrderBody(products: IProductInOrder[], payMethod: Partial<IPayByLinkMethod>) {
-  const host: string = process.env.NODE_ENV === 'development' ? '127.0.0.1' : 'pev-demo.store';
+  const host = process.env.NODE_ENV === 'development' ? process.env.APP_LOCAL_HOST : process.env.APP_PRODUCTION_HOST;
 
   return {
-    // notifyUrl: `http://127.0.0.1:${process.env.APP_PORT}`,
-    customerIp: '127.0.0.1',
+    // notifyUrl: `http://${process.env.APP_LOCAL_HOST}:${process.env.APP_PORT}`,
+    customerIp: process.env.APP_LOCAL_HOST,
     continueUrl: `http://${host}:${process.env.APP_PORT}/`,
     merchantPosId: process.env.PAYU_CLIENT_ID,
     description: 'PEV-Shop order',
@@ -79,7 +79,10 @@ export function getOrderPaymentMethod(
   minPrice: number,
   maxPrice: number
 ): Promise<Partial<IPayByLinkMethod>> {
-  const PAYU_METHODS_URL = 'https://secure.snd.payu.com/api/v2_1/paymethods';
+  const PAYU_METHODS_URL = process.env.PAYU_PAYMENT_METHODS_URL;
+  if (!PAYU_METHODS_URL) {
+    throw Error('PAYU_METHODS_URL env variable is undefined!');
+  }
 
   return fetch(PAYU_METHODS_URL, {
     headers: {

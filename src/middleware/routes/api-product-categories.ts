@@ -1,6 +1,6 @@
 import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
-import { getFromDB } from '@database/database-index';
+import { getFromDB } from '@database/api';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
@@ -9,8 +9,10 @@ import { COLLECTION_NAMES } from '@database/models';
 const router = Router();
 const logger = getLogger(module.filename);
 
-function createCategoriesHierarchy(productCategories: string[]): string[] {
-  const categoriesHierarchy: Array<any> = [];
+type TCategory = { categoryName: string; childCategories?: TCategory[] };
+
+function createCategoriesHierarchy(productCategories: string[]) {
+  const categoriesHierarchy: TCategory[] = [];
 
   productCategories.forEach((category) => {
     if (category.includes('|')) {
@@ -29,7 +31,12 @@ function createCategoriesHierarchy(productCategories: string[]): string[] {
           ],
         });
       } else {
-        categoriesHierarchy[parentCategorySlotIndex].childCategories.push({
+        const childCategories = categoriesHierarchy[parentCategorySlotIndex].childCategories;
+        if (!Array.isArray(childCategories)) {
+          throw Error(`childCategories is not an array! Received "${childCategories}".`);
+        }
+
+        childCategories.push({
           categoryName: childCategory,
         });
       }
@@ -52,13 +59,13 @@ async function getProductCategoriesHierarchy(req: Request, res: Response, next: 
   try {
     logger.log('(getProductCategoriesHierarchy) req.params:', req.params);
 
-    const productCategories = (await getFromDB('category', COLLECTION_NAMES.Product, { isDistinct: true })) as string[];
+    const productCategories = await getFromDB({ modelName: COLLECTION_NAMES.Product, isDistinct: true }, 'category');
 
     if (!productCategories) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product categories not found!' });
     }
 
-    const categoriesHierarchy = createCategoriesHierarchy(productCategories);
+    const categoriesHierarchy = createCategoriesHierarchy(productCategories as string[]);
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: categoriesHierarchy });
   } catch (exception) {

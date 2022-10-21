@@ -1,9 +1,6 @@
-import { config as dotenvConfig } from 'dotenv';
 import { createTransport } from 'nodemailer';
 import SMTPTransport = require('nodemailer/lib/smtp-transport');
 import SendmailTransport = require('nodemailer/lib/sendmail-transport');
-
-dotenvConfig();
 
 const translations = Object.freeze({
   activationSubject: 'Account activation',
@@ -57,7 +54,7 @@ export default async function sendMail(
 ): Promise<SendmailTransport.SentMessageInfo> {
   const transporter = createTransport(mailerConfig);
   const mailOptions: Partial<SendmailTransport.Options> = {
-    from: process.env.EMAIL_FROM, //'PEV_Shop@example.org',
+    from: process.env.EMAIL_FROM,
     to: receiver,
     subject: EMAIL_TYPES_CONFIG[emailType].subject,
     html: EMAIL_TYPES_CONFIG[emailType].getMessage(link),

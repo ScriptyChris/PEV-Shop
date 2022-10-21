@@ -1,23 +1,22 @@
+import type { Request } from 'express';
 import getLogger from '@commons/logger';
+
+type TReqQuery = Request['query'];
 
 const logger = getLogger(module.filename);
 
-const isEmptyQueryObject = (query: Record<string, unknown>): boolean => {
-  return typeof query === 'object' && !Object.keys(query).length;
-};
-
-const getSearchByNameConfig = (reqQuery: TProductNameReq): { name: RegExp } | null => {
+const getSearchByNameConfig = (reqQuery: TReqQuery) => {
   if (!reqQuery.name) {
     return null;
   }
 
-  const caseSensitiveFlag: string = reqQuery.caseSensitive === 'true' ? '' : 'i';
-  const nameQuery = new RegExp(reqQuery.name, caseSensitiveFlag);
+  const caseSensitiveFlag = reqQuery.caseSensitive === 'true' ? '' : 'i';
+  const nameQuery = new RegExp(reqQuery.name as string, caseSensitiveFlag);
 
   return { name: nameQuery };
 };
 
-const getPaginationConfig = (reqQuery: TPageLimit): TPageLimit | null => {
+const getPaginationConfig = (reqQuery: TReqQuery) => {
   if (!('page' in reqQuery) || !('limit' in reqQuery)) {
     return null;
   }
@@ -25,7 +24,7 @@ const getPaginationConfig = (reqQuery: TPageLimit): TPageLimit | null => {
   return { page: Number(reqQuery.page), limit: Number(reqQuery.limit) };
 };
 
-const getIdListConfig = (reqQuery: TIdListReq): { _id: { $in: string[] } } | null => {
+const getIdListConfig = (reqQuery: TReqQuery) => {
   if (typeof reqQuery.idList === 'string') {
     const commaSplitIdList = reqQuery.idList.split(',');
     return { _id: { $in: commaSplitIdList } };
@@ -34,7 +33,7 @@ const getIdListConfig = (reqQuery: TIdListReq): { _id: { $in: string[] } } | nul
   return null;
 };
 
-const getNameListConfig = (reqQuery: TNameListReq): { name: { $in: string[] } } | null => {
+const getNameListConfig = (reqQuery: TReqQuery) => {
   if (typeof reqQuery.nameList === 'string') {
     try {
       const commaSplitIdList = JSON.parse(reqQuery.nameList);
@@ -49,7 +48,7 @@ const getNameListConfig = (reqQuery: TNameListReq): { name: { $in: string[] } } 
   return null;
 };
 
-const getProductsWithChosenCategories = (reqQuery: TProductsCategoriesReq): { category: { $in: string[] } } | null => {
+const getProductsWithChosenCategories = (reqQuery: TReqQuery) => {
   if (typeof reqQuery.productCategories === 'string') {
     const productCategories = reqQuery.productCategories.split(',');
     return { category: { $in: productCategories } };
@@ -64,11 +63,9 @@ type TFilterQueryHeading = {
 type TFilterQueryData = {
   [key: string]: number | string | string[] | boolean | { [key: string]: number | string[] };
 };
-const getFilters = (reqQuery: TProductFiltersReq) => {
+const getFilters = (reqQuery: TReqQuery) => {
   if (typeof reqQuery.productsFilters === 'string') {
-    const specsList: Array<[TFilterQueryHeading, TFilterQueryData]> = reqQuery.productsFilters
-      .split(',')
-      .map(getFilters.mapQuery);
+    const specsList = reqQuery.productsFilters.split(',').map(getFilters.mapQuery);
 
     return {
       $and: specsList.map(([heading, data]) => ({
@@ -93,11 +90,11 @@ getFilters.BOOLEAN_VALUES = {
 getFilters.MIN_MAX_MAP = Object.freeze({
   min: '$gte',
   max: '$lte',
-} as { [key: string]: string });
-getFilters.getQueryDataKey = (subKey = ''): string => {
+} as const);
+getFilters.getQueryDataKey = (subKey = '') => {
   return subKey ? `technicalSpecs.data.${subKey}` : getFilters.DATA_BASE_KEY;
 };
-getFilters.mapQuery = (filter: string): [TFilterQueryHeading, TFilterQueryData] => {
+getFilters.mapQuery = (filter: string) => {
   type TFilterBlueprintQuery = {
     heading: {
       key: string;
@@ -132,7 +129,7 @@ getFilters.mapQuery = (filter: string): [TFilterQueryHeading, TFilterQueryData] 
 
     filterQueryTemplateObj.data.value = minOrMaxValue
       ? {
-          [getFilters.MIN_MAX_MAP[minOrMaxValue.toLowerCase()]]: parsedValue,
+          [getFilters.MIN_MAX_MAP[minOrMaxValue.toLowerCase() as keyof typeof getFilters.MIN_MAX_MAP]]: parsedValue,
         }
       : parsedValue;
   } else if (value.includes(getFilters.PIPE_SEPARATOR)) {
@@ -146,25 +143,17 @@ getFilters.mapQuery = (filter: string): [TFilterQueryHeading, TFilterQueryData] 
     filterQueryTemplateObj.data.value = value === getFilters.BOOLEAN_VALUES.TRUE;
   }
 
-  const filterQueryHeading = {
+  const filterQueryHeading: TFilterQueryHeading = {
     [filterQueryTemplateObj.heading.key]: filterQueryTemplateObj.heading.value,
   };
-  const filterQueryData = {
+  const filterQueryData: TFilterQueryData = {
     [filterQueryTemplateObj.data.key]: filterQueryTemplateObj.data.value,
   };
 
-  return [filterQueryHeading, filterQueryData];
+  return [filterQueryHeading, filterQueryData] as const;
 };
 
-export type TPageLimit = { page: number; limit: number };
-export type TIdListReq = { idList: string };
-export type TNameListReq = { nameList: string };
-export type TProductsCategoriesReq = { productCategories: string };
-export type TProductNameReq = { name: string; caseSensitive: string | boolean };
-export type TProductFiltersReq = { productsFilters: string };
-
 export const queryBuilder = {
-  isEmptyQueryObject,
   getSearchByNameConfig,
   getPaginationConfig,
   getIdListConfig,

@@ -1,7 +1,12 @@
-import { PaginateResult, PaginateOptions } from 'mongoose';
+import { PaginateModel, PaginateOptions } from 'mongoose';
+import { TDocuments } from '@database/models';
 
 // TODO: cache pagination for each user (for next/prev page navigation)
-const getPaginatedItems = async (Model: any, itemQuery: any, paginationConfig: TPaginationConfig): TPaginateResult => {
+const getPaginatedItems = async (
+  Model: TPaginateModel,
+  itemQuery: Parameters<TPaginateModel['paginate']>[0],
+  paginationConfig: TPaginationConfig
+) => {
   const options: PaginateOptions = {
     page: paginationConfig.page,
     limit: paginationConfig.limit,
@@ -11,13 +16,11 @@ const getPaginatedItems = async (Model: any, itemQuery: any, paginationConfig: T
     },
   };
 
-  const paginatedItems: PaginateResult<any> = await Model.paginate(itemQuery, options);
-
   // TODO: delete unnecessary pagination props from returning object
-  return paginatedItems;
+  return Model.paginate(itemQuery, options);
 };
 
 export type TPaginationConfig = { page: number; limit: number };
-export type TPaginateResult = Promise<PaginateResult<any>>;
+export type TPaginateModel = PaginateModel<TDocuments>;
 
 export default getPaginatedItems;

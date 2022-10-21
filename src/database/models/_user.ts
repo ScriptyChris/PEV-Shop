@@ -1,12 +1,4 @@
-import {
-  model,
-  Schema,
-  Types,
-  Document,
-  Model,
-  TRoleName,
-  COLLECTION_NAMES,
-} from '@database/models/__core-and-commons';
+import { model, Schema, Document, Model, TUserRoleName, COLLECTION_NAMES } from '@database/models/__core-and-commons';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '@middleware/features/auth';
 
@@ -44,7 +36,6 @@ const userSchema = new Schema<IUser>(
       required: true,
     },
     email: {
-      // @ts-ignore
       type: Schema.Types.Email,
       unique: true,
       required: true,
@@ -140,7 +131,7 @@ userSchema.methods.confirmUser = function (): Promise<IUser> {
 
 userSchema.methods.addProductToObserved = function (productId: string): string {
   const user = this as IUser;
-  const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
+  const productObjectId = new Schema.Types.ObjectId(productId);
 
   if (!user.observedProductsIDs) {
     user.observedProductsIDs = [productObjectId];
@@ -155,7 +146,7 @@ userSchema.methods.addProductToObserved = function (productId: string): string {
 
 userSchema.methods.removeProductFromObserved = function (productId: string): string {
   const user = this as IUser;
-  const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
+  const productObjectId = new Schema.Types.ObjectId(productId);
 
   if (!user.observedProductsIDs || !user.observedProductsIDs.includes(productObjectId)) {
     return 'Product was not observed by user!';
@@ -247,7 +238,7 @@ export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'>
 };
 
 export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & {
-  __accountType: TRoleName;
+  __accountType: TUserRoleName;
 };
 
 interface IUserModel extends Model<IUser> {
@@ -266,7 +257,7 @@ export interface IUser extends Document {
     confirmRegistration: string | undefined;
     resetPassword: string | undefined;
   };
-  accountType?: { roleName: TRoleName };
+  accountType?: { roleName: TUserRoleName };
   generateAuthToken(): Promise<string>;
   toJSON(): TUserPublic;
   matchPassword(password: string): Promise<boolean>;

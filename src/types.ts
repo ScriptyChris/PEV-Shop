@@ -3,7 +3,7 @@ import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
 
 export interface IProductInOrder {
-  name: number;
+  name: string;
   unitPrice: number;
   quantity: number;
 }

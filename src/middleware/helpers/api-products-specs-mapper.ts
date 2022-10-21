@@ -1,3 +1,5 @@
+import { IProduct } from '@database/models';
+
 type TSpecs<Collection, Circular> = Record<string, Collection | Circular>;
 type TIntermediateSpecsValues = Array<string | number> | Record<string, number[]>;
 type TIntermediateSpecs = [string, TIntermediateSpecsValues];
@@ -17,12 +19,8 @@ type TMappedSpecs = {
   categoryToSpecs: Record<string, Set<string>>;
 };
 type TProductTechSpec = {
-  category: string;
-  technicalSpecs: Array<{
-    heading: string;
-    defaultUnit: string;
-    data: unknown;
-  }>;
+  category: IProduct['category'];
+  technicalSpecs: IProduct['technicalSpecs'];
 };
 
 function mapUniqueSpecValues(
@@ -76,7 +74,7 @@ function mapUniqueSpecValues(
 }
 
 function mapMinMax(mappingSpecs: IUniqueSpecs): TIntermediateSpecs[] {
-  return Object.entries(mappingSpecs).map(function doMapMinMax([key, value]): TIntermediateSpecs {
+  return Object.entries(mappingSpecs).map(function doMapMinMax([key, value]) {
     const valueAsArray = Array.from(value as Set<number>);
 
     if (value instanceof Set || Array.isArray(value)) {
@@ -87,20 +85,16 @@ function mapMinMax(mappingSpecs: IUniqueSpecs): TIntermediateSpecs[] {
       return [key, valueAsArray];
     }
 
-    return [
-      key,
-      // @ts-ignore
-      Object.fromEntries(mapMinMax(value)),
-    ];
+    return [key, Object.fromEntries(mapMinMax(value))] as TIntermediateSpecs;
   });
 }
 
-export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]): TProductTechnicalSpecs {
+export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTechSpec[]) {
   const defaultUnits: Record<string, string> = {};
   const headingToDataType: Record<string, 'primitive' | 'object' | 'array'> = {};
 
   const mapping = productTechSpecs.reduce(
-    (mappedSpecs: TMappedSpecs, specData) => {
+    (mappedSpecs, specData) => {
       if (!mappedSpecs.categoryToSpecs[specData.category]) {
         mappedSpecs.categoryToSpecs[specData.category] = new Set();
       }
@@ -109,7 +103,7 @@ export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTech
 
       return mappedSpecs;
     },
-    { specs: {}, categoryToSpecs: {} }
+    { specs: {}, categoryToSpecs: {} } as TMappedSpecs
   );
 
   const mappedTechnicalSpecs: TProductTechnicalSpecs = {
@@ -119,7 +113,6 @@ export default function mapProductsTechnicalSpecs(productTechSpecs: TProductTech
       defaultUnit: defaultUnits[key],
     })),
 
-    // @ts-ignore
     categoryToSpecs: Object.fromEntries(
       Object.entries(mapping.categoryToSpecs).map(([key, value]) => [key, Array.from(value)])
     ),

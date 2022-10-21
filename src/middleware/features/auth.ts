@@ -2,13 +2,11 @@ import getLogger from '@root/commons/logger';
 import { compare, hash } from 'bcrypt';
 import { sign, verify, Secret } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { config as dotenvConfig } from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { IUser, TRoleName, COLLECTION_NAMES } from '@database/models';
+import { IUser, TUserRoleName, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
-
-dotenvConfig();
+import { getFromDB } from '@database/api';
 
 const logger = getLogger(module.filename);
 const SALT_ROUNDS = 8;
@@ -32,58 +30,52 @@ const verifyToken = (token: string) => {
   return verify(token, TOKEN_SECRET_KEY) as TToken;
 };
 
-const authMiddlewareFn = (
-  getFromDB: /* TODO: [DX] correct typing */ any
-): ((...args: any) => Promise<Pick<Response, 'json'> | void>) => {
-  return async (req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) => {
-    try {
-      const BEARER_TOKEN_PREFIX = 'Bearer ';
-      const authToken = req.header('Authorization');
+const authMiddlewareFn = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const BEARER_TOKEN_PREFIX = 'Bearer ';
+    const authToken = req.header('Authorization');
 
-      if (!authToken) {
-        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-          error: 'Authorization token header is empty or not attached!',
-        });
-      } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
-        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-          error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!`,
-        });
-      }
-
-      const bearerToken = authToken.replace(BEARER_TOKEN_PREFIX, '');
-
-      if (!bearerToken) {
-        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-          error: 'Auth token does not contain bearer value!',
-        });
-      }
-
-      const decodedToken = verifyToken(bearerToken);
-      const user = (await getFromDB(
-        { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
-        COLLECTION_NAMES.User,
-        { population: 'accountType' }
-      )) as IUser | IUser[];
-
-      if (!user || (user as IUser[]).length === 0) {
-        return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to authorize not found!' });
-      }
-
-      // TODO: [REFACTOR] normalize data returned by `getFromDB`
-      req.user = Array.isArray(user) ? user[0] : user;
-      req.token = bearerToken;
-
-      return next();
-    } catch (exception) {
-      return next(exception);
+    if (!authToken) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Authorization token header is empty or not attached!',
+      });
+    } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!`,
+      });
     }
-  };
+
+    const bearerToken = authToken.replace(BEARER_TOKEN_PREFIX, '');
+
+    if (!bearerToken) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Auth token does not contain bearer value!',
+      });
+    }
+
+    const decodedToken = verifyToken(bearerToken);
+    const user = await getFromDB(
+      { modelName: COLLECTION_NAMES.User, population: 'accountType' },
+      { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } }
+    );
+
+    if (!user) {
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to authorize not found!' });
+    }
+
+    req.user = user as IUser;
+    req.token = bearerToken;
+
+    return next();
+  } catch (exception) {
+    return next(exception);
+  }
 };
 
-const userRoleMiddlewareFn = (roleName: TRoleName): any => {
-  return async (req: Request & { user: IUser }, res: Response, next: NextFunction) => {
+const userRoleMiddlewareFn = (roleName: TUserRoleName) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.user.populated('accountType') || roleName !== req.user.accountType?.roleName) {
+      if (!req.user?.populated('accountType') || roleName !== req.user?.accountType?.roleName) {
         return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });
       }
 
@@ -95,9 +87,16 @@ const userRoleMiddlewareFn = (roleName: TRoleName): any => {
 };
 
 const authToPayU: () => Promise<string | Error> = (() => {
-  const clientId = process.env.PAYU_CLIENT_ID as string;
-  const clientSecret = process.env.PAYU_CLIENT_SECRET as string;
-  const PAYU_AUTH_URL = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
+  const clientId = process.env.PAYU_CLIENT_ID;
+  const clientSecret = process.env.PAYU_CLIENT_SECRET;
+  const PAYU_AUTH_URL = process.env.PAYU_AUTH_URL;
+
+  if (!clientId || !clientSecret || !PAYU_AUTH_URL) {
+    throw Error(
+      `Either of: clientId "${clientId}", clientSecret "${clientSecret}", PAYU_AUTH_URL "${PAYU_AUTH_URL}" is undefined!`
+    );
+  }
+
   const options: RequestInit = {
     method: 'POST',
     headers: {
