@@ -1,6 +1,7 @@
 import { createTransport } from 'nodemailer';
 import SMTPTransport = require('nodemailer/lib/smtp-transport');
 import SendmailTransport = require('nodemailer/lib/sendmail-transport');
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const translations = Object.freeze({
   activationSubject: 'Account activation',
@@ -23,8 +24,8 @@ const translations = Object.freeze({
   `.trim(),
 });
 const mailerConfig: SMTPTransport.Options = Object.freeze({
-  host: process.env.EMAIL_HOST as string, //'0.0.0.0',
-  port: Number(process.env.EMAIL_SMTP_PORT), //1025// 587 // TODO: [ENV] use 465 for HTTPS
+  host: dotEnv.EMAIL_HOST, //'0.0.0.0',
+  port: Number(dotEnv.EMAIL_SMTP_PORT), //1025// 587 // TODO: [ENV] use 465 for HTTPS
 });
 
 const EMAIL_TYPES_CONFIG = Object.freeze({
@@ -54,7 +55,7 @@ export default async function sendMail(
 ): Promise<SendmailTransport.SentMessageInfo> {
   const transporter = createTransport(mailerConfig);
   const mailOptions: Partial<SendmailTransport.Options> = {
-    from: process.env.EMAIL_FROM,
+    from: dotEnv.EMAIL_FROM,
     to: receiver,
     subject: EMAIL_TYPES_CONFIG[emailType].subject,
     html: EMAIL_TYPES_CONFIG[emailType].getMessage(link),

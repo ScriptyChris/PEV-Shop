@@ -1,6 +1,3 @@
-import { config as dotenvConfig } from 'dotenv';
-dotenvConfig();
-
 /*
   This module is located under `/dist` folder at runtime, but at "author time" (TypeScript compilation) 
   no `/dist` wrapper is up there - during unit tests, this module is ran as TypeScript by Jest. 
@@ -27,6 +24,7 @@ import apiOrders from './routes/api-orders';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getPopulationState } from '@database/connector';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
@@ -73,8 +71,8 @@ function wrappedMiddleware(): void {
 
     return res.sendFile(`${frontendPath}/index.html`);
   });
-  app.listen(process.env.APP_PORT, () => {
-    logger.log(`Server is listening on port ${process.env.APP_PORT}`);
+  app.listen(dotEnv.APP_PORT, () => {
+    logger.log(`Server is listening on port ${dotEnv.APP_PORT}`);
   });
 }
 

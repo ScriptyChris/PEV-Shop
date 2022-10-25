@@ -1,16 +1,16 @@
-import getLogger from '@root/commons/logger';
+import getLogger from '@commons/logger';
 import { compare, hash } from 'bcrypt';
-import { sign, verify, Secret } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { IUser, TUserRoleName, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getFromDB } from '@database/api';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
 const SALT_ROUNDS = 8;
-const TOKEN_SECRET_KEY = process.env.TOKEN_SECRET_KEY as Secret;
 
 type TToken = { _id: number };
 
@@ -23,11 +23,11 @@ const hashPassword = (password: string) => {
 };
 
 const getToken = (payloadObj: TToken) => {
-  return sign(payloadObj, TOKEN_SECRET_KEY);
+  return sign(payloadObj, dotEnv.TOKEN_SECRET_KEY);
 };
 
 const verifyToken = (token: string) => {
-  return verify(token, TOKEN_SECRET_KEY) as TToken;
+  return verify(token, dotEnv.TOKEN_SECRET_KEY) as TToken;
 };
 
 const authMiddlewareFn = async (req: Request, res: Response, next: NextFunction) => {
@@ -87,22 +87,12 @@ const userRoleMiddlewareFn = (roleName: TUserRoleName) => {
 };
 
 const authToPayU: () => Promise<string | Error> = (() => {
-  const clientId = process.env.PAYU_CLIENT_ID;
-  const clientSecret = process.env.PAYU_CLIENT_SECRET;
-  const PAYU_AUTH_URL = process.env.PAYU_AUTH_URL;
-
-  if (!clientId || !clientSecret || !PAYU_AUTH_URL) {
-    throw Error(
-      `Either of: clientId "${clientId}", clientSecret "${clientSecret}", PAYU_AUTH_URL "${PAYU_AUTH_URL}" is undefined!`
-    );
-  }
-
   const options: RequestInit = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    body: `grant_type=client_credentials&client_id=${dotEnv.PAYU_CLIENT_ID}&client_secret=${dotEnv.PAYU_CLIENT_SECRET}`,
   };
 
   interface IPayUToken {
@@ -119,10 +109,10 @@ const authToPayU: () => Promise<string | Error> = (() => {
       return Promise.resolve((token as unknown as IPayUToken).access_token);
     }
 
-    logger.log('authToPayU /PAYU_AUTH_URL:', PAYU_AUTH_URL, ' /options:', options);
+    logger.log('authToPayU /dotEnv.PAYU_AUTH_URL:', dotEnv.PAYU_AUTH_URL, ' /options:', options);
 
     return (
-      fetch(PAYU_AUTH_URL, options)
+      fetch(dotEnv.PAYU_AUTH_URL, options)
         .then((response: FetchResponse) => response.json())
         .then((response: IPayUToken) => {
           token = response;

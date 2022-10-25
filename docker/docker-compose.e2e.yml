@@ -8,7 +8,8 @@ services:
     working_dir: /app/test/e2e
     environment:
       - DISPLAY ## `xhost +local:` command must first be run on the host computer
-      - CYPRESS_BASE_URL=http://localhost:${APP_PORT}
+      - CYPRESS_APP_LOCAL_HOST=${APP_LOCAL_HOST}
+      - CYPRESS_BASE_URL=http://${APP_LOCAL_HOST}:${APP_PORT}
       - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
       - CYPRESS_WAIT_3_SEC=3000
       - CYPRESS_WAIT_1_SEC=1000

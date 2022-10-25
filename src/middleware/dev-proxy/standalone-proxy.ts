@@ -1,6 +1,4 @@
-import { config as dotenvConfig } from 'dotenv';
-dotenvConfig();
-
+import { dotEnv } from '@commons/dotEnvLoader';
 import Express, { Request, Response } from 'express';
 // @ts-ignore
 import proxy from '@root/node_modules/webpack-dev-server/node_modules/http-proxy-middleware';
@@ -10,12 +8,12 @@ import { ClientRequest, IncomingMessage } from 'http';
 const logger = getLogger(module.filename);
 const port = Number(process.argv[2]) || 3001;
 const url = process.argv[3] || '/dev-proxy';
-const target = process.argv[4] || process.env.PAYU_ORDERS_URL;
+const target = process.argv[4] || dotEnv.PAYU_ORDERS_URL;
 const app = Express();
 
 app.use(
   proxy(url, {
-    target: target,
+    target,
     changeOrigin: true,
     ignorePath: true,
     logLevel: 'debug',

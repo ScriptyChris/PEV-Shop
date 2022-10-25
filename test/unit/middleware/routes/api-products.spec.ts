@@ -4,7 +4,7 @@ mockAndRequireDBModelsModules();
 
 import { HTTP_STATUS_CODE } from '@src/types';
 import { getNextFnMock, getResMock, TJestMock } from '@unitTests/inline-mocks';
-import { COLLECTION_NAMES } from '@database/models';
+import { COLLECTION_NAMES, USER_ROLES_MAP } from '@database/models';
 
 const { Router, _router } = mockAndRequireModule('express');
 const { authMiddlewareFn: authMiddlewareFnMock, userRoleMiddlewareFn: userRoleMiddlewareMock } =
@@ -65,7 +65,7 @@ describe('#api-products', () => {
       apiProductsRouter._addProduct
     );
     expect(authMiddlewareFnMock.mock.calls[0][0]).toBe(getFromDBMock);
-    expect(userRoleMiddlewareMock.mock.calls[0][0]).toBe('seller');
+    expect(userRoleMiddlewareMock.mock.calls[0][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
       '/api/products/:name/add-review',
       expect.any(Function),
@@ -73,7 +73,7 @@ describe('#api-products', () => {
       apiProductsRouter._addReview
     );
     expect(authMiddlewareFnMock.mock.calls[1][0]).toBe(getFromDBMock);
-    expect(userRoleMiddlewareMock.mock.calls[1][0]).toBe('client');
+    expect(userRoleMiddlewareMock.mock.calls[1][0]).toBe(USER_ROLES_MAP.client);
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
       '/api/products/',
       expect.any(Function),
@@ -81,7 +81,7 @@ describe('#api-products', () => {
       apiProductsRouter._modifyProduct
     );
     expect(authMiddlewareFnMock.mock.calls[2][0]).toBe(getFromDBMock);
-    expect(userRoleMiddlewareMock.mock.calls[2][0]).toBe('seller');
+    expect(userRoleMiddlewareMock.mock.calls[2][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.delete).toHaveBeenCalledWith(
       '/api/products/:name',
       expect.any(Function),
@@ -89,7 +89,7 @@ describe('#api-products', () => {
       apiProductsRouter._deleteProduct
     );
     expect(authMiddlewareFnMock.mock.calls[3][0]).toBe(getFromDBMock);
-    expect(userRoleMiddlewareMock.mock.calls[3][0]).toBe('seller');
+    expect(userRoleMiddlewareMock.mock.calls[3][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.use).toHaveBeenCalledWith(expect.any(Function));
   });
 

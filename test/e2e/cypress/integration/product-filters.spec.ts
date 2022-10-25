@@ -1,7 +1,7 @@
 import { describe, it, cy, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
-import { HTTP_STATUS_CODE } from '@root/src/types';
+import { HTTP_STATUS_CODE } from '@src/types';
 
 function assertProductsFilterQueryParam(url: string, objectToAssertInclusion: { [key: string]: string }) {
   const productsFilterQueryParams = Object.fromEntries(

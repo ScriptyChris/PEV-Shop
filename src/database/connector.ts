@@ -1,9 +1,10 @@
 import { connect, Connection } from 'mongoose';
 import { readdirSync } from 'fs';
 import getLogger from '@commons/logger';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
-const { DATABASE_PROTOCOL, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME } = process.env;
+const { DATABASE_PROTOCOL, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME } = dotEnv;
 const DATABASE_URL = `${DATABASE_PROTOCOL}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`;
 const MAX_DB_CONNECTION_ATTEMPTS = 5;
 const CONNECTION_ATTEMPT_TIMEOUT = 2000;

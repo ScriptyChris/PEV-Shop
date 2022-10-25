@@ -19,8 +19,7 @@ const { jwt: mockedJwt } = {
 
 const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFromDB } = getFromDB;
 
-import { config as dotenvConfig } from 'dotenv';
-dotenvConfig();
+import { dotEnv } from '@commons/envLoader';
 
 describe('#auth', () => {
   let comparePasswords: any,
@@ -85,7 +84,7 @@ describe('#auth', () => {
 
       getToken(payloadObj);
 
-      expect(mockedJwt.sign).toHaveBeenCalledWith(payloadObj, process.env.TOKEN_SECRET_KEY);
+      expect(mockedJwt.sign).toHaveBeenCalledWith(payloadObj, dotEnv.TOKEN_SECRET_KEY);
     });
 
     it('should return result returned by jwt.sign, cause this is its internal implementation', () => {
@@ -105,7 +104,7 @@ describe('#auth', () => {
 
       verifyToken(token);
 
-      expect(mockedJwt.verify).toHaveBeenCalledWith(token, process.env.TOKEN_SECRET_KEY);
+      expect(mockedJwt.verify).toHaveBeenCalledWith(token, dotEnv.TOKEN_SECRET_KEY);
     });
 
     it('should return result returned by jwt.verify, cause this is its internal implementation', () => {

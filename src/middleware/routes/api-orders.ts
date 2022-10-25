@@ -8,6 +8,7 @@ import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod
 import { wrapRes, TypeOfHTTPStatusCodes } from '@middleware/helpers/middleware-response-wrapper';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { COLLECTION_NAMES, IProduct } from '@database/models';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const router: Router &
   Partial<{
@@ -15,12 +16,10 @@ const router: Router &
     _makeOrder: typeof makeOrder;
   }> = Router();
 const logger = getLogger(module.filename);
-
-const PAYMENT_URL = {
-  VPS: `http://${process.env.APP_PRODUCTION_HOST}:3001/dev-proxy`,
-  PAY_U: process.env.PAYU_ORDERS_URL,
-} as const;
-const PAYU_PAYMENT_URL = process.env.NODE_ENV === 'development' ? PAYMENT_URL.VPS : (PAYMENT_URL.PAY_U as string);
+const PAYU_PAYMENT_URL =
+  process.env.NODE_ENV === 'development'
+    ? `http://${dotEnv.APP_PRODUCTION_HOST}:3001/dev-proxy`
+    : dotEnv.PAYU_ORDERS_URL;
 
 router.options('/api/orders', handleOrderPreflight);
 router.post('/api/orders', makeOrder);
