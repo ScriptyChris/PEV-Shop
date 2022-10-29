@@ -6,7 +6,9 @@ import { getResMock, TJestMock } from '@unitTests/inline-mocks';
 import { IUser, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getType from 'jest-get-type';
-import { getFromDB } from '@database/__mocks__/database-index';
+
+const { getFromDB: getFromDBMock } = mockAndRequireModule('src/database/api');
+const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFromDB } = getFromDBMock;
 
 // rename exported variable
 const { bcrypt: mockedBcrypt } = {
@@ -17,9 +19,7 @@ const { jwt: mockedJwt } = {
   jwt: mockAndRequireModule('__mocks__/jsonwebtoken'),
 };
 
-const { _succeededCall: mockedSucceededGetFromDB, _failedCall: mockedFailedGetFromDB } = getFromDB;
-
-import { dotEnv } from '@commons/envLoader';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 describe('#auth', () => {
   let comparePasswords: any,
@@ -120,65 +120,94 @@ describe('#auth', () => {
 
   describe('authMiddlewareFn()', () => {
     // TODO: consider moving below mocks to separate file/module
-    const getReqMock: () => { header: () => string; token?: string; user?: IUser } = () => ({
+    const getReqMock: (mockedReturn?: unknown) => { header: () => unknown; token?: string; user?: IUser } = (
+      mockedReturn = 'Bearer test-token'
+    ) => ({
       header() {
-        return 'Bearer test-token';
+        return mockedReturn;
       },
     });
     const getNextMock = () => jest.fn();
 
-    it('should return a function, which returns a promise resolved to undefined', () => {
-      // for success case
-      const succeededAuthMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
-      const succeededAuthMiddlewareFnResultPromise = succeededAuthMiddlewareFnResult(
-        getReqMock(),
-        getResMock(),
-        getNextMock()
-      );
+    describe('when authToken is incorrect', () => {
+      it('should call res.status(..).json(..) with appropriate params when authToken is not a non-empty string', async () => {
+        // for empty string
+        {
+          const reqMockEmptyString = getReqMock('');
+          const resMockForEmptyString = getResMock();
 
-      expect(getType(succeededAuthMiddlewareFnResult)).toBe('function');
-      expect(getType(succeededAuthMiddlewareFnResultPromise)).toBe('object');
-      expect(succeededAuthMiddlewareFnResultPromise).resolves.toBe(undefined);
+          await authMiddlewareFn(reqMockEmptyString, resMockForEmptyString);
 
-      // for caught error case
-      const failedAuthMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB.general);
-      const failedAuthMiddlewareFnResultPromise = failedAuthMiddlewareFnResult(
-        getReqMock(),
-        getResMock(),
-        getNextMock()
-      );
+          expect(resMockForEmptyString.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
+          expect(resMockForEmptyString._jsonMethod).toBeCalledWith({
+            error: 'Authorization token header has to be a non-empty string!',
+          });
+        }
 
-      expect(getType(failedAuthMiddlewareFnResult)).toBe('function');
-      expect(getType(failedAuthMiddlewareFnResultPromise)).toBe('object');
-      expect(failedAuthMiddlewareFnResultPromise).resolves.toBe(undefined);
+        // for null
+        {
+          const reqMockNull = getReqMock(null);
+          const resMockForNull = getResMock();
+
+          await authMiddlewareFn(reqMockNull, resMockForNull);
+
+          expect(resMockForNull.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
+          expect(resMockForNull._jsonMethod).toBeCalledWith({
+            error: 'Authorization token header has to be a non-empty string!',
+          });
+        }
+      });
+
+      it(`should call res.status(..).json(..) with appropriate params when authToken doesn't start with a prefix`, async () => {
+        const reqMock = getReqMock('Not prefixed with "Bearer "');
+        const resMock = getResMock();
+
+        await authMiddlewareFn(reqMock, resMock);
+
+        expect(resMock.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
+        expect(resMock._jsonMethod).toBeCalledWith({
+          error: `Auth token value has to start with 'Bearer '!`,
+        });
+      });
+
+      it(`should call res.status(..).json(..) with appropriate params when authToken doesn't contain a bearer value`, async () => {
+        const reqMock = getReqMock('Bearer ');
+        const resMock = getResMock();
+
+        await authMiddlewareFn(reqMock, resMock);
+
+        expect(resMock.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
+        expect(resMock._jsonMethod).toBeCalledWith({
+          error: 'Auth token has to contain bearer value!',
+        });
+      });
     });
 
     describe('when found user in database', () => {
       it('should call getFromDB(..) with proper params', async () => {
         const reqMock = getReqMock();
         const getFromDBSucceededMock = jest.fn(mockedSucceededGetFromDB);
-        const authMiddlewareFnResult = authMiddlewareFn(getFromDBSucceededMock);
+        getFromDBMock.mockImplementationOnce(getFromDBSucceededMock);
 
-        await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+        await authMiddlewareFn(reqMock, getResMock(), getNextMock());
 
         expect(getFromDBSucceededMock).toHaveBeenCalledWith(
+          { modelName: COLLECTION_NAMES.User, population: 'accountType' },
           {
             _id: expect.any(String),
             'tokens.auth': { $exists: true, $eq: 'test-token' },
-          },
-          COLLECTION_NAMES.User,
-          { population: 'accountType' }
+          }
         );
       });
 
       it('should assign found user prop to req object', async () => {
         const reqMock = getReqMock();
 
-        expect('user' in reqMock).toBe(false);
+        expect(reqMock).toEqual(expect.not.objectContaining({ user: expect.any(String) }));
 
-        const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+        getFromDBMock.mockImplementationOnce(mockedSucceededGetFromDB);
 
-        await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+        await authMiddlewareFn(reqMock, getResMock(), getNextMock());
 
         expect(reqMock.user instanceof mockedSucceededGetFromDB._clazz).toBe(true);
       });
@@ -186,18 +215,20 @@ describe('#auth', () => {
       it('should assign processed token prop to req object', async () => {
         const reqMock = getReqMock();
 
-        const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+        expect(reqMock).toEqual(expect.not.objectContaining({ token: expect.any(String) }));
 
-        await authMiddlewareFnResult(reqMock, getResMock(), getNextMock());
+        getFromDBMock.mockImplementationOnce(mockedSucceededGetFromDB);
+
+        await authMiddlewareFn(reqMock, getResMock(), getNextMock());
 
         expect(reqMock.token).toBe('test-token');
       });
 
       it('should call next() function', async () => {
         const nextMock = getNextMock();
-        const authMiddlewareFnResult = authMiddlewareFn(mockedSucceededGetFromDB);
+        getFromDBMock.mockImplementationOnce(mockedSucceededGetFromDB);
 
-        await authMiddlewareFnResult(getReqMock(), getResMock(), nextMock);
+        await authMiddlewareFn(getReqMock(), getResMock(), nextMock);
         expect(nextMock).toHaveBeenCalled();
       });
     });
@@ -205,9 +236,9 @@ describe('#auth', () => {
     describe("when didn't find user in database", () => {
       it('should call res.status(..).json(..) with appropriate params', async () => {
         const resMock = getResMock();
-        const authMiddlewareFnResult = authMiddlewareFn(mockedFailedGetFromDB.general);
+        getFromDBMock.mockImplementationOnce(mockedFailedGetFromDB.general);
 
-        await authMiddlewareFnResult(getReqMock(), resMock, getNextMock());
+        await authMiddlewareFn(getReqMock(), resMock, getNextMock());
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
         expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'User to authorize not found!' });
       });
@@ -230,7 +261,7 @@ describe('#auth', () => {
     const getNextMock = () => jest.fn();
     const ROLE_NAME = 'test account type';
 
-    it('should return a function, which returns a promise resolved to undefined', () => {
+    it('should return a function, which returns a promise resolved to undefined', async () => {
       // for success case
       const succeededUserRoleMiddlewareFnResult = userRoleMiddlewareFn(ROLE_NAME);
       const succeededUserRoleMiddlewareFnResultPromise = succeededUserRoleMiddlewareFnResult(
@@ -241,7 +272,7 @@ describe('#auth', () => {
 
       expect(getType(succeededUserRoleMiddlewareFnResult)).toBe('function');
       expect(getType(succeededUserRoleMiddlewareFnResultPromise)).toBe('object');
-      expect(succeededUserRoleMiddlewareFnResultPromise).resolves.toBe(undefined);
+      await expect(succeededUserRoleMiddlewareFnResultPromise).resolves.toBe(undefined);
 
       // for caught error case
       const reqMock = getReqMock();
@@ -256,7 +287,7 @@ describe('#auth', () => {
 
       expect(getType(failedUserRoleMiddlewareFnResult)).toBe('function');
       expect(getType(failedUserRoleMiddlewareFnResultPromise)).toBe('object');
-      expect(failedUserRoleMiddlewareFnResultPromise).resolves.toBe(undefined);
+      await expect(failedUserRoleMiddlewareFnResultPromise).resolves.toBe(undefined);
     });
 
     describe('when req.user property is provided', () => {
@@ -311,7 +342,9 @@ describe('#auth', () => {
         const nextMock = getNextMock();
 
         await userRoleMiddlewareFnResult(reqMock, resMock, nextMock);
-        expect(nextMock).toHaveBeenCalledWith(new TypeError("Cannot read property 'populated' of undefined"));
+        expect(nextMock).toHaveBeenCalledWith(
+          new TypeError('Property req.user is empty, which most likely is a fault of a previous middleware!')
+        );
       });
     });
   });

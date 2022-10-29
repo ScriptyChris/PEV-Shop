@@ -6,7 +6,7 @@ import { getResMock, TJestMock } from '@unitTests/inline-mocks';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { COLLECTION_NAMES } from '@database/models';
 
-const { getFromDB } = mockAndRequireModule('src/database/database-index');
+const { getFromDB } = mockAndRequireModule('src/database/api');
 const { Router } = mockAndRequireModule('express');
 
 describe('#api-product-categories', () => {
@@ -62,7 +62,7 @@ describe('#api-product-categories', () => {
 
       await routerGetCallback(reqMock, getResMock());
 
-      expect(getFromDB).toHaveBeenCalledWith('category', COLLECTION_NAMES.Product, { isDistinct: true });
+      expect(getFromDB).toHaveBeenCalledWith({ modelName: COLLECTION_NAMES.Product, isDistinct: true }, 'category');
     });
 
     it('should call res.status(..).json(..) with correct params in case of succeeded and failed result from getFromDB(..)', async () => {

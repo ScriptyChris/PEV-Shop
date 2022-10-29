@@ -154,7 +154,7 @@ async function addProduct(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Product data is empty or not attached!' });
     }
 
-    await saveToDB(req.body, COLLECTION_NAMES.Product);
+    await saveToDB(COLLECTION_NAMES.Product, req.body);
 
     return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Success!' });
   } catch (exception) {

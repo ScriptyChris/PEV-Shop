@@ -1,5 +1,6 @@
 {
-  "exclude": ["./node_modules", "./dist", "./src/**/__mocks__", "./src/database/data"],
+  "exclude": ["./node_modules", "./dist", "./src/database/data"],
+  "include": ["./src/**/__mocks__"],
   "references": [
     { "path": "./tsconfig.backend.json" }
   ],

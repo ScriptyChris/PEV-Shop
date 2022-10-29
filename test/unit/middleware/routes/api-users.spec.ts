@@ -1,12 +1,16 @@
 import { mockAndRequireModule, findAssociatedSrcModulePath, mockAndRequireDBModelsModules } from '@unitTests/utils';
 
+const {
+  Schema: {
+    Types: { ObjectId: ObjectIdMock },
+  },
+} = mockAndRequireModule('mongoose');
 mockAndRequireDBModelsModules();
 
 import { HTTP_STATUS_CODE } from '@src/types';
 import { getResMock, getNextFnMock, TJestMock } from '@unitTests/inline-mocks';
 import { COLLECTION_NAMES } from '@database/models';
 
-const { ObjectId: ObjectIdMock } = mockAndRequireModule('mongodb');
 const { Router, _router } = mockAndRequireModule('express');
 const { authMiddlewareFn: authMiddlewareFnMock, hashPassword: hashPasswordMock } =
   mockAndRequireModule('src/middleware/features/auth');
@@ -14,10 +18,9 @@ const {
   getFromDB: getFromDBMock,
   saveToDB: saveToDBMock,
   updateOneModelInDB: updateOneModelInDBMock,
-} = mockAndRequireModule('src/database/database-index');
+} = mockAndRequireModule('src/database/api');
 
 describe('#api-users', () => {
-  const authMiddlewareReturnedFn = () => undefined;
   const getReqMock = () => ({
     body: {
       login: 'user123',
@@ -29,16 +32,6 @@ describe('#api-users', () => {
   let apiUsersRouter: any = null;
 
   beforeAll(async () => {
-    authMiddlewareFnMock
-      .mockImplementationOnce(() => authMiddlewareReturnedFn)
-      .mockImplementationOnce(() => authMiddlewareReturnedFn)
-      .mockImplementationOnce(() => authMiddlewareReturnedFn)
-      .mockImplementationOnce(() => authMiddlewareReturnedFn)
-      .mockImplementationOnce(() => authMiddlewareReturnedFn)
-      .mockImplementationOnce(() => authMiddlewareReturnedFn)
-      .mockImplementationOnce(() => authMiddlewareReturnedFn)
-      .mockImplementationOnce(() => authMiddlewareReturnedFn);
-
     try {
       apiUsersRouter = (await import(findAssociatedSrcModulePath())).default;
     } catch (moduleImportException) {
@@ -66,22 +59,22 @@ describe('#api-users', () => {
 
     expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/add-product-to-observed',
-      authMiddlewareReturnedFn,
+      authMiddlewareFnMock,
       apiUsersRouter._addProductToObserved
     );
     expect(apiUsersRouter.delete).toHaveBeenCalledWith(
       '/api/users/remove-product-from-observed/:productId',
-      authMiddlewareReturnedFn,
+      authMiddlewareFnMock,
       apiUsersRouter._removeProductFromObserved
     );
     expect(apiUsersRouter.delete).toHaveBeenCalledWith(
       '/api/users/remove-all-products-from-observed',
-      authMiddlewareReturnedFn,
+      authMiddlewareFnMock,
       apiUsersRouter._removeAllProductsFromObserved
     );
     expect(apiUsersRouter.get).toHaveBeenCalledWith(
       '/api/users/observed-products',
-      authMiddlewareReturnedFn,
+      authMiddlewareFnMock,
       apiUsersRouter._getObservedProducts
     );
     expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/register', apiUsersRouter._registerUser);
@@ -101,26 +94,22 @@ describe('#api-users', () => {
     );
     expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/logout',
-      authMiddlewareReturnedFn,
+      authMiddlewareFnMock,
       apiUsersRouter._logOutUser
     );
     expect(apiUsersRouter.post).toHaveBeenCalledWith(
       '/api/users/logout-all',
-      authMiddlewareReturnedFn,
+      authMiddlewareFnMock,
       apiUsersRouter._logOutUserFromSessions
     );
     expect(apiUsersRouter.patch).toHaveBeenCalledWith('/api/users/set-new-password', apiUsersRouter._setNewPassword);
     expect(apiUsersRouter.patch).toHaveBeenCalledWith(
       '/api/users/change-password',
-      authMiddlewareReturnedFn,
+      authMiddlewareFnMock,
       apiUsersRouter._changePassword
     );
     expect(apiUsersRouter.post).toHaveBeenCalledWith('/api/users/', apiUsersRouter._updateUser);
-    expect(apiUsersRouter.get).toHaveBeenCalledWith(
-      '/api/users/:id',
-      authMiddlewareReturnedFn,
-      apiUsersRouter._getUser
-    );
+    expect(apiUsersRouter.get).toHaveBeenCalledWith('/api/users/:id', authMiddlewareFnMock, apiUsersRouter._getUser);
     expect(apiUsersRouter.use).toHaveBeenCalledWith(expect.any(Function));
   });
 
@@ -148,24 +137,25 @@ describe('#api-users', () => {
 
         await apiUsersRouter._updateUser(reqMock, getResMock());
 
-        expect(saveToDBMock).toHaveBeenCalledWith(reqMock.body, COLLECTION_NAMES.User);
+        expect(saveToDBMock).toHaveBeenCalledWith(COLLECTION_NAMES.User, reqMock.body);
       });
 
       it('should call updateOneModelInDB(..) with correct params', async () => {
         const reqMock = getReqMock();
         saveToDBMock.mockImplementationOnce(saveToDBMock._succeededCall);
+        ObjectIdMock.mockReturnValueOnce({ id: 123 }).mockReturnValueOnce({ id: 123 });
 
         await apiUsersRouter._updateUser(reqMock, getResMock());
 
         expect(updateOneModelInDBMock).toHaveBeenCalledWith(
+          COLLECTION_NAMES.User_Role,
           { roleName: reqMock.body.roleName },
           {
             action: 'addUnique',
             data: {
-              owners: new ObjectIdMock(await saveToDBMock(reqMock.body)._id),
+              owners: new ObjectIdMock(),
             },
-          },
-          COLLECTION_NAMES.User_Role
+          }
         );
       });
 
@@ -210,9 +200,10 @@ describe('#api-users', () => {
 
         await apiUsersRouter._logInUser(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith({ login: reqMock.body.login }, COLLECTION_NAMES.User, {
-          population: 'accountType',
-        });
+        expect(getFromDBMock).toHaveBeenCalledWith(
+          { modelName: COLLECTION_NAMES.User, population: 'accountType' },
+          { login: reqMock.body.login }
+        );
       });
 
       it('should call user.matchPassword(..) with correct param', async () => {
@@ -358,9 +349,13 @@ describe('#api-users', () => {
 
         await apiUsersRouter._getUser(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params.id, COLLECTION_NAMES.User, {
-          population: 'accountType',
-        });
+        expect(getFromDBMock).toHaveBeenCalledWith(
+          {
+            modelName: COLLECTION_NAMES.User,
+            population: 'accountType',
+          },
+          reqMock.params.id
+        );
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {

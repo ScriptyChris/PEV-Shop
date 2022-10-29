@@ -67,7 +67,7 @@ export default router;
 //     };
 //     logger.log('userRole: ', userRole);
 
-//     const savedUserRole = (await saveToDB(userRole, 'UserRole')) as IUserRole;
+//     const savedUserRole = (await saveToDB(COLLECTION_NAMES.User_Role, userRole)) as IUserRole;
 //     await savedUserRole.save();
 
 //     logger.log('savedUserRole:', savedUserRole);
@@ -128,13 +128,13 @@ async function getUserRoles(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('(getUserRoles)');
 
-    const userRoles = await getFromDB(
+    const userRoles = (await getFromDB(
       { modelName: COLLECTION_NAMES.User_Role, findMultiple: true },
       {},
       { roleName: true }
-    );
+    )) as IUserRole[];
 
-    if (!userRoles) {
+    if (!userRoles.length) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: `User roles not found!` });
     }
 

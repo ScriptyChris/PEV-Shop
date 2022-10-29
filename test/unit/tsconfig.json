@@ -1,0 +1,11 @@
+/*
+    This file exists only for the VSC to provide TypeScript hints.
+    Unit test files are actually compiled via jest.config.js, which uses root tsconfig.json file.
+*/
+{
+  "extends": "../../tsconfig.json",
+  "include": ["./**/*.ts"],
+  "compilerOptions": {
+    "module": "ES2020"
+  }
+}

@@ -158,7 +158,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
 
     // TODO: [error-handling] validate password before hashing it, as in `registerUser` function
     req.body.password = await hashPassword(req.body.password);
-    const savedUser = (await saveToDB(req.body, COLLECTION_NAMES.User)) as IUser;
+    const savedUser = (await saveToDB(COLLECTION_NAMES.User, req.body)) as IUser;
 
     logger.log('User saved:', savedUser);
 
@@ -244,7 +244,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
 
     req.body.password = await hashPassword(req.body.password);
 
-    const newUser = (await saveToDB(req.body, COLLECTION_NAMES.User)) as IUser;
+    const newUser = (await saveToDB(COLLECTION_NAMES.User, req.body)) as IUser;
     await UserRoleModel.updateOne({ roleName: req.body.accountType }, { $push: { owners: newUser._id } });
     await newUser.setSingleToken('confirmRegistration');
 

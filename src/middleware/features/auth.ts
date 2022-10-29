@@ -35,13 +35,13 @@ const authMiddlewareFn = async (req: Request, res: Response, next: NextFunction)
     const BEARER_TOKEN_PREFIX = 'Bearer ';
     const authToken = req.header('Authorization');
 
-    if (!authToken) {
+    if (!authToken || typeof authToken !== 'string') {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-        error: 'Authorization token header is empty or not attached!',
+        error: 'Authorization token header has to be a non-empty string!',
       });
     } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-        error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!`,
+        error: `Auth token value has to start with '${BEARER_TOKEN_PREFIX}'!`,
       });
     }
 
@@ -49,7 +49,7 @@ const authMiddlewareFn = async (req: Request, res: Response, next: NextFunction)
 
     if (!bearerToken) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-        error: 'Auth token does not contain bearer value!',
+        error: 'Auth token has to contain bearer value!',
       });
     }
 
@@ -75,7 +75,9 @@ const authMiddlewareFn = async (req: Request, res: Response, next: NextFunction)
 const userRoleMiddlewareFn = (roleName: TUserRoleName) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.user?.populated('accountType') || roleName !== req.user?.accountType?.roleName) {
+      if (!req.user) {
+        throw Error('Property req.user is empty, which most likely is a fault of a previous middleware!');
+      } else if (!req.user.populated('accountType') || roleName !== req.user.accountType?.roleName) {
         return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });
       }
 

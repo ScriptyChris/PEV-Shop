@@ -16,7 +16,7 @@ const logger = getLogger(module.filename);
 
 connectWithDB();
 
-async function saveToDB(itemData: unknown, modelName: TCOLLECTION_NAMES) {
+async function saveToDB(modelName: TCOLLECTION_NAMES, itemData: unknown) {
   // TODO: improve validation
   if (!itemData || typeof itemData !== 'object') {
     return Promise.reject(`itemData must be an object! Received: "${itemData}"`);

@@ -14,6 +14,7 @@ Model.prototype.save._failedCall = () => Promise.reject(null);
 const ModelClassMock: TJestMock & {
   find: TJestMock;
   findOne: TJestMock;
+  findById: TJestMock;
   findOneAndUpdate: TJestMock<Error> & {
     _succeededCall: () => typeof Model;
     _clazz: typeof Model;
@@ -30,6 +31,7 @@ const ModelClassMock: TJestMock & {
   {
     find: jest.fn(() => 'find result'),
     findOne: jest.fn(() => 'findOne result'),
+    findById: jest.fn(() => 'findById result'),
     findOneAndUpdate: Object.assign(
       jest.fn(() => {
         throw getMockImplementationError('findOneAndUpdate');
@@ -58,4 +60,13 @@ const getModel: TJestMock & {
   }
 );
 
-export { getModel };
+const isValidObjectId: TJestMock & {
+  _succeededCall?: (value: unknown) => boolean;
+  _failedCall?: (value: unknown) => boolean;
+} = jest.fn(() => {
+  throw getMockImplementationError('isValidObjectId');
+});
+isValidObjectId._succeededCall = (value: unknown) => true;
+isValidObjectId._failedCall = (value: unknown) => false;
+
+export { getModel, isValidObjectId };

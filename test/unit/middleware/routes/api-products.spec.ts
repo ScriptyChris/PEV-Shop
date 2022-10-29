@@ -15,17 +15,12 @@ const {
   saveToDB: saveToDBMock,
   updateOneModelInDB: updateOneModelInDBMock,
   deleteFromDB: deleteFromDBMock,
-} = mockAndRequireModule('src/database/database-index');
+} = mockAndRequireModule('src/database/api');
 
 describe('#api-products', () => {
   let apiProductsRouter: any = null;
 
   beforeAll(async () => {
-    authMiddlewareFnMock
-      .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
-      .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
-      .mockImplementationOnce(authMiddlewareFnMock._succeededCall)
-      .mockImplementationOnce(authMiddlewareFnMock._succeededCall);
     userRoleMiddlewareMock
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
       .mockImplementationOnce(userRoleMiddlewareMock._succeededCall)
@@ -60,35 +55,31 @@ describe('#api-products', () => {
     expect(apiProductsRouter.get).toHaveBeenCalledWith('/api/products/:id', apiProductsRouter._getProductById);
     expect(apiProductsRouter.post).toHaveBeenCalledWith(
       '/api/products',
-      expect.any(Function),
+      authMiddlewareFnMock,
       expect.any(Function),
       apiProductsRouter._addProduct
     );
-    expect(authMiddlewareFnMock.mock.calls[0][0]).toBe(getFromDBMock);
     expect(userRoleMiddlewareMock.mock.calls[0][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
       '/api/products/:name/add-review',
-      expect.any(Function),
+      authMiddlewareFnMock,
       expect.any(Function),
       apiProductsRouter._addReview
     );
-    expect(authMiddlewareFnMock.mock.calls[1][0]).toBe(getFromDBMock);
     expect(userRoleMiddlewareMock.mock.calls[1][0]).toBe(USER_ROLES_MAP.client);
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
       '/api/products/',
-      expect.any(Function),
+      authMiddlewareFnMock,
       expect.any(Function),
       apiProductsRouter._modifyProduct
     );
-    expect(authMiddlewareFnMock.mock.calls[2][0]).toBe(getFromDBMock);
     expect(userRoleMiddlewareMock.mock.calls[2][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.delete).toHaveBeenCalledWith(
       '/api/products/:name',
-      expect.any(Function),
+      authMiddlewareFnMock,
       expect.any(Function),
       apiProductsRouter._deleteProduct
     );
-    expect(authMiddlewareFnMock.mock.calls[3][0]).toBe(getFromDBMock);
     expect(userRoleMiddlewareMock.mock.calls[3][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.use).toHaveBeenCalledWith(expect.any(Function));
   });
@@ -155,9 +146,14 @@ describe('#api-products', () => {
           queryBuilderMock.getPaginationConfig._succeededCall
         );
 
-        expect(getFromDBMock).toHaveBeenCalledWith(queryBuilderMock.getIdListConfig(), COLLECTION_NAMES.Product, {
-          pagination: queryBuilderMock.getPaginationConfig(),
-        });
+        expect(getFromDBMock).toHaveBeenCalledWith(
+          {
+            modelName: COLLECTION_NAMES.Product,
+            pagination: queryBuilderMock.getPaginationConfig(),
+            findMultiple: true,
+          },
+          queryBuilderMock.getIdListConfig()
+        );
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {
@@ -213,7 +209,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._getProductById(reqMock, getResMock());
 
-        expect(getFromDBMock).toHaveBeenCalledWith(reqMock.params._id, COLLECTION_NAMES.Product);
+        expect(getFromDBMock).toHaveBeenCalledWith({ modelName: COLLECTION_NAMES.Product }, reqMock.params._id);
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {
@@ -269,7 +265,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._addProduct(reqMock, getResMock());
 
-        expect(saveToDBMock).toHaveBeenCalledWith(reqMock.body, COLLECTION_NAMES.Product);
+        expect(saveToDBMock).toHaveBeenCalledWith(COLLECTION_NAMES.Product, reqMock.body);
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {
@@ -317,14 +313,12 @@ describe('#api-products', () => {
     });
 
     describe('when succeeded', () => {
-      const getReviewsMock = () => [
-        {
-          reviews: {
-            list: [],
-          },
-          save: getFromDBMock._succeededCall._clazz.prototype.save,
+      const getReviewsMock = () => ({
+        reviews: {
+          list: [],
         },
-      ];
+        save: getFromDBMock._succeededCall._clazz.prototype.save,
+      });
 
       afterEach(() => {
         getFromDBMock.mockClear();
@@ -337,7 +331,7 @@ describe('#api-products', () => {
         getFromDBMock.mockImplementationOnce(() => reviewsMock);
         await apiProductsRouter._addReview(reqMock, getResMock());
 
-        expect(getFromDBMock).toBeCalledWith({ name: reqMock.params.name }, COLLECTION_NAMES.Product, {});
+        expect(getFromDBMock).toBeCalledWith({ modelName: COLLECTION_NAMES.Product }, { name: reqMock.params.name });
       });
 
       it('should call .save(..) with correct params', async () => {
@@ -347,7 +341,7 @@ describe('#api-products', () => {
         getFromDBMock.mockImplementationOnce(() => reviewsMock);
         await apiProductsRouter._addReview(reqMock, getResMock());
 
-        expect(reviewsMock[0].save).toBeCalled();
+        expect(reviewsMock.save).toBeCalled();
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {
@@ -358,7 +352,7 @@ describe('#api-products', () => {
         await apiProductsRouter._addReview(getReqMock(), resMock);
 
         expect(resMock.status).toBeCalledWith(HTTP_STATUS_CODE.OK);
-        expect(resMock._jsonMethod).toBeCalledWith({ payload: reviewsMock[0].reviews });
+        expect(resMock._jsonMethod).toBeCalledWith({ payload: reviewsMock.reviews });
       });
     });
 
@@ -417,14 +411,14 @@ describe('#api-products', () => {
         );
       });
 
-      it('should call next(..) with an exception if getFromDB failed', async () => {
+      it(`should call res.status(..).json(..) when getFromDB didn't find any product for review`, async () => {
         const resMock = getResMock();
-        const nextFnMock = getNextFnMock();
 
         getFromDBMock.mockImplementationOnce(getFromDBMock._failedCall.general);
-        await apiProductsRouter._addReview(getReqMock(), resMock, nextFnMock);
+        await apiProductsRouter._addReview(getReqMock(), resMock);
 
-        expect(nextFnMock).toBeCalledWith(TypeError(`Cannot read property '0' of null`));
+        expect(resMock.status).toBeCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+        expect(resMock._jsonMethod).toBeCalledWith({ error: 'Reviewed product not found!' });
       });
     });
   });
@@ -478,9 +472,9 @@ describe('#api-products', () => {
         await apiProductsRouter._modifyProduct(reqMock, getResMock());
 
         expect(updateOneModelInDBMock).toHaveBeenCalledWith(
+          COLLECTION_NAMES.Product,
           reqMock.body.productId,
-          reqMock.body.modifications,
-          COLLECTION_NAMES.Product
+          reqMock.body.modifications
         );
       });
 
@@ -548,7 +542,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._deleteProduct(reqMock, getResMock());
 
-        expect(deleteFromDBMock).toBeCalledWith(reqMock.params.name, COLLECTION_NAMES.Product);
+        expect(deleteFromDBMock).toBeCalledWith(COLLECTION_NAMES.Product, reqMock.params.name);
       });
 
       it('should call res.sendStatus(..) with correct params', async () => {

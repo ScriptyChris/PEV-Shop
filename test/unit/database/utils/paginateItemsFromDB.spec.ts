@@ -2,7 +2,7 @@
 import { findAssociatedSrcModulePath } from '@unitTests/utils';
 
 describe('#paginateItemsFromDB', () => {
-  let getPaginatedItems: (...args: any[]) => void;
+  let getPaginatedItems: (...args: any[]) => Promise<void>;
 
   beforeAll(async () => {
     try {
@@ -39,7 +39,7 @@ describe('#paginateItemsFromDB', () => {
     it('should return promise resolved to value returned by call to Mode.paginate(..)', async () => {
       const getPaginatedItemsResult = getPaginatedItems(getModelMock(), itemQueryMock, paginationConfigMock);
 
-      expect(getPaginatedItemsResult).resolves.toStrictEqual(await getModelMock().paginate());
+      await expect(getPaginatedItemsResult).resolves.toStrictEqual(await getModelMock().paginate());
     });
   });
 });
