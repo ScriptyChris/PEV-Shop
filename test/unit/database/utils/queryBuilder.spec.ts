@@ -2,41 +2,16 @@
 import { findAssociatedSrcModulePath } from '@unitTests/utils';
 
 describe('#queryBuilder', () => {
-  let isEmptyQueryObject: any,
-    getPaginationConfig: any,
-    getIdListConfig: any,
-    getProductsWithChosenCategories: any,
-    getSearchByNameConfig: any;
+  let getPaginationConfig: any, getIdListConfig: any, getProductsWithChosenCategories: any, getSearchByNameConfig: any;
 
   beforeAll(async () => {
     try {
       ({
-        queryBuilder: {
-          isEmptyQueryObject,
-          getPaginationConfig,
-          getIdListConfig,
-          getProductsWithChosenCategories,
-          getSearchByNameConfig,
-        },
+        queryBuilder: { getPaginationConfig, getIdListConfig, getProductsWithChosenCategories, getSearchByNameConfig },
       } = await import(findAssociatedSrcModulePath()));
     } catch (moduleImportException) {
       console.error('(beforeAll) moduleImportException:', moduleImportException);
     }
-  });
-
-  describe('isEmptyQueryObject()', () => {
-    it('should return true if an empty object literal is passed', () => {
-      expect(isEmptyQueryObject({})).toBe(true);
-    });
-
-    it('should return false if a non empty object literal is passed', () => {
-      expect(isEmptyQueryObject({ key: 'value' })).toBe(false);
-    });
-
-    // TODO: guard target function not to throw error in such case
-    it('should throw a TypeError if null is passed', () => {
-      expect(() => isEmptyQueryObject(null)).toThrow(TypeError);
-    });
   });
 
   describe('getPaginationConfig()', () => {

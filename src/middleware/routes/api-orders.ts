@@ -1,12 +1,14 @@
 import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { getFromDB } from '@database/database-index';
+import { getFromDB } from '@database/api';
 import { authToPayU as getToken } from '@middleware/features/auth';
 import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '@src/types';
 import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '@middleware/helpers/payu-api';
 import { wrapRes, TypeOfHTTPStatusCodes } from '@middleware/helpers/middleware-response-wrapper';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
+import { COLLECTION_NAMES, IProduct } from '@database/models';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const router: Router &
   Partial<{
@@ -14,11 +16,10 @@ const router: Router &
     _makeOrder: typeof makeOrder;
   }> = Router();
 const logger = getLogger(module.filename);
-
-enum PAYMENT_URL {
-  VPS = 'http://pev-demo.store:3001/dev-proxy',
-  PAY_U = 'https://secure.snd.payu.com/api/v2_1/orders',
-}
+const PAYU_PAYMENT_URL =
+  process.env.NODE_ENV === 'development'
+    ? `http://${dotEnv.APP_PRODUCTION_HOST}:3001/dev-proxy`
+    : dotEnv.PAYU_ORDERS_URL;
 
 router.options('/api/orders', handleOrderPreflight);
 router.post('/api/orders', makeOrder);
@@ -43,14 +44,19 @@ async function makeOrder(req: Request, res: Response, next: NextFunction) {
 
     // TODO: refactor getFromDB function to handle searching by query array
     const products: IProductInOrder[] = await Promise.all(
-      req.body.products.map(
-        (product: { _id: string; count: number }): Promise<IProductInOrder> =>
-          getFromDB(product._id, 'Product').then(({ name, price }) => ({
-            name,
-            unitPrice: price * 100,
-            quantity: product.count,
-          }))
-      )
+      req.body.products.map(async (product: { _id: string; count: number }): Promise<IProductInOrder> => {
+        const productDocument = (await getFromDB({ modelName: COLLECTION_NAMES.Product }, product._id)) as IProduct;
+
+        if (!productDocument) {
+          throw Error(`Product to be ordered with id '${product._id}' was not found!`);
+        }
+
+        return {
+          name: productDocument.name,
+          unitPrice: productDocument.price * 100,
+          quantity: product.count,
+        };
+      })
     );
     logger.log('products:', products);
 
@@ -66,7 +72,6 @@ async function makeOrder(req: Request, res: Response, next: NextFunction) {
     const payMethod: Partial<IPayByLinkMethod> = await getOrderPaymentMethod(token as string, minPrice, maxPrice);
     logger.log('PayU order /minPrice:', minPrice, ' /maxPrice:', maxPrice, ' /payMethod:', payMethod);
 
-    const PAYU_PAYMENT_URL: string = process.env.NODE_ENV === 'development' ? PAYMENT_URL.VPS : PAYMENT_URL.PAY_U;
     const requestOptions = {
       method: 'POST',
       redirect: 'manual',

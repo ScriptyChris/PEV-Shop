@@ -5,7 +5,7 @@ const getEmailAPIURL = (version: number) => {
     throw ReferenceError('`version` must be provided as a number!');
   }
 
-  return `http://localhost:${Cypress.env('MAIL_PORT')}/api/v${version}/messages`;
+  return `http://${Cypress.env('APP_LOCAL_HOST')}:${Cypress.env('MAIL_PORT')}/api/v${version}/messages`;
 };
 
 const getMatchingEmails = (messages: TMessage[], receiver: string, subject: string | null = null) => {

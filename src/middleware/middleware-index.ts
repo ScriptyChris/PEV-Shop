@@ -21,12 +21,10 @@ import apiProductCategories from './routes/api-product-categories';
 import apiUsers from './routes/api-users';
 import apiUserRoles from './routes/api-user-roles';
 import apiOrders from './routes/api-orders';
-import { config as dotenvConfig } from 'dotenv';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getPopulationState } from '@database/connector';
-
-dotenvConfig();
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
 const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
@@ -73,8 +71,8 @@ function wrappedMiddleware(): void {
 
     return res.sendFile(`${frontendPath}/index.html`);
   });
-  app.listen(process.env.APP_PORT, () => {
-    logger.log(`Server is listening on port ${process.env.APP_PORT}`);
+  app.listen(dotEnv.APP_PORT, () => {
+    logger.log(`Server is listening on port ${dotEnv.APP_PORT}`);
   });
 }
 

@@ -5,11 +5,7 @@ type TMockWithProps = TJestMock & Partial<{ _succeededCall: any; _failedCall: an
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 function DataBaseResult() {}
 DataBaseResult.prototype.save = jest.fn();
-DataBaseResult.prototype.populate = jest.fn(() => ({
-  execPopulate() {
-    return Promise.resolve(true);
-  },
-}));
+DataBaseResult.prototype.execPopulate = jest.fn(() => Promise.resolve(true));
 DataBaseResult.prototype.matchPassword = jest.fn(() => {
   throw getMockImplementationError('matchPassword');
 });

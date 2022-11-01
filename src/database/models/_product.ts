@@ -1,4 +1,4 @@
-import { Document, Types, Schema, model } from 'mongoose';
+import { Document, Types, Schema, model, COLLECTION_NAMES } from '@database/models/__core-and-commons';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import getLogger from '@commons/logger';
 
@@ -36,7 +36,7 @@ const technicalSpecs = new Schema<IProduct['technicalSpecs']>({
   heading: String,
   data: {
     type: Schema.Types.Mixed,
-    set(value: any) {
+    set(value: unknown) {
       // TODO: make it dependable on heading value
       const stringValueAsNumber = typeof value === 'string' ? Number(value) : value;
 
@@ -142,7 +142,8 @@ productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
   this.url = this.name.toLowerCase().replace(/\s/g, '-');
 };
 
-export const ProductModel = model<IProduct>('Product', productSchema);
+export const ProductModel = model<IProduct>(COLLECTION_NAMES.Product, productSchema);
+export type TProductModel = typeof ProductModel;
 
 export type TProductPublic = Pick<
   IProduct,
@@ -162,7 +163,11 @@ export interface IProduct extends Document {
   category: string;
   price: number;
   shortDescription: string[];
-  technicalSpecs: Record<string, unknown>[];
+  technicalSpecs: {
+    heading: string;
+    defaultUnit: string;
+    data: unknown;
+  }[];
   images: Record<string, unknown>[];
   relatedProductsNames: Array<string>;
   reviews: IReviews;

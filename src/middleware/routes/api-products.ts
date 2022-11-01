@@ -1,19 +1,10 @@
 import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
 import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '@middleware/features/auth';
-import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '@database/database-index';
-import {
-  queryBuilder,
-  TIdListReq,
-  TNameListReq,
-  TPageLimit,
-  TProductFiltersReq,
-  TProductNameReq,
-  TProductsCategoriesReq,
-} from '@database/utils/queryBuilder';
-import { TPaginationConfig } from '@database/utils/paginateItemsFromDB';
+import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '@database/api';
+import { queryBuilder } from '@database/utils/queryBuilder';
 import mapProductsTechnicalSpecs from '@middleware/helpers/api-products-specs-mapper';
-import { IProduct, IReviews } from '@database/models/_product';
+import { IProduct, IReviews, COLLECTION_NAMES, USER_ROLES_MAP } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
@@ -35,10 +26,10 @@ const router: Router &
 router.get('/api/products/specs', getProductsSpecs);
 router.get('/api/products', getProducts);
 router.get('/api/products/:id', getProductById);
-router.post('/api/products', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), addProduct);
-router.patch('/api/products/:name/add-review', authMiddleware(getFromDB), userRoleMiddlewareFn('client'), addReview);
-router.patch('/api/products/', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), modifyProduct);
-router.delete('/api/products/:name', authMiddleware(getFromDB), userRoleMiddlewareFn('seller'), deleteProduct);
+router.post('/api/products', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.seller), addProduct);
+router.patch('/api/products/:name/add-review', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.client), addReview);
+router.patch('/api/products/', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.seller), modifyProduct);
+router.delete('/api/products/:name', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.seller), deleteProduct);
 router.use(getMiddlewareErrorHandler(logger));
 
 // expose for unit tests
@@ -64,7 +55,15 @@ async function getProductsSpecs(req: Request, res: Response, next: NextFunction)
       'technicalSpecs.data': 1,
       'technicalSpecs.defaultUnit': 1,
     };
-    const productsSpec = mapProductsTechnicalSpecs(await getFromDB(specQuery, 'Product', {}, projection));
+
+    const product = await getFromDB({ modelName: COLLECTION_NAMES.Product, findMultiple: true }, specQuery, projection);
+    if (!product) {
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product to match specs with was not found!' });
+    }
+
+    const productsSpec = mapProductsTechnicalSpecs(
+      (product as IProduct[]).map(({ category, technicalSpecs }) => ({ category, technicalSpecs }))
+    );
 
     if (!productsSpec) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products specs not found!' });
@@ -76,13 +75,7 @@ async function getProductsSpecs(req: Request, res: Response, next: NextFunction)
   }
 }
 
-async function getProducts(
-  req: Request & {
-    query: TIdListReq & TNameListReq & TProductsCategoriesReq & TPageLimit & TProductNameReq & TProductFiltersReq;
-  },
-  res: Response,
-  next: NextFunction
-) {
+async function getProducts(req: Request, res: Response, next: NextFunction) {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
     logger.log('[products GET] req.query', req.query);
@@ -112,20 +105,22 @@ async function getProducts(
       query = filters;
     }
 
-    const options: { pagination?: TPaginationConfig } = {};
+    const options: Omit<Parameters<typeof getFromDB>[0], 'modelName'> = {
+      findMultiple: true,
+    };
     const paginationConfig = queryBuilder.getPaginationConfig(req.query);
 
     if (paginationConfig) {
       options.pagination = paginationConfig;
     }
 
-    const paginatedProducts = await getFromDB(query, 'Product', options);
+    const paginatedProducts = await getFromDB({ modelName: COLLECTION_NAMES.Product, ...options }, query);
 
     if (!paginatedProducts) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products not found!' });
     }
 
-    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: paginatedProducts });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: paginatedProducts as IProduct[] });
   } catch (exception) {
     return next(exception);
   }
@@ -139,13 +134,13 @@ async function getProductById(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Id params is empty or not attached!' });
     }
 
-    const product = await getFromDB(req.params._id, 'Product');
+    const product = await getFromDB({ modelName: COLLECTION_NAMES.Product }, req.params._id);
 
     if (!product) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Product not found!' });
     }
 
-    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: product });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: product as Record<string, unknown> });
   } catch (exception) {
     return next(exception);
   }
@@ -159,7 +154,7 @@ async function addProduct(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Product data is empty or not attached!' });
     }
 
-    await saveToDB(req.body, 'Product');
+    await saveToDB(COLLECTION_NAMES.Product, req.body);
 
     return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Success!' });
   } catch (exception) {
@@ -205,7 +200,10 @@ async function addReview(req: Request, res: Response, next: NextFunction) {
     } /* TODO: [DUP] check if review is not a duplicate */
 
     // TODO: [DX] refactor update process to use some Mongo (declarative) aggregation atomicly
-    const productToUpdate: IProduct = (await getFromDB({ name: req.params.name }, 'Product', {}))[0];
+    const productToUpdate = (await getFromDB(
+      { modelName: COLLECTION_NAMES.Product },
+      { name: req.params.name }
+    )) as IProduct;
 
     if (!productToUpdate) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Reviewed product not found!' });
@@ -250,9 +248,9 @@ async function modifyProduct(req: Request, res: Response, next: NextFunction) {
 
     // TODO: prepare to be used with various product properties
     const modifiedProduct = await updateOneModelInDB(
+      COLLECTION_NAMES.Product,
       req.body.productId || { name: req.body.name },
-      req.body.modifications,
-      'Product'
+      req.body.modifications
     );
 
     if (!modifiedProduct) {
@@ -275,7 +273,7 @@ async function deleteProduct(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Name param is empty or not attached!' });
     }
 
-    const deletionResult = await deleteFromDB(req.params.name, 'Product');
+    const deletionResult = await deleteFromDB(COLLECTION_NAMES.Product, req.params.name);
 
     if (!deletionResult.ok) {
       logger.error('Deletion error occured...', deletionResult);

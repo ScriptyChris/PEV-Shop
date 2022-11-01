@@ -2,8 +2,7 @@
 
 import { TMessage } from './email-commands';
 import type { TE2EUser, IUserCart } from '@src/types';
-import type { TUserPublic, IUser } from '@database/models/_user';
-import type { TProductPublic } from '@database/models/_product';
+import type { TUserPublic, IUser, TProductPublic } from '@database/models';
 import type { HeadersInit } from 'node-fetch';
 
 // type TAPIEndpointGroup = 'users' | 'products'; // basically any API group used in tests

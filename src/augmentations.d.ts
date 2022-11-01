@@ -1,8 +1,15 @@
 import type { DeleteWriteOpResultObject } from 'mongodb';
 import type { TE2E } from './types';
 import type { Cypress } from 'local-cypress';
+import type { IUser } from '@database/models';
 
 declare module 'mongoose' {
+  namespace Schema {
+    namespace Types {
+      class Email extends String {}
+    }
+  }
+
   interface Document {
     save(): Promise<this>;
   }
@@ -10,19 +17,15 @@ declare module 'mongoose' {
   interface Model<T extends Document, QueryHelpers = {}> {
     find(conditions: FilterQuery<unknown>, projection?: any | null): DocumentQuery<T[], T, QueryHelpers> & QueryHelpers;
     findOne(conditions?: FilterQuery<unknown>): DocumentQuery<T | null, T, QueryHelpers> & QueryHelpers;
+    findById(id: any | string | number): DocumentQuery<T | null, T, QueryHelpers> & QueryHelpers;
     deleteOne(
       conditions: FilterQuery<unknown>
     ): Query<DeleteWriteOpResultObject['result'] & { deletedCount?: number }> & QueryHelpers;
     deleteMany(
       conditions: FilterQuery<unknown>
     ): Query<DeleteWriteOpResultObject['result'] & { deletedCount?: number }> & QueryHelpers;
-    execPopulate(callback: (err: any, res: this) => void): this;
-    execPopulate(path: string, callback?: (err: any, res: this) => void): this;
-    execPopulate(path: string, names: string, callback?: (err: any, res: this) => void): this;
-    execPopulate(
-      options: ModelPopulateOptions | ModelPopulateOptions[],
-      callback?: (err: any, res: this) => void
-    ): this;
+    execPopulate(path: string): this;
+    execPopulate(options: ModelPopulateOptions | ModelPopulateOptions[]): this;
     populated(path: string): any;
   }
 }
@@ -38,6 +41,13 @@ declare global {
       numberingSystem?: string;
       hourCycle?: 'h11' | 'h12' | 'h23' | 'h24';
       fractionalSecondDigits?: 0 | 1 | 2 | 3;
+    }
+  }
+
+  namespace Express {
+    export interface Request {
+      user?: IUser;
+      token?: string;
     }
   }
 

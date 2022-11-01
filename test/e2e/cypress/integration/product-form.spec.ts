@@ -1,8 +1,8 @@
 import { describe, it, cy, beforeEach, context, expect, after } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
-import { TE2EUser, HTTP_STATUS_CODE } from '@root/src/types';
-import * as users from '@database/populate/initial-users.json';
+import { TE2EUser, HTTP_STATUS_CODE } from '@src/types';
+import * as users from '@database/populate/initialData/users.json';
 
 const exampleSellerUser = (users as TE2EUser[])[1];
 

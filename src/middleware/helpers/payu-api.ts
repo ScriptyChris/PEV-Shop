@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { IPayByLinkMethod, IProductInOrder } from '@src/types';
 import getLogger from '@commons/logger';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
 
@@ -26,19 +27,18 @@ const EXCLUDED_METHODS: Partial<IPayByLinkMethod>[] = [
     name: 'Płatność online kartą płatniczą',
   },
 ];
+const HOST_NAME = process.env.NODE_ENV === 'development' ? dotEnv.APP_LOCAL_HOST : dotEnv.APP_PRODUCTION_HOST;
 
 function getTotalPrice(products: IProductInOrder[]) {
   return products.reduce((sum: number, { unitPrice, quantity }) => sum + unitPrice * quantity, 0);
 }
 
 export function getOrderBody(products: IProductInOrder[], payMethod: Partial<IPayByLinkMethod>) {
-  const host: string = process.env.NODE_ENV === 'development' ? '127.0.0.1' : 'pev-demo.store';
-
   return {
-    // notifyUrl: `http://127.0.0.1:${process.env.APP_PORT}`,
-    customerIp: '127.0.0.1',
-    continueUrl: `http://${host}:${process.env.APP_PORT}/`,
-    merchantPosId: process.env.PAYU_CLIENT_ID,
+    // notifyUrl: `http://${dotEnv.APP_LOCAL_HOST}:${dotEnv.APP_PORT}`,
+    customerIp: dotEnv.APP_LOCAL_HOST,
+    continueUrl: `http://${HOST_NAME}:${dotEnv.APP_PORT}/`,
+    merchantPosId: dotEnv.PAYU_CLIENT_ID,
     description: 'PEV-Shop order',
     // TODO: pass it dynamically by User's chosen currency in shop
     currencyCode: 'PLN',
@@ -79,9 +79,7 @@ export function getOrderPaymentMethod(
   minPrice: number,
   maxPrice: number
 ): Promise<Partial<IPayByLinkMethod>> {
-  const PAYU_METHODS_URL = 'https://secure.snd.payu.com/api/v2_1/paymethods';
-
-  return fetch(PAYU_METHODS_URL, {
+  return fetch(dotEnv.PAYU_PAYMENT_METHODS_URL, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

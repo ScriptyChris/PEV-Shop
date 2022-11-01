@@ -1,8 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import getLogger from '@commons/logger';
-import { authMiddlewareFn as authMiddleware } from '@middleware/features/auth';
-import { saveToDB, getFromDB, updateOneModelInDB } from '@database/database-index';
-import type { IUserRole } from '@database/models/_userRole';
+import { getFromDB } from '@database/api';
+import { IUserRole, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
@@ -68,7 +67,7 @@ export default router;
 //     };
 //     logger.log('userRole: ', userRole);
 
-//     const savedUserRole = (await saveToDB(userRole, 'UserRole')) as IUserRole;
+//     const savedUserRole = (await saveToDB(COLLECTION_NAMES.User_Role, userRole)) as IUserRole;
 //     await savedUserRole.save();
 
 //     logger.log('savedUserRole:', savedUserRole);
@@ -108,7 +107,7 @@ export default router;
 //       // }
 //     }
 
-//     const updatedUserRole = await updateOneModelInDB({ roleName: req.body.roleName }, req.body.permissions, 'UserRole');
+//     const updatedUserRole = await updateOneModelInDB(COLLECTION_NAMES.User_Role, { roleName: req.body.roleName }, req.body.permissions);
 //     logger.log('updatedUserRole:', updatedUserRole);
 
 //     if (!updatedUserRole) {
@@ -129,14 +128,18 @@ async function getUserRoles(req: Request, res: Response, next: NextFunction) {
   try {
     logger.log('(getUserRoles)');
 
-    const userRoles: IUserRole = await getFromDB({}, 'UserRole', {}, { roleName: true });
+    const userRoles = (await getFromDB(
+      { modelName: COLLECTION_NAMES.User_Role, findMultiple: true },
+      {},
+      { roleName: true }
+    )) as IUserRole[];
 
-    if (!userRoles) {
+    if (!userRoles.length) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: `User roles not found!` });
     }
 
     return wrapRes(res, HTTP_STATUS_CODE.OK, {
-      payload: Object.values(userRoles).map(({ roleName }) => roleName),
+      payload: (userRoles as IUserRole[]).map(({ roleName }) => roleName),
     });
   } catch (exception) {
     return next(exception);

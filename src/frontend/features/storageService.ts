@@ -1,5 +1,5 @@
 import type { IUserCart } from '@src/types';
-import type { IUser, TUserPublic } from '@database/models/_user';
+import type { IUser, TUserPublic } from '@database/models';
 
 type TStorageValue = IUserCart | TUserPublic | NonNullable<IUser['tokens']['auth']>[number] | null;
 

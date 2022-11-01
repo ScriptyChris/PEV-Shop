@@ -1,5 +1,5 @@
 import { cy, Cypress, it, describe, context, beforeEach, expect } from 'local-cypress';
-import type { TUserPublic } from '@database/models/_user';
+import type { TUserPublic } from '@database/models';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
 import { makeCyDataSelector } from '../synchronous-helpers';

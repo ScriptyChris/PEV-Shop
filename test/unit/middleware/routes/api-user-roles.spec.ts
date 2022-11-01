@@ -1,6 +1,10 @@
-import { findAssociatedSrcModulePath, mockAndRequireModule } from '@unitTests/utils';
+import { findAssociatedSrcModulePath, mockAndRequireModule, mockAndRequireDBModelsModules } from '@unitTests/utils';
+
+mockAndRequireDBModelsModules();
+
 import { getResMock, TJestMock } from '@unitTests/inline-mocks';
 import { HTTP_STATUS_CODE } from '@src/types';
+import { COLLECTION_NAMES } from '@database/models';
 
 const { Router, _router } = mockAndRequireModule('express');
 const { authMiddlewareFn: authMiddlewareFnMock } = mockAndRequireModule('src/middleware/features/auth');
@@ -8,14 +12,13 @@ const {
   getFromDB: getFromDBMock,
   // saveToDB: saveToDBMock,
   // updateOneModelInDB: updateOneModelInDBMock,
-} = mockAndRequireModule('src/database/database-index');
+} = mockAndRequireModule('src/database/api');
 
 describe('#api-user-roles', () => {
   const authMiddlewareReturnedFn = () => undefined;
   const reqMock = Object.freeze({
     body: {
       roleName: '[body] test role',
-      // permissions: [],
     },
     params: {
       roleName: '[params] test role',
@@ -145,26 +148,43 @@ describe('#api-user-roles', () => {
   // });
 
   describe('router.get(..) callback getUserRoles(..)', () => {
-    it('should call getFromDB(..) once with correct params', async () => {
-      getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
-      await apiUserRolesRouter._getUserRoles(reqMock, getResMock());
+    describe('when userRoles were found', () => {
+      it('should call getFromDB(..) once with correct params', async () => {
+        getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
 
-      expect(getFromDBMock).toHaveBeenCalledTimes(1);
-      expect(getFromDBMock).toHaveBeenCalledWith({}, 'UserRole', {}, { roleName: true });
-      getFromDBMock.mockClear();
+        await apiUserRolesRouter._getUserRoles(reqMock, getResMock());
+
+        expect(getFromDBMock).toHaveBeenCalledTimes(1);
+        expect(getFromDBMock).toHaveBeenCalledWith(
+          { modelName: COLLECTION_NAMES.User_Role, findMultiple: true },
+          {},
+          { roleName: true }
+        );
+        getFromDBMock.mockClear();
+      });
+
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const mockedCustomReturn = [{ roleName: 'first' }, { roleName: 'second' }];
+        getFromDBMock.mockReturnValueOnce(mockedCustomReturn);
+        const resMock = getResMock();
+
+        await apiUserRolesRouter._getUserRoles(reqMock, resMock);
+
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: ['first', 'second'] });
+      });
     });
 
-    it('should call res.status(..).json(..) with correct params', async () => {
-      const mockedCustomReturn = [{ roleName: 'first' }, { roleName: 'second' }];
-      getFromDBMock.mockReturnValueOnce(
-        Object.setPrototypeOf(mockedCustomReturn, getFromDBMock._succeededCall._clazz.prototype)
-      );
-      const resMock = getResMock();
+    describe('when userRoles were not found', () => {
+      it('should call res.status(..).json(..) with correct params', async () => {
+        const resMock = getResMock();
+        getFromDBMock.mockReturnValueOnce([]);
 
-      await apiUserRolesRouter._getUserRoles(reqMock, resMock);
+        await apiUserRolesRouter._getUserRoles(reqMock, resMock);
 
-      expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.OK);
-      expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: ['first', 'second'] });
+        expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.NOT_FOUND);
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ error: 'User roles not found!' });
+      });
     });
   });
 });

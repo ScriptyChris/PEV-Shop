@@ -1,15 +1,21 @@
 import { connect, Connection } from 'mongoose';
 import { readdirSync } from 'fs';
 import getLogger from '@commons/logger';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
-const { DATABASE_PROTOCOL, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME } = process.env;
+const { DATABASE_PROTOCOL, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME } = dotEnv;
 const DATABASE_URL = `${DATABASE_PROTOCOL}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`;
 const MAX_DB_CONNECTION_ATTEMPTS = 5;
 const CONNECTION_ATTEMPT_TIMEOUT = 2000;
-const requiredCollectionNames = readdirSync(`${__dirname}/populate`)
-  .filter((file) => /^initial-.*\.json$/.test(file))
-  .map((file) => file.match(/^initial-(?<collectionName>.*).json$/)?.groups?.collectionName);
+const requiredCollectionNames = readdirSync(`${__dirname}/populate/initialData`).map((file) => {
+  const collectionName = file.match(/(?<collectionName>.*)\.json$/)?.groups?.collectionName;
+  if (!collectionName) {
+    throw Error(`Could not find collection name for file "${file}"!`);
+  }
+
+  return collectionName;
+});
 
 let dbConnection: Connection;
 
@@ -72,19 +78,7 @@ export async function getPopulationState() {
   try {
     const collections = await dbConnection.db.listCollections().toArray();
     const requiredCollectionsReady = requiredCollectionNames.every((reqColName) =>
-      collections.find(({ name }) => {
-        if (!reqColName) {
-          throw Error(`reqColName "${reqColName}" is missing!`);
-        }
-
-        if (reqColName.includes('-')) {
-          logger.log(`Compare reqColName "${reqColName}" without dashes.`);
-
-          return reqColName.replace(/-/g, '') === name;
-        }
-
-        return reqColName === name;
-      })
+      collections.find(({ name }) => reqColName === name)
     );
 
     return requiredCollectionsReady;

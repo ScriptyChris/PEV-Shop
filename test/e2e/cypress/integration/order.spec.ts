@@ -2,7 +2,7 @@ import { beforeEach, cy, describe, expect, it } from 'local-cypress';
 import { TE2EUser, HTTP_STATUS_CODE } from '@src/types';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
-import * as users from '@database/populate/initial-users.json';
+import * as users from '@database/populate/initialData/users.json';
 
 const exampleUser = (users as TE2EUser[])[0];
 const testReceiver = {
@@ -228,18 +228,15 @@ describe('order', () => {
         },
       });
 
-      req.continue((res) => {
-        // TODO: do not alternate response when backend will be adjusted to handle extended order form
-        expect(res.statusCode).to.be.greaterThan(399);
-        res.send({
-          // NON_AUTHORITATIVE_INFORMATION
-          status: 203,
-          body: {
-            payload: {
-              redirectUri: ROUTES.ROOT,
-            },
+      // TODO: do not stub response when backend will be adjusted to handle extended order form
+      req.reply({
+        // NON_AUTHORITATIVE_INFORMATION
+        statusCode: 203,
+        body: {
+          payload: {
+            redirectUri: ROUTES.ROOT,
           },
-        });
+        },
       });
     }).as('orderRequest');
     cy.get(makeCyDataSelector('button:submit-order')).click();

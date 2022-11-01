@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./src/database/**/*.ts", "./src/middleware/**/*.ts", "./src/database/populate/**.json"],
+  "exclude": ["./src/**/__mocks__"],
+  "include": ["./src/database/**/*.ts", "./src/middleware/**/*.ts", "./src/database/populate/initialData/*.json"],
   "compilerOptions": {
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,

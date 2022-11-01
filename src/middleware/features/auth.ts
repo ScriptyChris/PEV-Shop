@@ -1,18 +1,16 @@
-import getLogger from '@root/commons/logger';
+import getLogger from '@commons/logger';
 import { compare, hash } from 'bcrypt';
-import { sign, verify, Secret } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { config as dotenvConfig } from 'dotenv';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { IUser, UserModel } from '@database/models/_user';
+import { IUser, TUserRoleName, COLLECTION_NAMES } from '@database/models';
 import { HTTP_STATUS_CODE } from '@src/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
-
-dotenvConfig();
+import { getFromDB } from '@database/api';
+import { dotEnv } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
 const SALT_ROUNDS = 8;
-const TOKEN_SECRET_KEY = process.env.TOKEN_SECRET_KEY as Secret;
 
 type TToken = { _id: number };
 
@@ -25,69 +23,61 @@ const hashPassword = (password: string) => {
 };
 
 const getToken = (payloadObj: TToken) => {
-  return sign(payloadObj, TOKEN_SECRET_KEY);
+  return sign(payloadObj, dotEnv.TOKEN_SECRET_KEY);
 };
 
 const verifyToken = (token: string) => {
-  return verify(token, TOKEN_SECRET_KEY) as TToken;
+  return verify(token, dotEnv.TOKEN_SECRET_KEY) as TToken;
 };
 
-const authMiddlewareFn = (
-  getFromDB: /* TODO: [DX] correct typing */ any
-): ((...args: any) => Promise<Pick<Response, 'json'> | void>) => {
-  return async (req: Request & { user: IUser; token: string }, res: Response, next: NextFunction) => {
-    try {
-      const BEARER_TOKEN_PREFIX = 'Bearer ';
-      const authToken = req.header('Authorization');
+const authMiddlewareFn = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const BEARER_TOKEN_PREFIX = 'Bearer ';
+    const authToken = req.header('Authorization');
 
-      if (!authToken) {
-        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-          error: 'Authorization token header is empty or not attached!',
-        });
-      } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
-        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-          error: `Auth token value does not start with '${BEARER_TOKEN_PREFIX}'!`,
-        });
-      }
-
-      const bearerToken = authToken.replace(BEARER_TOKEN_PREFIX, '');
-
-      if (!bearerToken) {
-        return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
-          error: 'Auth token does not contain bearer value!',
-        });
-      }
-
-      const decodedToken = verifyToken(bearerToken);
-      const user = (await getFromDB(
-        { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } },
-        'User',
-        { population: 'accountType' }
-      )) as IUser | IUser[];
-
-      if (!user || (user as IUser[]).length === 0) {
-        return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to authorize not found!' });
-      }
-
-      // TODO: [REFACTOR] normalize data returned by `getFromDB`
-      req.user = Array.isArray(user) ? user[0] : user;
-      req.token = bearerToken;
-
-      return next();
-    } catch (exception) {
-      return next(exception);
+    if (!authToken || typeof authToken !== 'string') {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Authorization token header has to be a non-empty string!',
+      });
+    } else if (!authToken.startsWith(BEARER_TOKEN_PREFIX)) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: `Auth token value has to start with '${BEARER_TOKEN_PREFIX}'!`,
+      });
     }
-  };
+
+    const bearerToken = authToken.replace(BEARER_TOKEN_PREFIX, '');
+
+    if (!bearerToken) {
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: 'Auth token has to contain bearer value!',
+      });
+    }
+
+    const decodedToken = verifyToken(bearerToken);
+    const user = await getFromDB(
+      { modelName: COLLECTION_NAMES.User, population: 'accountType' },
+      { _id: decodedToken._id.toString(), 'tokens.auth': { $exists: true, $eq: bearerToken } }
+    );
+
+    if (!user) {
+      return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'User to authorize not found!' });
+    }
+
+    req.user = user as IUser;
+    req.token = bearerToken;
+
+    return next();
+  } catch (exception) {
+    return next(exception);
+  }
 };
 
-const userRoleMiddlewareFn = (roleName: string /* TODO: [TS] use type from UserRole */): any => {
-  return async (
-    req: Request & { user: typeof UserModel & { accountType?: { roleName: string } } },
-    res: Response,
-    next: NextFunction
-  ) => {
+const userRoleMiddlewareFn = (roleName: TUserRoleName) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.user.populated('accountType') || roleName !== req.user.accountType?.roleName) {
+      if (!req.user) {
+        throw Error('Property req.user is empty, which most likely is a fault of a previous middleware!');
+      } else if (!req.user.populated('accountType') || roleName !== req.user.accountType?.roleName) {
         return wrapRes(res, HTTP_STATUS_CODE.FORBIDDEN, { error: `You don't have permissions!` });
       }
 
@@ -99,15 +89,12 @@ const userRoleMiddlewareFn = (roleName: string /* TODO: [TS] use type from UserR
 };
 
 const authToPayU: () => Promise<string | Error> = (() => {
-  const clientId = process.env.PAYU_CLIENT_ID as string;
-  const clientSecret = process.env.PAYU_CLIENT_SECRET as string;
-  const PAYU_AUTH_URL = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
   const options: RequestInit = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    body: `grant_type=client_credentials&client_id=${dotEnv.PAYU_CLIENT_ID}&client_secret=${dotEnv.PAYU_CLIENT_SECRET}`,
   };
 
   interface IPayUToken {
@@ -124,10 +111,10 @@ const authToPayU: () => Promise<string | Error> = (() => {
       return Promise.resolve((token as unknown as IPayUToken).access_token);
     }
 
-    logger.log('authToPayU /PAYU_AUTH_URL:', PAYU_AUTH_URL, ' /options:', options);
+    logger.log('authToPayU /dotEnv.PAYU_AUTH_URL:', dotEnv.PAYU_AUTH_URL, ' /options:', options);
 
     return (
-      fetch(PAYU_AUTH_URL, options)
+      fetch(dotEnv.PAYU_AUTH_URL, options)
         .then((response: FetchResponse) => response.json())
         .then((response: IPayUToken) => {
           token = response;

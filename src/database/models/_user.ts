@@ -1,4 +1,4 @@
-import { model, Schema, Types, Document, Model } from 'mongoose';
+import { model, Schema, Document, Model, TUserRoleName, COLLECTION_NAMES } from '@database/models/__core-and-commons';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '@middleware/features/auth';
 
@@ -36,7 +36,6 @@ const userSchema = new Schema<IUser>(
       required: true,
     },
     email: {
-      // @ts-ignore
       type: Schema.Types.Email,
       unique: true,
       required: true,
@@ -71,7 +70,7 @@ const userSchema = new Schema<IUser>(
 );
 
 userSchema.virtual('accountType', {
-  ref: 'UserRole',
+  ref: COLLECTION_NAMES.User_Role,
   localField: '_id',
   foreignField: 'owners',
   justOne: true,
@@ -132,7 +131,7 @@ userSchema.methods.confirmUser = function (): Promise<IUser> {
 
 userSchema.methods.addProductToObserved = function (productId: string): string {
   const user = this as IUser;
-  const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
+  const productObjectId = new Schema.Types.ObjectId(productId);
 
   if (!user.observedProductsIDs) {
     user.observedProductsIDs = [productObjectId];
@@ -147,7 +146,7 @@ userSchema.methods.addProductToObserved = function (productId: string): string {
 
 userSchema.methods.removeProductFromObserved = function (productId: string): string {
   const user = this as IUser;
-  const productObjectId = new Types.ObjectId(productId) as unknown as Schema.Types.ObjectId;
+  const productObjectId = new Schema.Types.ObjectId(productId);
 
   if (!user.observedProductsIDs || !user.observedProductsIDs.includes(productObjectId)) {
     return 'Product was not observed by user!';
@@ -198,7 +197,7 @@ userSchema.statics.validateNewUserPayload = (newUser: any) => {
   return '';
 };
 
-userSchema.statics.validatePassword = (password: any): string => {
+userSchema.statics.validatePassword = (password: unknown): string => {
   if (typeof password !== 'string') {
     return PASSWORD_METADATA.EMPTY_OR_INCORRECT_TYPE.errorMessage;
   }
@@ -231,17 +230,20 @@ userSchema.statics.findByCredentials = async (userModel: any, nick: string, pass
   return user;
 };
 
-export const UserModel = model<IUser, IUserModel>('User', userSchema);
+export const UserModel = model<IUser, IUserModel>(COLLECTION_NAMES.User, userSchema);
+export type TUserModel = typeof UserModel;
 
 export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'> & {
   accountType: NonNullable<IUser['accountType']>['roleName'];
 };
 
-export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & { __accountType: string };
+export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & {
+  __accountType: TUserRoleName;
+};
 
 interface IUserModel extends Model<IUser> {
   validateNewUserPayload(newUser: any): string;
-  validatePassword(password: any): string;
+  validatePassword(password: unknown): string;
 }
 
 export interface IUser extends Document {
@@ -255,7 +257,7 @@ export interface IUser extends Document {
     confirmRegistration: string | undefined;
     resetPassword: string | undefined;
   };
-  accountType?: { roleName: string };
+  accountType?: { roleName: TUserRoleName };
   generateAuthToken(): Promise<string>;
   toJSON(): TUserPublic;
   matchPassword(password: string): Promise<boolean>;
