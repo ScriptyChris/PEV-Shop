@@ -24,9 +24,15 @@ type TDotEnv = {
   [key in typeof DOT_ENV_KEYS[number]]: key;
 };
 
-import { config as dotenvConfig } from 'dotenv';
+import { config as dotenvConfig, DotenvConfigOptions } from 'dotenv';
+import { resolve } from 'path';
 
-const _env = dotenvConfig().parsed;
+const options: DotenvConfigOptions = {};
+if (process.env.NODE_ENV === 'test') {
+  options.path = resolve(__dirname, '../.env.example');
+}
+
+const _env = dotenvConfig(options).parsed;
 if (!_env) {
   throw Error('_env is undefined!');
 }
