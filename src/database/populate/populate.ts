@@ -109,18 +109,21 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
     logger.log(`Cleaning done. Removed: ${removedData}`);
   }
 
-  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USER_ROLES)) {
-    const userRolesSourceDataList = getSourceData<TUserRoleToPopulate>(CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES);
+  const userRolesPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USER_ROLES);
+  if (userRolesPath) {
+    const userRolesSourceDataList = getSourceData<TUserRoleToPopulate>(userRolesPath);
     await populateUserRoles(userRolesSourceDataList);
   }
 
-  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USERS)) {
-    const usersSourceDataList = getSourceData<TUserToPopulate>(CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS);
+  const usersPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USERS);
+  if (usersPath) {
+    const usersSourceDataList = getSourceData<TUserToPopulate>(usersPath);
     await populateUsers(usersSourceDataList);
   }
 
-  if (getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
-    const productsSourceDataList = getSourceData<TProductToPopulate>(CAPITALIZED_PLURAL_COLLECTION_NAMES.PRODUCTS);
+  const productsPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS);
+  if (productsPath) {
+    const productsSourceDataList = getSourceData<TProductToPopulate>(productsPath);
     await populateProducts(productsSourceDataList);
     await updateRelatedProductsNames(productsSourceDataList);
   }
@@ -158,18 +161,13 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
 };
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
-  executeDBPopulation();
+  executeDBPopulation().then(() => {
+    logger.log('Exiting from populate.ts initiated via CLI...');
+    process.exit(0);
+  });
 }
 
-function getSourceData<T extends TDataToPopulate>(modelName: keyof typeof PARAMS.JSON_FILE_PATH): T[] {
-  const sourceDataPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH[modelName]);
-
-  if (!sourceDataPath) {
-    throw ReferenceError(
-      `Path to data for "${modelName}" was not provided! You must pass "${PARAMS.JSON_FILE_PATH[modelName]}" parameter.`
-    );
-  }
-
+function getSourceData<T extends TDataToPopulate>(sourceDataPath: string): T[] {
   logger.log('getSourceData() /sourceDataPath:', sourceDataPath);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const sourceDataFiles = require(sourceDataPath);
