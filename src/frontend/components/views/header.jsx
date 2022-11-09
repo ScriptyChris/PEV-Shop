@@ -13,7 +13,6 @@ import Nav from './nav';
 import Cart from './cart';
 import { SearchProductsByName } from '@frontend/components/views/search';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
-import { getUrlToHome } from '@frontend/components/pages/home';
 
 const translations = Object.freeze({
   appMainHeader: 'PEV Shop',
@@ -33,7 +32,7 @@ export default observer(function Header() {
       TODO: [UX] if current subpage is not a product list, then show some information 
       that subpage redirection will be made to avoid surprising user
     */
-    history.push(ROUTES.SHOP, { searchedProducts });
+    history.push(ROUTES.PRODUCTS, { searchedProducts });
   };
 
   return (
@@ -43,7 +42,7 @@ export default observer(function Header() {
           level={1}
           className={classNames('header__main-heading', { 'header__main-heading--small': isHeadingSmall })}
         >
-          <PEVLink to={getUrlToHome(routesGuards)}>{translations.appMainHeader}</PEVLink>
+          <PEVLink to={ROUTES.ROOT}>{translations.appMainHeader}</PEVLink>
         </PEVHeading>
 
         <SearchProductsByName

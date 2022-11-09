@@ -4,10 +4,10 @@ import { useHistory } from 'react-router-dom';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 
-import { PEVButton } from '@frontend/components/utils/pevElements';
+import { PEVButton, PEVLink } from '@frontend/components/utils/pevElements';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import httpService from '@frontend/features/httpService';
-import { ROUTES } from '@frontend/components/pages/_routes';
+import { ROUTES, routeHelpers } from '@frontend/components/pages/_routes';
 
 const translations = {
   editProduct: 'Edit',
@@ -18,7 +18,7 @@ const translations = {
   abortProductDeletion: 'No',
   productDeletionSuccess: 'Product successfully deleted!',
   productDeletionFailed: 'Deleting product failed :(',
-  goBackToShop: 'Go back to shop',
+  goBackToProducts: 'Go back to products',
   goTologIn: 'Log in',
 };
 
@@ -46,8 +46,8 @@ export function DeleteProductFeature({ productName }) {
                     message: translations.productDeletionSuccess,
                     buttons: [
                       {
-                        onClick: () => history.push(ROUTES.SHOP),
-                        text: translations.goBackToShop,
+                        onClick: () => history.push(ROUTES.PRODUCTS),
+                        text: translations.goBackToProducts,
                       },
                     ],
                   });
@@ -79,21 +79,15 @@ export function DeleteProductFeature({ productName }) {
   );
 }
 
-export function NavigateToModifyProduct({ productName }) {
-  const history = useHistory();
-
-  const handleNavigateToProductModify = () => {
-    history.push(ROUTES.MODIFY_PRODUCT, productName);
-  };
-
+export function NavigateToModifyProduct({ productData }) {
   return (
-    <PEVButton
-      size="small"
-      startIcon={<EditIcon />}
-      onClick={handleNavigateToProductModify}
+    <PEVLink
+      to={{ pathname: routeHelpers.createModifyProductUrl(productData.url), state: productData }}
+      className="navigate-to-modify-product"
       data-cy="button:product-details__edit-product"
     >
+      <EditIcon />
       {translations.editProduct}
-    </PEVButton>
+    </PEVLink>
   );
 }

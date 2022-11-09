@@ -66,7 +66,7 @@ export function ProductCardLink({
     <Link
       {...restProps}
       to={{
-        pathname: `${ROUTES.PRODUCT}/${productData.url}`,
+        pathname: `${ROUTES.PRODUCTS}/${productData.url}`,
         state: productData,
       }}
       data-cy="link:product-card__link"
@@ -114,7 +114,7 @@ export default observer(function ProductCard({
   /* eslint-disable react/jsx-key */
   const menuItems = [
     routesGuards.isSeller()
-      ? [<NavigateToModifyProduct productName={name} />, <DeleteProductFeature productName={name} />]
+      ? [<NavigateToModifyProduct productData={product} />, <DeleteProductFeature productName={name} />]
       : [],
     routesGuards.isGuest() || routesGuards.isClient() ? (
       <AddToCartButton productInfoForCart={{ name, price, _id }} />

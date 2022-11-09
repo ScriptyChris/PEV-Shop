@@ -248,7 +248,7 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
         <div className="product-comparison-candidates__actions">
           <PEVIconButton
             component={PEVLink}
-            to={{ pathname: ROUTES.COMPARE }}
+            to={{ pathname: ROUTES.PRODUCTS__COMPARE }}
             onClick={showOptionalWarning}
             a11y={translations.proceedComparison}
             data-cy="link:product-comparison-candidates__actions-proceed"

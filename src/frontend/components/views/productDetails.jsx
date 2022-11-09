@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Field } from 'formik';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
@@ -28,7 +28,7 @@ import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils
 import RatingWidget from '@frontend/components/utils/ratingWidget';
 import { getLocalizedDate } from '@frontend/features/localization';
 import { AddToCartButton } from '@frontend/components/views/cart';
-import { useRoutesGuards } from '@frontend/components/pages/_routes';
+import { useRoutesGuards, routeHelpers, ROUTES } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
 import { ProductComparisonCandidatesToggler } from '@frontend/components/views/productComparisonCandidates';
@@ -395,34 +395,45 @@ const useSectionsObserver = () => {
   return { productDetailsNavSections, activatedNavMenuItemIndex };
 };
 
-export default observer(function ProductDetails({ product }) {
-  // TODO: fetch product data independently when page is loaded explicitly (not navigated to from other page)
-  const location = useLocation();
-  product = product || location.state;
+export default observer(function ProductDetails() {
+  const { state: productData, pathname } = useLocation();
+  const history = useHistory();
   const routesGuards = useRoutesGuards(storeService);
-
-  console.log('[ProductDetails] product received from navigation: ', product);
-
-  const [productDetails, setProductDetails] = useState(null);
+  const [mergedProductData, setMergedProductData] = useState(productData);
   const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
 
   useEffect(() => {
-    if (!product) {
+    if (mergedProductData) {
+      getRelatedProducts(mergedProductData);
       return;
     }
 
+    const productUrl = routeHelpers.extractProductUrlFromPathname(pathname);
+    if (!productUrl) {
+      throw Error(`Could not extract productUrl based on pathname: "${pathname}"!`);
+    }
+
     httpService
-      .getProductsByNames(product.relatedProductsNames)
+      .disableGenericErrorHandler()
+      .getProductByUrl(productUrl)
       .then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
+        } else if (res.__ERROR_TO_HANDLE === 'Products not found!') {
+          history.replace(ROUTES.NOT_FOUND, { label: 'product', url: productUrl });
+          return;
         }
 
-        const relatedProducts = res;
-        setProductDetails({ ...product, relatedProducts });
+        const product = res[0];
+        setMergedProductData(product);
+        return product;
       })
-      .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
-  }, [product]);
+      .then((maybeProduct) => {
+        if (maybeProduct && typeof maybeProduct === 'object') {
+          getRelatedProducts(maybeProduct);
+        }
+      });
+  }, []);
 
   useEffect(() => {
     if (location.hash) {
@@ -436,7 +447,20 @@ export default observer(function ProductDetails({ product }) {
     }
   }, [location.hash]);
 
-  if (!productDetails) {
+  const getRelatedProducts = (product) => {
+    httpService
+      .getProductsByNames(product.relatedProductsNames)
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        }
+
+        setMergedProductData((product) => ({ ...product, relatedProducts: res }));
+      })
+      .catch((error) => console.warn('TODO: fix relatedProducts! /error:', error));
+  };
+
+  if (!mergedProductData) {
     return null;
   }
 
@@ -450,45 +474,49 @@ export default observer(function ProductDetails({ product }) {
       >
         <ProductSpecificDetail
           detailName="category"
-          detailValue={productDetails.category}
+          detailValue={mergedProductData.category}
           extras={{
             className: 'product-details__header-category',
           }}
         />
-        <PEVParagraph className="product-details__header-action-btns">
+        <PEVParagraph className="product-details__header-action-elements">
           {routesGuards.isSeller() && (
             <>
-              <NavigateToModifyProduct productName={productDetails.name} />
-              <DeleteProductFeature productName={productDetails.name} />
+              <NavigateToModifyProduct productData={mergedProductData} />
+              <DeleteProductFeature productName={mergedProductData.name} />
             </>
           )}
-          <ProductObservabilityToggler productId={product._id} />
-          <ProductComparisonCandidatesToggler product={product} buttonVariant="outlined" />
+          <ProductObservabilityToggler productId={mergedProductData._id} />
+          <ProductComparisonCandidatesToggler product={mergedProductData} buttonVariant="outlined" />
         </PEVParagraph>
 
         <div className="product-details__header-image">TODO: [UI] image should go here</div>
         {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-details__header-image" />*/}
 
         <PEVHeading level={2} className="product-details__header-name">
-          <ProductSpecificDetail detailName="name" detailValue={productDetails.name} />
+          <ProductSpecificDetail detailName="name" detailValue={mergedProductData.name} />
         </PEVHeading>
         {/* TODO: [UX] clicking on rating here should scroll to this product ratings */}
         <RatingWidget
-          presetValue={productDetails.reviews.averageRating}
+          presetValue={mergedProductData.reviews.averageRating}
           isBig={true}
           externalClassName="product-details__header-rating"
         />
 
         <ProductSpecificDetail
           detailName="price"
-          detailValue={productDetails.price}
+          detailValue={mergedProductData.price}
           extras={{
             header: productDetailsTranslations.price,
             className: 'product-details__header-price',
           }}
         />
         <AddToCartButton
-          productInfoForCart={{ name: productDetails.name, price: productDetails.price, _id: productDetails._id }}
+          productInfoForCart={{
+            name: mergedProductData.name,
+            price: mergedProductData.price,
+            _id: mergedProductData._id,
+          }}
           startOrEndIcon="startIcon"
           className="product-details__header-buy-btn"
         />
@@ -520,7 +548,7 @@ export default observer(function ProductDetails({ product }) {
                         activated: activatedNavMenuItemIndex === index,
                       })}
                     >
-                      <PEVLink to={{ hash: `#${navSection.id}`, state: product }}>{navSection.label}</PEVLink>
+                      <PEVLink to={{ hash: `#${navSection.id}`, state: mergedProductData }}>{navSection.label}</PEVLink>
                     </MenuItem>
                   );
                 })}
@@ -538,7 +566,7 @@ export default observer(function ProductDetails({ product }) {
         >
           {productDetailsNavSections.description.label}
         </PEVHeading>
-        <ProductSpecificDetail detailName="shortDescription" detailValue={productDetails.shortDescription} />
+        <ProductSpecificDetail detailName="shortDescription" detailValue={mergedProductData.shortDescription} />
       </section>
 
       <Divider />
@@ -553,7 +581,7 @@ export default observer(function ProductDetails({ product }) {
         </PEVHeading>
         <ProductSpecificDetail
           detailName="technicalSpecs"
-          detailValue={productDetails.technicalSpecs}
+          detailValue={mergedProductData.technicalSpecs}
           extras={{
             classNames: {
               listItem: 'product-details__nav-section-specs',
@@ -570,12 +598,12 @@ export default observer(function ProductDetails({ product }) {
         </PEVHeading>
         <ProductSpecificDetail
           detailName="reviews"
-          detailValue={productDetails.reviews}
+          detailValue={mergedProductData.reviews}
           extras={{
             showReviewsList: true,
             showAddReview: true,
             updateReviews: (reviews) =>
-              setProductDetails((prev) => ({
+              setMergedProductData((prev) => ({
                 ...prev,
                 reviews,
               })),
@@ -594,7 +622,7 @@ export default observer(function ProductDetails({ product }) {
           {productDetailsNavSections.relatedProducts.label}
         </PEVHeading>
 
-        {productDetails.relatedProducts?.length && (
+        {mergedProductData.relatedProducts?.length && (
           <div className="product-details__nav-section-related-products">
             <Scroller
               scrollerBaseValueMeta={{
@@ -605,7 +633,7 @@ export default observer(function ProductDetails({ product }) {
                 <ScrollerHookingParent>
                   <ProductSpecificDetail
                     detailName="relatedProducts"
-                    detailValue={productDetails.relatedProducts}
+                    detailValue={mergedProductData.relatedProducts}
                     extras={{
                       disableListItemGutters: true,
                     }}

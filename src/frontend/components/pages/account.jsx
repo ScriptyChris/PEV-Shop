@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, Route, Switch } from 'react-router-dom';
+import { useHistory, useLocation, Route, Switch } from 'react-router-dom';
 
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -43,11 +43,12 @@ const translations = Object.freeze({
 
 function UserProfile() {
   const [userData, setUserData] = useState(storeService.userAccountState);
+  const isUserAttributeIgnored = (attributeName) => ['_id'].includes(attributeName);
 
   useEffect(() => {
     // this should not happen, because user account state is ready either on app start or after logging in
     if (!userData) {
-      httpService.getUser().then((res) => {
+      httpService.getCurrentUser().then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
         }
@@ -69,12 +70,18 @@ function UserProfile() {
       <TableContainer className="account__menu-tab-profile-table-container">
         <Table>
           <TableBody>
-            {Object.entries(userData).map(([key, value]) => (
-              <TableRow key={key}>
-                <TableCell component="th">{key}</TableCell>
-                <TableCell>{value}</TableCell>
-              </TableRow>
-            ))}
+            {Object.entries(userData).map(([key, value]) => {
+              if (isUserAttributeIgnored(key)) {
+                return null;
+              }
+
+              return (
+                <TableRow key={key}>
+                  <TableCell component="th">{key}</TableCell>
+                  <TableCell>{value}</TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -178,25 +185,26 @@ function Orders() {
 
 export default function Account() {
   const { isMobileLayout } = useRWDLayout();
+  const { pathname } = useLocation();
   // TODO: [PERFORMANCE]? fix rendering component twice when redirected from LogIn page
   const MENU_ITEMS = Object.freeze([
     {
-      url: 'user-profile',
+      url: ROUTES.ACCOUNT__USER_PROFILE,
       translation: translations.goToUserProfile,
       component: <UserProfile />,
     },
     {
-      url: 'security',
+      url: ROUTES.ACCOUNT__SECURITY,
       translation: translations.goToSecurity,
       component: <Security />,
     },
     {
-      url: 'observed-products',
+      url: ROUTES.ACCOUNT__OBSERVED_PRODUCTS,
       translation: translations.goToObservedProducts,
       component: <ObservedProducts />,
     },
     {
-      url: 'orders',
+      url: ROUTES.ACCOUNT__ORDERS,
       translation: translations.goToOrders,
       component: <Orders />,
     },
@@ -206,8 +214,8 @@ export default function Account() {
 
   useEffect(() => {
     // TODO: [DX] automatically select first link (user profile) in a better way
-    const userProfileURL = MENU_ITEMS[0].url;
-    document.querySelector(`a[href$="/${userProfileURL}"]`).click();
+    const userProfileURL = pathname.endsWith(ROUTES.ACCOUNT) ? MENU_ITEMS[0].url : pathname;
+    document.querySelector(`a[href$="${userProfileURL}"]`).click();
   }, []);
 
   return (
@@ -236,7 +244,7 @@ export default function Account() {
                       key={item.url}
                       // TODO: [UX] highlight active link
                     >
-                      <PEVLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
+                      <PEVLink to={item.url} data-cy="link:account-feature">
                         {item.translation}
                       </PEVLink>
                     </MenuItem>
@@ -250,7 +258,7 @@ export default function Account() {
             <MenuList className="account__menu-nav-list">
               {MENU_ITEMS.map((item) => (
                 <MenuItem disableGutters key={item.url}>
-                  <PEVLink to={`${ROUTES.ACCOUNT}/${item.url}`} data-cy="link:account-feature">
+                  <PEVLink to={item.url} data-cy="link:account-feature">
                     {item.translation}
                   </PEVLink>
                 </MenuItem>
@@ -263,7 +271,7 @@ export default function Account() {
       <TabsLayoutWrapper>
         <Switch>
           {MENU_ITEMS.map((item) => (
-            <Route path={`${ROUTES.ACCOUNT}/${item.url}`} key={item.url}>
+            <Route path={item.url} key={item.url}>
               {item.component}
             </Route>
           ))}

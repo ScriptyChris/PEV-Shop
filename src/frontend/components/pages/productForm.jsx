@@ -24,6 +24,7 @@ import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
+import { ROUTES, routeHelpers } from '@frontend/components/pages/_routes';
 
 const translations = {
   getIntro(isProductUpdate) {
@@ -709,12 +710,12 @@ const NewProduct = () => {
   return <ProductForm doSubmit={doSubmit} />;
 };
 const ModifyProduct = () => {
-  const productName = useLocation().state;
-  const [productData, setProductData] = useState(null);
+  const { state: productData, pathname } = useLocation();
+  const [mergedProductData, setMergedProductData] = useState(productData);
   const [modificationError, setModificationError] = useState(false);
   const getChangedFields = useCallback(
     (values) => {
-      const flatTechnicalSpecs = productData.technicalSpecs.reduce((output, spec) => {
+      const flatTechnicalSpecs = mergedProductData.technicalSpecs.reduce((output, spec) => {
         const obj = {};
         const PREFIX = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${swapSpaceForGap(spec.heading)}`;
 
@@ -734,7 +735,7 @@ const ModifyProduct = () => {
         };
       }, {});
 
-      const normalizedInitialProductData = { ...productData, ...flatTechnicalSpecs };
+      const normalizedInitialProductData = { ...mergedProductData, ...flatTechnicalSpecs };
       delete normalizedInitialProductData.technicalSpecs;
 
       const changedFields = Object.entries(values).filter(([key, value]) => {
@@ -747,17 +748,25 @@ const ModifyProduct = () => {
 
       return changedFields;
     },
-    [productData]
+    [mergedProductData]
   );
 
   useEffect(() => {
-    // TODO: implement `getProductByName` method instead of (or along with) `getProduct[ById]`
-    httpService.getProductsByNames([productName]).then((res) => {
+    if (productData) {
+      return;
+    }
+
+    const productUrl = routeHelpers.extractProductUrlFromPathname(pathname);
+    if (!productUrl) {
+      throw Error(`Could not extract productUrl based on pathname: "${pathname}"!`);
+    }
+
+    httpService.getProductByUrl(productUrl).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      setProductData(res[0]);
+      setMergedProductData(res[0]);
     });
   }, []);
 
@@ -785,7 +794,7 @@ const ModifyProduct = () => {
           return;
         }
 
-        setProductData(res);
+        setMergedProductData(res);
       });
     }
 
@@ -793,9 +802,9 @@ const ModifyProduct = () => {
     return Promise.reject('modify impossible, due to not changed data');
   };
 
-  return productData ? (
+  return mergedProductData ? (
     <>
-      <ProductForm initialData={productData} doSubmit={doSubmit} />
+      <ProductForm initialData={mergedProductData} doSubmit={doSubmit} />
       {modificationError && <PEVFormFieldError>{translations.modificationError}</PEVFormFieldError>}
     </>
   ) : (

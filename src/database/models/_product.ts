@@ -62,6 +62,14 @@ const productSchema = new Schema<IProduct>({
   url: {
     type: String,
     required: true,
+    set(value: string) {
+      if (value.includes('/')) {
+        logger.log('Doing percentage encoding for all forward slashes for product url:', value);
+        return value.replace(/\//g, '%2F');
+      }
+
+      return value;
+    },
   },
   category: {
     type: String,

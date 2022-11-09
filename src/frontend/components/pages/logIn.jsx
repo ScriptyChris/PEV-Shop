@@ -41,7 +41,7 @@ export default function LogIn() {
         TODO: [UX] redirect to the page where user was before logging in 
         OR just close/fold the form, if it is presented as a aside/sticky panel
       */
-      history.push(ROUTES.ROOT);
+      history.push(ROUTES.ACCOUNT__ORDERS);
     });
   };
 

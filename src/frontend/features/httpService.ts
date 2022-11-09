@@ -7,6 +7,7 @@ import type {
 } from '@middleware/helpers/middleware-response-wrapper';
 import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
 import { HTTP_STATUS_CODE, IOrder, TPagination } from '@src/types';
+import storeService from '@frontend/features/storeService';
 
 type TResDataType<T> = T[keyof T];
 
@@ -235,11 +236,11 @@ const httpService = new (class HttpService extends Ajax {
     return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });
   }
 
-  getProductsById(idList: string[]) {
+  getProductsById(idList: IProduct['_id'][]) {
     return this.getRequest(`${this.URLS.PRODUCTS}?idList=${idList}`);
   }
 
-  getProductsByNames(nameList: string[]) {
+  getProductsByNames(nameList: IProduct['name'][]) {
     const searchParams = new URLSearchParams({ nameList: JSON.stringify(nameList) });
 
     return this.getRequest({
@@ -248,12 +249,19 @@ const httpService = new (class HttpService extends Ajax {
     });
   }
 
-  getProductsByName(name: string, caseSensitive = 'false', pagination: TPagination) {
+  getProductsByName(name: IProduct['name'], caseSensitive = 'false', pagination: TPagination) {
     const searchParams = new URLSearchParams();
     searchParams.append('name', name);
     searchParams.append('caseSensitive', caseSensitive);
 
     this._preparePaginationParams(searchParams, pagination);
+
+    return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });
+  }
+
+  getProductByUrl(url: IProduct['url']) {
+    const searchParams = new URLSearchParams();
+    searchParams.append('url', url);
 
     return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });
   }
@@ -291,8 +299,13 @@ const httpService = new (class HttpService extends Ajax {
     return this.deleteRequest(`${this.URLS.PRODUCTS}/${productName}`, true);
   }
 
-  getUser() {
-    const userId = '5f5a8dce154f830fd840dc7b';
+  getCurrentUser() {
+    const userId = storeService.userAccountState?._id;
+
+    if (!userId) {
+      throw Error(`Current user's id is not available! User is probably not logged in.`);
+    }
+
     return this.getRequest(`${this.URLS.USERS}/${userId}`, true);
   }
 

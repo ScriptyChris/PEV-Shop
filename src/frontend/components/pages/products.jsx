@@ -11,27 +11,29 @@ import ProductComparison from './productComparison';
 import Order from './order';
 import NotFound from './notFound';
 
-function Shop() {
+function Products() {
   const routesGuards = useRoutesGuards(storeService);
 
   return (
     <Switch>
-      <Route path={ROUTES.SHOP} exact>
+      <Route path={ROUTES.PRODUCTS} exact>
         <ProductList />
       </Route>
-      <Route path={`${ROUTES.PRODUCT}/:productName`}>
-        <ProductDetails />
-      </Route>
-      <Route path={ROUTES.COMPARE}>
+      <Route path={ROUTES.PRODUCTS__COMPARE}>
         <ProductComparison />
       </Route>
-      <Route path={ROUTES.ADD_NEW_PRODUCT}>
+      <Route path={ROUTES.PRODUCTS__ADD_NEW_PRODUCT}>
         {routesGuards.isSeller() ? <NewProduct /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
       </Route>
-      <Route path={ROUTES.MODIFY_PRODUCT}>
+      <Route path={ROUTES.PRODUCTS__MODIFY_PRODUCT}>
         {routesGuards.isSeller() ? <ModifyProduct /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
       </Route>
-      <Route path={ROUTES.ORDER}>{routesGuards.isClient() ? <Order /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}</Route>
+      <Route path={ROUTES.PRODUCTS__PRODUCT}>
+        <ProductDetails />
+      </Route>
+      <Route path={ROUTES.PRODUCTS__ORDER}>
+        {routesGuards.isClient() ? <Order /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
+      </Route>
 
       <Route>
         <NotFound />
@@ -40,4 +42,4 @@ function Shop() {
   );
 }
 
-export default memo(observer(Shop));
+export default memo(observer(Products));

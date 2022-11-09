@@ -1,3 +1,11 @@
+.cart-toggler-btn {
+  text-transform: none;
+
+  &--not-mobile {
+    padding: 0;
+  }
+}
+
 .cart {
   &__header {
     position: relative;
