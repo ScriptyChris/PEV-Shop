@@ -17,7 +17,7 @@ function assertProductsFilterQueryParam(url: string, objectToAssertInclusion: { 
 describe('product-filters', () => {
   it('should find products regarding applied filters', () => {
     // prepare
-    cy.visit(ROUTES.SHOP);
+    cy.visit(ROUTES.PRODUCTS);
     cy.get(makeCyDataSelector('container:products-filter'))
       .children()
       .as('productsFiltersContainer')

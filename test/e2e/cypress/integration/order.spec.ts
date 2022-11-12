@@ -122,7 +122,7 @@ describe('order', () => {
     // add product to cart
     cy.visit(ROUTES.LOG_IN);
     cy.loginTestUserByUI(exampleUser);
-    cy.visit(ROUTES.SHOP);
+    cy.visit(ROUTES.PRODUCTS);
 
     cy.get(makeCyDataSelector('container:product-card_0'))
       .first()
@@ -166,7 +166,7 @@ describe('order', () => {
 
     // go to order page
     cy.get(makeCyDataSelector('button:submit-cart')).click();
-    cy.location('pathname').should('eq', ROUTES.ORDER);
+    cy.location('pathname').should('eq', ROUTES.PRODUCTS__ORDER);
 
     // assert form is empty
     cy.get(makeCyDataSelector('input:receiver-name')).as('nameInput').should('have.value', '');
@@ -249,7 +249,7 @@ describe('order', () => {
 
     // go to order page
     cy.get(makeCyDataSelector('button:submit-cart')).click();
-    cy.location('pathname').should('eq', ROUTES.ORDER);
+    cy.location('pathname').should('eq', ROUTES.PRODUCTS__ORDER);
 
     // fill basic form data
     cy.get(makeCyDataSelector('input:receiver-name')).type(testReceiver.name);

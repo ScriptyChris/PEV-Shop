@@ -11,7 +11,7 @@ describe('product-form', () => {
   let authToken: string;
 
   const goToProductModificationPage = (productName: string) => {
-    cy.visit(ROUTES.SHOP);
+    cy.visit(ROUTES.PRODUCTS);
     cy.get(makeCyDataSelector('input:the-search')).type(productName);
     cy.contains(makeCyDataSelector('label:product-card__name'), productName)
       .closest(makeCyDataSelector('link:product-card__link'))
@@ -147,7 +147,7 @@ describe('product-form', () => {
   context('add new product', () => {
     it('should add new product', () => {
       // assert that to-be-added product doesn't exist yet
-      cy.visit(ROUTES.SHOP);
+      cy.visit(ROUTES.PRODUCTS);
       cy.get(makeCyDataSelector('input:the-search')).type(testProductDataForForm.name);
       cy.get(makeCyDataSelector('list:product-list')).should(($list) => {
         expect($list.text()).to.equal('Lack of products...');
@@ -155,7 +155,7 @@ describe('product-form', () => {
       });
 
       // go to adding new product page
-      cy.get(`a[href="${ROUTES.ADD_NEW_PRODUCT}"]`).click();
+      cy.get(`a[href="${ROUTES.PRODUCTS__ADD_NEW_PRODUCT}"]`).click();
 
       // assert form is empty
       cy.get(makeCyDataSelector('input:base__name')).should('have.value', '');

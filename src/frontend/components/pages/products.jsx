@@ -28,15 +28,11 @@ function Products() {
       <Route path={ROUTES.PRODUCTS__MODIFY_PRODUCT}>
         {routesGuards.isSeller() ? <ModifyProduct /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
       </Route>
-      <Route path={ROUTES.PRODUCTS__PRODUCT}>
-        <ProductDetails />
-      </Route>
       <Route path={ROUTES.PRODUCTS__ORDER}>
         {routesGuards.isClient() ? <Order /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
       </Route>
-
-      <Route>
-        <NotFound />
+      <Route path={ROUTES.PRODUCTS__PRODUCT}>
+        <ProductDetails />
       </Route>
     </Switch>
   );

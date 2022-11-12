@@ -59,7 +59,7 @@ describe('product-comparing', () => {
   };
 
   beforeEach(() => {
-    cy.visit(ROUTES.SHOP);
+    cy.visit(ROUTES.PRODUCTS);
     cy.get(makeCyDataSelector('button:product-comparison-candidates__actions-clear')).click({ force: true });
     cy.get(makeCyDataSelector('container:product-comparison-candidates__list')).children().should('have.length', 0);
   });
@@ -168,7 +168,7 @@ describe('product-comparing', () => {
       cy.get(makeCyDataSelector('counter:product-comparison-candidates__list-counter')).contains(productIndex + 1);
 
       // go back to products list
-      cy.get(`a[href="${ROUTES.SHOP}"]`).click();
+      cy.get(`a[href="${ROUTES.PRODUCTS}"]`).click();
 
       // let caller to chain the result
       return cy.wrap(null);
@@ -238,7 +238,7 @@ describe('product-comparing', () => {
       }
 
       // go back to products list
-      cy.get(`a[href="${ROUTES.SHOP}"]`).click();
+      cy.get(`a[href="${ROUTES.PRODUCTS}"]`).click();
     }
   });
 
@@ -264,10 +264,10 @@ describe('product-comparing', () => {
     // assert warning popup doesn't show up
     cy.get(makeCyDataSelector('link:product-comparison-candidates__actions-proceed')).click();
     cy.get(makeCyDataSelector('popup:message')).should('not.exist');
-    cy.location('pathname').should('eq', ROUTES.COMPARE);
+    cy.location('pathname').should('eq', ROUTES.PRODUCTS__COMPARE);
 
     // go to third product's page
-    cy.get(`a[href="${ROUTES.SHOP}"]`).click();
+    cy.get(`a[href="${ROUTES.PRODUCTS}"]`).click();
     cy.get(makeCyDataSelector('label:product-card__name'))
       .eq(3)
       .closest(makeCyDataSelector('link:product-card__link'))
@@ -298,7 +298,7 @@ describe('product-comparing', () => {
     cy.get(makeCyDataSelector('link:product-comparison-candidates__actions-proceed')).click();
 
     // assertions
-    cy.location('pathname').should('eq', ROUTES.COMPARE);
+    cy.location('pathname').should('eq', ROUTES.PRODUCTS__COMPARE);
     cy.contains(makeCyDataSelector('label:product-comparison__header-counter'), '4');
     cy.get(makeCyDataSelector('label:product-detail__name')).then(($comparedProductsNameElements) => {
       const $comparedProductNames = $comparedProductsNameElements.map((_, { textContent }) => textContent);
