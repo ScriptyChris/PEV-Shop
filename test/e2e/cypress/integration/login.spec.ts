@@ -28,7 +28,7 @@ describe('#login', () => {
     });
     cy.get(makeCyDataSelector('button:submit-login')).click();
 
-    cy.location('pathname').should('eq', ROUTES.ROOT);
+    cy.location('pathname').should('eq', ROUTES.ACCOUNT__ORDERS);
     cy.get(makeCyDataSelector(`link:${ROUTES.LOG_IN}`)).should('not.exist');
   });
 

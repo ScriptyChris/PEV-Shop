@@ -102,6 +102,9 @@ describe('#api-products', () => {
         queryBuilderMock.getSearchByNameConfig.mockImplementationOnce(
           queryBuilderMock.getSearchByNameConfig._succeededCall
         );
+        queryBuilderMock.getSearchByUrlConfig.mockImplementationOnce(
+          queryBuilderMock.getSearchByUrlConfig._succeededCall
+        );
         queryBuilderMock.getFilters.mockImplementationOnce(queryBuilderMock.getFilters._succeededCall);
         getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
       });

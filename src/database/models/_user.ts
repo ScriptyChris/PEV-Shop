@@ -99,6 +99,7 @@ userSchema.methods.toJSON = function (): TUserPublic {
   }
 
   return {
+    _id: user._id,
     login: user.login,
     email: user.email,
     observedProductsIDs: user.observedProductsIDs || [],
@@ -235,6 +236,7 @@ export type TUserModel = typeof UserModel;
 
 export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'> & {
   accountType: NonNullable<IUser['accountType']>['roleName'];
+  _id: Schema.Types.ObjectId;
 };
 
 export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & {

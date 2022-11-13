@@ -5,7 +5,7 @@
         display: grid;
         grid-template-areas:
             "category"
-            "action-buttons"
+            "action-elements"
             "image"
             "name"
             "rating"
@@ -18,13 +18,13 @@
         grid-area: category;
     }
 
-    &__header-action-btns {
-        grid-area: action-buttons;
+    &__header-action-elements {
+        grid-area: action-elements;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
-        gap: 0.25rem;
+        gap: 0.5rem;
     }
 
     &__header-image {
@@ -138,7 +138,7 @@
     .product-details {
         &__header {
             grid-template-areas:
-                "category action-buttons action-buttons action-buttons"
+                "category action-elements action-elements action-elements"
                 "image image name name"
                 "image image rating rating"
                 "image image price price"

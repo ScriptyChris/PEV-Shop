@@ -17,6 +17,9 @@ export const queryBuilder = (() => {
     getSearchByNameConfig: jest.fn(() => {
       throw getMockImplementationError('getSearchByNameConfig');
     }),
+    getSearchByUrlConfig: jest.fn(() => {
+      throw getMockImplementationError('getSearchByUrlConfig');
+    }),
     getFilters: jest.fn(() => {
       throw getMockImplementationError('getFilters');
     }),
@@ -48,6 +51,11 @@ export const queryBuilder = (() => {
     name: /test/,
   });
   _queryBuilder.getSearchByNameConfig._failedCall = () => null;
+
+  _queryBuilder.getSearchByUrlConfig._succeededCall = () => ({
+    name: /some-test-product/,
+  });
+  _queryBuilder.getSearchByUrlConfig._failedCall = () => null;
 
   _queryBuilder.getFilters._succeededCall = () => ({
     $and: [

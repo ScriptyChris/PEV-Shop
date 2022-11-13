@@ -89,6 +89,7 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
     const nameListConfig = queryBuilder.getNameListConfig(req.query);
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
+    const searchByUrl = queryBuilder.getSearchByUrlConfig(req.query);
     const filters = queryBuilder.getFilters(req.query);
 
     let query = {};
@@ -101,6 +102,8 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
       query = chosenCategories;
     } else if (searchByName) {
       query = searchByName;
+    } else if (searchByUrl) {
+      query = searchByUrl;
     } else if (filters) {
       query = filters;
     }
@@ -114,13 +117,15 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
       options.pagination = paginationConfig;
     }
 
-    const paginatedProducts = await getFromDB({ modelName: COLLECTION_NAMES.Product, ...options }, query);
+    const paginatedProducts = (await getFromDB({ modelName: COLLECTION_NAMES.Product, ...options }, query)) as
+      | IProduct[]
+      | null;
 
-    if (!paginatedProducts) {
+    if (!paginatedProducts || paginatedProducts.length === 0) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products not found!' });
     }
 
-    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: paginatedProducts as IProduct[] });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: paginatedProducts });
   } catch (exception) {
     return next(exception);
   }

@@ -67,7 +67,7 @@ export const PEVIconButton = forwardRef(function PEVIconButton(props, ref) {
 
 export const PEVLink = forwardRef(function PEVLink({ children, ...restProps }, ref) {
   return (
-    <MUILink {...restProps} component={Link} color="inherit" ref={ref}>
+    <MUILink color="inherit" {...restProps} component={Link} ref={ref}>
       {children}
     </MUILink>
   );

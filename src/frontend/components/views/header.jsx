@@ -32,7 +32,7 @@ export default observer(function Header() {
       TODO: [UX] if current subpage is not a product list, then show some information 
       that subpage redirection will be made to avoid surprising user
     */
-    history.push(ROUTES.SHOP, { searchedProducts });
+    history.push(ROUTES.PRODUCTS, { searchedProducts });
   };
 
   return (

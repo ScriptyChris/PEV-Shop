@@ -1,12 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
 import Home from '@frontend/components/pages/home';
-import Shop from '@frontend/components/pages/shop';
+import Products from '@frontend/components/pages/products';
 import Register from '@frontend/components/pages/register';
 import NotLoggedIn from '@frontend/components/pages/notLoggedIn';
 import NotAuthorized from '@frontend/components/pages/notAuthorized';
@@ -21,13 +20,6 @@ import { ScrollToTop } from '@frontend/components/utils/scrollToTop';
 export default observer(function Main() {
   const routesGuards = useRoutesGuards(storeService);
 
-  /*
-    TODO: [UX] save user session to storage when page is unloaded (like by reloading or closing it).
-    It may be done via window's 'beforeunload' event, but it's better to use Page Lifecycle (API)
-    https://developers.google.com/web/updates/2018/07/page-lifecycle-api#observing-page-lifecycle-states-in-code
-  */
-  useEffect(userSessionService.restoreSession, []);
-
   return (
     <main className="main">
       <Switch>
@@ -36,8 +28,8 @@ export default observer(function Main() {
         </Route>
 
         <Route path={ROUTES.PAGES}>
-          <Route path={ROUTES.SHOP}>
-            <Shop />
+          <Route path={ROUTES.PRODUCTS}>
+            <Products />
           </Route>
           <Route path={ROUTES.REGISTER}>
             <Register />
@@ -67,8 +59,14 @@ export default observer(function Main() {
               routesGuards.isUser() ? <Account /> : <Redirect to={ROUTES.NOT_LOGGED_IN} />
             }
           </Route>
+
+          {/* for explicit redirection to 404 */}
+          <Route path={ROUTES.NOT_FOUND}>
+            <NotFound />
+          </Route>
         </Route>
 
+        {/* for unexpected 404 */}
         <Route>
           <NotFound />
         </Route>

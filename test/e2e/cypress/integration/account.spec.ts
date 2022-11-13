@@ -12,12 +12,6 @@ const ACCOUNT_TEST_USER: TE2EUser = Object.freeze({
 });
 
 describe('#account', () => {
-  const ACCOUNT_URLS = Object.freeze({
-    USER_PROFILE: `${ROUTES.ACCOUNT}/user-profile`,
-    SECURITY: `${ROUTES.ACCOUNT}/security`,
-    OBSERVED_PRODUCTS: `${ROUTES.ACCOUNT}/observed-products`,
-    ORDERS: `${ROUTES.ACCOUNT}/orders`,
-  });
   const goToNewUserAccount = () => {
     cy.registerAndLoginTestUser(ACCOUNT_TEST_USER);
 
@@ -33,14 +27,14 @@ describe('#account', () => {
     goToNewUserAccount();
 
     [
-      { name: 'Profile', url: ACCOUNT_URLS.USER_PROFILE, dataCySection: 'section:user-profile' },
-      { name: 'Security', url: ACCOUNT_URLS.SECURITY, dataCySection: 'section:security' },
+      { name: 'Profile', url: ROUTES.ACCOUNT__USER_PROFILE, dataCySection: 'section:user-profile' },
+      { name: 'Security', url: ROUTES.ACCOUNT__SECURITY, dataCySection: 'section:security' },
       {
         name: 'Observed products',
-        url: ACCOUNT_URLS.OBSERVED_PRODUCTS,
+        url: ROUTES.ACCOUNT__OBSERVED_PRODUCTS,
         dataCySection: 'section:observed-products',
       },
-      { name: 'Orders', url: ACCOUNT_URLS.ORDERS, dataCySection: 'section:orders' },
+      { name: 'Orders', url: ROUTES.ACCOUNT__ORDERS, dataCySection: 'section:orders' },
     ].forEach(({ name, url, dataCySection }) => {
       cy.get(makeCyDataSelector('link:account-feature')).contains(name).and('have.attr', 'href', url).click();
       cy.location('pathname').should('eq', url);
@@ -51,7 +45,7 @@ describe('#account', () => {
   it('should show profile details', () => {
     goToNewUserAccount();
 
-    cy.get(`${makeCyDataSelector('link:account-feature')}[href="${ACCOUNT_URLS.USER_PROFILE}"]`).click();
+    cy.get(`${makeCyDataSelector('link:account-feature')}[href="${ROUTES.ACCOUNT__USER_PROFILE}"]`).click();
     cy.getFromStorage<TUserPublic>('userAccount').then((user) => {
       const profileDetails = [
         { header: 'login', data: user.login },
@@ -135,7 +129,7 @@ describe('#account', () => {
       cy.get(makeCyDataSelector('button:logout-from-other-sessions')).click();
       cy.get(makeCyDataSelector('button:confirm-logging-out-from-multiple-sessions')).click();
 
-      cy.location('pathname').should('eq', `${ROUTES.ACCOUNT}/security`);
+      cy.location('pathname').should('eq', ROUTES.ACCOUNT__SECURITY);
       cy.getFromStorage('userAuthToken').should('have.length.gte', 0);
       confirmEndedAlternativeSession();
 

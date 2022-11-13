@@ -4,9 +4,16 @@ import { observer } from 'mobx-react-lite';
 
 import Menu from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
+import Divider from '@material-ui/core/Divider';
 import CloseIcon from '@material-ui/icons/Close';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
+import ListIcon from '@material-ui/icons/List';
+import AddToListIcon from '@material-ui/icons/PlaylistAdd';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 
 import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
@@ -16,13 +23,13 @@ import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   toggleNavMenu: 'Menu',
-  shop: 'Shop',
+  products: 'Products',
   addNewProduct: 'Add new product',
   modifyProduct: 'Modify product',
   register: 'Register',
   logIn: 'Log in',
   logOut: 'Log out',
-  account: 'Account',
+  getAccountLinkLabel: (login) => `go to "${login}" user account`,
 });
 
 /*
@@ -36,32 +43,44 @@ const NavMenu = observer(({ logOutUser }) => {
     <nav className="nav-menu">
       <MenuList className="nav-menu__links">
         <MenuItem>
-          <PEVLink to={ROUTES.SHOP}>{translations.shop}</PEVLink>
+          <PEVLink to={ROUTES.PRODUCTS}>
+            <ListIcon fontSize="inherit" />
+            {translations.products}
+          </PEVLink>
         </MenuItem>
         {routesGuards.isSeller() && [
-          <MenuItem key="ROUTES.ADD_NEW_PRODUCT">
-            <PEVLink to={ROUTES.ADD_NEW_PRODUCT}>{translations.addNewProduct}</PEVLink>
-          </MenuItem>,
-          <MenuItem key="ROUTES.MODIFY_PRODUCT">
-            <PEVLink to={ROUTES.MODIFY_PRODUCT}>{translations.modifyProduct}</PEVLink>
+          <MenuItem key="ROUTES.PRODUCTS__ADD_NEW_PRODUCT">
+            <PEVLink to={ROUTES.PRODUCTS__ADD_NEW_PRODUCT}>
+              <AddToListIcon fontSize="inherit" />
+              {translations.addNewProduct}
+            </PEVLink>
           </MenuItem>,
         ]}
         <MenuItem>
           {routesGuards.isUser() ? (
             <PEVLink to={ROUTES.ROOT} onClick={logOutUser}>
+              <ExitToAppIcon fontSize="inherit" />
               {translations.logOut}
             </PEVLink>
           ) : (
             <PEVLink to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
+              <VpnKeyIcon fontSize="inherit" />
               {translations.logIn}
             </PEVLink>
           )}
         </MenuItem>
         <MenuItem>
           {routesGuards.isUser() ? (
-            <PEVLink to={ROUTES.ACCOUNT}>{translations.account}</PEVLink>
+            <PEVLink
+              to={ROUTES.ACCOUNT}
+              aria-label={translations.getAccountLinkLabel(storeService.userAccountState.login)}
+            >
+              <AccountCircleIcon fontSize="inherit" />
+              {storeService.userAccountState.login}
+            </PEVLink>
           ) : (
             <PEVLink to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
+              <PersonAddIcon fontSize="inherit" />
               {translations.register}
             </PEVLink>
           )}
@@ -116,6 +135,8 @@ export default function Nav() {
         <PEVIconButton className="nav-close-btn" onClick={handleToggleNavMenu} a11y={translations.toggleNavMenu}>
           <CloseIcon />
         </PEVIconButton>
+
+        <Divider />
 
         <NavMenu logOutUser={logOutUser} />
       </Drawer>

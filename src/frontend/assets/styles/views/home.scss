@@ -1,0 +1,29 @@
+.home, .home-section {
+    align-items: stretch;
+}
+
+.home-section {
+    &__product-list {
+        display: flex;
+        align-items: center;
+        --product-card-width: 200px;
+
+        [data-compare-btn-scroll-dir] button {
+            width: 2rem;
+        }
+
+        [data-scrollable-parent] {
+            --scrollable-min-height: 8rem;
+        }
+
+        ul {
+            display: flex;
+            gap: 1rem;
+        }
+    }
+
+    &__link-to-see-all {
+        text-align: center;
+        text-transform: uppercase;
+    }
+}

@@ -53,6 +53,7 @@ const useRWDMediaQuery = () => {
     () =>
       mediaQueryList.reduce((output, { __deviceName: mqName }) => {
         const upperCasedMQName = `${mqName[0].toUpperCase()}${mqName.slice(1)}`;
+        // e.g.: isMobileLayout, isTabletLayout, isDesktopLayout
         const getterName = `is${upperCasedMQName}Layout`;
 
         return {

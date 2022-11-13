@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import CloseIcon from '@material-ui/icons/Close';
-import ShoppingCart from '@material-ui/icons/ShoppingCart';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import AddShoppingCart from '@material-ui/icons/AddShoppingCart';
 import TableContainer from '@material-ui/core/TableContainer';
 import Drawer from '@material-ui/core/Drawer';
@@ -20,12 +20,13 @@ import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import classNames from 'classnames';
 
 const translations = {
   addToCartBtn: 'Add to cart',
   addingToCartAuthFailure: 'Adding product to cart is not available for your account type.',
   header: 'Cart',
-  cartLabel: 'cart',
   goBackLabel: 'go back',
   productNameHeader: 'Product',
   productCountHeader: 'Count',
@@ -90,6 +91,7 @@ export default observer(function Cart() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const history = useHistory();
   const isCartEmpty = storeService.userCartProducts?.length === 0;
+  const { isMobileLayout } = useRWDLayout();
 
   useEffect(() => {
     storeService.replaceUserCartState(storageService.userCart.get());
@@ -120,20 +122,23 @@ export default observer(function Cart() {
   };
 
   const handleCartSubmission = () => {
-    history.push(ROUTES.ORDER);
+    history.push(ROUTES.PRODUCTS__ORDER);
     handleCloseCart();
   };
 
   return (
     <>
-      <PEVIconButton
+      <PEVButton
+        className={classNames('cart-toggler-btn', { 'cart-toggler-btn--not-mobile': !isMobileLayout })}
         color="inherit"
+        variant="text"
         onClick={handleOpenCart}
-        a11y={translations.cartLabel}
+        a11y={translations.header}
         data-cy="button:toggle-cart"
       >
-        <ShoppingCart />
-      </PEVIconButton>
+        <ShoppingCartIcon fontSize="inherit" />
+        {!isMobileLayout && translations.header}
+      </PEVButton>
 
       <Drawer anchor="right" open={isCartOpen} onClose={handleCloseCart}>
         <section className="cart pev-flex pev-flex--columned" data-cy="container:cart">
@@ -148,7 +153,7 @@ export default observer(function Cart() {
           </header>
 
           <TableContainer className="cart__table">
-            <Table size="small" aria-label={translations.cartLabel}>
+            <Table size="small" aria-label={translations.header}>
               <TableHead>
                 <TableRow>
                   <TableCell>{translations.productNameHeader}</TableCell>

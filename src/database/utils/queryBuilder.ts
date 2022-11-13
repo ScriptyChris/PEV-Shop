@@ -16,6 +16,14 @@ const getSearchByNameConfig = (reqQuery: TReqQuery) => {
   return { name: nameQuery };
 };
 
+const getSearchByUrlConfig = (reqQuery: TReqQuery) => {
+  if (!reqQuery.url) {
+    return null;
+  }
+
+  return { url: reqQuery.url };
+};
+
 const getPaginationConfig = (reqQuery: TReqQuery) => {
   if (!('page' in reqQuery) || !('limit' in reqQuery)) {
     return null;
@@ -158,6 +166,7 @@ export const queryBuilder = {
   getPaginationConfig,
   getIdListConfig,
   getNameListConfig,
+  getSearchByUrlConfig,
   getProductsWithChosenCategories,
   getFilters,
 };
