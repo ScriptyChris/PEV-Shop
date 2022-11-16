@@ -13,8 +13,25 @@
     grid-template-columns: 5fr 1fr;
   }
 
+  &--is-compact {
+    display: block;
+    padding: 0;
+    margin-right: 0.5rem;
+
+    .product-card__link {
+      display: grid;
+      grid-template-areas: "image-link content";
+      grid-template-columns: 1fr 2fr;
+      padding: 0.5rem 1rem;
+    }
+  }
+
   &__content {
     grid-area: content;
+
+    &--is-compact {
+      flex-wrap: nowrap;
+    }
   }
 
   &__actions-bar-toggler {
@@ -35,7 +52,11 @@
   }
 
   &__image {
-    height: 100px;
+    height: 6.25rem;
     background: radial-gradient(transparent, grey);
+
+    &--is-compact {
+      height: 4rem;
+    }
   }
 }

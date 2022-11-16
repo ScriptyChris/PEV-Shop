@@ -20,8 +20,6 @@ import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
-import { useRWDLayout } from '@frontend/contexts/rwd-layout';
-import classNames from 'classnames';
 
 const translations = {
   addToCartBtn: 'Add to cart',
@@ -91,7 +89,6 @@ export default observer(function Cart() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const history = useHistory();
   const isCartEmpty = storeService.userCartProducts?.length === 0;
-  const { isMobileLayout } = useRWDLayout();
 
   useEffect(() => {
     storeService.replaceUserCartState(storageService.userCart.get());
@@ -128,17 +125,15 @@ export default observer(function Cart() {
 
   return (
     <>
-      <PEVButton
-        className={classNames('cart-toggler-btn', { 'cart-toggler-btn--not-mobile': !isMobileLayout })}
+      <PEVIconButton
+        className="cart-toggler-btn"
         color="inherit"
-        variant="text"
         onClick={handleOpenCart}
         a11y={translations.header}
         data-cy="button:toggle-cart"
       >
         <ShoppingCartIcon fontSize="inherit" />
-        {!isMobileLayout && translations.header}
-      </PEVButton>
+      </PEVIconButton>
 
       <Drawer anchor="right" open={isCartOpen} onClose={handleCloseCart}>
         <section className="cart pev-flex pev-flex--columned" data-cy="container:cart">

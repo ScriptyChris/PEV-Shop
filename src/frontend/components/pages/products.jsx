@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import { ROUTES, useRoutesGuards } from './_routes';
 import storeService from '@frontend/features/storeService';
-import ProductList from '@frontend/components/views/productList';
+import ProductsDashboard from '@frontend/components/views/productsDashboard';
 import ProductDetails from '@frontend/components/views/productDetails';
 import { NewProduct, ModifyProduct } from './productForm';
 import ProductComparison from './productComparison';
@@ -17,7 +17,7 @@ function Products() {
   return (
     <Switch>
       <Route path={ROUTES.PRODUCTS} exact>
-        <ProductList />
+        <ProductsDashboard />
       </Route>
       <Route path={ROUTES.PRODUCTS__COMPARE}>
         <ProductComparison />

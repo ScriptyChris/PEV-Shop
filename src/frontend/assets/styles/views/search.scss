@@ -1,30 +1,83 @@
-.search-wrapper {
-  display: flex;
+.search-container {
+  position:relative;
 
-  &__toggle-button--is-hidden {
-    width: 0;
-    padding: 0;
-    visibility: hidden;
+  // Disable border in default state, because search'es label on tablet and desktop 
+  // has it's visual divider made via pseudo element.
+  input[type="search"]:not(:hover):not(:focus) + fieldset {
+    border: none;
   }
 }
 
-.search-container {
-  display: flex;
-  grid-area: search;
-  margin-bottom: 10px;
-  visibility: hidden;
-
-  &--is-visible {
-    visibility: visible;
+.search-menu, .search-menu--mobile {
+  &__field-container {
+    flex-basis: 85%;
+    justify-content: center;
+    flex-wrap: nowrap;
   }
 
-  &__field-letter-case-toggler {
-    [class$="colorPrimary"] {
-      color: white;
-    }
+  &__input-wrapper {
+    flex-basis: 100%;
+  }
+}
 
-    [class$="colorSecondary"] {
-      color: gray;
+.search-menu--mobile {
+  & > .MuiDrawer-paper {
+    width: 100vw;
+  }
+
+  &__controls {
+    justify-content: space-evenly;
+    margin: 0.5rem 1rem 0;
+    flex-wrap: nowrap;
+  }
+}
+
+.search-initial-results {
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  max-height: 90vh;
+  // TODO: [UI] set color from variable
+  box-shadow: none;
+  background: white;
+
+  .product-list {
+    overflow-y: auto;
+    margin-inline: 0.25rem;
+    padding-inline: 0.25rem;
+  }
+
+  & > .MuiDivider-root, &__see-all-link {
+    align-self: stretch;
+  }
+
+  &__see-all-link {
+    display: block;
+    text-transform: uppercase;
+  }
+}
+
+@include createMediaQuery(min-width, tablet) {
+  .search-menu__field-container {
+    padding: 0.5rem 1rem;
+
+    .search-menu__input-wrapper::before {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 2rem;
+      // TODO: [UI] sync color with MUI
+      background: rgba(0, 0, 0, 0.23);
     }
+  }
+
+  .search-initial-results {
+    position: absolute;
+    top: 3.6rem;
+    width: 100%;
+    border: 2px solid #3f51b5;
   }
 }

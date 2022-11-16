@@ -249,10 +249,10 @@ const httpService = new (class HttpService extends Ajax {
     });
   }
 
-  getProductsByName(name: IProduct['name'], caseSensitive = 'false', pagination: TPagination) {
+  getProductsByName(name: IProduct['name'], pagination: TPagination, getOnlyEssentialData = true) {
     const searchParams = new URLSearchParams();
     searchParams.append('name', name);
-    searchParams.append('caseSensitive', caseSensitive);
+    searchParams.append('getOnlyEssentialData', String(getOnlyEssentialData));
 
     this._preparePaginationParams(searchParams, pagination);
 

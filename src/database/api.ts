@@ -47,7 +47,14 @@ async function getFromDB<T extends TDocuments>(
       throw TypeError(`itemQuery for pagination cannot be a string! Received "${itemQuery}".`);
     }
 
-    return getPaginatedItems(Model as TPaginateModel, itemQuery, config.pagination);
+    return getPaginatedItems(
+      {
+        Model: Model as TPaginateModel,
+        pagination: config.pagination,
+      },
+      itemQuery,
+      projection
+    );
   }
 
   if (config.isDistinct === true) {

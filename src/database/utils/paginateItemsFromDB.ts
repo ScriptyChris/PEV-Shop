@@ -3,17 +3,18 @@ import { TDocuments } from '@database/models';
 
 // TODO: cache pagination for each user (for next/prev page navigation)
 const getPaginatedItems = async (
-  Model: TPaginateModel,
+  { Model, pagination }: { Model: TPaginateModel; pagination: TPaginationConfig },
   itemQuery: Parameters<TPaginateModel['paginate']>[0],
-  paginationConfig: TPaginationConfig
+  projection: NonNullable<Parameters<TPaginateModel['paginate']>[1]>['projection']
 ) => {
   const options: PaginateOptions = {
-    page: paginationConfig.page,
-    limit: paginationConfig.limit,
+    page: pagination.page,
+    limit: pagination.limit,
     customLabels: {
       docs: 'productsList',
       totalDocs: 'totalProducts',
     },
+    projection,
   };
 
   // TODO: delete unnecessary pagination props from returning object

@@ -1,37 +1,40 @@
-import React, { memo, useRef, useCallback, useState, useEffect, forwardRef } from 'react';
-import classNames from 'classnames';
+import React, { memo, useRef, useCallback, useState, forwardRef } from 'react';
 
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import TextFormat from '@material-ui/icons/TextFormat';
-import Zoom from '@material-ui/core/Zoom';
+import Drawer from '@material-ui/core/Drawer';
+import Fade from '@material-ui/core/Fade';
+import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
 import SearchIcon from '@material-ui/icons/Search';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
-import { PEVForm, PEVIconButton, PEVCheckbox } from '@frontend/components/utils/pevElements';
+import { PEVForm, PEVIconButton, PEVLink, PEVTextField } from '@frontend/components/utils/pevElements';
+import { ProductsList } from '@frontend/components/views/productsDashboard';
 import httpService from '@frontend/features/httpService';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   defaultLabel: 'Search for:',
-  caseSensitiveSearch: 'toggle case sensitivity',
-  doSearchLabel: 'do search',
+  openSearchMenu: 'open search menu',
+  seeAllSearchResults: 'See all results',
+  closeSearchMenu: 'close search menu',
 };
 
 const Search = memo(function Search({
   label = translations.defaultLabel,
+  placeholder,
+  labelInside,
   searchingTarget = Math.random() /* TODO: make default value more spec conforming */,
   debounceTimeMs = 0,
   onInputChange,
   onEscapeBtn = () => void 0,
   forwardedRef,
-  customCheckbox = null,
   list = '',
   presetValue = '',
   autoFocus = false,
+  className,
 }) {
   if (Number.isNaN(debounceTimeMs) || typeof debounceTimeMs !== 'number') {
-    throw TypeError(`debounceTimeMs prop must be number! Received: ${debounceTimeMs}`);
+    throw TypeError(`debounceTimeMs prop must be a number! Received: ${debounceTimeMs}`);
   } else if (typeof onInputChange !== 'function') {
     throw TypeError(`onInputChange prop must be a function! Received: ${onInputChange}`);
   } else if (onEscapeBtn && typeof onEscapeBtn !== 'function') {
@@ -53,7 +56,7 @@ const Search = memo(function Search({
   const handleChange = ({ target: { value } }) => {
     setInputValue(value);
 
-    if (debounceTimeMs) {
+    if (value && debounceTimeMs) {
       debounceNotify(() => onInputChange(value));
     } else {
       onInputChange(value);
@@ -62,32 +65,38 @@ const Search = memo(function Search({
 
   const handleKeyDown = (event) => {
     if (event.key === 'Escape') {
-      onEscapeBtn();
+      // Chrome seems to clear the input on ESC key, which may be confusing,
+      // so default browser action is prevented.
+      event.preventDefault();
+      onEscapeBtn(event);
     }
   };
 
   return (
     // Alone (and kind of no-op) `Formik` component wrapper is used only to provide a (React) context for underlying fields, which rely on Context API
     <PEVForm
+      role="search"
       overrideRenderFn={() => (
-        <TextField
+        <PEVTextField
+          className={className}
           ref={forwardedRef}
-          id={inputId}
+          identity={inputId}
           type="search"
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          inputProps={{
+          autoFocus={autoFocus}
+          autoComplete="off"
+          overrideProps={{
+            onChange: handleChange,
+            onKeyDown: handleKeyDown,
             value: inputValue,
-            list: list,
-            autoFocus: autoFocus,
-            autoComplete: 'off',
-            // TODO: [E2E] set more precise value
-            'data-cy': 'input:the-search',
+            inputProps: {
+              list,
+              // TODO: [E2E] set more precise value
+              'data-cy': 'input:the-search',
+            },
           }}
-          InputProps={{
-            endAdornment: customCheckbox && <InputAdornment position="end">{customCheckbox}</InputAdornment>,
-          }}
+          placeholder={placeholder}
           label={label}
+          labelInside={labelInside}
         />
       )}
     />
@@ -98,97 +107,97 @@ const ForwardedSearch = forwardRef(function ForwardedSearch(props, ref) {
   return <Search {...props} forwardedRef={ref} />;
 });
 
-function SearchProductsByName({ pagination, onReceivedProductsByName, toggleMainHeadingSize, ...restProps }) {
+function SearchProductsByName({
+  pagination = {
+    pageNumber: 1,
+    productsPerPage: 10,
+  },
+  onReceivedProductsByName,
+  toggleMainHeadingSize,
+  syncWithSearchQuery,
+  ...restProps
+}) {
   const { isMobileLayout } = useRWDLayout();
-  const [isCaseSensitive, setCaseSensitive] = useState(false);
-  const [isSearchVisible, setIsSearchVisible] = useState(!isMobileLayout);
-  const [isSearchBtnHidden, setIsSearchBtnHidden] = useState(!isMobileLayout);
+  const [isMobileSearchMenuOpened, setIsMobileSearchMenuOpened] = useState(false);
+  const [isSearchMenuOpened, setIsSearchMenuOpened] = useState(false);
+  const [foundProducts, setFoundProducts] = useState([]);
 
-  useEffect(() => setIsSearchVisible(!isMobileLayout), [isMobileLayout]);
-
-  // TODO: fix issue with stale isCaseSensitive value when checkbox is ticked between user types query and debounce delays reaction
   const handleInputSearchChange = (searchValue) => {
-    const mappedPagination = pagination
-      ? {
-          pageNumber: pagination.currentProductPage,
-          productsPerPage: pagination.currentProductsPerPageLimit,
-        }
-      : null;
+    if (!searchValue) {
+      return setFoundProducts([]);
+    }
 
-    httpService.getProductsByName(searchValue, isCaseSensitive, mappedPagination).then((res) => {
+    httpService.getProductsByName(searchValue, pagination).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      onReceivedProductsByName(res);
+      setFoundProducts(res.productsList);
     });
   };
 
-  const handleCaseSensitiveChange = ({ target: { checked } }) => {
-    setCaseSensitive(checked);
+  const toggleMobileSearchMenu = (shouldOpen) => {
+    return () => setIsMobileSearchMenuOpened(shouldOpen);
   };
 
-  const toggleSearch = (shouldShow) => {
-    return () => {
-      if (isMobileLayout) {
-        setIsSearchVisible(shouldShow);
-        toggleMainHeadingSize(shouldShow);
-      }
-    };
+  const toggleSearchMenu = (shouldOpen) => {
+    return () => setIsSearchMenuOpened(shouldOpen);
   };
 
-  const focusSearchInput = (searchRootRef) => {
-    if (restProps.autoFocus) {
-      const searchInput = searchRootRef.querySelector('input[type="search"]');
+  const closeSearch = ({ target }) => {
+    target.blur();
 
-      setTimeout(() => searchInput.focus());
+    if (isMobileSearchMenuOpened) {
+      setIsMobileSearchMenuOpened(false);
+    } else {
+      setIsSearchMenuOpened(false);
     }
   };
 
-  const toggleSearchBtn = (shouldShow) => {
-    return () => {
-      setIsSearchBtnHidden(shouldShow);
-    };
-  };
+  const searchInput = (
+    <div className="search-menu__field-container pev-flex">
+      <ForwardedSearch
+        {...restProps}
+        className="search-menu__input-wrapper"
+        onInputChange={handleInputSearchChange}
+        onEscapeBtn={closeSearch}
+        autoFocus={isMobileLayout}
+      />
+    </div>
+  );
+  const searchResults = (
+    <Paper className="search-initial-results pev-flex pev-flex--columned">
+      <PEVLink to="#" className="search-initial-results__see-all-link search pev-centered-padded-text" color="primary">
+        {translations.seeAllSearchResults}
+      </PEVLink>
+      <Divider variant="middle" />
+      <ProductsList initialProducts={foundProducts} isCompactProductCardSize />
+    </Paper>
+  );
 
-  return (
-    <ClickAwayListener onClickAway={toggleSearch(false)}>
-      {/* This <div> is used solely to forward a ref from ClickAwayListener, which React Fragment cannot do */}
-      <div className="search-wrapper">
-        <section className={classNames('search-container', { 'search-container--is-visible': isSearchVisible })}>
-          <Zoom in={isSearchVisible} onEntered={focusSearchInput}>
-            <ForwardedSearch
-              {...restProps}
-              onInputChange={handleInputSearchChange}
-              customCheckbox={
-                <PEVCheckbox
-                  className="search-container__field-letter-case-toggler"
-                  identity="searchCaseSensitivity"
-                  icon={<TextFormat color="primary" />}
-                  checkedIcon={<TextFormat color="secondary" />}
-                  onChange={handleCaseSensitiveChange}
-                  checked={isCaseSensitive}
-                  label={translations.caseSensitiveSearch}
-                  noExplicitlyVisibleLabel
-                />
-              }
-            />
-          </Zoom>
-        </section>
-
-        <Zoom in={!isSearchVisible} onEnter={toggleSearchBtn(false, 'enter')} onExit={toggleSearchBtn(true, 'exit')}>
-          <PEVIconButton
-            onClick={toggleSearch(true)}
-            className={classNames({
-              'search-wrapper__toggle-button--is-hidden': isSearchBtnHidden,
-            })}
-            a11y={translations.doSearchLabel}
-          >
-            <SearchIcon />
+  return isMobileLayout ? (
+    <>
+      <PEVIconButton onClick={toggleMobileSearchMenu(true)} a11y={translations.openSearchMenu}>
+        <SearchIcon />
+      </PEVIconButton>
+      <Drawer anchor="right" className="search-menu--mobile" open={isMobileSearchMenuOpened}>
+        <div className="search-menu--mobile__controls pev-flex">
+          {searchInput}
+          <PEVIconButton onClick={toggleMobileSearchMenu(false)} a11y={translations.closeSearchMenu}>
+            <ExitToAppIcon />
           </PEVIconButton>
-        </Zoom>
-      </div>
-    </ClickAwayListener>
+        </div>
+
+        {searchResults}
+      </Drawer>
+    </>
+  ) : (
+    <Paper className="search-container" onFocus={toggleSearchMenu(true)} onBlur={toggleSearchMenu(false)}>
+      {searchInput}
+      <Fade in={isSearchMenuOpened} onKeyDown={({ key }) => key === 'Escape' && toggleSearchMenu(false)()}>
+        {searchResults}
+      </Fade>
+    </Paper>
   );
 }
 
@@ -223,15 +232,13 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
         const products = (
           newSearchValueContainsOld
             ? searchResults.filter((result) => result.toLowerCase().includes(newSearchValue.toLowerCase()))
-            : (
-                await httpService.getProductsByName(searchRecentValues.newValue, false, null).then((res) => {
-                  if (res.__EXCEPTION_ALREADY_HANDLED) {
-                    return;
-                  }
+            : await httpService.getProductsByName(searchRecentValues.newValue).then((res) => {
+                if (res.__EXCEPTION_ALREADY_HANDLED) {
+                  return;
+                }
 
-                  return res;
-                })
-              ).map(({ name }) => name)
+                return res.map(({ name }) => name);
+              })
         ).filter((productName) => !(ignoredProductNames || []).includes(productName));
 
         setSearchResults(products);
@@ -246,7 +253,7 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
 
   return (
     <>
-      <Search {...restProps} onInputChange={handleInputSearchChange} />
+      <Search {...restProps} onInputChange={handleInputSearchChange} labelInside />
 
       <datalist ref={getDataListRef} id={restProps.list} data-cy="datalist:the-search-options">
         {searchResults.map((relatedProductName) => (
