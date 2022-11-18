@@ -142,7 +142,12 @@ export default observer(function Cart() {
               {translations.header}
             </PEVHeading>
 
-            <PEVIconButton onClick={handleCloseCart} className="cart__back-btn" a11y={translations.goBackLabel}>
+            <PEVIconButton
+              onClick={handleCloseCart}
+              className="cart__back-btn"
+              a11y={translations.goBackLabel}
+              autoFocus
+            >
               <CloseIcon />
             </PEVIconButton>
           </header>

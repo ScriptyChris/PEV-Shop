@@ -64,8 +64,10 @@ const productSchema = new Schema<IProduct>({
     required: true,
     set(value: string) {
       if (value.includes('/')) {
-        logger.log('Doing percentage encoding for all forward slashes for product url:', value);
-        return value.replace(/\//g, '%2F');
+        const encodedURI = globalThis.encodeURIComponent(value);
+        logger.log('Done percentage encoding for product:\n\t- url:', value, '\n\t- encodedURI:', encodedURI);
+
+        return encodedURI;
       }
 
       return value;

@@ -8,9 +8,13 @@ import SearchIcon from '@material-ui/icons/Search';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 import { PEVForm, PEVIconButton, PEVLink, PEVTextField } from '@frontend/components/utils/pevElements';
-import { ProductsList } from '@frontend/components/views/productsDashboard';
+
+// TODO: update imported module name after products dashboard will be refactored
+import { _ProductsList } from '@frontend/components/views/productList';
+
 import httpService from '@frontend/features/httpService';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import { ROUTES } from '../pages/_routes';
 
 const translations = {
   defaultLabel: 'Search for:',
@@ -107,22 +111,76 @@ const ForwardedSearch = forwardRef(function ForwardedSearch(props, ref) {
   return <Search {...props} forwardedRef={ref} />;
 });
 
+const useMobileSearchMenuOpenerBtn = () => {
+  const mobileSearchMenuOpenerBtnRef = useRef(null);
+  const getMobileSearchMenuOpenerBtnRef = useCallback((mobileSearchMenuOpenerBtnNode) => {
+    if (mobileSearchMenuOpenerBtnNode) {
+      mobileSearchMenuOpenerBtnRef.current = mobileSearchMenuOpenerBtnNode;
+    }
+  }, []);
+
+  return { mobileSearchMenuOpenerBtnRef, getMobileSearchMenuOpenerBtnRef };
+};
+
+const useHandleSearchContainerA11yEventHandlers = (closeSearchMenu) => {
+  const possibleBlurTriggerElementRef = useRef(null);
+
+  const resetPossibleBlurTriggerElAndCloseSearchMenu = () => {
+    possibleBlurTriggerElementRef.current = null;
+    closeSearchMenu();
+  };
+
+  const onMouseDown = ({ target }) => (possibleBlurTriggerElementRef.current = target);
+  const onKeyDown = ({ key, target }) => {
+    const isEnterKeyPressedOnAnchor = key === 'Enter' && (target.tagName.toLowerCase() === 'a' || target.closest('a'));
+    const isEscapeKeyPressed = key === 'Escape';
+
+    if (isEnterKeyPressedOnAnchor || isEscapeKeyPressed) {
+      resetPossibleBlurTriggerElAndCloseSearchMenu();
+    }
+  };
+
+  const onBlur = ({ target, currentTarget }) => {
+    // wait for browser to actually perform the blur, so `document.activeElement` will indicate newly focused element
+    setTimeout(() => {
+      const isCurrentlyFocusedElementOutsideOfSearchContainer = !currentTarget.contains(document.activeElement);
+      if (isCurrentlyFocusedElementOutsideOfSearchContainer) {
+        return resetPossibleBlurTriggerElAndCloseSearchMenu();
+      }
+
+      if (!possibleBlurTriggerElementRef.current) {
+        return;
+      }
+
+      const isAnchorClicked = possibleBlurTriggerElementRef.current === target;
+      const isAnchorDescendantClicked = possibleBlurTriggerElementRef.current.closest('a');
+
+      if (isAnchorClicked || isAnchorDescendantClicked) {
+        resetPossibleBlurTriggerElAndCloseSearchMenu();
+      }
+    });
+  };
+
+  return { onMouseDown, onKeyDown, onBlur };
+};
+
 function SearchProductsByName({
   pagination = {
     pageNumber: 1,
     productsPerPage: 10,
   },
-  onReceivedProductsByName,
-  toggleMainHeadingSize,
-  syncWithSearchQuery,
   ...restProps
 }) {
   const { isMobileLayout } = useRWDLayout();
-  const [isMobileSearchMenuOpened, setIsMobileSearchMenuOpened] = useState(false);
   const [isSearchMenuOpened, setIsSearchMenuOpened] = useState(false);
   const [foundProducts, setFoundProducts] = useState([]);
+  const { mobileSearchMenuOpenerBtnRef, getMobileSearchMenuOpenerBtnRef } = useMobileSearchMenuOpenerBtn();
+  const searchedValueRef = useRef('');
+  const linkToAllSearchResults = `${ROUTES.PRODUCTS}?name=${globalThis.encodeURIComponent(searchedValueRef.current)}`;
 
   const handleInputSearchChange = (searchValue) => {
+    searchedValueRef.current = searchValue;
+
     if (!searchValue) {
       return setFoundProducts([]);
     }
@@ -136,23 +194,22 @@ function SearchProductsByName({
     });
   };
 
-  const toggleMobileSearchMenu = (shouldOpen) => {
-    return () => setIsMobileSearchMenuOpened(shouldOpen);
-  };
-
   const toggleSearchMenu = (shouldOpen) => {
-    return () => setIsSearchMenuOpened(shouldOpen);
+    return () => {
+      setIsSearchMenuOpened(shouldOpen);
+
+      if (!shouldOpen) {
+        setTimeout(() => mobileSearchMenuOpenerBtnRef.current?.focus());
+      }
+    };
   };
 
   const closeSearch = ({ target }) => {
     target.blur();
-
-    if (isMobileSearchMenuOpened) {
-      setIsMobileSearchMenuOpened(false);
-    } else {
-      setIsSearchMenuOpened(false);
-    }
+    toggleSearchMenu(false)();
   };
+
+  const { onBlur, onMouseDown, onKeyDown } = useHandleSearchContainerA11yEventHandlers(toggleSearchMenu(false));
 
   const searchInput = (
     <div className="search-menu__field-container pev-flex">
@@ -166,24 +223,42 @@ function SearchProductsByName({
     </div>
   );
   const searchResults = (
-    <Paper className="search-initial-results pev-flex pev-flex--columned">
-      <PEVLink to="#" className="search-initial-results__see-all-link search pev-centered-padded-text" color="primary">
+    <Paper
+      className="search-initial-results pev-flex pev-flex--columned"
+      onKeyDown={onKeyDown}
+      onMouseDown={onMouseDown}
+    >
+      <PEVLink
+        to={linkToAllSearchResults}
+        className="search-initial-results__see-all-link pev-centered-padded-text"
+        color="primary"
+      >
         {translations.seeAllSearchResults}
       </PEVLink>
       <Divider variant="middle" />
-      <ProductsList initialProducts={foundProducts} isCompactProductCardSize />
+      <_ProductsList initialProducts={foundProducts} isCompactProductCardSize />
     </Paper>
   );
 
   return isMobileLayout ? (
     <>
-      <PEVIconButton onClick={toggleMobileSearchMenu(true)} a11y={translations.openSearchMenu}>
+      <PEVIconButton
+        ref={getMobileSearchMenuOpenerBtnRef}
+        onClick={toggleSearchMenu(true)}
+        a11y={translations.openSearchMenu}
+      >
         <SearchIcon />
       </PEVIconButton>
-      <Drawer anchor="right" className="search-menu--mobile" open={isMobileSearchMenuOpened}>
+      <Drawer
+        anchor="right"
+        className="search-menu--mobile"
+        open={isSearchMenuOpened}
+        onBlur={onBlur}
+        disableRestoreFocus
+      >
         <div className="search-menu--mobile__controls pev-flex">
           {searchInput}
-          <PEVIconButton onClick={toggleMobileSearchMenu(false)} a11y={translations.closeSearchMenu}>
+          <PEVIconButton onClick={toggleSearchMenu(false)} a11y={translations.closeSearchMenu}>
             <ExitToAppIcon />
           </PEVIconButton>
         </div>
@@ -192,11 +267,9 @@ function SearchProductsByName({
       </Drawer>
     </>
   ) : (
-    <Paper className="search-container" onFocus={toggleSearchMenu(true)} onBlur={toggleSearchMenu(false)}>
+    <Paper className="search-container" onFocus={toggleSearchMenu(true)} onBlur={onBlur}>
       {searchInput}
-      <Fade in={isSearchMenuOpened} onKeyDown={({ key }) => key === 'Escape' && toggleSearchMenu(false)()}>
-        {searchResults}
-      </Fade>
+      <Fade in={isSearchMenuOpened}>{searchResults}</Fade>
     </Paper>
   );
 }

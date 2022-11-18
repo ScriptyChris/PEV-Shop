@@ -50,8 +50,9 @@ function ProductCardBasicDesc({ isCompactDescription, compactLabel, dataCy, labe
 }
 
 export function ProductCardLink({
-  productData,
   children,
+  productData,
+  avoidPassingState = false,
   /* TODO: [UX] consider if it's needed */ isTextVisible = false,
   ...restProps
 }) {
@@ -62,7 +63,7 @@ export function ProductCardLink({
       {...restProps}
       to={{
         pathname: `${ROUTES.PRODUCTS}/${productData.url}`,
-        state: productData,
+        state: avoidPassingState ? null : productData,
       }}
       data-cy="link:product-card__link"
     >
@@ -162,7 +163,7 @@ export default observer(function ProductCard({
       {...(isCompact ? { disableGutters: true } : {})}
     >
       {isCompact ? (
-        <ProductCardLink className="product-card__link" productData={product}>
+        <ProductCardLink className="product-card__link" productData={product} avoidPassingState>
           {imageElement}
           <p className="product-card__content product-card__content--is-compact pev-flex">
             {nameElement}
