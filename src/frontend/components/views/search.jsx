@@ -1,13 +1,24 @@
-import React, { memo, useRef, useCallback, useState, forwardRef } from 'react';
+import React, { memo, useRef, useCallback, useMemo, useState, forwardRef, useEffect } from 'react';
 
 import Drawer from '@material-ui/core/Drawer';
 import Fade from '@material-ui/core/Fade';
 import Paper from '@material-ui/core/Paper';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
 import SearchIcon from '@material-ui/icons/Search';
+import HistoryIcon from '@material-ui/icons/History';
+import { ManageSearchIcon } from '@frontend/components/svgIcons';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
-import { PEVForm, PEVIconButton, PEVLink, PEVTextField } from '@frontend/components/utils/pevElements';
+import {
+  PEVForm,
+  PEVIconButton,
+  PEVLink,
+  PEVTextField,
+  PEVTabs,
+  PEVParagraph,
+} from '@frontend/components/utils/pevElements';
 
 // TODO: update imported module name after products dashboard will be refactored
 import { _ProductsList } from '@frontend/components/views/productList';
@@ -19,6 +30,14 @@ import { ROUTES } from '../pages/_routes';
 const translations = {
   defaultLabel: 'Search for:',
   openSearchMenu: 'open search menu',
+  searchMenu: 'search menu',
+  searchResults: 'Results',
+  recentSearches: 'Recently searched',
+  noRecentSearchesFound: 'No recent searches found',
+  noSearchInitiated: 'Nothing to search for. Please type a product name first.',
+  createNoProductsFound(productName) {
+    return `No products found for name: "${productName}"`;
+  },
   seeAllSearchResults: 'See all results',
   closeSearchMenu: 'close search menu',
 };
@@ -49,6 +68,11 @@ const Search = memo(function Search({
   const debounce = useRef(-1);
   const inputId = `${searchingTarget}Search`;
 
+  useEffect(() => {
+    setInputValue(presetValue);
+    handleChange({ target: { value: presetValue } }, true);
+  }, [presetValue]);
+
   const debounceNotify = (notifier) => {
     if (debounce.current > -1) {
       clearTimeout(debounce.current);
@@ -57,10 +81,12 @@ const Search = memo(function Search({
     debounce.current = window.setTimeout(notifier, debounceTimeMs);
   };
 
-  const handleChange = ({ target: { value } }) => {
+  const handleChange = ({ target: { value } }, goWithNextTick) => {
     setInputValue(value);
 
-    if (value && debounceTimeMs) {
+    if (goWithNextTick) {
+      setTimeout(() => onInputChange(value));
+    } else if (value && debounceTimeMs) {
       debounceNotify(() => onInputChange(value));
     } else {
       onInputChange(value);
@@ -122,47 +148,117 @@ const useMobileSearchMenuOpenerBtn = () => {
   return { mobileSearchMenuOpenerBtnRef, getMobileSearchMenuOpenerBtnRef };
 };
 
-const useHandleSearchContainerA11yEventHandlers = (closeSearchMenu) => {
-  const possibleBlurTriggerElementRef = useRef(null);
+const useHandleSearchContainerA11yEventHandlers = (openSearchMenu, _closeSearchMenu, isMobileLayout) => {
+  const possiblyTabbedOutOfContainer = useRef(false);
+  const canCloseMenuRef = useRef(false);
+
+  useEffect(() => {
+    if (isMobileLayout) {
+      return;
+    }
+
+    const onClickAway = ({ target }) => {
+      if (!target.closest('[data-search-container]')) {
+        resetPossibleBlurTriggerElAndCloseSearchMenu();
+      }
+    };
+
+    document.addEventListener('click', onClickAway);
+
+    return () => document.removeEventListener('click', onClickAway);
+  }, [_closeSearchMenu]);
 
   const resetPossibleBlurTriggerElAndCloseSearchMenu = () => {
-    possibleBlurTriggerElementRef.current = null;
-    closeSearchMenu();
+    canCloseMenuRef.current = false;
+    possiblyTabbedOutOfContainer.current = false;
+
+    _closeSearchMenu();
   };
 
-  const onMouseDown = ({ target }) => (possibleBlurTriggerElementRef.current = target);
-  const onKeyDown = ({ key, target }) => {
-    const isEnterKeyPressedOnAnchor = key === 'Enter' && (target.tagName.toLowerCase() === 'a' || target.closest('a'));
-    const isEscapeKeyPressed = key === 'Escape';
+  const isAnchorOrItsDescendant = (element) => element?.closest?.('a');
+  const getFirstAndLastFocusableElement = (currentTarget) => {
+    const focusable = currentTarget.querySelectorAll(
+      `button:not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([tabindex="-1"]), 
+      select:not([tabindex="-1"]), textarea:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])`
+    );
+    return {
+      first: currentTarget.querySelector('input[type="search"]'),
+      last: focusable[focusable.length - 1],
+    };
+  };
 
-    if (isEnterKeyPressedOnAnchor || isEscapeKeyPressed) {
+  const onMouseDown = ({ target }) => {
+    if (isAnchorOrItsDescendant(target)) {
+      canCloseMenuRef.current = true;
+    }
+  };
+  const onKeyDown = ({ key, shiftKey, target, currentTarget }) => {
+    const isEnterKeyPressedOnAnchor = key === 'Enter' && isAnchorOrItsDescendant(target);
+    const isEscapeKeyPressed = key === 'Escape';
+    const isTabKeyPressed = key === 'Tab';
+    const isNonShiftTabKeyPressed = isTabKeyPressed && !shiftKey;
+    const isShiftTabKeyPressed = isTabKeyPressed && shiftKey;
+
+    if (
+      canCloseMenuRef.current ||
+      (target === document.activeElement && isEnterKeyPressedOnAnchor) ||
+      isEscapeKeyPressed
+    ) {
+      resetPossibleBlurTriggerElAndCloseSearchMenu();
+    } else if (isShiftTabKeyPressed || isNonShiftTabKeyPressed) {
+      const firstAndLastFocusableElement = getFirstAndLastFocusableElement(currentTarget);
+      const goingOutToPrev = isShiftTabKeyPressed && firstAndLastFocusableElement.first === target;
+      const goingOutToNext = isNonShiftTabKeyPressed && firstAndLastFocusableElement.last === target;
+
+      if (goingOutToPrev || goingOutToNext) {
+        possiblyTabbedOutOfContainer.current = true;
+      }
+    }
+  };
+
+  const onFocus = ({ target }) => {
+    if (target.type === 'search') {
+      openSearchMenu();
+    }
+  };
+  const onBlur = () => {
+    const tabbedOutToBody = possiblyTabbedOutOfContainer.current && document.activeElement === document.body;
+
+    if (tabbedOutToBody) {
       resetPossibleBlurTriggerElAndCloseSearchMenu();
     }
   };
 
-  const onBlur = ({ target, currentTarget }) => {
-    // wait for browser to actually perform the blur, so `document.activeElement` will indicate newly focused element
-    setTimeout(() => {
-      const isCurrentlyFocusedElementOutsideOfSearchContainer = !currentTarget.contains(document.activeElement);
-      if (isCurrentlyFocusedElementOutsideOfSearchContainer) {
-        return resetPossibleBlurTriggerElAndCloseSearchMenu();
-      }
-
-      if (!possibleBlurTriggerElementRef.current) {
-        return;
-      }
-
-      const isAnchorClicked = possibleBlurTriggerElementRef.current === target;
-      const isAnchorDescendantClicked = possibleBlurTriggerElementRef.current.closest('a');
-
-      if (isAnchorClicked || isAnchorDescendantClicked) {
-        resetPossibleBlurTriggerElAndCloseSearchMenu();
-      }
-    });
+  const onMouseUp = () => {
+    if (canCloseMenuRef.current) {
+      resetPossibleBlurTriggerElAndCloseSearchMenu();
+    }
   };
 
-  return { onMouseDown, onKeyDown, onBlur };
+  return { onMouseDown, onKeyDown, onFocus, onBlur, onMouseUp };
 };
+
+const useRecentSearches = () => {
+  const MAX_RECENT_SEARCHES = 4;
+  const [recentSearchesList, setRecentSearchesList] = useState(useRecentSearches.recentSearchesList);
+
+  useEffect(() => {
+    return () => {
+      // TODO: [UX] save this to storage and sync with user session
+      useRecentSearches.recentSearchesList = recentSearchesList;
+    };
+  }, []);
+
+  const updateRecentSearchesList = (searchValue) => {
+    setRecentSearchesList((prev) => [
+      searchValue,
+      ...prev.filter((prevSearchValue) => prevSearchValue !== searchValue).filter((_, i) => i < MAX_RECENT_SEARCHES),
+    ]);
+  };
+
+  return { recentSearchesList, updateRecentSearchesList };
+};
+useRecentSearches.recentSearchesList = [];
 
 function SearchProductsByName({
   pagination = {
@@ -171,18 +267,42 @@ function SearchProductsByName({
   },
   ...restProps
 }) {
+  const TABS_BASE_INFO = Object.freeze({
+    recentSearches: {
+      name: 'recent-searches',
+      index: 0,
+    },
+    results: {
+      name: 'results',
+      index: 1,
+    },
+  });
   const { isMobileLayout } = useRWDLayout();
   const [isSearchMenuOpened, setIsSearchMenuOpened] = useState(false);
   const [foundProducts, setFoundProducts] = useState([]);
   const { mobileSearchMenuOpenerBtnRef, getMobileSearchMenuOpenerBtnRef } = useMobileSearchMenuOpenerBtn();
-  const searchedValueRef = useRef('');
+  const [tabIndex, setTabIndex] = useState(TABS_BASE_INFO.recentSearches.index);
+  const [initialSearch, setInitialSearch] = useState('');
+  const searchedValueRef = useRef(initialSearch);
+  const { recentSearchesList, updateRecentSearchesList } = useRecentSearches();
   const linkToAllSearchResults = `${ROUTES.PRODUCTS}?name=${globalThis.encodeURIComponent(searchedValueRef.current)}`;
 
   const handleInputSearchChange = (searchValue) => {
     searchedValueRef.current = searchValue;
 
     if (!searchValue) {
+      setTabIndex(TABS_BASE_INFO.recentSearches.index);
       return setFoundProducts([]);
+    }
+
+    {
+      // Force PEVTabs component to refresh it's tab state
+      // before setting target value, if it has been set to the same value.
+      if (tabIndex === TABS_BASE_INFO.results.index) {
+        setTabIndex(false);
+      }
+      setTabIndex(TABS_BASE_INFO.results.index);
+      updateRecentSearchesList(searchValue);
     }
 
     httpService.getProductsByName(searchValue, pagination).then((res) => {
@@ -196,10 +316,18 @@ function SearchProductsByName({
 
   const toggleSearchMenu = (shouldOpen) => {
     return () => {
+      if (isSearchMenuOpened === shouldOpen) {
+        return;
+      }
+
+      if (shouldOpen) {
+        setTabIndex(TABS_BASE_INFO.recentSearches.index);
+      }
+
       setIsSearchMenuOpened(shouldOpen);
 
-      if (!shouldOpen) {
-        setTimeout(() => mobileSearchMenuOpenerBtnRef.current?.focus());
+      if (!shouldOpen && mobileSearchMenuOpenerBtnRef.current) {
+        setTimeout(() => mobileSearchMenuOpenerBtnRef.current.focus());
       }
     };
   };
@@ -209,24 +337,50 @@ function SearchProductsByName({
     toggleSearchMenu(false)();
   };
 
-  const { onBlur, onMouseDown, onKeyDown } = useHandleSearchContainerA11yEventHandlers(toggleSearchMenu(false));
+  const { onFocus, onBlur, onMouseDown, onKeyDown, onMouseUp } = useHandleSearchContainerA11yEventHandlers(
+    toggleSearchMenu(true),
+    toggleSearchMenu(false),
+    isMobileLayout
+  );
 
   const searchInput = (
     <div className="search-menu__field-container pev-flex">
       <ForwardedSearch
         {...restProps}
         className="search-menu__input-wrapper"
+        presetValue={initialSearch}
         onInputChange={handleInputSearchChange}
         onEscapeBtn={closeSearch}
         autoFocus={isMobileLayout}
       />
     </div>
   );
-  const searchResults = (
-    <Paper
+  const recentSearches = recentSearchesList.length ? (
+    <div className="search-recent-searches">
+      <List component="ol" className="pev-flex pev-flex--columned">
+        {recentSearchesList.map((searchPhrase) => (
+          <ListItem
+            component="li"
+            button
+            variant="text"
+            onClick={() => setInitialSearch(searchPhrase)}
+            disabled={searchPhrase === searchedValueRef.current}
+            key={searchPhrase}
+          >
+            {searchPhrase}
+          </ListItem>
+        ))}
+      </List>
+    </div>
+  ) : (
+    <PEVParagraph className="pev-centered-padded-text">{translations.noRecentSearchesFound}</PEVParagraph>
+  );
+  const searchResults = foundProducts.length ? (
+    <div
       className="search-initial-results pev-flex pev-flex--columned"
       onKeyDown={onKeyDown}
       onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
     >
       <PEVLink
         to={linkToAllSearchResults}
@@ -237,7 +391,42 @@ function SearchProductsByName({
       </PEVLink>
       <Divider variant="middle" />
       <_ProductsList initialProducts={foundProducts} isCompactProductCardSize />
-    </Paper>
+    </div>
+  ) : (
+    <PEVParagraph className="pev-centered-padded-text">
+      {searchedValueRef.current
+        ? translations.createNoProductsFound(searchedValueRef.current)
+        : translations.noSearchInitiated}
+    </PEVParagraph>
+  );
+  const tabsConfig = useMemo(
+    () => ({
+      groupName: 'search',
+      initialData: [
+        {
+          name: TABS_BASE_INFO.recentSearches.name,
+          translation: translations.recentSearches,
+          icon: <HistoryIcon />,
+          content: recentSearches,
+        },
+        {
+          name: TABS_BASE_INFO.results.name,
+          translation: translations.searchResults,
+          icon: <ManageSearchIcon />,
+          content: searchResults,
+        },
+      ],
+    }),
+    [foundProducts]
+  );
+  const searchMenu = (
+    <PEVTabs
+      className="search-menu__tabs"
+      config={tabsConfig}
+      label={translations.searchMenu}
+      prechosenTabValue={tabIndex}
+      horizontalTabIcons
+    />
   );
 
   return isMobileLayout ? (
@@ -263,13 +452,16 @@ function SearchProductsByName({
           </PEVIconButton>
         </div>
 
-        {searchResults}
+        {searchMenu}
       </Drawer>
     </>
   ) : (
-    <Paper className="search-container" onFocus={toggleSearchMenu(true)} onBlur={onBlur}>
+    <Paper className="search-container" onFocus={onFocus} onBlur={onBlur} onKeyDown={onKeyDown} data-search-container>
       {searchInput}
-      <Fade in={isSearchMenuOpened}>{searchResults}</Fade>
+      <Fade in={isSearchMenuOpened}>
+        {/* `div` is used as a workaround for underlying PEVTabs not obeying Fade hidden state */}
+        <div>{searchMenu}</div>
+      </Fade>
     </Paper>
   );
 }

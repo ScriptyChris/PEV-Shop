@@ -1,5 +1,5 @@
 .search-container {
-  position:relative;
+  position: relative;
 
   // Disable border in default state, because search'es label on tablet and desktop 
   // has it's visual divider made via pseudo element.
@@ -32,15 +32,29 @@
   }
 }
 
-.search-initial-results {
+.search-menu__tabs {
   flex-wrap: nowrap;
   gap: 0.5rem;
-  max-height: 90vh;
   // TODO: [UI] set color from variable
   box-shadow: none;
   background: white;
+}
 
+.search-recent-searches {
+  ol {
+    width: 100%;
+    padding-left: 2rem;
+  }
+
+  li {
+    display: list-item;
+    list-style: auto;
+  }
+}
+
+.search-initial-results {
   .product-list {
+    max-height: 70vh;
     overflow-y: auto;
     margin-inline: 0.25rem;
     padding-inline: 0.25rem;
@@ -74,7 +88,7 @@
     }
   }
 
-  .search-initial-results {
+  .search-menu__tabs {
     position: absolute;
     top: 3.6rem;
     width: 100%;

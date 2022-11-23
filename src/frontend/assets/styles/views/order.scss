@@ -22,34 +22,6 @@
     &__summary {
         padding: 0.5rem;
     }
-
-    &__shipment-tabs {
-        display: flex;
-        align-items: center;
-        --scrollable-min-height: 4.5rem;
-    }
-
-    &__shipment-tab {
-        min-width: 10rem;
-
-        &::before {
-            content: attr(data-presented-price);
-            position: absolute;
-            top: 0;
-            right: 0;
-            display: block;
-            border: 1px solid;
-            border-radius: 0.5rem;
-            padding: 0 0.5rem;
-        }
-
-        &[aria-selected="true"]::before {
-            // TODO: [UI] set proper MUI color
-            background: #3f51b5;
-            color: white;
-            border-color: transparent;
-        }
-    }
     
     &__shipment--parcel-locker {
         display: grid;

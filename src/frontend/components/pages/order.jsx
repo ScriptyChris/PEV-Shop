@@ -2,11 +2,8 @@ import React, { memo, useState, useEffect, useRef, useMemo } from 'react';
 import classNames from 'classnames';
 import { useFormikContext } from 'formik';
 
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import InputLabel from '@material-ui/core/InputLabel';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
 import Dialog from '@material-ui/core/Dialog';
 import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
 import HomeIcon from '@material-ui/icons/Home';
@@ -37,8 +34,8 @@ import {
   PEVTextField,
   PEVRadio,
   PEVFormFieldError,
+  PEVTabs,
 } from '@frontend/components/utils/pevElements';
-import Scroller from '@frontend/components/utils/scroller';
 
 const translations = Object.freeze({
   mainHeading: 'Shipment and payment',
@@ -342,91 +339,53 @@ function PackageShipment({ formInitialsShipmentExtender }) {
   );
 }
 
-const tabsHelper = (tabsGroupName, tabsData) => {
-  const createId = (tabPart, name) => `${tabsGroupName}-tab-${tabPart}__${name}`;
-  const createA11yObj = (txt, relatedId) => ({
-    'aria-label': txt,
-    'aria-controls': relatedId,
-    label: txt,
-    title: txt,
-  });
-
-  return tabsData.reduce(
-    (output, { name, translation, icon, content, shipmentPrice }, index) => {
-      output.tabChoosers.push({
-        get id() {
-          return createId('chooser', name);
-        },
-        get a11y() {
-          return createA11yObj(translation, output.tabPanels[index].id);
-        },
-        name,
-        icon,
-        shipmentPrice,
-        shipmentPresentedPrice: getPresentedPrice(shipmentPrice),
-        dataCy: `button:choose-${name}-tab`,
-      });
-      output.tabPanels.push({
-        content,
-        get id() {
-          return createId('panel', name);
-        },
-      });
-
-      return output;
-    },
-    { tabChoosers: [], tabPanels: [] }
-  );
-};
-
-function TabPanel({ children, value, index, id, relatedTabId }) {
-  return (
-    <div id={id} role="tabpanel" aria-labelledby={relatedTabId} hidden={value !== index} data-cy={`container:${id}`}>
-      {value === index && <Box p={2}>{children}</Box>}
-    </div>
-  );
-}
-
 const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateChosenShipmentPrice }) {
   const { setFieldValue, errors, setFieldError } = useFormikContext();
-  const [tabValue, setTabValue] = useState(false);
+
   // TODO: this should be (at least partially) received from backend and be configurable by seller
-  const shipmentMethods = useMemo(
-    () =>
-      tabsHelper('shipment', [
+  const tabsConfig = useMemo(
+    () => ({
+      groupName: 'shipment',
+      initialData: [
         {
           name: 'inPerson',
           translation: translations.inPersonShipment,
-          shipmentPrice: 0,
           icon: <EmojiPeopleIcon />,
           content: <InPersonShipment formInitialsShipmentExtender={formInitialsShipmentExtender} />,
+          ribbon: {
+            value: 0,
+            transformer: getPresentedPrice,
+          },
         },
         {
           name: 'home',
           translation: translations.homeShipment,
-          shipmentPrice: 5,
           icon: <HomeIcon />,
           content: <HomeShipment formInitialsShipmentExtender={formInitialsShipmentExtender} />,
+          ribbon: {
+            value: 5,
+            transformer: getPresentedPrice,
+          },
         },
         {
           name: 'parcelLocker',
           translation: translations.parcelLockerShipment,
-          shipmentPrice: 2,
           icon: <MailboxIcon />,
           content: <PackageShipment formInitialsShipmentExtender={formInitialsShipmentExtender} />,
+          ribbon: {
+            value: 2,
+            transformer: getPresentedPrice,
+          },
         },
-      ]),
+      ],
+      onTabChangeCallbacks: [
+        ({ name }) => setFieldValue('shipmentMethod', name),
+        ({ ribbon: { value: shipmentPrice } }) => updateChosenShipmentPrice(shipmentPrice),
+        () => setFieldError('shipmentMethod', ''),
+      ],
+    }),
     [formInitialsShipmentExtender]
   );
-
-  const handleTabChange = (_, newTabValue) => {
-    const tabChooser = shipmentMethods.tabChoosers[newTabValue];
-
-    setFieldValue('shipmentMethod', tabChooser.name);
-    setTabValue(newTabValue);
-    updateChosenShipmentPrice(tabChooser.shipmentPrice);
-    setFieldError('shipmentMethod', '');
-  };
 
   return (
     <Paper component="section" className="order__shipment">
@@ -435,48 +394,9 @@ const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateCh
           {translations.shipmentHeading}
         </PEVHeading>
       </header>
-      <div className="order__shipment-tabs">
-        <Scroller
-          scrollerBaseValueMeta={{
-            useDefault: true,
-          }}
-          render={({ ScrollerHookingParent }) => (
-            <ScrollerHookingParent>
-              <Tabs
-                value={tabValue}
-                onChange={handleTabChange}
-                variant="fullWidth"
-                indicatorColor="primary"
-                textColor="primary"
-                aria-label={translations.orderShipmentChooser}
-              >
-                {shipmentMethods.tabChoosers.map(({ id, icon, a11y, shipmentPresentedPrice, dataCy }) => (
-                  <Tab
-                    className="order__shipment-tab"
-                    data-presented-price={shipmentPresentedPrice}
-                    icon={icon}
-                    {...a11y}
-                    id={id}
-                    data-cy={dataCy}
-                    key={id}
-                  />
-                ))}
-              </Tabs>
-            </ScrollerHookingParent>
-          )}
-        />
-      </div>
-      {shipmentMethods.tabPanels.map(({ content, id }, index) => (
-        <TabPanel
-          value={tabValue}
-          index={index}
-          id={id}
-          relatedTabId={shipmentMethods.tabChoosers[index].id}
-          key={index}
-        >
-          {content}
-        </TabPanel>
-      ))}
+
+      <PEVTabs config={tabsConfig} label={translations.orderShipmentChooser} areChoosersScrollable />
+
       {errors.shipmentMethod && <PEVFormFieldError customMessage={errors.shipmentMethod} />}
     </Paper>
   );

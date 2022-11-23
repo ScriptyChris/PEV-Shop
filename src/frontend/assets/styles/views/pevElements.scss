@@ -1,0 +1,42 @@
+.pev-element {
+    &-form-field-error {
+        color: red;
+    }
+
+    &-tabs__chooser {
+        display: flex;
+        align-items: center;
+        --scrollable-min-height: 4.5rem;
+
+        .MuiTabs-root {
+            flex-basis: 100%;
+        }
+    }
+    
+    &-tabs__tab {
+        min-width: 10rem;
+
+        &--with-ribbon::before {
+            content: attr(data-ribbon-value);
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: block;
+            border: 1px solid;
+            border-radius: 0.5rem;
+            padding: 0 0.5rem;
+        }
+
+        &--with-horizontal-icon .MuiTab-wrapper {
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+
+        &[aria-selected="true"]::before {
+            // TODO: [UI] set proper MUI color
+            background: #3f51b5;
+            color: white;
+            border-color: transparent;
+        }
+    }
+}
