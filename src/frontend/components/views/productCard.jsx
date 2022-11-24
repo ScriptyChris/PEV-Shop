@@ -165,6 +165,7 @@ export default observer(function ProductCard({
       {isCompact ? (
         <ProductCardLink className="product-card__link" productData={product} avoidPassingState>
           {imageElement}
+
           <p className="product-card__content product-card__content--is-compact pev-flex">
             {nameElement}
             {priceElement}
@@ -174,11 +175,12 @@ export default observer(function ProductCard({
         <>
           <ProductCardLink className="product-card__link" productData={product}>
             {imageElement}
+
+            <p className="product-card__content">
+              {nameElement}
+              {priceElement}
+            </p>
           </ProductCardLink>
-          <p className="product-card__content">
-            {nameElement}
-            {priceElement}
-          </p>
 
           <PEVIconButton
             onClick={handleClickToggleActionsBarBtns(true)}

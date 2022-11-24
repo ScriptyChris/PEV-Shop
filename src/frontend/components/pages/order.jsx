@@ -388,7 +388,7 @@ const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateCh
   );
 
   return (
-    <Paper component="section" className="order__shipment">
+    <Paper component="section" className="order__shipment" data-cy="container:order-shipment">
       <header>
         <PEVHeading level={3} className="order-heading">
           {translations.shipmentHeading}

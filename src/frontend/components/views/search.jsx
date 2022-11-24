@@ -55,6 +55,7 @@ const Search = memo(function Search({
   presetValue = '',
   autoFocus = false,
   className,
+  searchInputDataCy = 'input:the-search',
 }) {
   if (Number.isNaN(debounceTimeMs) || typeof debounceTimeMs !== 'number') {
     throw TypeError(`debounceTimeMs prop must be a number! Received: ${debounceTimeMs}`);
@@ -121,7 +122,7 @@ const Search = memo(function Search({
             inputProps: {
               list,
               // TODO: [E2E] set more precise value
-              'data-cy': 'input:the-search',
+              'data-cy': searchInputDataCy,
             },
           }}
           placeholder={placeholder}
@@ -148,12 +149,16 @@ const useMobileSearchMenuOpenerBtn = () => {
   return { mobileSearchMenuOpenerBtnRef, getMobileSearchMenuOpenerBtnRef };
 };
 
-const useHandleSearchContainerA11yEventHandlers = (openSearchMenu, _closeSearchMenu, isMobileLayout) => {
+const useHandleSearchContainerA11yEventHandlers = (
+  openSearchMenu,
+  _closeSearchMenu,
+  { isMobileLayout, isSearchMenuOpened }
+) => {
   const possiblyTabbedOutOfContainer = useRef(false);
   const canCloseMenuRef = useRef(false);
 
   useEffect(() => {
-    if (isMobileLayout) {
+    if (isMobileLayout || !isSearchMenuOpened) {
       return;
     }
 
@@ -166,7 +171,7 @@ const useHandleSearchContainerA11yEventHandlers = (openSearchMenu, _closeSearchM
     document.addEventListener('click', onClickAway);
 
     return () => document.removeEventListener('click', onClickAway);
-  }, [_closeSearchMenu]);
+  }, [isMobileLayout, isSearchMenuOpened, _closeSearchMenu]);
 
   const resetPossibleBlurTriggerElAndCloseSearchMenu = () => {
     canCloseMenuRef.current = false;
@@ -340,7 +345,7 @@ function SearchProductsByName({
   const { onFocus, onBlur, onMouseDown, onKeyDown, onMouseUp } = useHandleSearchContainerA11yEventHandlers(
     toggleSearchMenu(true),
     toggleSearchMenu(false),
-    isMobileLayout
+    { isMobileLayout, isSearchMenuOpened }
   );
 
   const searchInput = (
@@ -352,6 +357,7 @@ function SearchProductsByName({
         onInputChange={handleInputSearchChange}
         onEscapeBtn={closeSearch}
         autoFocus={isMobileLayout}
+        searchInputDataCy="input:search-products-by-name"
       />
     </div>
   );
@@ -393,7 +399,7 @@ function SearchProductsByName({
       <_ProductsList initialProducts={foundProducts} isCompactProductCardSize />
     </div>
   ) : (
-    <PEVParagraph className="pev-centered-padded-text">
+    <PEVParagraph className="pev-centered-padded-text" data-cy="message:empty-search-results">
       {searchedValueRef.current
         ? translations.createNoProductsFound(searchedValueRef.current)
         : translations.noSearchInitiated}
@@ -472,7 +478,11 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
   ...restProps
 }) {
   const [searchResults, setSearchResults] = useState([]);
-  const [searchRecentValues, setSearchRecentValues] = useState({ oldValue: '', newValue: '' });
+  const initialSearchValue = restProps.presetValue ?? '';
+  const [searchRecentValues, setSearchRecentValues] = useState({
+    oldValue: initialSearchValue,
+    newValue: initialSearchValue,
+  });
   const getDataListRef = useCallback(
     async (dataListNode) => {
       if (!dataListNode) {
@@ -518,7 +528,12 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
 
   return (
     <>
-      <Search {...restProps} onInputChange={handleInputSearchChange} labelInside />
+      <Search
+        {...restProps}
+        onInputChange={handleInputSearchChange}
+        searchInputDataCy="input:search-single-product-by-name"
+        labelInside
+      />
 
       <datalist ref={getDataListRef} id={restProps.list} data-cy="datalist:the-search-options">
         {searchResults.map((relatedProductName) => (

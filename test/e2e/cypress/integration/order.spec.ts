@@ -172,12 +172,14 @@ describe('order', () => {
     cy.get(makeCyDataSelector('input:receiver-name')).as('nameInput').should('have.value', '');
     cy.get(makeCyDataSelector('input:receiver-email')).as('emailInput').should('have.value', '');
     cy.get(makeCyDataSelector('input:receiver-phone')).as('phoneInput').should('have.value', '');
-    cy.get('[data-cy^="button:choose-"][data-cy$="-tab"]').its('length').as('paymentTabChoosersAmount');
-    cy.get('[data-cy^="button:choose-"][data-cy$="-tab"][aria-selected="false"]').then(
-      ($unSelectedPaymentTabChoosers) => {
-        cy.get('@paymentTabChoosersAmount').should('eq', $unSelectedPaymentTabChoosers.length);
-      }
-    );
+    cy.get('[data-cy="container:order-shipment"] [data-cy^="button:choose-"][data-cy$="-tab"]')
+      .its('length')
+      .as('paymentTabChoosersAmount');
+    cy.get(
+      '[data-cy="container:order-shipment"] [data-cy^="button:choose-"][data-cy$="-tab"][aria-selected="false"]'
+    ).then(($unSelectedPaymentTabChoosers) => {
+      cy.get('@paymentTabChoosersAmount').should('eq', $unSelectedPaymentTabChoosers.length);
+    });
     cy.get('[data-cy^="input:choose-"][data-cy$="-payment"]').its('length').as('shipmentChoosersAmount');
     cy.get('[data-cy^="input:choose-"][data-cy$="-payment"]:not(:checked)').then(($nonCheckedShipmentChoosers) => {
       cy.get('@shipmentChoosersAmount').should('eq', $nonCheckedShipmentChoosers.length);

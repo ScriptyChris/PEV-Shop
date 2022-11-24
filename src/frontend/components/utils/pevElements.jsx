@@ -333,7 +333,7 @@ export const PEVTabs = forwardRef(function PEVTabs(
           hidden={tabValue !== index}
           data-cy={`container:${id}`}
         >
-          {tabValue === index && <Box p={2}>{content}</Box>}
+          {tabValue === index && <Box padding={1}>{content}</Box>}
         </div>
       ))}
     </div>
