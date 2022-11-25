@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,6 +13,11 @@ import MUILink from '@material-ui/core/Link';
 import Checkbox from '@material-ui/core/Checkbox';
 import Radio from '@material-ui/core/Radio';
 import Typography from '@material-ui/core/Typography';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
+
+import Scroller from '@frontend/components/utils/scroller';
 
 const useFieldsetStyles = makeStyles({
   root: {
@@ -22,8 +27,8 @@ const useFieldsetStyles = makeStyles({
 
 const FormikTextFieldForwarder = ({ field: _field, form, defaultValue, ...props }) => {
   const { value: fieldValue, ...field } = _field;
-  const { value: propsValue, overrideProps, ...restProps } = props;
-  const value = propsValue ?? fieldValue;
+  const { value: propsValue, overrideProps: { value: overridenValue, ...overrideProps } = {}, ...restProps } = props;
+  const value = overridenValue ?? propsValue ?? fieldValue;
   const valueOrDefaultValue = {
     [defaultValue === null || defaultValue === undefined ? 'value' : 'defaultValue']: defaultValue ?? value,
   };
@@ -197,7 +202,7 @@ export const PEVForm = forwardRef(function PEVForm(
 
 // TODO: [DX] use Formik's `<ErrorMessage>` component
 export const PEVFormFieldError = ({ children, customMessage }) => {
-  return <PEVParagraph className="form-field-error">{customMessage || children}</PEVParagraph>;
+  return <PEVParagraph className="pev-element-form-field-error">{customMessage || children}</PEVParagraph>;
 };
 
 export const PEVHeading = forwardRef(function PEVHeading({ level, children, withMargin, ...restProps }, ref) {
@@ -223,5 +228,114 @@ export const PEVParagraph = forwardRef(function PEVParagraph({ children, ...rest
     <Typography {...restProps} variant="body1" ref={ref}>
       {children}
     </Typography>
+  );
+});
+
+const setupTabs = (groupName, data) => {
+  const createId = (tabPart, name) => `${groupName}-tab-${tabPart}__${name}`;
+  const createA11yObj = (txt, relatedId) => ({
+    'aria-label': txt,
+    'aria-controls': relatedId,
+    label: txt,
+    title: txt,
+  });
+
+  return data.reduce(
+    (output, { name, translation, icon, content, ribbon = {} }, index) => {
+      output.tabChoosers.push({
+        get id() {
+          return createId('chooser', name);
+        },
+        get a11y() {
+          return createA11yObj(translation, output.tabPanels[index].id);
+        },
+        name,
+        icon,
+        dataCy: `button:choose-${name}-tab`,
+        ribbon,
+      });
+      output.tabPanels.push({
+        content,
+        get id() {
+          return createId('panel', name);
+        },
+      });
+
+      return output;
+    },
+    { tabChoosers: [], tabPanels: [] }
+  );
+};
+
+export const PEVTabs = forwardRef(function PEVTabs(
+  { config, label, prechosenTabValue = false, areChoosersScrollable, className, horizontalTabIcons },
+  ref
+) {
+  const [tabValue, setTabValue] = useState(prechosenTabValue);
+  const { tabChoosers, tabPanels } = useMemo(() => setupTabs(config.groupName, config.initialData), [config]);
+
+  useEffect(() => setTabValue(prechosenTabValue), [prechosenTabValue]);
+
+  const handleTabChange = (_, newTabValue) => {
+    const tabChooser = tabChoosers[newTabValue];
+
+    setTabValue(newTabValue);
+    config.onTabChangeCallbacks?.forEach((callback) => callback(tabChooser));
+  };
+
+  const tabsElement = (
+    <Tabs
+      value={tabValue}
+      onChange={handleTabChange}
+      variant="fullWidth"
+      indicatorColor="primary"
+      textColor="primary"
+      aria-label={label}
+      selectionFollowsFocus
+    >
+      {tabChoosers.map(({ id, icon, a11y, ribbon, dataCy }) => (
+        <Tab
+          className={classNames('pev-element-tabs__tab', {
+            'pev-element-tabs__tab--with-ribbon': !!ribbon.transformer,
+            'pev-element-tabs__tab--with-horizontal-icon': horizontalTabIcons,
+          })}
+          icon={icon}
+          data-ribbon-value={ribbon.transformer?.(ribbon.value)}
+          {...a11y}
+          id={id}
+          data-cy={dataCy}
+          key={id}
+        />
+      ))}
+    </Tabs>
+  );
+
+  return (
+    <div ref={ref} className={className}>
+      <div className="pev-element-tabs__chooser">
+        {areChoosersScrollable ? (
+          <Scroller
+            scrollerBaseValueMeta={{
+              useDefault: true,
+            }}
+            render={({ ScrollerHookingParent }) => <ScrollerHookingParent>{tabsElement}</ScrollerHookingParent>}
+          />
+        ) : (
+          tabsElement
+        )}
+      </div>
+      {tabPanels.map(({ content, id }, index) => (
+        <div
+          key={index}
+          id={id}
+          role="tabpanel"
+          aria-labelledby={tabChoosers[index].id}
+          hidden={tabValue !== index}
+          data-cy={`container:${id}`}
+        >
+          {tabValue === index && <Box padding={1}>{content}</Box>}
+        </div>
+      ))}
+    </div>
   );
 });

@@ -1,6 +1,7 @@
 import { Document, Types, Schema, model, COLLECTION_NAMES } from '@database/models/__core-and-commons';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import getLogger from '@commons/logger';
+import { possiblyReEncodeURI } from '@commons/uriReEncoder';
 
 const logger = getLogger(module.filename);
 
@@ -62,13 +63,8 @@ const productSchema = new Schema<IProduct>({
   url: {
     type: String,
     required: true,
-    set(value: string) {
-      if (value.includes('/')) {
-        logger.log('Doing percentage encoding for all forward slashes for product url:', value);
-        return value.replace(/\//g, '%2F');
-      }
-
-      return value;
+    set(uniformResourceName: string) {
+      return possiblyReEncodeURI(uniformResourceName, true);
     },
   },
   category: {

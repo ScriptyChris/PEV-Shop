@@ -80,11 +80,27 @@ describe('#queryBuilder', () => {
       expect(getSearchByNameConfig({ name: undefined })).toBeNull();
     });
 
-    it('should return an object with "name" prop containing query as RegExp based on passed value with "i" flag when caseSensitive param is equal to "true"', () => {
-      expect(getSearchByNameConfig({ name: 'test' })).toStrictEqual({ name: /test/i });
-      expect(getSearchByNameConfig({ name: 'test', caseSensitive: 'false' })).toStrictEqual({ name: /test/i });
-      expect(getSearchByNameConfig({ name: 'test', caseSensitive: '' })).toStrictEqual({ name: /test/i });
-      expect(getSearchByNameConfig({ name: 'test', caseSensitive: 'true' })).toStrictEqual({ name: /test/ });
+    it(`should return an object with "query.name" prop containing query as RegExp with "i" flag 
+      and "projection" property based on "getOnlyEssentialData" param`, () => {
+      expect(getSearchByNameConfig({ name: 'test', getOnlyEssentialData: 'false' })).toStrictEqual({
+        query: { name: /test/i },
+        projection: {},
+      });
+      expect(getSearchByNameConfig({ name: 'test', getOnlyEssentialData: 'true' })).toStrictEqual({
+        query: { name: /test/i },
+        projection: { name: true, url: true, price: true },
+      });
+    });
+
+    it('should throw a TypeError when "reqQuery.getOnlyEssentialData" props is invalid', () => {
+      expect(() => getSearchByNameConfig({ name: 'test' })).toThrow(
+        TypeError(`getOnlyEssentialData should be either "true" or "false"! Received: "undefined".`)
+      );
+      expect(() => getSearchByNameConfig({ name: 'test', getOnlyEssentialData: null })).toThrow(
+        TypeError(`getOnlyEssentialData should be either "true" or "false"! Received: "null".`)
+      );
+      expect(() => getSearchByNameConfig({ name: 'test', getOnlyEssentialData: 'true' })).not.toThrow();
+      expect(() => getSearchByNameConfig({ name: 'test', getOnlyEssentialData: 'false' })).not.toThrow();
     });
   });
 });

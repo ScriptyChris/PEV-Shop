@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
@@ -9,7 +8,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVIconButton } from '@frontend/components/utils/pevElements';
+import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
 import { AddToCartButton } from '@frontend/components/views/cart';
@@ -36,43 +35,40 @@ const translations = {
   productDeletionFailed: 'Deleting product failed :(',
 };
 
-function ProductCardBasicDesc({ isCompact, compactLabel, dataCy, label, value }) {
-  return (
-    <div>
-      {isCompact ? (
-        /* TODO: [a11y] presumably use `aria-description` instead, which is only supported from React v18 */
-        <span aria-label={compactLabel} data-cy={dataCy}>
-          {value}
-        </span>
-      ) : (
-        <>
-          <dt>{label}:</dt>
-          <dd data-cy={dataCy}>{value}</dd>
-        </>
-      )}
-    </div>
+function ProductCardBasicDesc({ isCompactDescription, compactLabel, dataCy, label, value }) {
+  return isCompactDescription ? (
+    /* TODO: [a11y] presumably use `aria-description` instead, which is only supported from React v18 */
+    <span aria-label={compactLabel} data-cy={dataCy}>
+      {value}
+    </span>
+  ) : (
+    <dl className="product-card__metadata">
+      <dt>{label}:</dt>
+      <dd data-cy={dataCy}>{value}</dd>
+    </dl>
   );
 }
 
 export function ProductCardLink({
-  productData,
   children,
+  productData,
+  avoidPassingState = false,
   /* TODO: [UX] consider if it's needed */ isTextVisible = false,
   ...restProps
 }) {
   // TODO: maybe state should be just index or prop name of the element and target component should get it from store?
 
   return (
-    <Link
+    <PEVLink
       {...restProps}
       to={{
         pathname: `${ROUTES.PRODUCTS}/${productData.url}`,
-        state: productData,
+        state: avoidPassingState ? null : productData,
       }}
       data-cy="link:product-card__link"
     >
       {children || (isTextVisible && translations.detailsBtn)}
-    </Link>
+    </PEVLink>
   );
 }
 
@@ -91,6 +87,7 @@ export default observer(function ProductCard({
   RenderedComponent,
   layoutType = PRODUCT_CARD_LAYOUT_TYPES.DETAILED,
   hasCompactBasicDesc = true,
+  isCompact = false,
   entryNo,
 }) {
   if (!PRODUCT_CARD_LAYOUT_TYPES[layoutType]) {
@@ -126,92 +123,119 @@ export default observer(function ProductCard({
   ].flat();
   /* eslint-enable react/jsx-key */
 
+  const imageElement = (
+    <>
+      <div className={classNames('product-card__image', { 'product-card__image--is-compact': isCompact })}>
+        TODO: [UI] image should go here
+      </div>
+      {/* TODO: [UI] <img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
+    </>
+  );
+
+  const nameElement = (
+    <ProductCardBasicDesc
+      isCompactDescription={hasCompactBasicDesc}
+      compactLabel={translations.descriptiveProductName}
+      dataCy="label:product-card__name"
+      label={translations.productName}
+      value={name}
+    />
+  );
+
+  const priceElement = (
+    <ProductCardBasicDesc
+      isCompactDescription={hasCompactBasicDesc}
+      compactLabel={translations.descriptiveProductPrice}
+      dataCy="label:product-price"
+      label={translations.price}
+      value={price}
+    />
+  );
+
   return (
     <Paper
       component={RenderedComponent || 'div'}
-      className={classNames('product-card', `product-card--${productCardLayoutTypesClassModifiers[layoutType]}`)}
+      className={classNames('product-card', `product-card--${productCardLayoutTypesClassModifiers[layoutType]}`, {
+        'product-card--is-compact': isCompact,
+      })}
       data-cy={`container:product-card_${dataCySuffix}`}
       elevation={elevation}
+      {...(isCompact ? { disableGutters: true } : {})}
     >
-      <ProductCardLink className="product-card__link" productData={product}>
-        <div className="product-card__image">TODO: [UI] image should go here</div>
-        {/* TODO: [UI] <img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
-      </ProductCardLink>
-      <div className="product-card__content">
-        <dl className="product-card__metadata">
-          <ProductCardLink productData={product}>
-            <ProductCardBasicDesc
-              isCompact={hasCompactBasicDesc}
-              compactLabel={translations.descriptiveProductName}
-              dataCy="label:product-card__name"
-              label={translations.productName}
-              value={name}
-            />
+      {isCompact ? (
+        <ProductCardLink className="product-card__link" productData={product} avoidPassingState>
+          {imageElement}
+
+          <p className="product-card__content product-card__content--is-compact pev-flex">
+            {nameElement}
+            {priceElement}
+          </p>
+        </ProductCardLink>
+      ) : (
+        <>
+          <ProductCardLink className="product-card__link" productData={product}>
+            {imageElement}
+
+            <p className="product-card__content">
+              {nameElement}
+              {priceElement}
+            </p>
           </ProductCardLink>
 
-          <ProductCardBasicDesc
-            isCompact={hasCompactBasicDesc}
-            compactLabel={translations.descriptiveProductPrice}
-            dataCy="label:product-price"
-            label={translations.price}
-            value={price}
-          />
-        </dl>
-      </div>
-      <PEVIconButton
-        onClick={handleClickToggleActionsBarBtns(true)}
-        a11y={translations.actionsBarTogglerLabel}
-        className="product-card__actions-bar-toggler"
-        data-cy="button:toggle-action-bar"
-      >
-        <MoreVertIcon />
-      </PEVIconButton>
+          <PEVIconButton
+            onClick={handleClickToggleActionsBarBtns(true)}
+            a11y={translations.actionsBarTogglerLabel}
+            className="product-card__actions-bar-toggler"
+            data-cy="button:toggle-action-bar"
+          >
+            <MoreVertIcon />
+          </PEVIconButton>
 
-      <Menu
-        anchorEl={menuBtnRef}
-        open={!!menuBtnRef}
-        onClose={handleClickToggleActionsBarBtns(false)}
-        getContentAnchorEl={null}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-        MenuListProps={{
-          className: 'product-card__actions-bar',
-          'data-cy': 'container:product-card__actions-bar',
-        }}
-        data-cy="popup:product-card__actions-bar"
-      >
-        {menuItems.flatMap((item, index) => {
-          const result = [
-            <MenuItem button={false} className="product-card__actions-bar-item" key={`menu-item-${index}`}>
-              {item}
-            </MenuItem>,
-          ];
+          <Menu
+            anchorEl={menuBtnRef}
+            open={!!menuBtnRef}
+            onClose={handleClickToggleActionsBarBtns(false)}
+            getContentAnchorEl={null}
+            anchorOrigin={{
+              vertical: 'center',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'center',
+              horizontal: 'right',
+            }}
+            MenuListProps={{
+              className: 'product-card__actions-bar',
+              'data-cy': 'container:product-card__actions-bar',
+            }}
+            data-cy="popup:product-card__actions-bar"
+          >
+            {menuItems.flatMap((item, index) => {
+              const result = [
+                <MenuItem button={false} className="product-card__actions-bar-item" key={`menu-item-${index}`}>
+                  {item}
+                </MenuItem>,
+              ];
 
-          if (index < menuItems.length - 1) {
-            const MenuItemDivider = (
-              <MenuItem
-                button={false}
-                disableGutters={true}
-                className="product-card__actions-bar-item"
-                key={`menu-divider-${index}`}
-              >
-                <Divider orientation="vertical" flexItem />
-              </MenuItem>
-            );
-            result.push(MenuItemDivider);
-          }
+              if (index < menuItems.length - 1) {
+                const MenuItemDivider = (
+                  <MenuItem
+                    button={false}
+                    disableGutters={true}
+                    className="product-card__actions-bar-item"
+                    key={`menu-divider-${index}`}
+                  >
+                    <Divider orientation="vertical" flexItem />
+                  </MenuItem>
+                );
+                result.push(MenuItemDivider);
+              }
 
-          return result;
-        })}
-
-        {/* TODO: [UX] add (un)observing product */}
-      </Menu>
+              return result;
+            })}
+          </Menu>
+        </>
+      )}
     </Paper>
   );
 });

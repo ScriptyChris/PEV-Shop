@@ -396,17 +396,20 @@ const useSectionsObserver = () => {
 };
 
 export default observer(function ProductDetails() {
-  const { state: productData, pathname } = useLocation();
+  const { state: initialProductData, pathname } = useLocation();
+  const recentPathName = useRef(pathname);
   const history = useHistory();
   const routesGuards = useRoutesGuards(storeService);
-  const [mergedProductData, setMergedProductData] = useState(productData);
+  const [mergedProductData, setMergedProductData] = useState(initialProductData);
   const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
 
   useEffect(() => {
-    if (mergedProductData) {
+    if (mergedProductData && recentPathName.current === pathname) {
       getRelatedProducts(mergedProductData);
       return;
     }
+
+    recentPathName.current = pathname;
 
     const productUrl = routeHelpers.extractProductUrlFromPathname(pathname);
     if (!productUrl) {
@@ -433,7 +436,7 @@ export default observer(function ProductDetails() {
           getRelatedProducts(maybeProduct);
         }
       });
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (location.hash) {

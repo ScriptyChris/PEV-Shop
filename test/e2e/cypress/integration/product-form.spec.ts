@@ -12,8 +12,11 @@ describe('product-form', () => {
 
   const goToProductModificationPage = (productName: string) => {
     cy.visit(ROUTES.PRODUCTS);
-    cy.get(makeCyDataSelector('input:the-search')).type(productName);
-    cy.contains(makeCyDataSelector('label:product-card__name'), productName)
+    cy.get(makeCyDataSelector('input:search-products-by-name')).type(productName);
+    cy.contains(
+      `${makeCyDataSelector('container:search-tab-panel__results')} ${makeCyDataSelector('label:product-card__name')}`,
+      productName
+    )
       .closest(makeCyDataSelector('link:product-card__link'))
       .click();
     cy.get(makeCyDataSelector('button:product-details__edit-product')).click();
@@ -115,14 +118,14 @@ describe('product-form', () => {
       cy.get(makeCyDataSelector('button:related-product-names__edit-0')).click();
       cy.get(makeCyDataSelector('button:related-product-names__cancel-0')).should('be.visible');
       cy.get('@relatedProductNames')
-        .find(makeCyDataSelector('input:the-search'))
+        .find(makeCyDataSelector('input:search-single-product-by-name'))
         .clear()
         .type(updatedProductFormData.raw.relatedProductName.part);
       cy.get('@relatedProductNames').within(() => {
         cy.get(makeCyDataSelector('datalist:the-search-options'))
           .children(`[value="${updatedProductFormData.raw.relatedProductName.whole}"]`)
           .should('exist');
-        cy.get(makeCyDataSelector('input:the-search'))
+        cy.get(makeCyDataSelector('input:search-single-product-by-name'))
           .clear()
           .type(updatedProductFormData.raw.relatedProductName.whole);
       });
@@ -148,11 +151,13 @@ describe('product-form', () => {
     it('should add new product', () => {
       // assert that to-be-added product doesn't exist yet
       cy.visit(ROUTES.PRODUCTS);
-      cy.get(makeCyDataSelector('input:the-search')).type(testProductDataForForm.name);
-      cy.get(makeCyDataSelector('list:product-list')).should(($list) => {
-        expect($list.text()).to.equal('Lack of products...');
-        expect($list.children()).to.have.lengthOf(0);
-      });
+      cy.get(makeCyDataSelector('input:search-products-by-name')).type(testProductDataForForm.name);
+      cy.contains(
+        `${makeCyDataSelector('container:search-tab-panel__results')} ${makeCyDataSelector(
+          'message:empty-search-results'
+        )}`,
+        `No products found for name: "${testProductDataForForm.name}"`
+      );
 
       // go to adding new product page
       cy.get(`a[href="${ROUTES.PRODUCTS__ADD_NEW_PRODUCT}"]`).click();
@@ -200,7 +205,7 @@ describe('product-form', () => {
         cy.get(makeCyDataSelector('list:related-product-names')).within(() =>
           relatedProductNames.map((relatedProductName, index) => {
             cy.root().next(makeCyDataSelector('button:related-product-names__add-new')).click();
-            cy.get(makeCyDataSelector('input:the-search')).type(relatedProductName);
+            cy.get(makeCyDataSelector('input:search-single-product-by-name')).type(relatedProductName);
             // assert correct related product name
             cy.contains(makeCyDataSelector(`label:related-product-names__${index}`), relatedProductName);
           })

@@ -100,12 +100,6 @@
   }
 }
 
-.product-comparison-candidates-toggle-icon {
-  width: 1.125rem;
-  height: 1.125rem;
-  fill: currentColor;
-
-  &--checked {
-    fill: #3f51b5;
-  }
+.product-comparison-candidates-toggle-icon--checked {
+  fill: #3f51b5;
 }

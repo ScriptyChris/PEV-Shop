@@ -18,6 +18,7 @@ const translations = {
   edit: 'Edit',
   delete: 'Delete',
   cancel: 'Cancel',
+  searchForItem: 'search for...?',
 };
 
 const flexibleListStates = Object.freeze({
@@ -156,7 +157,7 @@ function FlexibleList({
             if (item === EMPTY_LIST_ITEM) {
               return (
                 <ListItem className="flexible-list__item flexible-list__item--is-editable" key={item}>
-                  <NewItemComponent listFeatures={features} updateItem={updateItem}>
+                  <NewItemComponent listFeatures={features} updateItem={updateItem} label={translations.searchForItem}>
                     {getConfirmAndCancelButtons(itemsContextName, features)}
                   </NewItemComponent>
                 </ListItem>
@@ -170,7 +171,13 @@ function FlexibleList({
                   key={item}
                 >
                   {isCurrentlyEdited ? (
-                    <EditItemComponent item={item} editedIndex={index} listFeatures={features} updateItem={updateItem}>
+                    <EditItemComponent
+                      item={item}
+                      editedIndex={index}
+                      listFeatures={features}
+                      updateItem={updateItem}
+                      label={translations.searchForItem}
+                    >
                       {getConfirmAndCancelButtons(itemsContextName, features, index)}
                     </EditItemComponent>
                   ) : (

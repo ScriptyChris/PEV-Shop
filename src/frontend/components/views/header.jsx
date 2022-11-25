@@ -16,7 +16,8 @@ import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   appMainHeader: 'PEV Shop',
-  typeProductName: 'Search for a product',
+  searchLabel: 'Search',
+  searchPlaceholder: 'type product name...',
 });
 
 export default observer(function Header() {
@@ -37,7 +38,7 @@ export default observer(function Header() {
 
   return (
     <AppBar className="header">
-      <Toolbar className="header__toolbar">
+      <Toolbar className="header__toolbar pev-flex">
         <PEVHeading
           level={1}
           className={classNames('header__main-heading', { 'header__main-heading--small': isHeadingSmall })}
@@ -46,16 +47,15 @@ export default observer(function Header() {
         </PEVHeading>
 
         <SearchProductsByName
-          label={translations.typeProductName}
+          label={translations.searchLabel}
+          placeholder={translations.searchPlaceholder}
           searchingTarget="productName"
           debounceTimeMs={750}
-          pagination={{
-            currentProductPage: 1,
-            currentProductsPerPageLimit: 15 /* TODO: should be set from a variable */,
-          }}
           onReceivedProductsByName={updateProductList}
           toggleMainHeadingSize={setIsHeadingSmall}
+          syncWithSearchQuery
         />
+
         <Nav />
         {(routesGuards.isGuest() || routesGuards.isClient()) && <Cart />}
       </Toolbar>

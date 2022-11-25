@@ -86,10 +86,15 @@ describe('#database/api', () => {
     it('should call getPaginatedItems(..) with appropriate params when provided options.pagination param is truthy', async () => {
       const itemQuery = { itemQuery: true };
       const config = { modelName: MODEL_TYPE, pagination: true };
+      const projectionMock = {};
 
-      await getFromDB(config, itemQuery);
+      await getFromDB(config, itemQuery, projectionMock);
 
-      expect(getPaginatedItemsMock).toHaveBeenCalledWith(getModelMock._ModelClassMock, itemQuery, config.pagination);
+      expect(getPaginatedItemsMock).toHaveBeenCalledWith(
+        { Model: getModelMock._ModelClassMock, pagination: config.pagination },
+        itemQuery,
+        projectionMock
+      );
     });
 
     it('should return result of calling getPaginatedItems(..) when provided options.pagination param is truthy', async () => {

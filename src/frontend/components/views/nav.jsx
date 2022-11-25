@@ -2,7 +2,7 @@ import { useHistory } from 'react-router-dom';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import Menu from '@material-ui/icons/Menu';
+import MenuIcon from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import CloseIcon from '@material-ui/icons/Close';
@@ -15,14 +15,14 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 
-import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
+import { PEVIconButton, PEVLink, PEVButton } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
-  toggleNavMenu: 'Menu',
+  toggleNavMenu: 'toggle nav menu',
   products: 'Products',
   addNewProduct: 'Add new product',
   modifyProduct: 'Modify product',
@@ -36,21 +36,26 @@ const translations = Object.freeze({
   TODO: [UX/a11y] implement (interactive - so i.e. user can go back a few levels) mini nav widget 
         located under main header to indicate where user currently is
 */
-const NavMenu = observer(({ logOutUser }) => {
+const NavMenu = observer(({ logOutUser, closeMenu = () => void 0 }) => {
   const routesGuards = useRoutesGuards(storeService);
+
+  const handleLinkClick = (event) => {
+    event.stopPropagation();
+    closeMenu();
+  };
 
   return (
     <nav className="nav-menu">
-      <MenuList className="nav-menu__links">
+      <MenuList className="nav-menu__links" disablePadding>
         <MenuItem>
-          <PEVLink to={ROUTES.PRODUCTS}>
+          <PEVLink to={ROUTES.PRODUCTS} onClick={handleLinkClick}>
             <ListIcon fontSize="inherit" />
             {translations.products}
           </PEVLink>
         </MenuItem>
         {routesGuards.isSeller() && [
           <MenuItem key="ROUTES.PRODUCTS__ADD_NEW_PRODUCT">
-            <PEVLink to={ROUTES.PRODUCTS__ADD_NEW_PRODUCT}>
+            <PEVLink to={ROUTES.PRODUCTS__ADD_NEW_PRODUCT} onClick={handleLinkClick}>
               <AddToListIcon fontSize="inherit" />
               {translations.addNewProduct}
             </PEVLink>
@@ -58,12 +63,12 @@ const NavMenu = observer(({ logOutUser }) => {
         ]}
         <MenuItem>
           {routesGuards.isUser() ? (
-            <PEVLink to={ROUTES.ROOT} onClick={logOutUser}>
+            <PEVButton onClick={logOutUser} className="MuiLink-button" a11y={translations.logOut}>
               <ExitToAppIcon fontSize="inherit" />
               {translations.logOut}
-            </PEVLink>
+            </PEVButton>
           ) : (
-            <PEVLink to={ROUTES.LOG_IN} data-cy={`link:${ROUTES.LOG_IN}`}>
+            <PEVLink to={ROUTES.LOG_IN} onClick={handleLinkClick} data-cy={`link:${ROUTES.LOG_IN}`}>
               <VpnKeyIcon fontSize="inherit" />
               {translations.logIn}
             </PEVLink>
@@ -73,13 +78,14 @@ const NavMenu = observer(({ logOutUser }) => {
           {routesGuards.isUser() ? (
             <PEVLink
               to={ROUTES.ACCOUNT}
+              onClick={handleLinkClick}
               aria-label={translations.getAccountLinkLabel(storeService.userAccountState.login)}
             >
               <AccountCircleIcon fontSize="inherit" />
               {storeService.userAccountState.login}
             </PEVLink>
           ) : (
-            <PEVLink to={ROUTES.REGISTER} data-cy={`link:${ROUTES.REGISTER}`}>
+            <PEVLink to={ROUTES.REGISTER} onClick={handleLinkClick} data-cy={`link:${ROUTES.REGISTER}`}>
               <PersonAddIcon fontSize="inherit" />
               {translations.register}
             </PEVLink>
@@ -92,10 +98,10 @@ const NavMenu = observer(({ logOutUser }) => {
 
 export default function Nav() {
   const history = useHistory();
-  const { isMobileLayout } = useRWDLayout();
+  const { isDesktopLayout } = useRWDLayout();
   const [isMobileMenuOpened, setIsMobileMenuOpened] = useState(false);
 
-  const handleToggleNavMenu = () => setIsMobileMenuOpened(!isMobileMenuOpened);
+  const handleToggleNavMenu = () => setIsMobileMenuOpened((prevState) => !prevState);
 
   const handleNavMobileOverlayClick = (event) => {
     const clickedInNavAnchor = event.target.tagName.toLowerCase() === 'a';
@@ -112,18 +118,22 @@ export default function Nav() {
       }
 
       history.replace(ROUTES.ROOT);
+      handleToggleNavMenu();
     });
   };
 
-  return isMobileLayout ? (
+  return isDesktopLayout ? (
+    <NavMenu logOutUser={logOutUser} />
+  ) : (
     <>
       <PEVIconButton
         onClick={handleToggleNavMenu}
         className="nav-toggle-btn"
         color="inherit"
         a11y={translations.toggleNavMenu}
+        tabIndex="1"
       >
-        <Menu />
+        <MenuIcon />
       </PEVIconButton>
 
       <Drawer
@@ -132,16 +142,19 @@ export default function Nav() {
         onClose={handleToggleNavMenu}
         onClick={handleNavMobileOverlayClick}
       >
-        <PEVIconButton className="nav-close-btn" onClick={handleToggleNavMenu} a11y={translations.toggleNavMenu}>
+        <PEVIconButton
+          className="nav-close-btn"
+          onClick={handleToggleNavMenu}
+          a11y={translations.toggleNavMenu}
+          autoFocus
+        >
           <CloseIcon />
         </PEVIconButton>
 
         <Divider />
 
-        <NavMenu logOutUser={logOutUser} />
+        <NavMenu logOutUser={logOutUser} closeMenu={handleToggleNavMenu} />
       </Drawer>
     </>
-  ) : (
-    <NavMenu logOutUser={logOutUser} />
   );
 }

@@ -4,12 +4,14 @@ import { observer } from 'mobx-react-lite';
 
 import { ROUTES, useRoutesGuards } from './_routes';
 import storeService from '@frontend/features/storeService';
-import ProductList from '@frontend/components/views/productList';
+
+// TODO: update module file name after search refactor is done
+import ProductsDashboard from '@frontend/components/views/productList';
+
 import ProductDetails from '@frontend/components/views/productDetails';
 import { NewProduct, ModifyProduct } from './productForm';
 import ProductComparison from './productComparison';
 import Order from './order';
-import NotFound from './notFound';
 
 function Products() {
   const routesGuards = useRoutesGuards(storeService);
@@ -17,7 +19,7 @@ function Products() {
   return (
     <Switch>
       <Route path={ROUTES.PRODUCTS} exact>
-        <ProductList />
+        <ProductsDashboard />
       </Route>
       <Route path={ROUTES.PRODUCTS__COMPARE}>
         <ProductComparison />

@@ -142,6 +142,7 @@ describe('#api-products', () => {
       });
 
       it('should call getFromDB(..) with correct params', async () => {
+        const projection = {};
         await apiProductsRouter._getProducts(getReqMock(), getResMock());
 
         queryBuilderMock.getIdListConfig.mockImplementationOnce(queryBuilderMock.getIdListConfig._succeededCall);
@@ -155,7 +156,8 @@ describe('#api-products', () => {
             pagination: queryBuilderMock.getPaginationConfig(),
             findMultiple: true,
           },
-          queryBuilderMock.getIdListConfig()
+          queryBuilderMock.getIdListConfig(),
+          projection
         );
       });
 

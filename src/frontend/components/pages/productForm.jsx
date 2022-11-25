@@ -24,7 +24,7 @@ import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
-import { ROUTES, routeHelpers } from '@frontend/components/pages/_routes';
+import { routeHelpers } from '@frontend/components/pages/_routes';
 
 const translations = {
   getIntro(isProductUpdate) {

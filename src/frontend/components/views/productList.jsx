@@ -155,6 +155,30 @@ const listViewModeToProductCardLayoutMap = {
   tiles: PRODUCT_CARD_LAYOUT_TYPES.COMPACT,
 };
 
+export const _ProductsList = ({
+  initialProducts,
+  isCompactProductCardSize,
+  currentListViewModeClassName,
+  listViewModeType,
+}) => {
+  return (
+    <List className={classNames('product-list', currentListViewModeClassName)} data-cy="list:product-list">
+      {initialProducts.length > 0
+        ? initialProducts.map((product, index) => (
+            <ProductCard
+              key={product.name}
+              entryNo={index}
+              product={product}
+              layoutType={listViewModeToProductCardLayoutMap[listViewModeType]}
+              RenderedComponent={ListItem}
+              isCompact={isCompactProductCardSize}
+            />
+          ))
+        : translations.lackOfProducts}
+    </List>
+  );
+};
+
 export default function ProductList() {
   const { state: locationState } = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -330,19 +354,12 @@ export default function ProductList() {
           </Toolbar>
         </>
       )}
-      <List className={classNames('product-list', currentListViewModeClassName)} data-cy="list:product-list">
-        {productsList.length > 0
-          ? productsList.map((product, index) => (
-              <ProductCard
-                key={product.name}
-                entryNo={index}
-                product={product}
-                layoutType={listViewModeToProductCardLayoutMap[listViewModeType]}
-                RenderedComponent={ListItem}
-              />
-            ))
-          : translations.lackOfProducts}
-      </List>
+
+      <_ProductsList
+        initialProducts={productsList}
+        currentListViewModeClassName={currentListViewModeClassName}
+        listViewModeType={listViewModeType}
+      />
 
       {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
       <Toolbar className="product-list-pagination">

@@ -8,12 +8,16 @@ const logger = getLogger(module.filename);
 const getSearchByNameConfig = (reqQuery: TReqQuery) => {
   if (!reqQuery.name) {
     return null;
+  } else if (!(reqQuery.getOnlyEssentialData === 'true' || reqQuery.getOnlyEssentialData === 'false')) {
+    throw TypeError(
+      `getOnlyEssentialData should be either "true" or "false"! Received: "${reqQuery.getOnlyEssentialData}".`
+    );
   }
 
-  const caseSensitiveFlag = reqQuery.caseSensitive === 'true' ? '' : 'i';
-  const nameQuery = new RegExp(reqQuery.name as string, caseSensitiveFlag);
+  const nameQuery = new RegExp(reqQuery.name as string, 'i');
+  const projection = reqQuery.getOnlyEssentialData === 'true' ? { name: true, url: true, price: true } : {};
 
-  return { name: nameQuery };
+  return { query: { name: nameQuery }, projection };
 };
 
 const getSearchByUrlConfig = (reqQuery: TReqQuery) => {

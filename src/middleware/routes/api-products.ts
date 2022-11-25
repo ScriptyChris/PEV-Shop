@@ -93,6 +93,7 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
     const filters = queryBuilder.getFilters(req.query);
 
     let query = {};
+    let projection = {};
 
     if (idListConfig) {
       query = idListConfig;
@@ -101,7 +102,7 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
     } else if (chosenCategories) {
       query = chosenCategories;
     } else if (searchByName) {
-      query = searchByName;
+      ({ query, projection } = searchByName);
     } else if (searchByUrl) {
       query = searchByUrl;
     } else if (filters) {
@@ -117,9 +118,11 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
       options.pagination = paginationConfig;
     }
 
-    const paginatedProducts = (await getFromDB({ modelName: COLLECTION_NAMES.Product, ...options }, query)) as
-      | IProduct[]
-      | null;
+    const paginatedProducts = (await getFromDB(
+      { modelName: COLLECTION_NAMES.Product, ...options },
+      query,
+      projection
+    )) as IProduct[] | null;
 
     if (!paginatedProducts || paginatedProducts.length === 0) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Products not found!' });
