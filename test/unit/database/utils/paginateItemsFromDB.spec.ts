@@ -13,33 +13,41 @@ describe('#paginateItemsFromDB', () => {
   });
 
   describe('getPaginatedItems()', () => {
-    const getModelMock = () => {
+    const getConfigMock = () => {
       return {
-        paginate: jest.fn(async () => ({ pagination: null })),
+        Model: {
+          paginate: jest.fn(async () => ({ pagination: null })),
+        },
+        pagination: { page: 1, limit: 2 },
       };
     };
     const itemQueryMock = { query: 'test' };
-    const paginationConfigMock = { page: 1, limit: 2 };
+    const projectionMock = {};
 
     it('should call Model.paginate with appropriate params', async () => {
-      const modelMock = getModelMock();
+      const configMock = getConfigMock();
 
-      await getPaginatedItems(modelMock, itemQueryMock, paginationConfigMock);
+      await getPaginatedItems(
+        { Model: configMock.Model, pagination: configMock.pagination },
+        itemQueryMock,
+        projectionMock
+      );
 
-      expect(modelMock.paginate).toHaveBeenCalledWith(itemQueryMock, {
-        page: paginationConfigMock.page,
-        limit: paginationConfigMock.limit,
+      expect(configMock.Model.paginate).toHaveBeenCalledWith(itemQueryMock, {
+        page: configMock.pagination.page,
+        limit: configMock.pagination.limit,
         customLabels: {
           docs: 'productsList',
           totalDocs: 'totalProducts',
         },
+        projection: projectionMock,
       });
     });
 
     it('should return promise resolved to value returned by call to Mode.paginate(..)', async () => {
-      const getPaginatedItemsResult = getPaginatedItems(getModelMock(), itemQueryMock, paginationConfigMock);
+      const getPaginatedItemsResult = getPaginatedItems(getConfigMock(), itemQueryMock, projectionMock);
 
-      await expect(getPaginatedItemsResult).resolves.toStrictEqual(await getModelMock().paginate());
+      await expect(getPaginatedItemsResult).resolves.toStrictEqual(await getConfigMock().Model.paginate());
     });
   });
 });

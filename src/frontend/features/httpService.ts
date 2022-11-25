@@ -8,6 +8,7 @@ import type {
 import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
 import { HTTP_STATUS_CODE, IOrder, TPagination } from '@src/types';
 import storeService from '@frontend/features/storeService';
+import { possiblyReEncodeURI } from '@commons/uriReEncoder';
 
 type TResDataType<T> = T[keyof T];
 
@@ -261,6 +262,8 @@ const httpService = new (class HttpService extends Ajax {
 
   getProductByUrl(url: IProduct['url']) {
     const searchParams = new URLSearchParams();
+
+    url = possiblyReEncodeURI(url);
     searchParams.append('url', url);
 
     return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });
