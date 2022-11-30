@@ -1,0 +1,172 @@
+@import '../_var';
+
+.products-dashboard {
+  &__mobile-control-bar {
+    box-shadow: 0 1px 10px 2px #3f51b5; /* TODO: [CSS] reuse color from variable */
+    border: 0px solid #3f51b5; /* TODO: [CSS] reuse color from variable */
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-radius: 0 0 8px 8px;
+    background: white;
+    justify-content: space-around;
+
+    // TODO: [UI] add some transition to stickiness
+    &--sticky {
+      position: sticky;
+      top: 3.5rem;
+      z-index: $productListCtrlBarZIndex;
+      padding: 0.5rem;
+    }
+  }
+
+  &__filters {
+    width: 100vw;
+    align-items: stretch;
+  }
+
+  &__filters-header {
+    position: relative;
+    justify-content: center;
+    // TODO: [UI] reuse MUI color
+    border-bottom: 4px double #3f51b5;
+  }
+
+  &__filters-close-menu-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &__filters-common-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    border-radius: inherit;
+    padding: 1rem;
+    // TODO: [UI] reuse MUI color
+    border-top: 4px double #3f51b5;
+    background: inherit;
+    justify-content: space-around;
+  }
+}
+
+.products-dashboard {
+  &__filters {
+    &, 
+    &-sidebar {
+      section {
+        margin: 1rem;
+      }
+
+      hr {
+        // TODO: [UI] use variable
+        background: #3f51b5;
+        margin-inline: 0.5rem;
+      }
+    }
+  }
+}
+
+.products-dashboard__list,
+.products-list {
+  display: grid;
+  grid-gap: 1rem;
+  list-style: none;
+
+  &--details-view {
+    grid-template-columns: 1fr;
+  }
+
+  &--tiles-view {
+    grid-template-columns: repeat(auto-fit, 14rem);
+    justify-content: center;
+  }
+}
+
+@include createMediaQuery(min-width, tablet) {
+  .products-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 3.5fr;
+    grid-template-rows: 4rem auto 4rem;
+    grid-template-areas: 
+      "sidebar topbar"
+      "sidebar list"
+      "sidebar pagination";
+    grid-gap: 1rem 2rem;
+    margin: 1rem;
+    transition: grid-template-columns $transitionDuration, grid-column-gap $transitionDuration;
+
+    &__filters-sidebar {
+      grid-area: sidebar;
+      height: max-content;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      // TODO: [UI] use variable
+      border: 1px solid #3f51b5;
+    }
+
+    &__topbar {
+      grid-area: topbar;
+      justify-content: center;
+    }
+
+    &__list {
+      grid-area: list;
+      height: max-content;
+    }
+
+    &__pagination {
+      grid-area: pagination;
+      justify-content: center;
+    }
+  }
+}
+
+@include useMediaQuery(tablet) {
+  .products-dashboard {
+    &--extended {
+      grid-template-columns: 0 1fr;
+      grid-column-gap: 0;
+    }
+
+    &__filters-sidebar {
+      position: relative;
+      z-index: 1;
+      transition: transform $transitionDuration;
+
+      &--collapsed {
+        transform: translateX(calc(-100% - 1rem));
+        visibility: hidden;
+      }
+    }
+
+    &__filters-sidebar-extend-toggle-btn {
+      position: absolute;
+      left: 100%;
+      top: 0.5rem;
+      width: max-content;
+      visibility: visible;
+      border: inherit;
+      border-left: none;
+      // TODO: [UI/DX] reuse MUI color
+      background: #3f51b5;
+      color: white;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      padding-inline: 0 0.3rem;
+
+      &:hover {
+        // TODO: [UI/DX] reuse MUI color
+        background-color: #303f9f;
+      }
+    }
+  }
+}
+
+@include useMediaQuery(desktop) {
+  .products-dashboard {
+    grid-template-columns: clamp(15rem, 25%, 17rem) auto;
+  }
+}

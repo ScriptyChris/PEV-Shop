@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
@@ -22,19 +21,10 @@ const translations = Object.freeze({
 
 export default observer(function Header() {
   const routesGuards = useRoutesGuards(storeService);
-  const history = useHistory();
   const { isMobileLayout } = useRWDLayout();
   const [isHeadingSmall, setIsHeadingSmall] = useState(false);
 
   useEffect(() => setIsHeadingSmall(false), [isMobileLayout]);
-
-  const updateProductList = (searchedProducts) => {
-    /*
-      TODO: [UX] if current subpage is not a product list, then show some information 
-      that subpage redirection will be made to avoid surprising user
-    */
-    history.push(ROUTES.PRODUCTS, { searchedProducts });
-  };
 
   return (
     <AppBar className="header">
@@ -51,7 +41,6 @@ export default observer(function Header() {
           placeholder={translations.searchPlaceholder}
           searchingTarget="productName"
           debounceTimeMs={750}
-          onReceivedProductsByName={updateProductList}
           toggleMainHeadingSize={setIsHeadingSmall}
           syncWithSearchQuery
         />

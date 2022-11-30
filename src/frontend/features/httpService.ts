@@ -9,6 +9,7 @@ import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-sp
 import { HTTP_STATUS_CODE, IOrder, TPagination } from '@src/types';
 import storeService from '@frontend/features/storeService';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
+import { routeHelpers } from '@frontend/components/pages/_routes';
 
 type TResDataType<T> = T[keyof T];
 
@@ -134,15 +135,19 @@ class Ajax {
   }
 
   // TODO: fix creating URL by apiEndpoint
-  getRequest(apiEndpoint: { url: string; searchParams: URLSearchParams } | string, useToken = false) {
+  getRequest(apiEndpoint: { url: string; searchParams: URLSearchParams | string } | string, useToken = false) {
     const url = this._BASE_API_URL_OBJECT;
 
     if (typeof apiEndpoint === 'object') {
       url.pathname += apiEndpoint.url;
 
-      apiEndpoint.searchParams.forEach((value, key) => {
-        url.searchParams.append(key, value);
-      });
+      if (apiEndpoint.searchParams instanceof URLSearchParams) {
+        apiEndpoint.searchParams.forEach((value, key) => {
+          url.searchParams.append(key, value);
+        });
+      } else {
+        url.search = apiEndpoint.searchParams;
+      }
     } else {
       url.pathname += apiEndpoint;
     }
@@ -213,25 +218,43 @@ const httpService = new (class HttpService extends Ajax {
     return this.postRequest(this.URLS.PRODUCTS, product, true);
   }
 
-  getProducts({
-    pagination,
-    productCategories,
-    productsFilters,
-  }: Partial<{
-    pagination: TPagination;
-    productCategories: string;
-    productsFilters: string[];
-  }> = {}) {
-    const searchParams = new URLSearchParams();
+  getProducts(
+    initialSearchParams: Partial<{
+      name: IProduct['name'];
+      pagination: TPagination;
+      productCategories: string;
+      productTechnicalSpecs: string[];
+    }>,
+    customSearchParamsSerialization = false
+  ) {
+    let searchParams: ReturnType<typeof routeHelpers.stringifySearchParams> | URLSearchParams;
 
-    this._preparePaginationParams(searchParams, pagination);
+    if (customSearchParamsSerialization) {
+      searchParams = routeHelpers.stringifySearchParams({
+        ...initialSearchParams,
+        page: initialSearchParams.pagination?.pageNumber,
+        limit: initialSearchParams.pagination?.productsPerPage,
+        pagination: undefined,
+        getOnlyEssentialData: 'false',
+      });
+    } else {
+      const { name, pagination, productCategories, productTechnicalSpecs } = initialSearchParams;
+      searchParams = new URLSearchParams();
 
-    if (productCategories && productCategories.length) {
-      searchParams.append('productCategories', productCategories);
-    }
+      this._preparePaginationParams(searchParams, pagination);
 
-    if (productsFilters && productsFilters.length) {
-      searchParams.append('productsFilters', productsFilters as unknown as string);
+      if (name && name.length) {
+        searchParams.append('name', name);
+        searchParams.append('getOnlyEssentialData', 'false');
+      }
+
+      if (productCategories && productCategories.length) {
+        searchParams.append('productCategories', productCategories);
+      }
+
+      if (productTechnicalSpecs && productTechnicalSpecs.length) {
+        searchParams.append('productTechnicalSpecs', productTechnicalSpecs as unknown as string);
+      }
     }
 
     return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });

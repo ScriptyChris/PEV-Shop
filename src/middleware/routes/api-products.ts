@@ -90,7 +90,7 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const searchByUrl = queryBuilder.getSearchByUrlConfig(req.query);
-    const filters = queryBuilder.getFilters(req.query);
+    const technicalSpecs = queryBuilder.getTechnicalSpecs(req.query);
 
     let query = {};
     let projection = {};
@@ -99,14 +99,12 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
       query = idListConfig;
     } else if (nameListConfig) {
       query = nameListConfig;
-    } else if (chosenCategories) {
-      query = chosenCategories;
     } else if (searchByName) {
       ({ query, projection } = searchByName);
     } else if (searchByUrl) {
       query = searchByUrl;
-    } else if (filters) {
-      query = filters;
+    } else if (chosenCategories || technicalSpecs) {
+      query = { ...(chosenCategories || {}), ...(technicalSpecs || {}) };
     }
 
     const options: Omit<Parameters<typeof getFromDB>[0], 'modelName'> = {

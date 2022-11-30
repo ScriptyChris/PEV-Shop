@@ -1,15 +1,19 @@
-import React, { memo } from 'react';
+import React from 'react';
 import ReactPaginate from 'react-paginate';
 
-function Pagination(props) {
-  const translations = {
-    page: 'Strona',
-    previous: 'Poprzednia',
-    next: 'Następna',
-  };
-  translations.previousAriaLabel = `${translations.previous} ${translations.page.toLowerCase()}`;
-  translations.nextAriaLabel = `${translations.next} ${translations.page.toLowerCase()}`;
+const translations = {
+  page: 'Page',
+  previous: 'Previous',
+  next: 'Next',
+  get previousAriaLabel() {
+    return `${this.previous} ${this.page.toLowerCase()}`;
+  },
+  get nextAriaLabel() {
+    return `${this.next} ${this.page.toLowerCase()}`;
+  },
+};
 
+export default function Pagination(props) {
   const updateAriaLabelForPageBtn = (pageNr) => `${translations.page} ${pageNr}`;
 
   return (
@@ -53,12 +57,3 @@ function Pagination(props) {
     </div>
   );
 }
-
-function arePropsEqual(prevProp, nextProp) {
-  const equalTotalPages = prevProp.totalPages === nextProp.totalPages;
-  const equalCurrentItemPageIndex = prevProp.currentItemPageIndex === nextProp.currentItemPageIndex;
-
-  return equalTotalPages && equalCurrentItemPageIndex;
-}
-
-export default memo(Pagination, arePropsEqual);

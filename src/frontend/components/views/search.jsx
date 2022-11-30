@@ -21,7 +21,7 @@ import {
 } from '@frontend/components/utils/pevElements';
 
 // TODO: update imported module name after products dashboard will be refactored
-import { _ProductsList } from '@frontend/components/views/productList';
+import { BaseProductsList } from '@frontend/components/views/productsDashboard';
 
 import httpService from '@frontend/features/httpService';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
@@ -396,7 +396,7 @@ function SearchProductsByName({
         {translations.seeAllSearchResults}
       </PEVLink>
       <Divider variant="middle" />
-      <_ProductsList initialProducts={foundProducts} isCompactProductCardSize />
+      <BaseProductsList productsList={foundProducts} isCompactProductCardSize />
     </div>
   ) : (
     <PEVParagraph className="pev-centered-padded-text" data-cy="message:empty-search-results">

@@ -1,6 +1,6 @@
 .app-root {
     display: grid;
-    grid-template-rows: 4rem minmax(calc(100vh - 8rem), auto) 4rem;
+    grid-template-rows: 3.5rem max-content 4rem;
     grid-template-areas:
         "header"
         "main"
@@ -35,6 +35,10 @@
 }
 
 @include createMediaQuery(min-width, tablet) {
+  .app-root {
+    grid-template-rows: 4.5rem max-content 4rem;
+  }
+
   .main {
     max-width: getBreakpointPXValue(main-container);
   }
