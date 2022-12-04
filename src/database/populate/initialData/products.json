@@ -392,7 +392,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "800wh-84-2v-battery-pack-for-the-acmsmsuper-v3smonster",
     "name": "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 15, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 10, "height": 4 }, "defaultUnit": "in" }
@@ -452,7 +452,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "acmacms-set-of-pedals",
     "name": "GW ACM/ACMS+: Set of Pedals",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 6, "height": 3 }, "defaultUnit": "in" }
@@ -516,7 +516,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "acms-control-board",
     "name": "GW ACM/ACMS+: Replacement Control-Board",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -652,7 +652,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-2-3-handlebar-locking-latch",
     "name": "Dualtron 2-3- Handlebar Locking Latch",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
@@ -718,7 +718,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-2-handlebar-support-strut-suspension",
     "name": "Dualtron 2- Handlebar Support Strut & Suspension",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 8, "height": 3 }, "defaultUnit": "in" }
@@ -783,7 +783,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-2-rear-fender-mud-guard",
     "name": "Dualtron 2- Rear Fender/Mud-guard",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -851,7 +851,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-3-thunder-suspension-cartridge-modules",
     "name": "Dualtron 3-Thunder- Suspension Cartridge Modules",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" },
@@ -916,7 +916,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-charging-flap",
     "name": "Dualtron- Charging Flap",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
@@ -983,7 +983,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-eye-dashboard-throttle-control",
     "name": "Dualtron- EYE Dashboard/Throttle Control",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -1048,7 +1048,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-fingerprint-security-scanner",
     "name": "Dualtron- Fingerprint Security Scanner",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -1116,7 +1116,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-folding-handlebar",
     "name": "Dualtron- Folding Handlebar",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -1183,7 +1183,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-front-fender-mud-guard",
     "name": "Dualtron- Front Fender/Mud-guard",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -1247,7 +1247,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-seat-kit",
     "name": "Dualtron- Seat Kit",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 6, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 12, "width": 8, "height": 6 }, "defaultUnit": "in" }
@@ -1313,7 +1313,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-side-panel-to-controller-splitter-cable",
     "name": "Dualtron- Side-panel to Controller Splitter Cable",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
@@ -1380,7 +1380,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-side-panels",
     "name": "Dualtron- Side Panels",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 5, "height": 3 }, "defaultUnit": "in" },
@@ -1445,7 +1445,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-single-dual-motor-activation-switch",
     "name": "Dualtron- Single-Dual Motor Activation Switch",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
@@ -1513,7 +1513,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-spider-controller",
     "name": "Dualtron Spider- Controller",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -1646,7 +1646,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-thunder-ultra-handlebar-locking-latch",
     "name": "Dualtron Thunder-Ultra- Handlebar Locking Latch",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 3, "height": 1 }, "defaultUnit": "in" }
@@ -1711,7 +1711,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "dualtron-ultra-thunder-rear-fender-mud-guard",
     "name": "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
-    "category": "Parts|Dualtron",
+    "category": "Parts:Dualtron",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -2709,7 +2709,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "gw-monster-pair-shells",
     "name": "GW Monster: Pair of Shells",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 12, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 20, "height": 6 }, "defaultUnit": "in" },
@@ -2773,7 +2773,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "gw-mten3-replacement-control-board",
     "name": "GW MTen3: Replacement Control-Board",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -2836,7 +2836,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "gw-telsa-replacement-control-board",
     "name": "GW Telsa: Replacement Control-Board",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -2895,7 +2895,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "inmotion-v5f-set-outer-shells-black",
     "name": "V5F: Set of Outer Shells, Black",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 3, "height": 20 }, "defaultUnit": "in" }
@@ -3460,7 +3460,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-14-control-board",
     "name": "KS 14C: Replacement Control-Board",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
@@ -3558,7 +3558,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-14-led-panels-black",
     "name": "KS 14B/C: Pair of Replacement LED Covers, Black",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.7, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -3945,7 +3945,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-16-control-board",
     "name": "KS 16B: Replacement Control-Board",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -4007,7 +4007,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-16-handle-kit",
     "name": "KS 16: Retractable Handle Kit",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 20, "height": 3 }, "defaultUnit": "in" }
@@ -4132,7 +4132,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-16-led-panel-cover",
     "name": "KS 16: LED Panel Cover",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 16, "height": 1 }, "defaultUnit": "in" }
@@ -4194,7 +4194,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-16-led-strip",
     "name": "KS 16: Set of 2x LED Strips",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -4535,7 +4535,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-840wh-battery-pack",
     "name": "KS 14C & 16B: 840Wh Battery Pack Pair",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 8, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 6 }, "defaultUnit": "in" }
@@ -4591,7 +4591,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "king-song-telescopic-handle-accessory",
     "name": "KS 14B/C: Telescopic Handle Add-on",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 12, "height": 2 }, "defaultUnit": "in" }
@@ -5105,7 +5105,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks-14b-battery-pack",
     "name": "KS 14B: 174Wh Battery Pack",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [{ "heading": "colour", "data": ["black", "red"] }],
     "relatedProductsNames": [
       "KS 14S: Set of Unbranded Pads",
@@ -5165,7 +5165,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks-14d-replacement-control-board",
     "name": "KS 14D: Replacement Control-Board",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
@@ -5227,7 +5227,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks-14s-set-of-unbranded-upper-pads",
     "name": "KS 14S: Set of Unbranded Pads",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -5289,7 +5289,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks-16-set-of-unbranded-upper-pads",
     "name": "KS 16: Set of Unbranded Upper Pads",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -5352,7 +5352,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks-16s-replacement-control-board",
     "name": "KS 16S: Replacement Control-Board",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
@@ -5414,7 +5414,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks-18-unbranded-set-of-upper-pads",
     "name": "KS 18: Set of Unbranded Upper Pads",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -5474,7 +5474,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks14c-replacement-shell-black",
     "name": "KS14C: Replacement Set of Shells, Black Gloss",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
@@ -5538,7 +5538,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks16-replacement-outer-shells-black-gloss",
     "name": "KS16: Replacement Set of Outer Shells, Black Gloss",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
@@ -5597,7 +5597,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks16-replacement-outer-shells-black-matte",
     "name": "KS16: Replacement Set of Outer Shells, Rubber Finish Black Matte",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
@@ -5655,7 +5655,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks16-replacement-outer-shells-white-gloss",
     "name": "KS16: Replacement Set of Outer Shells, White Gloss",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 17, "height": 5 }, "defaultUnit": "in" }
@@ -5715,7 +5715,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks16-replacement-top-shell-switch-charging-port-black-gloss",
     "name": "KS16: Top Cover with Switch & Charging Port, Black Gloss",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 5 }, "defaultUnit": "in" }
@@ -5775,7 +5775,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks16-top-cover-switch-charging-port-black-matte",
     "name": "KS16: Top Cover with Switch & Charging Port, Black Matte",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 5 }, "defaultUnit": "in" }
@@ -5836,7 +5836,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "ks18ay-1200w-replacement-control-board",
     "name": "KS 18AY+(1200W): Replacement Control-board",
-    "category": "Parts|King Song",
+    "category": "Parts:King Song",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 5, "height": 2 }, "defaultUnit": "in" }
@@ -6007,7 +6007,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "l6-kickstand",
     "name": "L6/Lively: Kickstand",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 6, "width": 6, "height": 2 }, "defaultUnit": "in" }
@@ -6061,7 +6061,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "l6-scooter-front-spring-set",
     "name": "L6: Front Spring Set",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -6115,7 +6115,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "l6-scooter-rear-spring-set",
     "name": "L6: Rear Spring Set",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "relatedProductsNames": [
       "V3S: Replacement Control-Board",
       "V8: Pair of Structural Inner/shells",
@@ -6167,7 +6167,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "l6-standing-mat",
     "name": "L6/Lively: Standing Mat",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -6223,7 +6223,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "l8-control-board",
     "name": "L6/Lively: Replacement Control-Board",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
@@ -6285,7 +6285,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "livelyl6-411wh-replacement-battery-pack",
     "name": "Lively/L6: 411Wh Replacement Battery Pack",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 15, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 8, "height": 8 }, "defaultUnit": "in" }
@@ -6351,7 +6351,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-bare-handle-bar-folding-parts",
     "name": "Mini4- Bare Handlebar with Folding Extensions",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 6, "height": 3 }, "defaultUnit": "in" }
@@ -6416,7 +6416,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-dashboard-data-cable",
     "name": "Mini4- Dashboard Data Cable",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -6482,7 +6482,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-front-mud-guard",
     "name": "Mini4- Front Fender/Mud-guard",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -6548,7 +6548,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-handle-grip-set",
     "name": "Mini4- Handle Grip Set",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 3, "height": 3 }, "defaultUnit": "in" }
@@ -6613,7 +6613,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-rear-brake-line-cable",
     "name": "Scooter Rear Brake Line Cable",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -6683,7 +6683,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-rear-mud-guard",
     "name": "Mini4- Rear Mud-guard",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -6752,7 +6752,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-rear-wheel-drum-brake-system",
     "name": "Mini 4- Rear Drum Brake Shoe",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 6, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 6 }, "defaultUnit": "in" }
@@ -6824,7 +6824,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini-4-set-side-led-panels",
     "name": "Mini4- Side Panels",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 5, "height": 3 }, "defaultUnit": "in" },
@@ -6893,7 +6893,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini4-dashboard-throttle-unit",
     "name": "Mini4- Dashboard/Throttle Unit",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -6959,7 +6959,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini4-foot-plate-anti-slip-mat",
     "name": "Mini4- Deck Anti-slip Mat",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -7028,7 +7028,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini4-front-fork",
     "name": "Mini4- Front Fork",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 6, "height": 6 }, "defaultUnit": "in" }
@@ -7094,7 +7094,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini4-handle-bar-base",
     "name": "Mini4- Handlebar Base",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -7160,7 +7160,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini4-rear-brake-lever",
     "name": "Mini4- Rear Brake Lever",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -7226,7 +7226,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini4-solid-rubber-front-tire",
     "name": "Mini4- Solid Rubber Front Tire",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -7294,7 +7294,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "mini4-trolley-wheel-kit",
     "name": "Mini4- Trolley-wheel Kit",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -7357,7 +7357,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "monster-control-board",
     "name": "GW Monster: Replacement Control-Board",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -7421,7 +7421,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "monster-seatcushion",
     "name": "GW Monster: Seat/Cushion",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 12, "height": 8 }, "defaultUnit": "in" }
@@ -7483,7 +7483,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "monster-set-of-side-panels-black",
     "name": "GW Monster: Set of Side Panels, Black",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 16, "height": 3 }, "defaultUnit": "in" }
@@ -7545,7 +7545,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "msuper-3s-set-of-side-panels-black",
     "name": "GW MSuper V3s+: Set of Side Panels, Black",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 18, "height": 3 }, "defaultUnit": "in" }
@@ -7605,7 +7605,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "msuper-set-of-pedals",
     "name": "GW MSuper: Set of Pedals",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 16, "width": 6, "height": 3 }, "defaultUnit": "in" }
@@ -7669,7 +7669,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "msuper-v3s-control-board",
     "name": "GW MSuper V3s+: Replacement Control-Board",
-    "category": "Parts|Gotway",
+    "category": "Parts:Gotway",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -11987,7 +11987,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "scooter-brake-disc-rotor",
     "name": "Scooter Brake Disc Rotor",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -12052,7 +12052,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "scooter-brake-pads",
     "name": "4x Scooter Brake Pads",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -12181,7 +12181,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "speedway-iii-iv-600w-motor",
     "name": "Speedway III/IV- 600W Motor",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 15, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 12, "width": 12, "height": 15 }, "defaultUnit": "in" }
@@ -12246,7 +12246,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "speedway-iii-rear-fender-mud-guard",
     "name": "Speedway III- Rear Fender/Mud-guard",
-    "category": "Parts|Speedway",
+    "category": "Parts:Speedway",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -12444,7 +12444,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-dart-brake-lever-set",
     "name": "Turbowheel Dart- Brake Lever Set",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -12509,7 +12509,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-dart-front-cover-panel",
     "name": "Turbowheel Dart- Front Cover Panel",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -12579,7 +12579,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-dart-front-fender-mud-guard",
     "name": "Turbowheel Dart- Front Fender/Mud-guard",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -12645,7 +12645,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-dart-led-strips",
     "name": "Turbowheel Dart- LED Strips",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -12713,7 +12713,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-dashboard-throttle-unit",
     "name": "Turbowheel- Dashboard/Throttle Unit",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -12778,7 +12778,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-hornet-brake-lever",
     "name": "Turbowheel Hornet- Brake Lever",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -12842,7 +12842,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-hornet-front-fender-mud-guard",
     "name": "Turbowheel Hornet- Front Fender/Mud-guard",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -12910,7 +12910,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-hornet-key-ignition-voltmeter",
     "name": "Turbowheel Hornet- Key Ignition & Voltmeter",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -12977,7 +12977,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "turbowheel-hornet-rear-fender-mud-guard",
     "name": "Turbowheel Hornet- Rear Fender/Mud-guard",
-    "category": "Parts|Turbowheel",
+    "category": "Parts:Turbowheel",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -13091,7 +13091,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3pro-battery-pack-144wh",
     "name": "V3Pro: 144Wh Replacement Battery Pack",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 4 }, "defaultUnit": "in" }
@@ -13147,7 +13147,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3pro-control-board",
     "name": "V3Pro: Replacement Control-Board",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
@@ -13260,7 +13260,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3pro-v3s-charging-slot-panel",
     "name": "V3Pro: Charging Slot & Panel",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
@@ -13320,7 +13320,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3prov3s-replacement-set-of-pedals",
     "name": "V3Pro/V3S: Replacement Set of Pedals",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
@@ -13380,7 +13380,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3prov3s-replacement-touch-panel",
     "name": "V3Pro: Replacement Touch-Panel",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 6, "width": 5, "height": 1 }, "defaultUnit": "in" }
@@ -13436,7 +13436,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3prov3s-resting-bumpers",
     "name": "V3Pro: Resting Bumpers",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
@@ -13492,7 +13492,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3prov3s-set-pads",
     "name": "V3Pro: Set of Pads",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 2 }, "defaultUnit": "in" }
@@ -13548,7 +13548,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v3s-control-board",
     "name": "V3S: Replacement Control-Board",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 3 }, "defaultUnit": "in" }
@@ -13602,7 +13602,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5-v8-front-led-headlight",
     "name": "V5/V8: Front LED Headlight",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
@@ -13656,7 +13656,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-charger-port-flap",
     "name": "V5F: Charger Port Flap",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
@@ -13717,7 +13717,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-frontrear-color-strips",
     "name": "V5F: Front/Rear Color Strips",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 6, "height": 2 }, "defaultUnit": "in" }
@@ -13777,7 +13777,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-handle-kit",
     "name": "V5F/+ Handle Kit",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 2 }, "defaultUnit": "in" }
@@ -13842,7 +13842,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-set-of-center-plastic-panel-bits",
     "name": "V5F: Set of Center Plastic Panel Parts",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 6, "width": 6, "height": 3 }, "defaultUnit": "in" }
@@ -13902,7 +13902,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-set-of-outer-shells",
     "name": "V5F: Set of Outer Shells, White",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 3, "height": 20 }, "defaultUnit": "in" }
@@ -13964,7 +13964,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-set-of-pedals-white",
     "name": "V5F/V8: Set of Pedals, White",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -14024,7 +14024,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-upper-side-padding",
     "name": "V5F: Upper Side Pads",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 5, "height": 3 }, "defaultUnit": "in" }
@@ -14087,7 +14087,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-v3pro-v3s-84-2v-1-5a-standard-charger",
     "name": "V5F/V3Pro: 84.2v, 1.5A Standard Charger",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 2, "height": 6 }, "defaultUnit": "in" }
@@ -14146,7 +14146,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-v8-control-board-cover",
     "name": "V5F/V8: Control Board Cover",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 5 }, "defaultUnit": "in" }
@@ -14208,7 +14208,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5f-v8set-of-pedals-black",
     "name": "V5F/V8: Set of Pedals, Black",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 10, "height": 3 }, "defaultUnit": "in" }
@@ -14268,7 +14268,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5fv5f-control-board",
     "name": "V5F/V5F+: Replacement Control-board",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -14330,7 +14330,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v5fv8-pedal-grip-replacements",
     "name": "V5F/V8: Adhesive Pedal Grips",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.5, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 10, "width": 6, "height": 2 }, "defaultUnit": "in" }
@@ -14396,7 +14396,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-480wh-removeable-battery-pack",
     "name": "V8: 480Wh Removeable Battery Pack",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 6, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 10, "height": 6 }, "defaultUnit": "in" }
@@ -14450,7 +14450,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-charger-port-flap",
     "name": "V8: Charger Port Flap",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
@@ -14508,7 +14508,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-control-board",
     "name": "V8: Replacement Control-board",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 10, "height": 1 }, "defaultUnit": "in" }
@@ -14562,7 +14562,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-extendable-handle",
     "name": "V8: Extendable Handle",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 6, "height": 1 }, "defaultUnit": "in" }
@@ -14620,7 +14620,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-pair-innershells",
     "name": "V8: Pair of Structural Inner/shells",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 4, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 18, "height": 6 }, "defaultUnit": "in" }
@@ -14680,7 +14680,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-pair-of-outer-shells",
     "name": "V8: Pair of Outer Shells",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 18, "width": 18, "height": 4 }, "defaultUnit": "in" }
@@ -14739,7 +14739,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-protective-cover",
     "name": "V8/Glide 3: Protective Cover",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 8, "width": 8, "height": 1 }, "defaultUnit": "in" }
@@ -14793,7 +14793,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-rear-led-light",
     "name": "V8: Rear LED Light",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 1, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }
@@ -14852,7 +14852,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-replacement-charging-port-wire",
     "name": "V8: Replacement Charging Port & Wire",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 2 }, "defaultUnit": "in" }
@@ -14908,7 +14908,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-replacement-motor",
     "name": "V8: 800W Motor",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 18, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 20, "width": 20, "height": 8 }, "defaultUnit": "in" }
@@ -14973,7 +14973,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-set-of-center-plastic-panel-bits",
     "name": "V8: Set of Center Plastic Panel Parts",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 2, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 15, "width": 6, "height": 3 }, "defaultUnit": "in" }
@@ -15035,7 +15035,7 @@
     "reviews": { "list": [], "averageRating": 0 },
     "url": "v8-v5f-speaker",
     "name": "V5F/V8: Internal Speaker",
-    "category": "Parts|Inmotion",
+    "category": "Parts:Inmotion",
     "technicalSpecs": [
       { "heading": "weight", "data": 0.3, "defaultUnit": "lbs" },
       { "heading": "dimensions", "data": { "length": 5, "width": 5, "height": 1 }, "defaultUnit": "in" }

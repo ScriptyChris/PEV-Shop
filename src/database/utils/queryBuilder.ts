@@ -61,12 +61,21 @@ const getNameListConfig = (reqQuery: TReqQuery) => {
 };
 
 const getProductsWithChosenCategories = (reqQuery: TReqQuery) => {
+  let productCategories = null;
+
   if (typeof reqQuery.productCategories === 'string') {
-    const productCategories = reqQuery.productCategories.split(',');
-    return { category: { $in: productCategories } };
+    productCategories = reqQuery.productCategories.split(',');
+  } else if (
+    Array.isArray(reqQuery.productCategories) &&
+    reqQuery.productCategories &&
+    typeof reqQuery.productCategories[0] === 'string' &&
+    reqQuery.productCategories[0].length
+  ) {
+    // TODO: [DX] unify search params interface
+    productCategories = reqQuery.productCategories[0].split('|');
   }
 
-  return null;
+  return productCategories && { category: { $in: productCategories } };
 };
 
 type TFilterQueryHeading = {
