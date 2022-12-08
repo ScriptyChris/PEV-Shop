@@ -84,38 +84,48 @@ type TFilterQueryHeading = {
 type TFilterQueryData = {
   [key: string]: number | string | string[] | boolean | { [key: string]: number | string[] };
 };
-const getFilters = (reqQuery: TReqQuery) => {
-  if (typeof reqQuery.productsFilters === 'string') {
-    const specsList = reqQuery.productsFilters.split(',').map(getFilters.mapQuery);
+const getTechnicalSpecs = (reqQuery: TReqQuery) => {
+  let specsList = null;
 
-    return {
+  if (typeof reqQuery.productTechnicalSpecs === 'string') {
+    specsList = reqQuery.productTechnicalSpecs.split(',').map(getTechnicalSpecs.mapQuery);
+  } else if (
+    Array.isArray(reqQuery.productTechnicalSpecs) &&
+    reqQuery.productTechnicalSpecs &&
+    typeof reqQuery.productTechnicalSpecs[0] === 'string' &&
+    reqQuery.productTechnicalSpecs[0].length
+  ) {
+    // TODO: [DX] unify search params interface
+    specsList = reqQuery.productTechnicalSpecs[0].split('|').map(getTechnicalSpecs.mapQuery);
+  }
+
+  return (
+    specsList && {
       $and: specsList.map(([heading, data]) => ({
         $and: [heading, data],
       })),
-    };
-  }
-
-  return null;
+    }
+  );
 };
-getFilters.HEADING_KEY = 'technicalSpecs.heading' as const;
-getFilters.DATA_BASE_KEY = 'technicalSpecs.data' as const;
-getFilters.MIN_MAX_SEPARATOR = '--' as const;
-getFilters.PIPE_SEPARATOR = '|' as const;
-getFilters.SPACE = ' ' as const;
-getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX = /(?<!_)(_)(?!_)/g;
-getFilters.DOUBLE_UNDERSCORE_KEY_SEPARATOR = '__' as const;
-getFilters.BOOLEAN_VALUES = {
+getTechnicalSpecs.HEADING_KEY = 'technicalSpecs.heading' as const;
+getTechnicalSpecs.DATA_BASE_KEY = 'technicalSpecs.data' as const;
+getTechnicalSpecs.MIN_MAX_SEPARATOR = '--' as const;
+getTechnicalSpecs.PIPE_SEPARATOR = '|' as const;
+getTechnicalSpecs.SPACE = ' ' as const;
+getTechnicalSpecs.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX = /(?<!_)(_)(?!_)/g;
+getTechnicalSpecs.DOUBLE_UNDERSCORE_KEY_SEPARATOR = '__' as const;
+getTechnicalSpecs.BOOLEAN_VALUES = {
   TRUE: 'true',
   FALSE: 'false',
 } as const;
-getFilters.MIN_MAX_MAP = Object.freeze({
+getTechnicalSpecs.MIN_MAX_MAP = Object.freeze({
   min: '$gte',
   max: '$lte',
 } as const);
-getFilters.getQueryDataKey = (subKey = '') => {
-  return subKey ? `technicalSpecs.data.${subKey}` : getFilters.DATA_BASE_KEY;
+getTechnicalSpecs.getQueryDataKey = (subKey = '') => {
+  return subKey ? `technicalSpecs.data.${subKey}` : getTechnicalSpecs.DATA_BASE_KEY;
 };
-getFilters.mapQuery = (filter: string) => {
+getTechnicalSpecs.mapQuery = (filter: string) => {
   type TFilterBlueprintQuery = {
     heading: {
       key: string;
@@ -130,38 +140,49 @@ getFilters.mapQuery = (filter: string) => {
   const [headingName, value] = filter.split(':');
   const filterQueryTemplateObj: TFilterBlueprintQuery = {
     heading: {
-      key: getFilters.HEADING_KEY,
-      value: headingName.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getFilters.SPACE),
+      key: getTechnicalSpecs.HEADING_KEY,
+      value: headingName
+        .toLowerCase()
+        .replace(getTechnicalSpecs.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getTechnicalSpecs.SPACE),
     },
     data: {
-      key: getFilters.getQueryDataKey(),
-      value: value.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getFilters.SPACE),
+      key: getTechnicalSpecs.getQueryDataKey(),
+      value: value
+        .toLowerCase()
+        .replace(getTechnicalSpecs.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getTechnicalSpecs.SPACE),
     },
   };
 
   if (!Number.isNaN(Number(value))) {
-    const [wholeHeading, minOrMaxValue] = filterQueryTemplateObj.heading.value.split(getFilters.MIN_MAX_SEPARATOR);
-    const [baseHeading, optionalNestedData = ''] = wholeHeading.split(getFilters.DOUBLE_UNDERSCORE_KEY_SEPARATOR);
+    const [wholeHeading, minOrMaxValue] = filterQueryTemplateObj.heading.value.split(
+      getTechnicalSpecs.MIN_MAX_SEPARATOR
+    );
+    const [baseHeading, optionalNestedData = ''] = wholeHeading.split(
+      getTechnicalSpecs.DOUBLE_UNDERSCORE_KEY_SEPARATOR
+    );
 
     filterQueryTemplateObj.heading.value = baseHeading;
-    filterQueryTemplateObj.data.key = getFilters.getQueryDataKey(optionalNestedData.toLowerCase());
+    filterQueryTemplateObj.data.key = getTechnicalSpecs.getQueryDataKey(optionalNestedData.toLowerCase());
 
     const parsedValue = Number(value);
 
     filterQueryTemplateObj.data.value = minOrMaxValue
       ? {
-          [getFilters.MIN_MAX_MAP[minOrMaxValue.toLowerCase() as keyof typeof getFilters.MIN_MAX_MAP]]: parsedValue,
+          [getTechnicalSpecs.MIN_MAX_MAP[minOrMaxValue.toLowerCase() as keyof typeof getTechnicalSpecs.MIN_MAX_MAP]]:
+            parsedValue,
         }
       : parsedValue;
-  } else if (value.includes(getFilters.PIPE_SEPARATOR)) {
+  } else if (value.includes(getTechnicalSpecs.PIPE_SEPARATOR)) {
     const parsedValue = value
-      .split(getFilters.PIPE_SEPARATOR)
-      .map((val) => val.toLowerCase().replace(getFilters.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getFilters.SPACE));
+      .split(getTechnicalSpecs.PIPE_SEPARATOR)
+      .map((val) =>
+        val.toLowerCase().replace(getTechnicalSpecs.UNDERSCORE_AS_SPACE_SEPARATOR_REGEX, getTechnicalSpecs.SPACE)
+      );
     filterQueryTemplateObj.data.value = {
       $all: parsedValue,
     };
-  } else if (value === getFilters.BOOLEAN_VALUES.TRUE || value === getFilters.BOOLEAN_VALUES.FALSE) {
-    filterQueryTemplateObj.data.value = value === getFilters.BOOLEAN_VALUES.TRUE;
+  } else if (value === getTechnicalSpecs.BOOLEAN_VALUES.TRUE || value === getTechnicalSpecs.BOOLEAN_VALUES.FALSE) {
+    filterQueryTemplateObj.data.value = value === getTechnicalSpecs.BOOLEAN_VALUES.TRUE;
   }
 
   const filterQueryHeading: TFilterQueryHeading = {
@@ -181,5 +202,5 @@ export const queryBuilder = {
   getNameListConfig,
   getSearchByUrlConfig,
   getProductsWithChosenCategories,
-  getFilters,
+  getTechnicalSpecs,
 };

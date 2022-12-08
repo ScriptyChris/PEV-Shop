@@ -1,4 +1,4 @@
-.products-filter {
+.products-spec-chooser {
     &__header {
         position: relative;
         width: 100%;
@@ -14,7 +14,6 @@
     &__form {
         align-items: stretch;
         margin: 1rem;
-        margin-top: 0;
 
         &-field-legend {}
 
@@ -55,22 +54,18 @@
 }
 
 @include useMediaQuery(tablet) {
-    .products-filter__form-field-controls-level {
+    .products-spec-chooser__form {
+        margin-inline: 0.5rem;
+    }
+
+    .products-spec-chooser__form-field-controls-level {
         grid-template-columns: 1fr;
         grid-template-rows: 1fr 0.75fr 1fr;
     }
 }
 
-@include createMediaQuery(min-width, tablet) {
-    .products-filter__form {
-        margin-top: 1rem;
-    }
-}
-
 @include useMediaQuery(desktop) {
-    .products-filter__form {
-        margin-inline: 0;
-
+    .products-spec-chooser__form {
         &-field-controls-nested {
             margin-inline-end: 0;
         }
