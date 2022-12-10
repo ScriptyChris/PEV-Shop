@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 import getLogger from '@commons/logger';
+import { FILTER_RANGE_SEPARATOR, ARRAY_FORMAT_SEPARATOR } from '@root/commons/consts';
+import { productPriceRangeValidator } from '@commons/filterValidators';
 
 type TReqQuery = Request['query'];
 
@@ -45,6 +47,35 @@ const getIdListConfig = (reqQuery: TReqQuery) => {
   return null;
 };
 
+const getPriceConfig = (reqQuery: TReqQuery) => {
+  if (
+    !(reqQuery.productPrice && Array.isArray(reqQuery.productPrice) && typeof reqQuery.productPrice[0] === 'string')
+  ) {
+    return null;
+  }
+
+  const validatedPriceRange = productPriceRangeValidator(reqQuery.productPrice as string[]);
+  if (!validatedPriceRange) {
+    return null;
+  }
+
+  const { priceRange, error } = validatedPriceRange;
+
+  if (error && priceRange.every((price) => price === null)) {
+    throw Error(error);
+  }
+
+  const [minPrice, maxPrice] = priceRange;
+  const priceQueryConditions: Partial<{
+    $gte: number;
+    $lte: number;
+  }> = {};
+  if (minPrice !== null) priceQueryConditions.$gte = minPrice;
+  if (maxPrice !== null) priceQueryConditions.$lte = maxPrice;
+
+  return { price: priceQueryConditions };
+};
+
 const getNameListConfig = (reqQuery: TReqQuery) => {
   if (typeof reqQuery.nameList === 'string') {
     try {
@@ -72,7 +103,7 @@ const getProductsWithChosenCategories = (reqQuery: TReqQuery) => {
     reqQuery.productCategories[0].length
   ) {
     // TODO: [DX] unify search params interface
-    productCategories = reqQuery.productCategories[0].split('|');
+    productCategories = reqQuery.productCategories[0].split(ARRAY_FORMAT_SEPARATOR);
   }
 
   return productCategories && { category: { $in: productCategories } };
@@ -96,7 +127,7 @@ const getTechnicalSpecs = (reqQuery: TReqQuery) => {
     reqQuery.productTechnicalSpecs[0].length
   ) {
     // TODO: [DX] unify search params interface
-    specsList = reqQuery.productTechnicalSpecs[0].split('|').map(getTechnicalSpecs.mapQuery);
+    specsList = reqQuery.productTechnicalSpecs[0].split(ARRAY_FORMAT_SEPARATOR).map(getTechnicalSpecs.mapQuery);
   }
 
   return (
@@ -137,7 +168,7 @@ getTechnicalSpecs.mapQuery = (filter: string) => {
     };
   };
 
-  const [headingName, value] = filter.split(':');
+  const [headingName, value] = filter.split(FILTER_RANGE_SEPARATOR);
   const filterQueryTemplateObj: TFilterBlueprintQuery = {
     heading: {
       key: getTechnicalSpecs.HEADING_KEY,
@@ -199,6 +230,7 @@ export const queryBuilder = {
   getSearchByNameConfig,
   getPaginationConfig,
   getIdListConfig,
+  getPriceConfig,
   getNameListConfig,
   getSearchByUrlConfig,
   getProductsWithChosenCategories,

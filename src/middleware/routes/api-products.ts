@@ -87,6 +87,7 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
     // TODO: ... and really refactor this!
     const idListConfig = queryBuilder.getIdListConfig(req.query);
     const nameListConfig = queryBuilder.getNameListConfig(req.query);
+    const price = queryBuilder.getPriceConfig(req.query);
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const searchByUrl = queryBuilder.getSearchByUrlConfig(req.query);
@@ -103,8 +104,8 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
       ({ query, projection } = searchByName);
     } else if (searchByUrl) {
       query = searchByUrl;
-    } else if (chosenCategories || technicalSpecs) {
-      query = { ...(chosenCategories || {}), ...(technicalSpecs || {}) };
+    } else if (price || chosenCategories || technicalSpecs) {
+      query = { ...(price || {}), ...(chosenCategories || {}), ...(technicalSpecs || {}) };
     }
 
     const options: Omit<Parameters<typeof getFromDB>[0], 'modelName'> = {

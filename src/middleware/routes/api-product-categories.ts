@@ -5,7 +5,7 @@ import { HTTP_STATUS_CODE } from '@src/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { COLLECTION_NAMES } from '@database/models';
-import { CATEGORIES_SEPARATOR } from '@commons/consts';
+import { CATEGORY_DEPTH_SEPARATOR } from '@commons/consts';
 
 const router = Router();
 const logger = getLogger(module.filename);
@@ -16,8 +16,8 @@ function createCategoriesHierarchy(productCategories: string[]) {
   const categoriesHierarchy: TCategory[] = [];
 
   productCategories.forEach((category) => {
-    if (category.includes(CATEGORIES_SEPARATOR)) {
-      const [categoryName, childCategory] = category.split(CATEGORIES_SEPARATOR);
+    if (category.includes(CATEGORY_DEPTH_SEPARATOR)) {
+      const [categoryName, childCategory] = category.split(CATEGORY_DEPTH_SEPARATOR);
       const parentCategorySlotIndex = categoriesHierarchy.findIndex(
         (categoryItem) => categoryItem.categoryName === categoryName
       );

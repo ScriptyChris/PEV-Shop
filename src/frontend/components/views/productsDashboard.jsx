@@ -16,7 +16,14 @@ import Toolbar from '@material-ui/core/Toolbar';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
-import { PEVButton, PEVIconButton, PEVHeading } from '@frontend/components/utils/pevElements';
+import {
+  PEVButton,
+  PEVIconButton,
+  PEVHeading,
+  PEVForm,
+  PEVTextField,
+  PEVFormFieldError,
+} from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import ProductCard, { PRODUCT_CARD_LAYOUT_TYPES } from './productCard';
 import Pagination from '@frontend/components/utils/pagination';
@@ -25,6 +32,8 @@ import { ProductComparisonCandidatesList } from './productComparisonCandidates';
 import TechnicalSpecsChooser from './technicalSpecsChooser';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import { routeHelpers } from '@frontend/components/pages/_routes';
+import { FILTER_RANGE_SEPARATOR } from '@commons/consts';
+import { productPriceRangeValidator } from '@commons/filterValidators';
 
 const translations = {
   lackOfProducts: 'Lack of products...',
@@ -34,9 +43,13 @@ const translations = {
   sortingMode: 'sort',
   tabletFiltersToggleBtn: 'toggle filters',
   filtersHeading: 'Filters',
+  priceFilterHeading: 'Price',
+  minLabel: 'min',
+  maxLabel: 'max',
   goBackLabel: 'go back',
   clear: 'Clear',
   apply: 'Apply',
+  minValueGreaterThanMaxError: 'Minimum value must be less than maximum!',
 };
 
 function ViewModeBtn({ viewModeType, onClick }) {
@@ -194,6 +207,7 @@ function ProductsList({ currentListViewModeClassName, listViewModeType, searchPa
     productsPerPage,
     pageNumber,
     name,
+    productPrice = [],
     productCategories = [],
     productTechnicalSpecs = [],
   } = {}) => {
@@ -201,24 +215,29 @@ function ProductsList({ currentListViewModeClassName, listViewModeType, searchPa
       return;
     }
 
+    const normalizedForAPI = {
+      productPrice: productPrice.length ? productPrice : undefined,
+      productCategories: productCategories.length ? productCategories : undefined,
+      productTechnicalSpecs: productTechnicalSpecs.length ? productTechnicalSpecs : undefined,
+    };
+
     let productsList = [];
     let totalPages = 1;
     const isHighestProductsPerPage = productsPerPage === productsPerPageLimits[productsPerPageLimits.length - 1];
 
     if (isHighestProductsPerPage) {
-      productsList = await httpService
-        .getProducts({ name, productCategories, productTechnicalSpecs }, true)
-        .then(onGetProducts);
+      productsList = await httpService.getProducts({ name, ...normalizedForAPI }, true).then(onGetProducts);
     } else {
       const pagination = { pageNumber, productsPerPage };
       ({ productsList, totalPages } = await httpService
-        .getProducts({ name, pagination, productCategories, productTechnicalSpecs }, true)
+        .getProducts({ name, pagination, ...normalizedForAPI }, true)
         .then(onGetProducts));
     }
 
     setProductsList(productsList);
     settersProp.setTotalPages(totalPages);
     settersProp.setCurrentProductPage(pageNumber);
+    settersProp.setProductPrice(productPrice);
     settersProp.setProductCategories(productCategories);
     settersProp.setProductTechnicalSpecs(productTechnicalSpecs);
   };
@@ -262,7 +281,9 @@ const useFiltersCommonActions = ({ initialFiltersNames, onFiltersCycleEnd }) => 
       );
       if (allFiltersChildrenUpdated) {
         const filtersOutput = Object.fromEntries(
-          Object.entries(filtersChildrenRef.current).map(([key, value]) => [key, value.value])
+          Object.entries(filtersChildrenRef.current)
+            .map(([key, value]) => [key, value.value])
+            .filter(([, value]) => (Array.isArray(value) && !value.length ? false : true))
         );
         onFiltersCycleEnd(filtersOutput);
       }
@@ -299,6 +320,7 @@ const useFiltersCommonActions = ({ initialFiltersNames, onFiltersCycleEnd }) => 
   return {
     filtersCommonParentAPI: { triggerFiltersNextCycle, isSubmitBtnDisabled },
     filtersCommonChildrenAPI: {
+      triggerFiltersNextCycle,
       tryUpdatingFiltersCycleData,
       renderIndex,
       requestTogglingSubmitBtnDisability,
@@ -307,7 +329,114 @@ const useFiltersCommonActions = ({ initialFiltersNames, onFiltersCycleEnd }) => 
   };
 };
 
+function PriceFilter({ productPrice, filtersCommonChildrenAPI }) {
+  const [priceRenderingKeyIndex, setPriceRenderingKeyIndex] = useState(0);
+  const [minPrice, maxPrice] = useMemo(() => {
+    const validatedPriceRange = productPriceRangeValidator(productPrice);
+
+    return validatedPriceRange ? validatedPriceRange.priceRange.map((price) => price ?? '') : ['', ''];
+  }, [productPrice]);
+  const formInitials = { minPrice, maxPrice };
+  const externalSubmitTriggerRef = useRef();
+
+  useEffect(() => {
+    setPriceRenderingKeyIndex((prev) => prev + 1);
+  }, [minPrice, maxPrice]);
+
+  useEffect(() => {
+    if (filtersCommonChildrenAPI.renderIndex === 0) {
+      return;
+    }
+
+    externalSubmitTriggerRef.current?.();
+  }, [filtersCommonChildrenAPI?.renderIndex]);
+
+  const validateHandler = (values) => {
+    const errors = {};
+
+    if (values.maxPrice && values.minPrice > values.maxPrice) {
+      errors.minPriceGreaterThanMaxPrice = true;
+    }
+
+    filtersCommonChildrenAPI.requestTogglingSubmitBtnDisability(
+      filtersCommonChildrenAPI.filterNamesMap.productPrice,
+      !!errors.minPriceGreaterThanMaxPrice
+    );
+
+    return errors;
+  };
+
+  const handleSubmit = (values) => {
+    const outputValues = Object.entries(values)
+      .filter(([, value]) => value !== '')
+      .map(([key, value]) => `${key.replace('Price', '')}${FILTER_RANGE_SEPARATOR}${value}`);
+
+    filtersCommonChildrenAPI.tryUpdatingFiltersCycleData(
+      filtersCommonChildrenAPI.filterNamesMap.productPrice,
+      outputValues
+    );
+  };
+
+  return (
+    <section className="products-price-filter">
+      <PEVHeading level={3}>{translations.priceFilterHeading}</PEVHeading>
+      <PEVForm
+        initialValues={formInitials}
+        validate={validateHandler}
+        onSubmit={handleSubmit}
+        key={priceRenderingKeyIndex}
+      >
+        {(formikProps) => {
+          externalSubmitTriggerRef.current = formikProps.handleSubmit.bind(formikProps);
+
+          // TODO: [DX] these values should be provided by API
+          const [minValue, maxValue] = [0, 99999];
+
+          return (
+            <div className="products-price-filter__control-field">
+              <PEVTextField
+                labelInside
+                label={translations.minLabel}
+                identity="price-min"
+                type="number"
+                inputProps={{
+                  min: minValue,
+                  max: maxValue,
+                  name: 'minPrice',
+                  value: formikProps.values.minPrice,
+                }}
+                onEnterKey={filtersCommonChildrenAPI.triggerFiltersNextCycle}
+              />
+
+              <span className="products-price-filter__control-field-separator">-</span>
+
+              <PEVTextField
+                labelInside
+                label={translations.maxLabel}
+                identity="price-max"
+                type="number"
+                inputProps={{
+                  min: minValue,
+                  max: maxValue,
+                  name: 'maxPrice',
+                  value: formikProps.values.maxPrice,
+                }}
+                onEnterKey={filtersCommonChildrenAPI.triggerFiltersNextCycle}
+              />
+
+              {formikProps.errors.minPriceGreaterThanMaxPrice && (
+                <PEVFormFieldError>{translations.minValueGreaterThanMaxError}</PEVFormFieldError>
+              )}
+            </div>
+          );
+        }}
+      </PEVForm>
+    </section>
+  );
+}
+
 function Filters({
+  productPrice,
   productCategories,
   productTechnicalSpecs,
   updateProductsDashboardQuery,
@@ -319,7 +448,7 @@ function Filters({
   closeFiltersMobileMenu,
 }) {
   const { filtersCommonParentAPI, filtersCommonChildrenAPI } = useFiltersCommonActions({
-    initialFiltersNames: ['productCategories', 'productTechnicalSpecs'],
+    initialFiltersNames: ['productPrice', 'productCategories', 'productTechnicalSpecs'],
     onFiltersCycleEnd: updateProductsDashboardQuery,
   });
   const onFiltersSidebarToggle = () => setIsFiltersSidebarCollapsed((prevState) => !prevState);
@@ -343,35 +472,37 @@ function Filters({
       {translations.filtersHeading}
     </PEVHeading>
   );
-  const categoriesTreeElement = (
-    <CategoriesTree
-      {...{ filtersCommonChildrenAPI }}
-      preSelectedCategories={productCategories}
-      shouldPreselectLazily
-      isMultiselect
-    />
-  );
-  const technicalSpecsChooser = (
-    <TechnicalSpecsChooser
-      {...{
-        productCategories,
-        productTechnicalSpecs,
-        filtersCommonChildrenAPI,
-      }}
-    />
-  );
-  const filtersCommonActionsContainer = (
-    <div className="products-dashboard__filters-common-actions pev-flex">
-      <PEVButton onClick={handleClearFilters}>{translations.clear}</PEVButton>
-      <PEVButton
-        onClick={handleApplyFilters}
-        variant="contained"
-        color="primary"
-        disabled={filtersCommonParentAPI.isSubmitBtnDisabled}
-      >
-        {translations.apply}
-      </PEVButton>
-    </div>
+
+  const filterElements = (
+    <>
+      <CategoriesTree
+        {...{ filtersCommonChildrenAPI }}
+        preSelectedCategories={productCategories}
+        shouldPreselectLazily
+        isMultiselect
+      />
+      <Divider />
+      <PriceFilter {...{ productPrice, filtersCommonChildrenAPI }} />
+      <Divider />
+      <TechnicalSpecsChooser
+        {...{
+          productCategories,
+          productTechnicalSpecs,
+          filtersCommonChildrenAPI,
+        }}
+      />
+      <div className="products-dashboard__filters-common-actions pev-flex">
+        <PEVButton onClick={handleClearFilters}>{translations.clear}</PEVButton>
+        <PEVButton
+          onClick={handleApplyFilters}
+          variant="contained"
+          color="primary"
+          disabled={filtersCommonParentAPI.isSubmitBtnDisabled}
+        >
+          {translations.apply}
+        </PEVButton>
+      </div>
+    </>
   );
 
   return isMobileLayout ? (
@@ -389,41 +520,33 @@ function Filters({
           {filtersHeading}
         </header>
 
-        {categoriesTreeElement}
-        <Divider />
-        {technicalSpecsChooser}
-        {filtersCommonActionsContainer}
+        {filterElements}
       </Paper>
     </Drawer>
   ) : (
-    <>
-      <Paper
-        component="aside"
-        variant="outlined"
-        className={classNames('products-dashboard__filters-sidebar', {
-          'products-dashboard__filters-sidebar--collapsed': isFiltersSidebarCollapsed,
-        })}
-      >
-        <header className="products-dashboard__filters-header">{filtersHeading}</header>
+    <Paper
+      component="aside"
+      variant="outlined"
+      className={classNames('products-dashboard__filters-sidebar', {
+        'products-dashboard__filters-sidebar--collapsed': isFiltersSidebarCollapsed,
+      })}
+    >
+      <header className="products-dashboard__filters-header">{filtersHeading}</header>
 
-        {isTabletLayout && (
-          <PEVIconButton
-            onClick={onFiltersSidebarToggle}
-            className="products-dashboard__filters-sidebar-extend-toggle-btn"
-            a11y={translations.tabletFiltersToggleBtn}
-          >
-            {!isFiltersSidebarCollapsed && <ChevronLeftIcon fontSize="small" />}
-            <TuneIcon fontSize="small" />
-            {isFiltersSidebarCollapsed && <ChevronRightIcon fontSize="small" />}
-          </PEVIconButton>
-        )}
+      {isTabletLayout && (
+        <PEVIconButton
+          onClick={onFiltersSidebarToggle}
+          className="products-dashboard__filters-sidebar-extend-toggle-btn"
+          a11y={translations.tabletFiltersToggleBtn}
+        >
+          {!isFiltersSidebarCollapsed && <ChevronLeftIcon fontSize="small" />}
+          <TuneIcon fontSize="small" />
+          {isFiltersSidebarCollapsed && <ChevronRightIcon fontSize="small" />}
+        </PEVIconButton>
+      )}
 
-        {categoriesTreeElement}
-        <Divider />
-        {technicalSpecsChooser}
-        {filtersCommonActionsContainer}
-      </Paper>
-    </>
+      {filterElements}
+    </Paper>
   );
 }
 
@@ -437,6 +560,7 @@ export default function ProductsDashboard() {
   );
   const [isFiltersSidebarCollapsed, setIsFiltersSidebarCollapsed] = useState(false);
   const [isFiltersMobileMenuVisible, setIsFiltersMobileMenuVisible] = useState(false);
+  const [productPrice, setProductPrice] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
   const [productTechnicalSpecs, setProductTechnicalSpecs] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -499,6 +623,7 @@ export default function ProductsDashboard() {
     >
       <Filters
         {...{
+          productPrice,
           productCategories,
           productTechnicalSpecs,
           isFiltersSidebarCollapsed,
@@ -543,6 +668,7 @@ export default function ProductsDashboard() {
           settersProp: {
             setTotalPages,
             setCurrentProductPage,
+            setProductPrice,
             setProductCategories,
             setProductTechnicalSpecs,
           },

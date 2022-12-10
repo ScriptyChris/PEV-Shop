@@ -19,6 +19,7 @@ import {
   PEVFormFieldError,
 } from '@frontend/components/utils/pevElements';
 import productSpecsService from '@frontend/features/productSpecsService';
+import { FILTER_RANGE_SEPARATOR } from '@commons/consts';
 
 const translations = {
   specsChooserHeader: 'Technical specs',
@@ -79,6 +80,7 @@ const GetControlsForSpecs = (() => {
 
   return function _GetControlsForSpecs({
     formikProps,
+    filtersCommonChildrenAPI,
     spec: { _normalizedName: name, values, type, descriptions, defaultUnit, _namesRangeMapping: namesRangeMapping },
   }) {
     const templateMethod = TEMPLATE_FUNCTION_PER_CONTROL_TYPE[type];
@@ -116,14 +118,21 @@ const GetControlsForSpecs = (() => {
             <PEVLegend className="products-spec-chooser__form-field-legend">{getLegendContent()}</PEVLegend>
           </AccordionSummary>
           <AccordionDetails className="products-spec-chooser__form-field-controls">
-            {templateMethod(formikProps, name, namesRangeMapping[name], values, descriptions)}
+            {templateMethod(formikProps, filtersCommonChildrenAPI, name, namesRangeMapping[name], values, descriptions)}
           </AccordionDetails>
         </Accordion>
       </PEVFieldset>
     );
   };
 
-  function getInputNumberControl(formikProps, specName, specRangeNames, specValues, specDescriptions) {
+  function getInputNumberControl(
+    formikProps,
+    filtersCommonChildrenAPI,
+    specName,
+    specRangeNames,
+    specValues,
+    specDescriptions
+  ) {
     return specValues.map(([vMin, vMax], index) => {
       vMin = Math.floor(vMin);
       vMax = Math.ceil(vMax);
@@ -176,6 +185,7 @@ const GetControlsForSpecs = (() => {
               overrideProps={{
                 onChange: formikProps.handleChange,
               }}
+              onEnterKey={filtersCommonChildrenAPI.triggerFiltersNextCycle}
             />
 
             <span className="products-spec-chooser__form-range-separator">-</span>
@@ -194,6 +204,7 @@ const GetControlsForSpecs = (() => {
               overrideProps={{
                 onChange: formikProps.handleChange,
               }}
+              onEnterKey={filtersCommonChildrenAPI.triggerFiltersNextCycle}
             />
 
             {errorList.length > 0 &&
@@ -221,7 +232,7 @@ const GetControlsForSpecs = (() => {
     });
   }
 
-  function getInputCheckboxControl(formikProps, specName, _, specValues) {
+  function getInputCheckboxControl(formikProps, _, specName, __, specValues) {
     const value = formikProps.values[specName] === undefined ? '' : formikProps.values[specName];
     const normalizedSpecValues = specValues[0].map((specV) => specV.replaceAll(CHARS.SPACE, SPEC_NAMES_SEPARATORS.GAP));
 
@@ -241,7 +252,7 @@ const GetControlsForSpecs = (() => {
   }
 })();
 
-function FormControls({ formikProps, productSpecsPerSelectedCategory, formInitials }) {
+function FormControls({ formikProps, filtersCommonChildrenAPI, productSpecsPerSelectedCategory, formInitials }) {
   if (!productSpecsPerSelectedCategory.length) {
     return;
   }
@@ -269,7 +280,7 @@ function FormControls({ formikProps, productSpecsPerSelectedCategory, formInitia
 
     return (
       spec._namesRangeMapping[spec._normalizedName]?.length && (
-        <GetControlsForSpecs formikProps={formikProps} spec={spec} key={spec.name} />
+        <GetControlsForSpecs {...{ formikProps, filtersCommonChildrenAPI, spec }} key={spec.name} />
       )
     );
   });
@@ -472,7 +483,7 @@ export default function TechnicalSpecsChooser({ productCategories, productTechni
     }
 
     const technicalSpecsToUpdate = productTechnicalSpecs.map((spec) => {
-      let [key, value] = spec.split(':');
+      let [key, value] = spec.split(FILTER_RANGE_SEPARATOR);
 
       const valueAsNum = Number(value);
       if (valueAsNum !== value) {
@@ -516,7 +527,9 @@ export default function TechnicalSpecsChooser({ productCategories, productTechni
       return;
     }
 
-    const filterValuesOutput = Object.entries(chosenTechnicalSpecsOutputRef.current).map((specs) => specs.join(':'));
+    const filterValuesOutput = Object.entries(chosenTechnicalSpecsOutputRef.current).map((specs) =>
+      specs.join(FILTER_RANGE_SEPARATOR)
+    );
     filtersCommonChildrenAPI.tryUpdatingFiltersCycleData(
       filtersCommonChildrenAPI.filterNamesMap.productTechnicalSpecs,
       filterValuesOutput
@@ -529,33 +542,33 @@ export default function TechnicalSpecsChooser({ productCategories, productTechni
       .map(([key]) => [key, true])
   );
 
-  const specsForm = (
-    <PEVForm
-      className="products-spec-chooser__form pev-flex pev-flex--columned"
-      data-cy="container:products-spec-chooser"
-      initialValues={formInitials}
-      initialTouched={formInitiallyTouched}
-      validate={validateHandler}
-      onSubmit={handleSubmit}
-      key={`technicalSpecsChooser${formRenderingKeyIndex}`}
-    >
-      {(formikProps) => {
-        const _handleChange = formikProps.handleChange.bind(formikProps);
-        formikProps.handleChange = function (event) {
-          handleOnChange(event);
-          _handleChange(event);
-        };
-        externalSubmitTriggerRef.current = formikProps.handleSubmit.bind(formikProps);
-
-        return <FormControls {...{ formikProps, productSpecsPerSelectedCategory, formInitials }} />;
-      }}
-    </PEVForm>
-  );
-
   return (
     <section>
       <PEVHeading level={3}>{translations.specsChooserHeader}</PEVHeading>
-      {specsForm}
+      <PEVForm
+        className="products-spec-chooser__form pev-flex pev-flex--columned"
+        data-cy="container:products-spec-chooser"
+        initialValues={formInitials}
+        initialTouched={formInitiallyTouched}
+        validate={validateHandler}
+        onSubmit={handleSubmit}
+        key={formRenderingKeyIndex}
+      >
+        {(formikProps) => {
+          const _handleChange = formikProps.handleChange.bind(formikProps);
+          formikProps.handleChange = function (event) {
+            handleOnChange(event);
+            _handleChange(event);
+          };
+          externalSubmitTriggerRef.current = formikProps.handleSubmit.bind(formikProps);
+
+          return (
+            <FormControls
+              {...{ formikProps, filtersCommonChildrenAPI, productSpecsPerSelectedCategory, formInitials }}
+            />
+          );
+        }}
+      </PEVForm>
     </section>
   );
 }

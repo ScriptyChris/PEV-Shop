@@ -221,6 +221,7 @@ const httpService = new (class HttpService extends Ajax {
   getProducts(
     initialSearchParams: Partial<{
       name: IProduct['name'];
+      price: [IProduct['price'], IProduct['price']];
       pagination: TPagination;
       productCategories: string;
       productTechnicalSpecs: string[];

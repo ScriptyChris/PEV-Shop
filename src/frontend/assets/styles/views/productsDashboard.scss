@@ -22,6 +22,23 @@
   &__filters {
     width: 100vw;
     align-items: stretch;
+
+    &, 
+    &-sidebar {
+      section {
+        margin-inline: 1rem;
+      }
+
+      hr {
+        // TODO: [UI] use variable
+        background: #3f51b5;
+        margin-inline: 0.5rem;
+      }
+
+      .pev-element-form-field-error {
+        grid-column: 1 / -1;
+      }
+    }
   }
 
   &__filters-header {
@@ -51,20 +68,16 @@
   }
 }
 
-.products-dashboard {
-  &__filters {
-    &, 
-    &-sidebar {
-      section {
-        margin: 1rem;
-      }
+.products-price-filter {
+  &__control-field {
+      display: grid;
+      grid-template-columns: 2fr 1fr 2fr;
+      align-items: center;
+      margin: 1rem;
 
-      hr {
-        // TODO: [UI] use variable
-        background: #3f51b5;
-        margin-inline: 0.5rem;
+      &-separator {
+          justify-self: center;
       }
-    }
   }
 }
 
@@ -162,6 +175,11 @@
         background-color: #303f9f;
       }
     }
+  }
+
+  .products-price-filter__control-field {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 0.75fr 1fr;
   }
 }
 

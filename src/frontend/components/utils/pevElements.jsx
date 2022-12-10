@@ -94,12 +94,18 @@ export const PEVLegend = forwardRef(function PEVLegend({ children, ...restProps 
   );
 });
 
-export const PEVTextField = ({ identity, label, labelInside, type = 'text', ...restProps }) => {
+export const PEVTextField = ({ identity, label, labelInside, type = 'text', onEnterKey, ...restProps }) => {
   if (label === undefined) {
     throw Error('`label` has to be provided!');
   } else if (!identity) {
     throw Error('`identity` has to be provided!');
   }
+
+  const onKeyDown = ({ key }) => {
+    if (key === 'Enter' && typeof onEnterKey === 'function') {
+      onEnterKey();
+    }
+  };
 
   return (
     <>
@@ -112,6 +118,7 @@ export const PEVTextField = ({ identity, label, labelInside, type = 'text', ...r
         id={identity}
         variant="outlined"
         size="small"
+        onKeyDown={onKeyDown}
         {...(labelInside ? { label } : {})}
         {...restProps}
       />

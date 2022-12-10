@@ -1,6 +1,7 @@
 import queryString from 'query-string';
 import type { useHistory } from 'react-router-dom';
 import type { TStoreService } from '@frontend/features/storeService';
+import { ARRAY_FORMAT_SEPARATOR } from '@commons/consts';
 
 const ROUTE_GROUPS = Object.freeze({
   ROOT: '/',
@@ -51,7 +52,7 @@ export const ROUTES = Object.freeze({
 
 const QUERY_PARAMS_CONFIG = {
   arrayFormat: 'bracket-separator',
-  arrayFormatSeparator: '|',
+  arrayFormatSeparator: ARRAY_FORMAT_SEPARATOR,
 } as const;
 
 export const routeHelpers = Object.freeze({
