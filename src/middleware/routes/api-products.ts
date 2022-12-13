@@ -112,9 +112,14 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
       findMultiple: true,
     };
     const paginationConfig = queryBuilder.getPaginationConfig(req.query);
+    const sortingConfig = queryBuilder.getSortingConfig(req.query);
 
     if (paginationConfig) {
       options.pagination = paginationConfig;
+    }
+
+    if (sortingConfig) {
+      options.sort = sortingConfig;
     }
 
     const paginatedProducts = (await getFromDB(

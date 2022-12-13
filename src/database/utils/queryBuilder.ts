@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import getLogger from '@commons/logger';
 import { FILTER_RANGE_SEPARATOR, ARRAY_FORMAT_SEPARATOR } from '@root/commons/consts';
-import { productPriceRangeValidator } from '@commons/filterValidators';
+import { productPriceRangeValidator, productSortingValidator } from '@commons/filterValidators';
 
 type TReqQuery = Request['query'];
 
@@ -107,6 +107,14 @@ const getProductsWithChosenCategories = (reqQuery: TReqQuery) => {
   }
 
   return productCategories && { category: { $in: productCategories } };
+};
+
+const getSortingConfig = (reqQuery: TReqQuery) => {
+  if (typeof reqQuery.sortBy !== 'string') {
+    return null;
+  }
+
+  return productSortingValidator(reqQuery.sortBy);
 };
 
 type TFilterQueryHeading = {
@@ -235,4 +243,5 @@ export const queryBuilder = {
   getSearchByUrlConfig,
   getProductsWithChosenCategories,
   getTechnicalSpecs,
+  getSortingConfig,
 };

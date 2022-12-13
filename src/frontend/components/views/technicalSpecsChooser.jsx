@@ -95,7 +95,7 @@ const GetControlsForSpecs = (() => {
     };
 
     // Enforce setting `shouldExpand` is done only once per component's life
-    const [shouldExpand] = useState(namesRangeMapping[name].some((rangeName) => formikProps.values[rangeName]));
+    const [shouldExpand] = useState(() => namesRangeMapping[name].some((rangeName) => formikProps.values[rangeName]));
 
     return (
       <PEVFieldset key={`product-spec-${name}`}>

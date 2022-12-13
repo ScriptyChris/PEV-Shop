@@ -224,7 +224,8 @@ const httpService = new (class HttpService extends Ajax {
       price: [IProduct['price'], IProduct['price']];
       pagination: TPagination;
       productCategories: string;
-      productTechnicalSpecs: string[];
+      productTechnicalSpecs: string;
+      sortBy: string;
     }>,
     customSearchParamsSerialization = false
   ) {
@@ -254,7 +255,7 @@ const httpService = new (class HttpService extends Ajax {
       }
 
       if (productTechnicalSpecs && productTechnicalSpecs.length) {
-        searchParams.append('productTechnicalSpecs', productTechnicalSpecs as unknown as string);
+        searchParams.append('productTechnicalSpecs', productTechnicalSpecs);
       }
     }
 

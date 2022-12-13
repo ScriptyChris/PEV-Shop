@@ -5,6 +5,7 @@ import {
   COLLECTION_NAMES,
   ModelPopulateOptions,
   isValidObjectId,
+  TSort,
 } from './models';
 import getPaginatedItems, { TPaginationConfig, TPaginateModel } from './utils/paginateItemsFromDB';
 import getLogger from '@commons/logger';
@@ -36,6 +37,7 @@ async function getFromDB<T extends TDocuments>(
     isDistinct?: boolean;
     findMultiple?: boolean;
     population?: ModelPopulateOptions | ModelPopulateOptions[] | string;
+    sort?: TSort;
   },
   itemQuery: TFindParams[0] | string,
   projection?: unknown
@@ -51,6 +53,7 @@ async function getFromDB<T extends TDocuments>(
       {
         Model: Model as TPaginateModel,
         pagination: config.pagination,
+        sort: config.sort,
       },
       itemQuery,
       projection
@@ -74,7 +77,7 @@ async function getFromDB<T extends TDocuments>(
       throw TypeError(`itemQuery "${itemQuery}" is a string, but not valid ObjectId!`);
     }
   } else if (config.findMultiple) {
-    result = await Model.find(itemQuery, projection);
+    result = await Model.find(itemQuery, projection, { sort: config.sort });
   } else {
     result = await Model.findOne(itemQuery, projection);
   }

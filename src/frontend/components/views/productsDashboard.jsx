@@ -7,7 +7,10 @@ import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import TuneIcon from '@material-ui/icons/Tune';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SortIcon from '@material-ui/icons/Sort';
+import SortByAlphaIcon from '@material-ui/icons/SortByAlpha';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ViewModuleIcon from '@material-ui/icons/ViewModule';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -15,6 +18,7 @@ import ListIcon from '@material-ui/icons/List';
 import Toolbar from '@material-ui/core/Toolbar';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import { FormControl, Select, MenuItem } from '@material-ui/core';
 
 import {
   PEVButton,
@@ -40,7 +44,11 @@ const translations = {
   typeProductName: 'Type product name:',
   showFilters: 'filters',
   viewMode: 'view',
-  sortingMode: 'sort',
+  sortBy: 'sort',
+  sortByNameAsc: 'Name ascending',
+  sortByNameDesc: 'Name descending',
+  sortByPriceAsc: 'Price ascending',
+  sortByPriceDesc: 'Price descending',
   tabletFiltersToggleBtn: 'toggle filters',
   filtersHeading: 'Filters',
   priceFilterHeading: 'Price',
@@ -134,7 +142,7 @@ function useListViewModes() {
   const getCurrentViewModeType = () => viewTypes[viewTypeIndex].match(/--(\w+)-/)[1];
   const [viewTypeIndex, setViewTypeIndex] = useState(0);
   const [listViewModeClassName, setListViewModeClassName] = useState('');
-  const [listViewModeType, setListViewModeType] = useState(getCurrentViewModeType());
+  const [listViewModeType, setListViewModeType] = useState(getCurrentViewModeType);
 
   useEffect(() => {
     setListViewModeClassName(viewTypes[viewTypeIndex]);
@@ -210,6 +218,7 @@ function ProductsList({ currentListViewModeClassName, listViewModeType, searchPa
     productPrice = [],
     productCategories = [],
     productTechnicalSpecs = [],
+    sortBy,
   } = {}) => {
     if (!productsPerPage || !pageNumber) {
       return;
@@ -219,6 +228,7 @@ function ProductsList({ currentListViewModeClassName, listViewModeType, searchPa
       productPrice: productPrice.length ? productPrice : undefined,
       productCategories: productCategories.length ? productCategories : undefined,
       productTechnicalSpecs: productTechnicalSpecs.length ? productTechnicalSpecs : undefined,
+      sortBy: sortBy || undefined,
     };
 
     let productsList = [];
@@ -550,6 +560,115 @@ function Filters({
   );
 }
 
+function Sorting({ sortBy = '', updateProductsDashboardQuery }) {
+  const iconCommonProps = {
+    fontSize: 'small',
+    color: 'primary',
+  };
+  const sortOptions = [
+    {
+      value: 'nameAsc',
+      translation: translations.sortByNameAsc,
+      icons: (
+        <>
+          <SortByAlphaIcon className="products-dashboard__sorting-alpha-icon" {...iconCommonProps} />
+          <ArrowUpwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+    {
+      value: 'nameDesc',
+      translation: translations.sortByNameDesc,
+      icons: (
+        <>
+          <SortByAlphaIcon className="products-dashboard__sorting-alpha-icon" {...iconCommonProps} />
+          <ArrowDownwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+    {
+      value: 'priceAsc',
+      translation: translations.sortByPriceAsc,
+      icons: (
+        <>
+          <AttachMoneyIcon {...iconCommonProps} />
+          <ArrowUpwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+    {
+      value: 'priceDesc',
+      translation: translations.sortByPriceDesc,
+      icons: (
+        <>
+          <AttachMoneyIcon {...iconCommonProps} />
+          <ArrowDownwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+  ];
+
+  const [sortByValueIndex, setSortByValueIndex] = useState(() =>
+    sortOptions.findIndex(({ value }) => value === sortBy)
+  );
+
+  useEffect(() => {
+    if (!sortBy) {
+      setSortByValueIndex(-1);
+    }
+  }, [sortBy]);
+
+  const handleChangeSortBy = ({
+    nativeEvent: {
+      target: { dataset },
+    },
+  }) => {
+    const newIndex = Number(dataset.sortOptionIndex);
+    const sortBy = dataset.value;
+
+    setSortByValueIndex(newIndex);
+    updateProductsDashboardQuery({ sortBy, pageNumber: 1 });
+  };
+
+  return (
+    <FormControl
+      classes={{ root: 'MuiButtonBase-root' }}
+      className="products-dashboard__sorting-control MuiButton-root MuiButton-contained MuiButton-containedPrimary"
+    >
+      <label className="MuiButton-label" id="sort-by">
+        {translations.sortBy}:
+      </label>
+
+      <Select
+        className="products-dashboard__sorting-select-trigger"
+        labelId="sort-by"
+        value={sortOptions[sortByValueIndex]?.value || ''}
+        onChange={handleChangeSortBy}
+        MenuProps={{
+          getContentAnchorEl: null,
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'center',
+          },
+          transformOrigin: {
+            vertical: 'top',
+            horizontal: 'center',
+          },
+        }}
+        inputProps={{ className: 'products-dashboard__sorting-select' }}
+        renderValue={(value) => sortOptions.find((opt) => opt.value === value).icons}
+      >
+        {sortOptions.map(({ value, translation, icons }, index) => (
+          <MenuItem value={value} data-sort-option-index={index} key={value}>
+            <div className="products-dashboard__sorting-list-item pev-flex">{icons}</div>
+            {translation}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+}
+
 export default function ProductsDashboard() {
   const { pathname, search } = useLocation();
   const history = useHistory();
@@ -605,15 +724,9 @@ export default function ProductsDashboard() {
     updateProductsDashboardQuery({ pageNumber: currentPageIndex + 1 });
   };
   const getFiltersMobileMenuToggler = (shouldShow) => () => setIsFiltersMobileMenuVisible(shouldShow);
-  const handleSorting = () => console.log('TODO: [feature] implement sorting');
 
   const viewModeBtn = <ViewModeBtn viewModeType={listViewModeType} onClick={switchListViewMode} />;
-  // TODO: [UX] add sorting
-  const sortBtn = (
-    <PEVButton onClick={handleSorting} variant="contained" color="primary" startIcon={<SortIcon />}>
-      {translations.sortingMode}
-    </PEVButton>
-  );
+  const sortingWidget = <Sorting {...{ sortBy: searchParams.sortBy, updateProductsDashboardQuery }} />;
 
   return (
     <article
@@ -651,12 +764,12 @@ export default function ProductsDashboard() {
             {translations.showFilters}
           </PEVButton>
           {viewModeBtn}
-          {sortBtn}
+          {sortingWidget}
         </aside>
       ) : (
         <Toolbar className="products-dashboard__topbar pev-flex" component="aside">
           {viewModeBtn}
-          {sortBtn}
+          {sortingWidget}
         </Toolbar>
       )}
 

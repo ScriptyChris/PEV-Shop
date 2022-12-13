@@ -28,7 +28,7 @@ const mediaQueryList = (() => {
 
 const useRWDMediaQuery = () => {
   const [currentMediaQueryName, setCurrentMediaQueryName] = useState(
-    (mediaQueryList.find(({ matches }) => matches) || mediaQueryList[0]).__deviceName
+    () => (mediaQueryList.find(({ matches }) => matches) || mediaQueryList[0]).__deviceName
   );
 
   useEffect(() => {

@@ -262,7 +262,7 @@ function HomeShipment({ formInitialsShipmentExtender }) {
 
 function PackageShipment({ formInitialsShipmentExtender }) {
   const { values, setFieldValue, errors, setFieldError } = useFormikContext();
-  const [parcelLocker, setParcelLocker] = useState(
+  const [parcelLocker, setParcelLocker] = useState(() =>
     Object.values(values.receiver?.address?.parcelLocker || {}).every(Boolean)
       ? values.receiver.address.parcelLocker
       : null
