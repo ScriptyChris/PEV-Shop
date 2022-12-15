@@ -119,9 +119,9 @@ function useTreeMetaData({ preSelectedCategories, valueToPassToParentOnClickRef,
 
     if (onCategorySelect) {
       onCategorySelect(preSelectedCategories);
-    } else {
-      valueToPassToParentOnClickRef.current = preSelectedCategories;
     }
+
+    valueToPassToParentOnClickRef.current = preSelectedCategories;
   }, [treeInitials]);
 
   const updateTreeInitials = (alreadySelectedCategories) => {
@@ -250,9 +250,9 @@ function Tree({
 
     if (onCategorySelect) {
       onCategorySelect(outputCategoryNames);
-    } else {
-      valueToPassToParentOnClickRef.current = outputCategoryNames;
     }
+
+    valueToPassToParentOnClickRef.current = outputCategoryNames;
 
     if (isMultiselect) {
       updateTreeInitials([activeCategoryNames]);
@@ -346,11 +346,6 @@ export default function CategoriesTree({
     throw TypeError(`preSelectedCategories has to be an array! Received: "${preSelectedCategories}".`);
   } else if (onCategorySelect && typeof onCategorySelect !== 'function') {
     throw TypeError(`onCategorySelect should be a function! Received: "${onCategorySelect}".`);
-  } else if (filtersCommonChildrenAPI && onCategorySelect) {
-    throw Error(
-      `Only either of filtersCommonChildrenAPI or onCategorySelect must be provided! 
-      Received: "${filtersCommonChildrenAPI}" and "${onCategorySelect}".`
-    );
   }
 
   const valueToPassToParentOnClickRef = useRef(preSelectedCategories);

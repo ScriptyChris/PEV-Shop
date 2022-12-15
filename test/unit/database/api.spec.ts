@@ -139,6 +139,7 @@ describe('#database/api', () => {
 
     it('should call either Model.findById(..) or Model.find(..) or Model.findOne(..) depending on itemQuery param type and config.findMultiple value', async () => {
       const PROJECTION_PARAM = null;
+      const SORT_VALUE = { name: 1 };
 
       const itemQueryObjectId = 'some string query for ID';
       isValidObjectIdMock.mockImplementationOnce(isValidObjectIdMock._succeededCall);
@@ -146,8 +147,14 @@ describe('#database/api', () => {
       expect(getModelMock._ModelClassMock.findById).toHaveBeenCalledWith(itemQueryObjectId, PROJECTION_PARAM);
 
       const itemQueryForMultiDocs = { multiDoc: true };
-      await getFromDB({ modelName: MODEL_TYPE, findMultiple: true }, itemQueryForMultiDocs, PROJECTION_PARAM);
-      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryForMultiDocs, PROJECTION_PARAM);
+      await getFromDB(
+        { modelName: MODEL_TYPE, findMultiple: true, sort: SORT_VALUE },
+        itemQueryForMultiDocs,
+        PROJECTION_PARAM
+      );
+      expect(getModelMock._ModelClassMock.find).toHaveBeenCalledWith(itemQueryForMultiDocs, PROJECTION_PARAM, {
+        sort: SORT_VALUE,
+      });
 
       const itemQueryForSingleDoc = { singleDoc: true };
       await getFromDB({ modelName: MODEL_TYPE }, itemQueryForSingleDoc, PROJECTION_PARAM);

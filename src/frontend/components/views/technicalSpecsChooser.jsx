@@ -547,7 +547,7 @@ export default function TechnicalSpecsChooser({ productCategories, productTechni
       <PEVHeading level={3}>{translations.specsChooserHeader}</PEVHeading>
       <PEVForm
         className="products-spec-chooser__form pev-flex pev-flex--columned"
-        data-cy="container:products-spec-chooser"
+        dataCy="container:products-spec-chooser"
         initialValues={formInitials}
         initialTouched={formInitiallyTouched}
         validate={validateHandler}

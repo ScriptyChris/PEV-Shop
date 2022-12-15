@@ -38,6 +38,7 @@ import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import { routeHelpers } from '@frontend/components/pages/_routes';
 import { FILTER_RANGE_SEPARATOR } from '@commons/consts';
 import { productPriceRangeValidator } from '@commons/filterValidators';
+import { subscribeToBodyMutations, unSubscribeFromBodyMutations } from '@frontend/components/utils/bodyObserver';
 
 const translations = {
   lackOfProducts: 'Lack of products...',
@@ -414,6 +415,7 @@ function PriceFilter({ productPrice, filtersCommonChildrenAPI }) {
                   max: maxValue,
                   name: 'minPrice',
                   value: formikProps.values.minPrice,
+                  'data-cy': 'input:price-min-filter',
                 }}
                 onEnterKey={filtersCommonChildrenAPI.triggerFiltersNextCycle}
               />
@@ -430,6 +432,7 @@ function PriceFilter({ productPrice, filtersCommonChildrenAPI }) {
                   max: maxValue,
                   name: 'maxPrice',
                   value: formikProps.values.maxPrice,
+                  'data-cy': 'input:price-max-filter',
                 }}
                 onEnterKey={filtersCommonChildrenAPI.triggerFiltersNextCycle}
               />
@@ -444,6 +447,17 @@ function PriceFilter({ productPrice, filtersCommonChildrenAPI }) {
     </section>
   );
 }
+
+const useFiltersCommonActionsRefHandler = () => {
+  const containerRef = useRef();
+  const getContainerRef = useCallback((containerNode) => {
+    if (containerNode) {
+      containerRef.current = containerNode;
+    }
+  }, []);
+
+  return { containerRef, getContainerRef };
+};
 
 function Filters({
   productPrice,
@@ -461,6 +475,21 @@ function Filters({
     initialFiltersNames: ['productPrice', 'productCategories', 'productTechnicalSpecs'],
     onFiltersCycleEnd: updateProductsDashboardQuery,
   });
+  const { containerRef, getContainerRef } = useFiltersCommonActionsRefHandler();
+  const [adhocProductCategoriesForSpecs, setAdhocProductCategoriesForSpecs] = useState(productCategories);
+
+  useEffect(() => {
+    if (isMobileLayout) {
+      return;
+    }
+
+    const subscriptionID = subscribeToBodyMutations(({ marginBottom }) => {
+      containerRef.current.style.bottom = marginBottom;
+    });
+
+    return () => unSubscribeFromBodyMutations(subscriptionID);
+  }, [isMobileLayout]);
+
   const onFiltersSidebarToggle = () => setIsFiltersSidebarCollapsed((prevState) => !prevState);
   const handleClearFilters = () => {
     updateProductsDashboardQuery(null);
@@ -488,6 +517,7 @@ function Filters({
       <CategoriesTree
         {...{ filtersCommonChildrenAPI }}
         preSelectedCategories={productCategories}
+        onCategorySelect={setAdhocProductCategoriesForSpecs}
         shouldPreselectLazily
         isMultiselect
       />
@@ -496,18 +526,21 @@ function Filters({
       <Divider />
       <TechnicalSpecsChooser
         {...{
-          productCategories,
+          productCategories: adhocProductCategoriesForSpecs,
           productTechnicalSpecs,
           filtersCommonChildrenAPI,
         }}
       />
-      <div className="products-dashboard__filters-common-actions pev-flex">
-        <PEVButton onClick={handleClearFilters}>{translations.clear}</PEVButton>
+      <div ref={getContainerRef} className="products-dashboard__filters-common-actions pev-flex">
+        <PEVButton onClick={handleClearFilters} data-cy="button:clear-filters">
+          {translations.clear}
+        </PEVButton>
         <PEVButton
           onClick={handleApplyFilters}
           variant="contained"
           color="primary"
           disabled={filtersCommonParentAPI.isSubmitBtnDisabled}
+          data-cy="button:apply-filters"
         >
           {translations.apply}
         </PEVButton>
@@ -655,11 +688,12 @@ function Sorting({ sortBy = '', updateProductsDashboardQuery }) {
             horizontal: 'center',
           },
         }}
+        SelectDisplayProps={{ 'data-cy': 'button:trigger-sorting-select' }}
         inputProps={{ className: 'products-dashboard__sorting-select' }}
         renderValue={(value) => sortOptions.find((opt) => opt.value === value).icons}
       >
         {sortOptions.map(({ value, translation, icons }, index) => (
-          <MenuItem value={value} data-sort-option-index={index} key={value}>
+          <MenuItem value={value} data-sort-option-index={index} data-cy={`option:sort-by-${value}`} key={value}>
             <div className="products-dashboard__sorting-list-item pev-flex">{icons}</div>
             {translation}
           </MenuItem>

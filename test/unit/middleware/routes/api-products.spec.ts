@@ -93,6 +93,8 @@ describe('#api-products', () => {
       beforeEach(() => {
         queryBuilderMock.getIdListConfig.mockImplementationOnce(queryBuilderMock.getIdListConfig._succeededCall);
         queryBuilderMock.getNameListConfig.mockImplementationOnce(queryBuilderMock.getNameListConfig._succeededCall);
+        queryBuilderMock.getPriceConfig.mockImplementationOnce(queryBuilderMock.getPriceConfig._succeededCall);
+        queryBuilderMock.getSortingConfig.mockImplementationOnce(queryBuilderMock.getSortingConfig._succeededCall);
         queryBuilderMock.getProductsWithChosenCategories.mockImplementationOnce(
           queryBuilderMock.getProductsWithChosenCategories._succeededCall
         );
@@ -105,15 +107,17 @@ describe('#api-products', () => {
         queryBuilderMock.getSearchByUrlConfig.mockImplementationOnce(
           queryBuilderMock.getSearchByUrlConfig._succeededCall
         );
-        queryBuilderMock.getFilters.mockImplementationOnce(queryBuilderMock.getFilters._succeededCall);
+        queryBuilderMock.getTechnicalSpecs.mockImplementationOnce(queryBuilderMock.getTechnicalSpecs._succeededCall);
         getFromDBMock.mockImplementationOnce(getFromDBMock._succeededCall);
       });
 
       afterEach(() => {
         queryBuilderMock.getIdListConfig.mockClear();
+        queryBuilderMock.getPriceConfig.mockClear();
+        queryBuilderMock.getSortingConfig.mockClear();
         queryBuilderMock.getProductsWithChosenCategories.mockClear();
         queryBuilderMock.getPaginationConfig.mockClear();
-        queryBuilderMock.getFilters.mockClear();
+        queryBuilderMock.getTechnicalSpecs.mockClear();
         getFromDBMock.mockClear();
       });
 
@@ -149,11 +153,13 @@ describe('#api-products', () => {
         queryBuilderMock.getPaginationConfig.mockImplementationOnce(
           queryBuilderMock.getPaginationConfig._succeededCall
         );
+        queryBuilderMock.getSortingConfig.mockImplementationOnce(queryBuilderMock.getSortingConfig._succeededCall);
 
         expect(getFromDBMock).toHaveBeenCalledWith(
           {
             modelName: COLLECTION_NAMES.Product,
             pagination: queryBuilderMock.getPaginationConfig(),
+            sort: queryBuilderMock.getSortingConfig(),
             findMultiple: true,
           },
           queryBuilderMock.getIdListConfig(),

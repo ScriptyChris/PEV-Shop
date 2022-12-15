@@ -62,6 +62,7 @@
   &__filters-common-actions {
     position: sticky;
     bottom: 0;
+    transition: bottom $transitionDuration;
     z-index: 1;
     border-radius: inherit;
     padding: 1rem;

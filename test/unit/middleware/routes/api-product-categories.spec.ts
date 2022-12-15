@@ -77,7 +77,7 @@ describe('#api-product-categories', () => {
           ],
         },
         {
-          input: ['parent category|test category'],
+          input: ['parent category:test category'],
           output: [{ categoryName: 'parent category', childCategories: [{ categoryName: 'test category' }] }],
         },
       ];
