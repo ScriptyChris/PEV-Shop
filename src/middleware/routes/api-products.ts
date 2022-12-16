@@ -87,10 +87,11 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
     // TODO: ... and really refactor this!
     const idListConfig = queryBuilder.getIdListConfig(req.query);
     const nameListConfig = queryBuilder.getNameListConfig(req.query);
+    const price = queryBuilder.getPriceConfig(req.query);
     const chosenCategories = queryBuilder.getProductsWithChosenCategories(req.query);
     const searchByName = queryBuilder.getSearchByNameConfig(req.query);
     const searchByUrl = queryBuilder.getSearchByUrlConfig(req.query);
-    const filters = queryBuilder.getFilters(req.query);
+    const technicalSpecs = queryBuilder.getTechnicalSpecs(req.query);
 
     let query = {};
     let projection = {};
@@ -99,23 +100,26 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
       query = idListConfig;
     } else if (nameListConfig) {
       query = nameListConfig;
-    } else if (chosenCategories) {
-      query = chosenCategories;
     } else if (searchByName) {
       ({ query, projection } = searchByName);
     } else if (searchByUrl) {
       query = searchByUrl;
-    } else if (filters) {
-      query = filters;
+    } else if (price || chosenCategories || technicalSpecs) {
+      query = { ...(price || {}), ...(chosenCategories || {}), ...(technicalSpecs || {}) };
     }
 
     const options: Omit<Parameters<typeof getFromDB>[0], 'modelName'> = {
       findMultiple: true,
     };
     const paginationConfig = queryBuilder.getPaginationConfig(req.query);
+    const sortingConfig = queryBuilder.getSortingConfig(req.query);
 
     if (paginationConfig) {
       options.pagination = paginationConfig;
+    }
+
+    if (sortingConfig) {
+      options.sort = sortingConfig;
     }
 
     const paginatedProducts = (await getFromDB(

@@ -20,8 +20,14 @@ export const queryBuilder = (() => {
     getSearchByUrlConfig: jest.fn(() => {
       throw getMockImplementationError('getSearchByUrlConfig');
     }),
-    getFilters: jest.fn(() => {
-      throw getMockImplementationError('getFilters');
+    getTechnicalSpecs: jest.fn(() => {
+      throw getMockImplementationError('getTechnicalSpecs');
+    }),
+    getPriceConfig: jest.fn(() => {
+      throw getMockImplementationError('getPriceConfig');
+    }),
+    getSortingConfig: jest.fn(() => {
+      throw getMockImplementationError('getSortingConfig');
     }),
   };
   _queryBuilder.getIdListConfig._succeededCall = () => ({
@@ -33,6 +39,11 @@ export const queryBuilder = (() => {
     name: { $in: ['first', 'second', 'third'] },
   });
   _queryBuilder.getNameListConfig._failedCall = () => null;
+
+  _queryBuilder.getPriceConfig._succeededCall = () => ({
+    price: { $gte: 10, $lte: 15 },
+  });
+  _queryBuilder.getPriceConfig._failedCall = () => null;
 
   _queryBuilder.getProductsWithChosenCategories._succeededCall = () => ({
     category: {
@@ -57,14 +68,19 @@ export const queryBuilder = (() => {
   });
   _queryBuilder.getSearchByUrlConfig._failedCall = () => null;
 
-  _queryBuilder.getFilters._succeededCall = () => ({
+  _queryBuilder.getTechnicalSpecs._succeededCall = () => ({
     $and: [
       {
         $and: ['test heading', 'test data'],
       },
     ],
   });
-  _queryBuilder.getFilters._failedCall = () => null;
+  _queryBuilder.getTechnicalSpecs._failedCall = () => null;
+
+  _queryBuilder.getSortingConfig._succeededCall = () => ({
+    price: -1,
+  });
+  _queryBuilder.getSortingConfig._failedCall = () => null;
 
   return Object.freeze(_queryBuilder);
 })();

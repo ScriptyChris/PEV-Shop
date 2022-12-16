@@ -11,6 +11,7 @@ const MODELS = {
 
 export const getModel = <T extends TCOLLECTION_NAMES>(modelName: T) => MODELS[modelName];
 export type TDocuments = IProduct | IUser | IUserRole;
+export type TSort = { [key: string]: 1 | -1 };
 
 export * from './_product';
 export * from './_user';

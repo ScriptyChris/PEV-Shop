@@ -242,7 +242,7 @@ function CategorySelector({
         required
         component={CategoriesTreeFormField}
         onCategorySelect={handleCategorySelect}
-        preSelectedCategory={initialData.category}
+        preSelectedCategories={[initialData.category]}
         forceCombinedView={true}
       />
       <ErrorMessage name="category" component={PEVFormFieldError} />

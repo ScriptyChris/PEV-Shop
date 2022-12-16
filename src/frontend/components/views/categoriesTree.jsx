@@ -1,25 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import TreeMenu, { ItemComponent } from 'react-simple-tree-menu';
-import classNames from 'classnames';
 
-import Drawer from '@material-ui/core/Drawer';
-import AccountTree from '@material-ui/icons/AccountTree';
-import CloseIcon from '@material-ui/icons/Close';
 import List from '@material-ui/core/List';
 import TextField from '@material-ui/core/TextField';
 
-import { PEVIconButton, PEVHeading } from '@frontend/components/utils/pevElements';
+import { PEVHeading } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
-import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import { CATEGORIES_SEPARATOR } from '@commons/consts';
 
 const translations = Object.freeze({
   treeHeader: 'Categories',
   toggleCategoriesTree: 'Categories',
   goBackLabel: 'go back',
   categoriesSearchAriaLabel: 'Type and search',
+  apply: 'Apply',
   lackOfData: 'No data!',
 });
-const CATEGORIES_SEPARATOR = '|';
 
 // TODO: handle selecting tree node wrapper (as "Parts") - it should auto-select all it's descendants and not consider node itself being selected
 const treeRecursiveMapper = (categoryItem, index, _, level = 0) => {
@@ -48,29 +44,51 @@ const treeRecursiveMapper = (categoryItem, index, _, level = 0) => {
   };
 };
 
-const findNodeToPreSelect = (output, processedPreSelectedCategory, node) => {
-  output.activeKey += node.key;
+const prepareNodeFindPreSelect = (output, categoriesGroups, node) => {
+  const markNodeToPreSelect = (categoriesToPreSelect, node) => {
+    output.activeKey += node.key;
 
-  if (Array.isArray(node.nodes)) {
-    output.openedNodes.push(node.key);
-    processedPreSelectedCategory.shift();
-
-    if (processedPreSelectedCategory.length) {
-      const subCategoryName = processedPreSelectedCategory.shift();
-      const subNode = node.nodes.find((subNodeItem) => subNodeItem.label === subCategoryName);
-
-      output.activeKey += '/';
-      findNodeToPreSelect(output, processedPreSelectedCategory, subNode);
+    if (!Array.isArray(node.nodes)) {
+      return;
     }
-  }
+
+    output.openedNodes.push(node.key);
+    categoriesToPreSelect.shift();
+
+    if (!categoriesToPreSelect.length) {
+      return;
+    }
+
+    const subCategoryName = categoriesToPreSelect.shift();
+    const subNode = node.nodes.find(
+      (subNodeItem) => subNodeItem.label === subCategoryName || subCategoryName.includes(subNodeItem.label)
+    );
+
+    // TODO: [refactor] subcategories structure should be fixed/unified
+    if (!subNode) {
+      return;
+    }
+
+    output.activeKey += '/';
+    markNodeToPreSelect(categoriesToPreSelect, subNode);
+  };
+
+  categoriesGroups.forEach((categories) => {
+    const isMatchingGroup = categories.some((category) => node.label === category);
+
+    if (isMatchingGroup) {
+      markNodeToPreSelect(categories, node);
+    }
+  });
 };
 
-function useTreeMetaData({ preSelectedCategory, onCategorySelect }) {
-  const [categoriesMap, setCategoriesMap] = useState(null);
+function useTreeMetaData({ preSelectedCategories, valueToPassToParentOnClickRef, onCategorySelect }) {
   const [treeData, setTreeData] = useState(null);
   const [treeInitials, setTreeInitials] = useState(null);
   const [autoSelectedCategory, setAutoSelectedCategory] = useState(false);
-  const parsedPreSelectedCategory = preSelectedCategory.split(CATEGORIES_SEPARATOR);
+  const parsedPreSelectedCategories = preSelectedCategories.map((category) =>
+    category.includes(CATEGORIES_SEPARATOR) ? category.split(CATEGORIES_SEPARATOR) : [category]
+  );
 
   useEffect(() => {
     httpService.getProductCategories().then((res) => {
@@ -78,60 +96,49 @@ function useTreeMetaData({ preSelectedCategory, onCategorySelect }) {
         return;
       }
 
-      setCategoriesMap(res);
+      setTreeData(res.map(treeRecursiveMapper));
     });
   }, []);
 
   useEffect(() => {
-    if (!categoriesMap) {
-      return;
-    }
-
-    setTreeData(categoriesMap.map(treeRecursiveMapper));
-  }, [categoriesMap]);
-
-  useEffect(() => {
-    if (!treeData) {
-      return;
-    }
-
-    if (!treeInitials) {
-      // TODO: [UX] set initial tree data from any previous component "session"
+    if (treeData) {
       updateTreeInitials();
     }
-  }, [treeData]);
+  }, [treeData, preSelectedCategories]);
 
   useEffect(() => {
-    if (!treeInitials) {
+    if (!treeInitials || !treeInitials.activeKey || autoSelectedCategory) {
       return;
     }
 
-    if (treeInitials.activeKey && !autoSelectedCategory) {
-      setAutoSelectedCategory(true);
-      onCategorySelect(preSelectedCategory);
+    setAutoSelectedCategory(true);
+
+    if (!preSelectedCategories?.length) {
+      return;
     }
+
+    if (onCategorySelect) {
+      onCategorySelect(preSelectedCategories);
+    }
+
+    valueToPassToParentOnClickRef.current = preSelectedCategories;
   }, [treeInitials]);
 
-  const updateTreeInitials = (alreadySelectedCategory) => {
-    // TODO: [DX/babel] refactor to modern JS syntax `&&=`
-    alreadySelectedCategory = alreadySelectedCategory && [alreadySelectedCategory];
+  const updateTreeInitials = (alreadySelectedCategories) => {
+    const newTreeInitials = treeData.reduce(
+      (output, node) => {
+        const categoriesGroups = alreadySelectedCategories?.length
+          ? alreadySelectedCategories
+          : parsedPreSelectedCategories;
 
-    setTreeInitials(() => {
-      const prepareNodeFindPreSelect = (output, categories, node) => {
-        if (node.label === categories[0]) {
-          findNodeToPreSelect(output, [...categories], node);
-        }
-      };
+        prepareNodeFindPreSelect(output, categoriesGroups, node);
 
-      return treeData.reduce(
-        (output, node) => {
-          prepareNodeFindPreSelect(output, alreadySelectedCategory || parsedPreSelectedCategory, node);
+        return output;
+      },
+      { activeKey: '', openedNodes: [] }
+    );
 
-          return output;
-        },
-        { activeKey: '', openedNodes: [] }
-      );
-    });
+    setTreeInitials(newTreeInitials);
   };
 
   return { treeData, treeInitials, updateTreeInitials };
@@ -140,33 +147,142 @@ function useTreeMetaData({ preSelectedCategory, onCategorySelect }) {
 function Tree({
   treeData,
   treeInitials,
-  toggleActiveTreeNode,
-  activeTreeNodes,
-  categoriesTreeRef,
   formField,
-  isTreeHidden,
+  isMultiselect,
+  valueToPassToParentOnClickRef,
+  onCategorySelect,
+  updateTreeInitials,
+  shouldPreselectLazily,
+  preSelectedCategories,
 }) {
   if (!treeData || !treeInitials) {
     return null;
   }
+  const categoriesTreeRef = useRef(null);
+  const categoriesTreeRefGetter = useCallback(
+    (categoriesTreeNode) => {
+      if (!categoriesTreeNode) {
+        return;
+      }
+
+      categoriesTreeRef.current = categoriesTreeNode;
+
+      /*
+        It's workaround, because lbirary doesn't seem to support lazy initializing.
+        TreeMenu likely memoizes initial active keys, so updating them later doesn't affect TreeMenu.
+        Hence simulating clicks to select all needed category nodes.
+      */
+      if (!shouldPreselectLazily) {
+        return;
+      }
+
+      const lazyClick = (nodeTarget) =>
+        new Promise((resolve) => {
+          const delayInMs = 75;
+
+          setTimeout(() => {
+            nodeTarget.click();
+            setTimeout(resolve, delayInMs);
+          }, delayInMs);
+        });
+
+      (function openNodesRecursively(categories = preSelectedCategories) {
+        categoriesTreeNode
+          .querySelectorAll('.rstm-tree-item:not(.rstm-tree-item--active)')
+          .forEach(async (treeNode) => {
+            const matchedCategory = categories.find((categoryName) =>
+              categoryName.includes(treeNode.textContent.replace('+', ''))
+            );
+
+            if (!matchedCategory) {
+              return;
+            }
+
+            if (matchedCategory.includes(CATEGORIES_SEPARATOR)) {
+              await lazyClick(treeNode.querySelector('.rstm-toggle-icon'));
+              openNodesRecursively(matchedCategory.split(CATEGORIES_SEPARATOR));
+            } else {
+              await lazyClick(treeNode);
+            }
+          });
+      })();
+    },
+    [preSelectedCategories, shouldPreselectLazily]
+  );
+
+  const activeTreeNodes = useRef(new Map());
+  const toggleActiveTreeNode = (nodeLevel, nodeIndex, matchedParentKey, nodeLabel) => {
+    const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
+    const currentNodeValue = `${matchedParentKey}${nodeLabel}`;
+
+    if (isMultiselect) {
+      const isActiveTreeNode = activeTreeNodes.current.has(currentNodeKey);
+
+      if (isActiveTreeNode) {
+        activeTreeNodes.current.delete(currentNodeKey);
+      } else {
+        activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
+      }
+
+      // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
+      [[currentNodeKey], ...activeTreeNodes.current].forEach(([key], iteration) => {
+        const isCurrentNodeKey = iteration === 0;
+        const [level, index] = key.split('-');
+        const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
+        const treeNodeDOM = categoriesTreeRef.current.querySelectorAll(treeNodeLevelSelector)[index];
+
+        // when some node has been folded, it's descendants won't be found by querySelector, so check for presence is needed
+        if (treeNodeDOM) {
+          // "Force" DOM actions execution on elements controlled by React.
+          window.requestAnimationFrame(() => {
+            treeNodeDOM.classList.toggle('rstm-tree-item--active', !isCurrentNodeKey);
+            treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
+          });
+        }
+      });
+    } else {
+      activeTreeNodes.current.clear();
+      activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
+    }
+
+    const activeCategoryNames = [...activeTreeNodes.current.values()];
+    const outputCategoryNames = isMultiselect ? activeCategoryNames : activeCategoryNames[0];
+
+    if (onCategorySelect) {
+      onCategorySelect(outputCategoryNames);
+    }
+
+    valueToPassToParentOnClickRef.current = outputCategoryNames;
+
+    if (isMultiselect) {
+      updateTreeInitials([activeCategoryNames]);
+    }
+  };
+  toggleActiveTreeNode.matchParentKey = (treeData, clickedItem) => {
+    const matchedParent = treeData.find((node) => clickedItem.parent && clickedItem.parent === node.key);
+    return matchedParent ? `${matchedParent.label}${CATEGORIES_SEPARATOR}` : '';
+  };
 
   // TODO: [refactor] dirty workaround to show already selected nodes (unfortunately, except nested ones)
   useEffect(() => {
-    if (!isTreeHidden && activeTreeNodes.current.size > 1 && categoriesTreeRef.current) {
-      const firstActiveTreeNode = categoriesTreeRef.current.querySelector('.rstm-tree-item--active');
-
-      if (firstActiveTreeNode) {
-        // click twice to "toggle" the first active node, which will automatically activate remaining ones
-        window.setTimeout(() => {
-          firstActiveTreeNode.click();
-
-          window.setTimeout(() => {
-            firstActiveTreeNode.click();
-          });
-        });
-      }
+    if (activeTreeNodes.current.size > 1 || categoriesTreeRef.current) {
+      return;
     }
-  }, [isTreeHidden]);
+
+    const firstActiveTreeNode = categoriesTreeRef.current.querySelector('.rstm-tree-item--active');
+
+    if (!firstActiveTreeNode) {
+      return;
+    }
+    // click twice to "toggle" the first active node, which will automatically activate remaining ones
+    window.setTimeout(() => {
+      firstActiveTreeNode.click();
+
+      window.setTimeout(() => {
+        firstActiveTreeNode.click();
+      });
+    });
+  }, []);
 
   const searchCategories =
     (search) =>
@@ -179,12 +295,7 @@ function Tree({
       both useRef() hook and React.createRef() method don't seem to
       give reference to nested functional component's DOM elements, such as used TreeMenu.
     */
-    <div
-      ref={categoriesTreeRef}
-      className={classNames('categories-tree', {
-        'categories-tree--hidden': isTreeHidden,
-      })}
-    >
+    <div ref={categoriesTreeRefGetter} className="categories-tree">
       {formField}
 
       <TreeMenu
@@ -223,121 +334,61 @@ function Tree({
   );
 }
 
-function CategoriesTree({ preSelectedCategory = '', onCategorySelect, isMultiselect, formField, forceCombinedView }) {
-  const { isMobileLayout } = useRWDLayout();
-  const isSeparatedView = isMobileLayout && !forceCombinedView;
-  const [isTreeHidden, setIsTreeHidden] = useState(isSeparatedView);
+export default function CategoriesTree({
+  preSelectedCategories = [],
+  shouldPreselectLazily = false,
+  onCategorySelect,
+  isMultiselect,
+  formField,
+  filtersCommonChildrenAPI,
+}) {
+  if (!Array.isArray(preSelectedCategories)) {
+    throw TypeError(`preSelectedCategories has to be an array! Received: "${preSelectedCategories}".`);
+  } else if (onCategorySelect && typeof onCategorySelect !== 'function') {
+    throw TypeError(`onCategorySelect should be a function! Received: "${onCategorySelect}".`);
+  }
+
+  const valueToPassToParentOnClickRef = useRef(preSelectedCategories);
   const { treeData, treeInitials, updateTreeInitials } = useTreeMetaData({
-    preSelectedCategory,
+    preSelectedCategories,
+    valueToPassToParentOnClickRef,
     onCategorySelect,
   });
-  const categoriesTreeRef = useRef();
-  const activeTreeNodes = useRef(new Map());
-
-  useEffect(() => setIsTreeHidden(isSeparatedView), [isMobileLayout]);
-
-  const handleCategoriesTreeToggle = () => setIsTreeHidden(!isTreeHidden);
-
-  const toggleActiveTreeNode = (nodeLevel, nodeIndex, matchedParentKey, nodeLabel) => {
-    const currentNodeKey = `${nodeLevel}-${nodeIndex}`;
-    const currentNodeValue = `${matchedParentKey}${nodeLabel}`;
-
-    if (isMultiselect) {
-      const isActiveTreeNode = activeTreeNodes.current.has(currentNodeKey);
-
-      if (isActiveTreeNode) {
-        activeTreeNodes.current.delete(currentNodeKey);
-      } else {
-        activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
-      }
-
-      // This is a dirty workaround, because 3rd-party TreeMenu component doesn't seem to support multi selection.
-      [[currentNodeKey], ...activeTreeNodes.current].forEach(([key], iteration) => {
-        const isCurrentNodeKey = iteration === 0;
-        const [level, index] = key.split('-');
-        const treeNodeLevelSelector = `.rstm-tree-item-level${level}`;
-        const treeNodeDOM = categoriesTreeRef.current.querySelectorAll(treeNodeLevelSelector)[index];
-
-        // when some node has been folded, it's descendants won't be found by querySelector, so check for presence is needed
-        if (treeNodeDOM) {
-          // "Force" DOM actions execution on elements controlled by React.
-          window.requestAnimationFrame(() => {
-            treeNodeDOM.classList.toggle('rstm-tree-item--active', !isCurrentNodeKey);
-            treeNodeDOM.setAttribute('aria-pressed', !isCurrentNodeKey);
-          });
-        }
-      });
-    } else {
-      activeTreeNodes.current.clear();
-      activeTreeNodes.current.set(currentNodeKey, currentNodeValue);
-    }
-
-    const activeCategoryNames = [...activeTreeNodes.current.values()];
-    onCategorySelect(isMultiselect ? activeCategoryNames : activeCategoryNames[0]);
-
-    if (isMultiselect) {
-      updateTreeInitials(activeCategoryNames[0]);
-    }
-  };
-  toggleActiveTreeNode.matchParentKey = (treeData, clickedItem) => {
-    const matchedParent = treeData.find((node) => clickedItem.parent && clickedItem.parent === node.key);
-    return matchedParent ? `${matchedParent.label}${CATEGORIES_SEPARATOR}` : '';
-  };
 
   if (!treeData) {
     return translations.lackOfData;
   }
 
-  return isSeparatedView ? (
-    <>
-      <PEVIconButton onClick={handleCategoriesTreeToggle} a11y={translations.toggleCategoriesTree}>
-        <AccountTree />
-      </PEVIconButton>
-      <Drawer anchor="left" open={!isTreeHidden} onClose={handleCategoriesTreeToggle}>
-        <section className="categories-tree-menu pev-flex pev-flex--columned">
-          <header className="categories-tree-menu__header">
-            <PEVIconButton
-              onClick={handleCategoriesTreeToggle}
-              className="categories-tree-menu__close-btn"
-              a11y={translations.toggleCategoriesTree}
-            >
-              <CloseIcon />
-            </PEVIconButton>
+  filtersCommonChildrenAPI?.tryUpdatingFiltersCycleData(
+    filtersCommonChildrenAPI?.filterNamesMap.productCategories,
+    valueToPassToParentOnClickRef.current
+  );
 
-            <PEVHeading className="pev-centered-padded-text" level={3}>
-              {translations.treeHeader}
-            </PEVHeading>
-          </header>
-
-          <Tree
-            treeData={treeData}
-            treeInitials={treeInitials}
-            toggleActiveTreeNode={toggleActiveTreeNode}
-            activeTreeNodes={activeTreeNodes}
-            categoriesTreeRef={categoriesTreeRef}
-            formField={formField}
-            isTreeHidden={isTreeHidden}
-          />
-        </section>
-      </Drawer>
-    </>
-  ) : (
-    <section>
-      <PEVHeading level={3}>{translations.treeHeader}</PEVHeading>
+  return (
+    <section className="pev-flex pev-flex--columned">
+      {filtersCommonChildrenAPI && (
+        <PEVHeading level={3} className="categories-tree-heading">
+          {translations.treeHeader}
+        </PEVHeading>
+      )}
       <Tree
-        treeData={treeData}
-        treeInitials={treeInitials}
-        toggleActiveTreeNode={toggleActiveTreeNode}
-        activeTreeNodes={activeTreeNodes}
-        categoriesTreeRef={categoriesTreeRef}
-        formField={formField}
-        isTreeHidden={isTreeHidden}
+        {...{
+          treeData,
+          treeInitials,
+          formField,
+          isMultiselect,
+          valueToPassToParentOnClickRef,
+          updateTreeInitials,
+          shouldPreselectLazily,
+          preSelectedCategories,
+          onCategorySelect,
+        }}
       />
     </section>
   );
 }
 
-function CategoriesTreeFormField({ onCategorySelect, ...props }) {
+export function CategoriesTreeFormField({ onCategorySelect, ...props }) {
   const handleCategorySelect = (categoryNames) => {
     props.form.setFieldValue(props.field.name, categoryNames.toString());
     onCategorySelect(categoryNames.toString());
@@ -359,5 +410,3 @@ function CategoriesTreeFormField({ onCategorySelect, ...props }) {
     />
   );
 }
-
-export { CategoriesTree as default, CategoriesTreeFormField };

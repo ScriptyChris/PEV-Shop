@@ -94,12 +94,18 @@ export const PEVLegend = forwardRef(function PEVLegend({ children, ...restProps 
   );
 });
 
-export const PEVTextField = ({ identity, label, labelInside, type = 'text', ...restProps }) => {
+export const PEVTextField = ({ identity, label, labelInside, type = 'text', onEnterKey, ...restProps }) => {
   if (label === undefined) {
     throw Error('`label` has to be provided!');
   } else if (!identity) {
     throw Error('`identity` has to be provided!');
   }
+
+  const onKeyDown = ({ key }) => {
+    if (key === 'Enter' && typeof onEnterKey === 'function') {
+      onEnterKey();
+    }
+  };
 
   return (
     <>
@@ -112,6 +118,7 @@ export const PEVTextField = ({ identity, label, labelInside, type = 'text', ...r
         id={identity}
         variant="outlined"
         size="small"
+        onKeyDown={onKeyDown}
         {...(labelInside ? { label } : {})}
         {...restProps}
       />
@@ -171,7 +178,7 @@ export const PEVRadio = forwardRef(function PEVRadio(props, ref) {
 });
 
 export const PEVForm = forwardRef(function PEVForm(
-  { initialValues = {}, children, overrideRenderFn, className, id, ...props },
+  { initialValues = {}, children, overrideRenderFn, className, id, dataCy, ...props },
   ref
 ) {
   // TODO: consider if providing `onSubmit` and `initialViews` is required or just optional
@@ -187,11 +194,11 @@ export const PEVForm = forwardRef(function PEVForm(
       {(formikProps) => {
         // TODO: [DX] remove it when `ProductsFilter` component's form will be refactored
         if (overrideRenderFn) {
-          return overrideRenderFn(formikProps);
+          return overrideRenderFn({ ...formikProps, dataCy });
         }
 
         return (
-          <Form id={id} className={className}>
+          <Form id={id} className={className} data-cy={dataCy}>
             {typeof children === 'function' ? children(formikProps) : children}
           </Form>
         );
