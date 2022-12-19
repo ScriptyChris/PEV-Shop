@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo, createContext, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Field, ErrorMessage } from 'formik';
 import classNames from 'classnames';
@@ -116,26 +116,15 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
     <PEVFieldset>
       <PEVLegend>{translations.shortDescription}</PEVLegend>
 
-      <FlexibleList
-        initialListItems={initialData[formikField.name]}
-        NewItemComponent={({ listFeatures, ...restProps }) => (
-          <ShortDescription.InputComponent
-            {...restProps}
-            shortDescriptionList={shortDescriptionList}
-            listFeatures={listFeatures}
-          />
-        )}
-        EditItemComponent={({ item: shortDescItem, ...restProps }) => (
-          <ShortDescription.InputComponent
-            {...restProps}
-            shortDescriptionList={shortDescriptionList}
-            isEditMode={true}
-            presetValue={shortDescItem}
-          />
-        )}
-        emitUpdatedItemsList={setShortDescriptionList}
-        itemsContextName="product-descriptions"
-      />
+      <ShortDescription.DescriptionContext.Provider value={shortDescriptionList}>
+        <FlexibleList
+          initialListItems={initialData[formikField.name]}
+          NewItemComponent={ShortDescription._NewShortDescriptionInputHoC}
+          EditItemComponent={ShortDescription._EditShortDescriptionInputHoc}
+          emitUpdatedItemsList={setShortDescriptionList}
+          itemsContextName="product-descriptions"
+        />
+      </ShortDescription.DescriptionContext.Provider>
 
       <input {...formikField} type="hidden" />
     </PEVFieldset>
@@ -222,6 +211,24 @@ ShortDescription.InputComponent = function InputComponent(props) {
 
       {error && <PEVFormFieldError>{error}</PEVFormFieldError>}
     </>
+  );
+};
+ShortDescription.DescriptionContext = createContext([]);
+ShortDescription._NewShortDescriptionInputHoC = function NewShortDescriptionInputHoC({ listFeatures, ...restProps }) {
+  const shortDescriptionList = useContext(ShortDescription.DescriptionContext);
+  return <ShortDescription.InputComponent {...{ ...restProps, shortDescriptionList, listFeatures }} />;
+};
+ShortDescription._EditShortDescriptionInputHoc = function EditShortDescriptionInputHoc({
+  item: shortDescItem,
+  ...restProps
+}) {
+  const shortDescriptionList = useContext(ShortDescription.DescriptionContext);
+  return (
+    <ShortDescription.InputComponent
+      {...{ ...restProps, shortDescriptionList }}
+      isEditMode={true}
+      presetValue={shortDescItem}
+    />
   );
 };
 
@@ -395,57 +402,70 @@ function RelatedProductsNames({ data: { initialData = {} }, field: formikField, 
     setFieldValue(formikField.name, relatedProductNamesList.filter(Boolean));
   }, [relatedProductNamesList]);
 
-  const BoundSearchSingleProductByName = useCallback(
-    ({ children = () => void 0, ...props }) => (
-      <>
-        <SearchSingleProductByName
-          {...props}
-          list="foundRelatedProductsNames"
-          debounceTimeMs={200}
-          InputLabel={translations.relatedProductName}
-          searchingTarget="relatedProductsNames"
-          ignoredProductNames={relatedProductNamesList.filter(
-            (productName) => productName && props.presetValue !== productName
-          )}
-          onSelectedProductName={(productName) => {
-            if (props.editedProductIndex > -1) {
-              props.listFeatures.editItem(productName, props.editedProductIndex);
-            } else {
-              props.listFeatures.addItem(productName);
-            }
-          }}
-          onEscapeBtn={() => props.listFeatures.resetState()}
-          autoFocus={true}
-        />
-        {children()}
-      </>
-    ),
-    [relatedProductNamesList]
-  );
-
   return (
     <PEVFieldset className="product-form__related-product-names">
       <PEVLegend>{translations.relatedProductsNames}</PEVLegend>
 
-      <FlexibleList
-        initialListItems={initialData[formikField.name]}
-        NewItemComponent={(props) => <BoundSearchSingleProductByName {...props} />}
-        EditItemComponent={({ item: relatedProductName, editedIndex, ...restProps }) => (
-          <BoundSearchSingleProductByName
-            {...restProps}
-            presetValue={relatedProductName}
-            editedProductIndex={editedIndex}
-          />
-        )}
-        emitUpdatedItemsList={setRelatedProductNamesList}
-        itemsContextName="related-product-names"
-      />
+      <RelatedProductsNames.SearchContext.Provider value={relatedProductNamesList}>
+        <FlexibleList
+          initialListItems={initialData[formikField.name]}
+          NewItemComponent={RelatedProductsNames._SearchSingleProductByNameHoC}
+          EditItemComponent={RelatedProductsNames._EditItemComponentHoC}
+          emitUpdatedItemsList={setRelatedProductNamesList}
+          itemsContextName="related-product-names"
+        />
+      </RelatedProductsNames.SearchContext.Provider>
 
       <input {...formikField} type="hidden" />
       {/* TODO: [UX] show error when related product name was not found */}
     </PEVFieldset>
   );
 }
+RelatedProductsNames.SearchContext = createContext([]);
+RelatedProductsNames._SearchSingleProductByNameHoC = function SearchSingleProductByNameHoC({
+  children = () => void 0,
+  ...props
+}) {
+  const relatedProductNamesList = useContext(RelatedProductsNames.SearchContext);
+
+  return (
+    <>
+      <SearchSingleProductByName
+        {...props}
+        list="foundRelatedProductsNames"
+        debounceTimeMs={200}
+        InputLabel={translations.relatedProductName}
+        searchingTarget="relatedProductsNames"
+        ignoredProductNames={relatedProductNamesList.filter(
+          (productName) => productName && props.presetValue !== productName
+        )}
+        onSelectedProductName={(productName) => {
+          if (props.editedProductIndex > -1) {
+            props.listFeatures.editItem(productName, props.editedProductIndex);
+          } else {
+            props.listFeatures.addItem(productName);
+          }
+        }}
+        onEscapeBtn={() => props.listFeatures.resetState()}
+        autoFocus={true}
+      />
+      {children()}
+    </>
+  );
+};
+RelatedProductsNames._EditItemComponentHoC = function EditItemComponentHoC({
+  item: relatedProductName,
+  editedIndex,
+  ...restProps
+}) {
+  return (
+    <RelatedProductsNames._SearchSingleProductByNameHoC
+      {...restProps}
+      presetValue={relatedProductName}
+      editedProductIndex={editedIndex}
+    />
+  );
+};
 
 const ProductForm = ({ initialData = {}, doSubmit }) => {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
