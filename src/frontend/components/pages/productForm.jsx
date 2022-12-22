@@ -1,19 +1,24 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo, createContext, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Field, ErrorMessage } from 'formik';
+import { Field, ErrorMessage, useFormikContext } from 'formik';
 import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import AddAPhotoOutlinedIcon from '@material-ui/icons/AddAPhotoOutlined';
 import SaveIcon from '@material-ui/icons/SaveOutlined';
 
 import {
   PEVForm,
   PEVButton,
+  PEVIconButton,
   PEVHeading,
+  PEVParagraph,
   PEVTextField,
   PEVFieldset,
   PEVLegend,
@@ -25,6 +30,10 @@ import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTr
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
 import { routeHelpers } from '@frontend/components/pages/_routes';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import { imageSizeValidator } from '@commons/validators';
+import { ARRAY_FORMAT_SEPARATOR, MAX_IMAGES_AMOUNT } from '@commons/consts';
 
 const translations = {
   getIntro(isProductUpdate) {
@@ -32,6 +41,33 @@ const translations = {
   },
   baseInformation: 'Basic information',
   technicalSpecs: 'Technical specification',
+  images: 'Images',
+  getUploadImageHint(isMobileLayout) {
+    if (isMobileLayout) {
+      return 'Add a new image by clicking the button.';
+    }
+
+    return 'Add a new image by clicking the button or drag and drop it inside this field.';
+  },
+  uploadImageBtn: 'Add image',
+  uploadedImagesAmount: 'Added images',
+  getUploadedImageAlt(imageNumber) {
+    return `Uploaded image number ${imageNumber}`;
+  },
+  getRemoveImage(imageNumber) {
+    return `Remove image ${imageNumber}`;
+  },
+  getImageWithDuplicatedNameError(imgName) {
+    return `Image with name "${imgName}" is already added! Please add a different image.`;
+  },
+  getMaxImageSizeExceededError(currentImgSizeInMB, maxImgSizeInMB) {
+    currentImgSizeInMB = currentImgSizeInMB.toFixed(1);
+
+    return `Maximum allowed image size is ${maxImgSizeInMB}MB! Your image has ${currentImgSizeInMB}MB.`;
+  },
+  reachedMaxImagesAmount:
+    'All image slots filled. You can replace any image by first removing it and then adding some other one.',
+  notAnImageTypeError: 'Only image files are allowed!',
   categoryChooser: 'Category',
   chooseCategoryFirst: 'A category needs to be chosen first...',
   name: 'Name',
@@ -46,6 +82,7 @@ const translations = {
   duplicatedDescription: 'Description item must be unique!',
   lackOfData: 'No data!',
   emptyCategoryError: 'Category must be selected!',
+  emptyImagesError: 'At least one image must be added!',
   colourIsNotTextError: 'Colour value must be a text!',
   modificationError: 'Cannot modify, because no changes were made!',
 };
@@ -122,7 +159,7 @@ function ShortDescription({ data: { initialData = {} }, field: formikField, form
           NewItemComponent={ShortDescription._NewShortDescriptionInputHoC}
           EditItemComponent={ShortDescription._EditShortDescriptionInputHoc}
           emitUpdatedItemsList={setShortDescriptionList}
-          itemsContextName="product-descriptions"
+          itemsContextName="shortDescription"
         />
       </ShortDescription.DescriptionContext.Provider>
 
@@ -186,7 +223,7 @@ ShortDescription.InputComponent = function InputComponent(props) {
           }
         }}
         inputProps={{
-          'data-cy': `input:product-descriptions__${props.editedIndex ?? 'new'}`,
+          'data-cy': `input:shortDescription__${props.editedIndex ?? 'new'}`,
         }}
         autoFocus
         required
@@ -395,6 +432,200 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
   );
 }
 
+function Images({ data: { initialData = [] } }) {
+  const { isMobileLayout } = useRWDLayout();
+  const [uploadedImages, setUploadedImages] = useState(initialData);
+  const [popupData, setPopupData] = useState(null);
+  const canUploadImages = uploadedImages.length < MAX_IMAGES_AMOUNT;
+  const { setFieldValue, setFieldTouched, setFieldError } = useFormikContext();
+  const { handleChangeImg, handleDrop, handleDragOver } = Images.useHandleUploadImage({
+    uploadedImages,
+    canUploadImages,
+    setUploadedImages,
+    setPopupData,
+    setFieldTouched,
+    setFieldError,
+  });
+  const imagesNamesValue = uploadedImages.map(({ name }) => name).join(ARRAY_FORMAT_SEPARATOR);
+
+  useEffect(() => {
+    if (initialData.length) {
+      setFieldTouched('imagesEmpty');
+    }
+  }, []);
+
+  useEffect(() => {
+    setFieldValue(
+      'images',
+      uploadedImages.length ? uploadedImages.map(({ imgFile, ...originalRest }) => imgFile || originalRest) : ''
+    );
+  }, [uploadedImages]);
+
+  const handleRemoveImg = (imgIndex) => () => {
+    setFieldTouched('images');
+    setUploadedImages((prev) => prev.filter((_, index) => index !== imgIndex));
+  };
+
+  return (
+    <PEVFieldset className="product-form__images pev-flex pev-flex--columned">
+      <PEVLegend>{translations.images}</PEVLegend>
+
+      <Box
+        borderRadius="borderRadius"
+        borderColor={canUploadImages ? 'primary.main' : 'text.disabled'}
+        className="product-form__images-drag-and-drop pev-flex pev-flex--columned"
+        onDrop={isMobileLayout ? undefined : handleDrop}
+        onDragOver={isMobileLayout ? undefined : handleDragOver}
+      >
+        <PEVParagraph
+          className={classNames('pev-centered-padded-text', { 'product-form__images-limit-hint': !canUploadImages })}
+        >
+          {canUploadImages ? translations.getUploadImageHint(isMobileLayout) : translations.reachedMaxImagesAmount}
+        </PEVParagraph>
+        <input
+          id="add-product-image"
+          type="file"
+          accept="image/*"
+          onChange={handleChangeImg}
+          // this input doesn't need a `value`, because it only serves to show OS based file explorer
+          value=""
+          style={{ display: 'none' }}
+          disabled={!canUploadImages}
+          data-cy="input:add-new-image"
+        />
+        <label htmlFor="add-product-image">
+          <PEVIconButton
+            component="span"
+            a11y={translations.uploadImageBtn}
+            disabled={!canUploadImages}
+            name="images"
+            value={imagesNamesValue}
+          >
+            <AddAPhotoOutlinedIcon color={canUploadImages ? 'primary' : 'disabled'} />
+          </PEVIconButton>
+        </label>
+        <small>
+          {translations.uploadedImagesAmount}:{' '}
+          <span data-cy="label:attached-images-count">
+            {uploadedImages.length}/{MAX_IMAGES_AMOUNT}
+          </span>
+        </small>
+      </Box>
+
+      <div style={{ '--images-limit': MAX_IMAGES_AMOUNT }} className="product-form__images-list">
+        {/* TODO: [UX] let user choose, which image should serve as a preview on product's card */}
+        {uploadedImages.map(({ src, name }, index) => (
+          <Box
+            component="figure"
+            borderColor="primary.main"
+            borderRadius="borderRadius"
+            className="product-form__images-list-item"
+            key={name}
+          >
+            <img
+              src={src}
+              width={128}
+              height={128}
+              style={{ objectFit: 'contain' }}
+              /* TODO: use `object-fit: contain;` */ alt={translations.getUploadedImageAlt(index + 1)}
+            />
+            <figcaption data-cy={`label:attached-image-${index}-caption`}>{name}</figcaption>
+            <PEVIconButton
+              type="button"
+              color="secondary"
+              a11y={translations.getRemoveImage(index + 1)}
+              onClick={handleRemoveImg(index)}
+              data-cy={`button:remove-${index}-uploaded-image`}
+            >
+              <DeleteOutlineIcon />
+            </PEVIconButton>
+          </Box>
+        ))}
+      </div>
+
+      <Popup {...popupData} />
+
+      <ErrorMessage name="images" component={PEVFormFieldError} />
+    </PEVFieldset>
+  );
+}
+Images.useHandleUploadImage = ({
+  uploadedImages,
+  canUploadImages,
+  setUploadedImages,
+  setPopupData,
+  setFieldTouched,
+  setFieldError,
+}) => {
+  const validateFileType = (fileType) => fileType.startsWith('image/');
+  const validateImgUniqueName = (imgName) => !uploadedImages.some(({ name }) => name === imgName);
+  const handleUploadImg = (imgFile) => {
+    if (!imgFile) {
+      return;
+    }
+
+    if (!validateFileType(imgFile.type)) {
+      return setPopupData({
+        type: POPUP_TYPES.FAILURE,
+        message: translations.notAnImageTypeError,
+        buttons: [getClosePopupBtn(setPopupData)],
+      });
+    }
+
+    if (!validateImgUniqueName(imgFile.name)) {
+      return setPopupData({
+        type: POPUP_TYPES.FAILURE,
+        message: translations.getImageWithDuplicatedNameError(imgFile.name),
+        buttons: [getClosePopupBtn(setPopupData)],
+      });
+    }
+
+    const { isValidSize, currentImgSizeInMB, maxImgSizeInMB } = imageSizeValidator(imgFile.size);
+    if (!isValidSize) {
+      return setPopupData({
+        type: POPUP_TYPES.FAILURE,
+        message: translations.getMaxImageSizeExceededError(currentImgSizeInMB, maxImgSizeInMB),
+        buttons: [getClosePopupBtn(setPopupData)],
+      });
+    }
+
+    setUploadedImages((prev) => [
+      ...prev,
+      {
+        src: URL.createObjectURL(imgFile),
+        name: imgFile.name,
+        imgFile,
+      },
+    ]);
+    setFieldTouched('images');
+    setFieldError('images', '');
+  };
+  const handleChangeImg = ({
+    target: {
+      files: [imgFile],
+    },
+  }) => handleUploadImg(imgFile);
+  const handleDrop = (event) => {
+    event.preventDefault();
+
+    if (canUploadImages) {
+      event.dataTransfer.dropEffect = 'move';
+      handleUploadImg(event.dataTransfer?.files[0]);
+    } else {
+      event.dataTransfer.dropEffect = 'none';
+    }
+  };
+  const handleDragOver = (event) => {
+    event.preventDefault();
+
+    if (!canUploadImages) {
+      event.dataTransfer.dropEffect = 'none';
+    }
+  };
+
+  return { handleChangeImg, handleDrop, handleDragOver };
+};
+
 function RelatedProductsNames({ data: { initialData = {} }, field: formikField, form: { setFieldValue } }) {
   const [relatedProductNamesList, setRelatedProductNamesList] = useState([]);
 
@@ -467,6 +698,7 @@ RelatedProductsNames._EditItemComponentHoC = function EditItemComponentHoC({
   );
 };
 
+// TODO: [UX] show a validation ornament at each form section to indicate user, which section is required/valid/invalid
 const ProductForm = ({ initialData = {}, doSubmit }) => {
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
@@ -474,18 +706,25 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
     categoryToSpecs: null,
   });
   const [formInitials, setFormInitials] = useState(() =>
-    Object.fromEntries(ProductForm.initialFormKeys.map((key) => [key, initialData[key] || '']))
+    Object.fromEntries(ProductForm.initialFormEntries.map(([key, value]) => [key, initialData[key] || value]))
   );
   const ORIGINAL_FORM_INITIALS_KEYS = useMemo(() => Object.keys(formInitials), []);
-  const getSpecsForSelectedCategory = useCallback((selectedCategoryName) => {
-    const specsFromChosenCategory = (
-      productSpecsMap.current.categoryToSpecs.find(
-        (categoryToSpec) => categoryToSpec.category === selectedCategoryName
-      ) || { specs: [] }
-    ) /* TODO: remove fallback when CategoriesTree will handle ignoring toggle'able nodes */.specs;
+  const getSpecsForSelectedCategory = useCallback(
+    (selectedCategoryName) => {
+      if (!productSpecsMap.current.categoryToSpecs || !productSpecsMap.current.specs) {
+        return [];
+      }
 
-    return productSpecsMap.current.specs.filter((spec) => specsFromChosenCategory.includes(spec.name));
-  }, []);
+      const specsFromChosenCategory = (
+        productSpecsMap.current.categoryToSpecs.find(
+          (categoryToSpec) => categoryToSpec.category === selectedCategoryName
+        ) || { specs: [] }
+      ) /* TODO: remove fallback when CategoriesTree will handle ignoring toggle'able nodes */.specs;
+
+      return productSpecsMap.current.specs.filter((spec) => specsFromChosenCategory.includes(spec.name));
+    },
+    [formInitials]
+  );
   const getNestedEntries = useMemo(() => {
     const _getNestedEntries = (entries) =>
       (Array.isArray(entries) ? entries : Object.entries(entries))
@@ -646,6 +885,10 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
       errors.category = translations.emptyCategoryError;
     }
 
+    if (!values.images?.length) {
+      errors.imagesEmpty = translations.emptyImagesError;
+    }
+
     const { isColourFieldError, colourFieldKey } = validateHandler.colorFieldTextValidator(values);
     if (isColourFieldError) {
       errors[colourFieldKey] = translations.colourIsNotTextError;
@@ -661,7 +904,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   };
 
   return (
-    <section className={classNames('product-form pev-fixed-container')}>
+    <section className="product-form pev-fixed-container">
       <PEVForm
         className="product-form__form"
         onSubmit={onSubmitHandler}
@@ -693,6 +936,9 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
               />
             </Paper>
             <Paper className="product-form__fields-group">
+              <Images data={{ initialData: initialData.images }} />
+            </Paper>
+            <Paper className="product-form__fields-group">
               <Field
                 name="relatedProductsNames"
                 data={{ initialData: formikProps.values }}
@@ -715,17 +961,31 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
     </section>
   );
 };
-ProductForm.initialFormKeys = ['name', 'price', 'shortDescription', 'category', 'relatedProductsNames'];
+ProductForm.initialFormEntries = [
+  ['name', ''],
+  ['price', ''],
+  ['shortDescription', []],
+  ['category', ''],
+  ['images', []],
+  ['relatedProductsNames', []],
+];
 
 const NewProduct = () => {
-  const doSubmit = (newProductData) =>
-    httpService.addProduct(newProductData).then((res) => {
+  const doSubmit = (newProductData) => {
+    const fd = new FormData();
+    const { images, ...plainData } = newProductData;
+
+    fd.append('plainData', JSON.stringify(plainData));
+    images.forEach((img, index) => fd.append(`image${index}`, img));
+    return httpService.addProduct(fd).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
+      // TODO: [UX] show a popup
       console.log('Product successfully saved');
     });
+  };
 
   return <ProductForm doSubmit={doSubmit} />;
 };

@@ -95,7 +95,8 @@ module.exports = (env) => {
           'src/database',
           'test/middleware',
           'test/database',
-          '__mocks__'
+          '__mocks__',
+          'public/images'
         ].map((path) => resolve(__dirname, path)),
       },
     },

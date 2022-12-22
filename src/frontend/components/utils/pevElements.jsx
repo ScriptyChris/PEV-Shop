@@ -213,8 +213,12 @@ export const PEVForm = forwardRef(function PEVForm(
 });
 
 // TODO: [DX] use Formik's `<ErrorMessage>` component
-export const PEVFormFieldError = ({ children, customMessage }) => {
-  return <PEVParagraph className="pev-element-form-field-error">{customMessage || children}</PEVParagraph>;
+export const PEVFormFieldError = ({ children, customMessage, ...restProps }) => {
+  return (
+    <PEVParagraph className="pev-element-form-field-error" {...restProps}>
+      {customMessage || children}
+    </PEVParagraph>
+  );
 };
 
 export const PEVHeading = forwardRef(function PEVHeading({ level, children, withMargin, ...restProps }, ref) {
