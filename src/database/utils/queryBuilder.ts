@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import getLogger from '@commons/logger';
 import { FILTER_RANGE_SEPARATOR, ARRAY_FORMAT_SEPARATOR } from '@root/commons/consts';
-import { productPriceRangeValidator, productSortingValidator } from '@commons/filterValidators';
+import { productPriceRangeValidator, productSortingValidator } from '@root/commons/validators';
 
 type TReqQuery = Request['query'];
 

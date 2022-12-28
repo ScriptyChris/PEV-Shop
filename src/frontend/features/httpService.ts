@@ -59,10 +59,12 @@ class Ajax {
   }
 
   /** @internal */
-  _getContentTypeHeader() {
-    return {
-      'Content-Type': 'application/json',
-    };
+  _getContentTypeHeader(shouldSendAsFormData = false) {
+    return shouldSendAsFormData
+      ? undefined
+      : {
+          'Content-Type': 'application/json',
+        };
   }
 
   /** @internal */
@@ -145,8 +147,14 @@ class Ajax {
   }
 
   /** @internal */
-  _sendRequestWithPayload(methodName: string, apiEndpoint: string, data: unknown, useToken: boolean) {
-    const headers = new Headers(this._getContentTypeHeader());
+  _sendRequestWithPayload(
+    methodName: string,
+    apiEndpoint: string,
+    data: unknown,
+    useToken: boolean,
+    shouldSendAsFormData = false
+  ) {
+    const headers = new Headers(this._getContentTypeHeader(shouldSendAsFormData));
 
     if (useToken) {
       headers.append('Authorization', this._getAuthHeader());
@@ -156,7 +164,7 @@ class Ajax {
       fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
         method: methodName,
         headers,
-        body: JSON.stringify(data || {}),
+        body: shouldSendAsFormData ? (data as FormData) : JSON.stringify(data || {}),
       })
     );
   }
@@ -192,8 +200,8 @@ class Ajax {
   }
 
   /** @internal */
-  postRequest(apiEndpoint: string, data: unknown, useToken = false) {
-    return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.POST, apiEndpoint, data, useToken);
+  postRequest(apiEndpoint: string, data: unknown, useToken = false, shouldSendAsFormData = false) {
+    return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.POST, apiEndpoint, data, useToken, shouldSendAsFormData);
   }
 
   /** @internal */
@@ -252,7 +260,7 @@ class HttpService extends Ajax {
    * Adds a new product.
    */
   addProduct(product: IProduct) {
-    return this.postRequest(this.URLS.PRODUCTS, product, true);
+    return this.postRequest(this.URLS.PRODUCTS, product, true, true);
   }
 
   /**
@@ -303,6 +311,10 @@ class HttpService extends Ajax {
   }
 
   getProductsById(idList: IProduct['_id'][]) {
+    if (!idList || !idList.length) {
+      return Promise.resolve([]);
+    }
+
     return this.getRequest(`${this.URLS.PRODUCTS}?idList=${idList}`);
   }
 
@@ -310,6 +322,10 @@ class HttpService extends Ajax {
    * Gets products by list of names - mostly useful for retrieving related products of a single one.
    */
   getProductsByNames(nameList: IProduct['name'][]) {
+    if (!nameList || !nameList.length) {
+      return Promise.resolve([]);
+    }
+
     const searchParams = new URLSearchParams({ nameList: JSON.stringify(nameList) });
 
     return this.getRequest({

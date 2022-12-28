@@ -64,3 +64,14 @@ export const productSortingValidator = (sortBy: string) => {
 
   return { [field]: order } as const;
 };
+
+export const imageSizeValidator = (currentImgSize: number) => {
+  const mbToByteMultiplier = 1024000;
+  const maxImgSizeInMB = 1;
+
+  return {
+    isValidSize: currentImgSize <= maxImgSizeInMB * mbToByteMultiplier,
+    currentImgSizeInMB: currentImgSize / mbToByteMultiplier,
+    maxImgSizeInMB,
+  };
+};
