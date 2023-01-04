@@ -43,6 +43,7 @@
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend && npm run prepare-commons",
     "debug": "cross-env BACKEND_ONLY=true node --inspect-brk dist/src/middleware/middleware-index.js",
+    "generate-api-docs": "tsc --project tsconfig.jsdoc.json && jsdoc2md '_tmp-compiled-scripts-for-docs/**' --configure jsdoc.json > API.md && rm -rf ./_tmp-compiled-scripts-for-docs",
     "serve": "node_modules/.bin/cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"
   },
   "devDependencies": {
@@ -79,6 +80,7 @@
     "glob": "^7.1.6",
     "html-webpack-plugin": "^4.4.1",
     "jest": "^26.6.3",
+    "jsdoc-to-markdown": "^8.0.0",
     "local-cypress": "^1.2.3",
     "mini-css-extract-plugin": "^0.10.0",
     "node-fetch": "^2.6.7",
@@ -106,7 +108,7 @@
     "classnames": "^2.3.1",
     "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
-    "express": "^4.17.2",
+    "express": "^4.18.2",
     "formik": "^2.2.9",
     "jsonwebtoken": "^8.5.1",
     "mobx": "^5.15.6",

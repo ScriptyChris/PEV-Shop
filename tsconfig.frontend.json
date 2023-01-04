@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./src/frontend/**/*.ts"],
+  "include": ["./src/frontend/**/*.ts?"],
   "exclude": ["./src/**/__mocks__"],
   "compilerOptions": {
     "module": "ES2020",

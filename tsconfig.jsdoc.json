@@ -1,0 +1,11 @@
+{
+    "extends": "./tsconfig.json",
+    "include": ["./**/*.ts?", "./**/*.js?"],
+    "files": ["./src/augmentations.d.ts", "./src/database/populate/populate.ts"],
+    "compilerOptions": {
+        "outDir": "_tmp-compiled-scripts-for-docs",
+        "skipLibCheck": true,
+        "allowJs": true,
+        "jsx": "react"
+    }
+}
