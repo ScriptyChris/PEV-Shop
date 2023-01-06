@@ -1,3 +1,8 @@
+/**
+ * Custom wrapper for a commonly used global `console` methods.
+ * @module Logger
+ */
+
 import { basename } from 'path';
 
 // TODO: improve typing to avoid repeating method declarations
@@ -44,6 +49,13 @@ class Logger extends Log {
   }
 }
 
+/**
+ * Creates a module bound logger, which name will be visually emphased in output logs.
+ * @example <caption>Log output for `middleware-index` module</caption>
+ * ([Module: middleware-index.js])::  Server is listening on port 3000
+ * @param {string} moduleFileName
+ * @returns {TLogger}
+ */
 function getLogger(moduleFileName: string): Logger {
   if (moduleFileName.endsWith('.spec.js')) {
     throw TypeError('Logger may not be used in *.spec.js files!');

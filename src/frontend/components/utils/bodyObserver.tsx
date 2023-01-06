@@ -1,6 +1,12 @@
+/**
+ * Handles HTML `<body>` style changes, which affect position of components,
+ * such as `ScrollToTop` button and `ProductComparisonCandidates` bar.
+ * @module BodyObserver
+ */
+
 type TSubscriptionCallback = {
-  subscriptionID: number,
-  (bodyStyle: CSSStyleDeclaration): void,
+  subscriptionID: number;
+  (bodyStyle: CSSStyleDeclaration): void;
 };
 
 let nextMutationSubscriptionID = 0;
@@ -13,6 +19,11 @@ const bodyObserver = new MutationObserver((mutations) => {
 });
 bodyObserver.observe(document.body, { attributes: true });
 
+/**
+ * Subscribes a provided `callback` to `<body>` style mutations.
+ * @param {TSubscriptionCallback} callback
+ * @returns {number} subscriptionID, which lets unsubscribing `callback` later.
+ */
 export const subscribeToBodyMutations = (callback: TSubscriptionCallback) => {
   callback.subscriptionID = nextMutationSubscriptionID++;
   bodyMutationSubscribers.push(callback);
@@ -20,6 +31,10 @@ export const subscribeToBodyMutations = (callback: TSubscriptionCallback) => {
   return callback.subscriptionID;
 };
 
+/**
+ * Unsubscribes previously subscribed `callback` (via it's ID) from `<body>` style mutations.
+ * @param {number} subscriptionID
+ */
 export const unSubscribeFromBodyMutations = (subscriptionID: number) => {
   const subscriptionCallbackIndex = bodyMutationSubscribers.findIndex(
     (callback) => callback.subscriptionID === subscriptionID

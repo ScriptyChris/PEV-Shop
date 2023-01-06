@@ -1,6 +1,6 @@
 import React, { createContext, useState, useMemo, useEffect } from 'react';
 
-const RWDLayoutContext = createContext(undefined);
+const RWDLayoutContext = createContext({});
 
 const mediaQueryList = (() => {
   const documentStyles = window.getComputedStyle(document.documentElement);
@@ -11,7 +11,9 @@ const mediaQueryList = (() => {
       .trim()
       .replace(/\\a|\s{2,}/g, '');
 
-    const mql: TMQLWithName = window.matchMedia(mediaQuery);
+    const mql = window.matchMedia(mediaQuery) as ReturnType<typeof window.matchMedia> & {
+      __deviceName: string;
+    };
     const deviceName = queryName.match(/(?<=--)\w+/)?.[0];
 
     if (!deviceName) {
@@ -32,7 +34,7 @@ const useRWDMediaQuery = () => {
   );
 
   useEffect(() => {
-    function onMQLChange({ matches, media }) {
+    function onMQLChange({ matches, media }: MediaQueryListEvent) {
       if (matches) {
         const matchedMediaName = mediaQueryList.find((mql) => media === mql.media)?.__deviceName;
 
@@ -49,7 +51,7 @@ const useRWDMediaQuery = () => {
     return () => mediaQueryList.forEach((mql) => mql.removeEventListener('change', onMQLChange));
   }, []);
 
-  const mediaQueryCheckers = useMemo(
+  const mediaQueryCheckers = useMemo<Record<string, boolean>>(
     () =>
       mediaQueryList.reduce((output, { __deviceName: mqName }) => {
         const upperCasedMQName = `${mqName[0].toUpperCase()}${mqName.slice(1)}`;
@@ -69,7 +71,7 @@ const useRWDMediaQuery = () => {
   return mediaQueryCheckers;
 };
 
-function RWDLayoutProvider({ children }) {
+function RWDLayoutProvider({ children }: React.PropsWithChildren<Record<string, unknown>>) {
   return <RWDLayoutContext.Provider value={useRWDMediaQuery()}>{children}</RWDLayoutContext.Provider>;
 }
 

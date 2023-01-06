@@ -5,7 +5,7 @@ import { unstable_createMuiStrictModeTheme, createMuiTheme } from '@material-ui/
 // eslint-disable-next-line no-var
 declare var __IS_DEV_MODE__: string;
 
-function MUIThemeProvider({ children }) {
+function MUIThemeProvider({ children }: React.PropsWithChildren<Record<string, unknown>>) {
   // TODO: [DX] refactor this after migrating to React v18 and MUI v5
   // https://github.com/mui/material-ui/issues/13394
 

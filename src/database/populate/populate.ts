@@ -1,3 +1,15 @@
+/**
+ * Populates database with indicated initial data, optionally doing a cleanup beforehand.
+ * @module Populate
+ * @example <caption>npm usage</caption>
+ * > npm run populate-db
+ * @example <caption>Manual CLI usage</caption>
+ * > cd path/to/this/module
+ * > ts-node populate.ts \
+ *    executedFromCLI=true \
+ *    products__InputPath=path/to/JSON/with/initial/products/data
+ */
+
 // TODO: [DX] activate `moduleAliasesResolvers.js` beforehand, so module alias can be used here
 import { COLLECTION_NAMES, TCOLLECTION_NAMES } from '../models/__core-and-commons';
 
@@ -13,7 +25,12 @@ const CAPITALIZED_PLURAL_COLLECTION_NAMES = Object.fromEntries(
   })
 ) as TCapitalizedPluralCollectionsMap;
 
-const PARAMS = Object.freeze({
+/**
+ * Maps supported params passed via CLI.
+ * @readonly
+ * @enum {string}
+ */
+const PARAMS = {
   EXECUTED_FROM_CLI: 'executedFromCLI',
   CLEAN_ALL_BEFORE: 'cleanAllBefore',
   JSON_FILE_PATH: {
@@ -21,13 +38,18 @@ const PARAMS = Object.freeze({
     [CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS]: 'users__InputPath',
     [CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES]: 'user_roles__InputPath',
   },
-});
-const DEFAULT_PARAMS = Object.freeze({
+} as const;
+/**
+ * Maps default params, which are applied when regarding individual params are not provided via CLI.
+ * @readonly
+ * @enum {string}
+ */
+const DEFAULT_PARAMS = {
   [PARAMS.CLEAN_ALL_BEFORE]: 'true',
   [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initialData/products.json',
   [PARAMS.JSON_FILE_PATH.USERS]: './initialData/users.json',
   [PARAMS.JSON_FILE_PATH.USER_ROLES]: './initialData/user_roles.json',
-});
+} as const;
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -87,6 +109,11 @@ if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
   throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string!`);
 }
 
+/**
+ * Executes database population. May be called from other module or it's automatically called when this script is run from CLI.
+ * @async
+ * @param {boolean} shouldCleanupAll - Decides whether do database cleanup. Passing `PARAMS.CLEAN_ALL_BEFORE` via CLI is an alternative way to do cleanup.
+ */
 const executeDBPopulation = async (shouldCleanupAll = false) => {
   logger.log('executeDBPopulation() called.');
 
@@ -253,7 +280,8 @@ function updateRelatedProductsNames(sourceDataList: TProductToPopulate[]): Promi
 }
 
 function getScriptParamStringValue(paramName: string) {
-  const paramValue = process.argv.find((arg) => arg.includes(paramName)) ?? DEFAULT_PARAMS[paramName];
+  const paramValue =
+    process.argv.find((arg) => arg.includes(paramName)) ?? DEFAULT_PARAMS[paramName as keyof typeof DEFAULT_PARAMS];
 
   // not using `logger`, because this function might be called before `logger` initialization (to resolve module aliases)
   console.log('[getScriptParamValue()] /paramName:', paramName, '/paramValue:', paramValue);
