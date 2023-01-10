@@ -1,0 +1,8 @@
+{
+  "tsconfig": "./tsconfig.typedoc.json",
+  "entryPointStrategy": "expand",
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "exclude": ["./src/**/__mocks__/**", "./src/frontend/assets/**"],
+  "readme": "none"
+}
