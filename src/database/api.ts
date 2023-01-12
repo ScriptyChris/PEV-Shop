@@ -1,3 +1,8 @@
+/**
+ * Facade over database CRUD operations.
+ * @module
+ */
+
 import {
   getModel,
   TCOLLECTION_NAMES,

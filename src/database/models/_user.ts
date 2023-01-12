@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @notExported
+ */
+
 import { model, Schema, Document, Model, TUserRoleName, COLLECTION_NAMES } from '@database/models/__core-and-commons';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '@middleware/features/auth';
@@ -243,11 +248,17 @@ export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isCo
   __accountType: TUserRoleName;
 };
 
+/**
+ * @internal
+ */
 interface IUserModel extends Model<IUser> {
   validateNewUserPayload(newUser: any): string;
   validatePassword(password: unknown): string;
 }
 
+/**
+ * @internal
+ */
 export interface IUser extends Document {
   login: string;
   password: string;

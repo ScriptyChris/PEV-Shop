@@ -1,19 +1,17 @@
 /**
  * Handles reading and manipulating browser's LocalStorage data.
- * @module StorageService
+ * @module
  */
 
-import type { IUserCart } from '@src/types';
+import type { IUserCart } from '@commons/types';
 import type { IUser, TUserPublic } from '@database/models';
 
 type TStorageValue = IUserCart | TUserPublic | NonNullable<IUser['tokens']['auth']>[number] | null;
 
 /**
  * Manipulating storage data API for various contexts, such as `UserCart` or `UserAccount`.
- * @namespace storageService
  */
 const storageService = (() => {
-  /** @memberof storageService */
   class StorageService {
     key: string;
 
@@ -24,8 +22,6 @@ const storageService = (() => {
     /**
      * Update regarding storage context by either setting given `value` or removing existing one,
      * depending on result of calling `checkIfShouldRemove`.
-     * @param {TStorageValue} value
-     * @param {Function} checkIfShouldRemove
      */
     update(value: TStorageValue, checkIfShouldRemove: () => boolean) {
       try {

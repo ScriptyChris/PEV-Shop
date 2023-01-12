@@ -1,5 +1,19 @@
+/**
+ * Common types for whole app.
+ * @module
+ */
+
+/**
+ * @ignore
+ */
 import userSessionService from '@frontend/features/userSessionService';
+/**
+ * @ignore
+ */
 import storageService from '@frontend/features/storageService';
+/**
+ * @ignore
+ */
 import storeService from '@frontend/features/storeService';
 
 export interface IProductInOrder {
@@ -66,12 +80,21 @@ export interface IOrder {
 
 export type TPagination = { pageNumber: number; productsPerPage: number };
 
+/**
+ * @ignore
+ */
 export type TE2E = {
+  /** @ignore */
   userSessionService: typeof userSessionService;
+  /** @ignore */
   storeService: typeof storeService;
+  /** @ignore */
   storageService: typeof storageService;
 };
 
+/**
+ * @ignore
+ */
 export type TE2EUser = {
   login: string;
   password: string;

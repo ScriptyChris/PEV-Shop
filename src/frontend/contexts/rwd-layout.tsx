@@ -1,3 +1,8 @@
+/**
+ * Observes DOM viewport changes and emits information about the currently established one.
+ * @module
+ */
+
 import React, { createContext, useState, useMemo, useEffect } from 'react';
 
 const RWDLayoutContext = createContext({});

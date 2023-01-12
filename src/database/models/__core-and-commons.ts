@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @notExported
+ */
+
 import mongoose from 'mongoose';
 // fix `isValidObjectId` lost `this`
 export const isValidObjectId = mongoose.isValidObjectId.bind(mongoose);

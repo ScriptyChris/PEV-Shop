@@ -1,11 +1,13 @@
 /**
  * Custom wrapper for a commonly used global `console` methods.
- * @module Logger
+ * @module
  */
 
 import { basename } from 'path';
 
-// TODO: improve typing to avoid repeating method declarations
+/**
+ * @ignore
+ */
 abstract class Log {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   public log(...args: any[]): void {}
@@ -15,6 +17,9 @@ abstract class Log {
   public error(...args: any[]): void {}
 }
 
+/**
+ * @ignore
+ */
 class Logger extends Log {
   private readonly loggingEnabled: boolean;
   private readonly msgPrefix: string;
@@ -53,8 +58,6 @@ class Logger extends Log {
  * Creates a module bound logger, which name will be visually emphased in output logs.
  * @example <caption>Log output for `middleware-index` module</caption>
  * ([Module: middleware-index.js])::  Server is listening on port 3000
- * @param {string} moduleFileName
- * @returns {TLogger}
  */
 function getLogger(moduleFileName: string): Logger {
   if (moduleFileName.endsWith('.spec.js')) {

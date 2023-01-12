@@ -1,10 +1,10 @@
 /**
  * Custom wrapper to secure consistent usage of a few {@link https://expressjs.com/en/4x/api.html#res|`Express#res`} methods.
- * @module MiddlewareResponseWrapper
+ * @module
  */
 
 import type { Response } from 'express';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 
 export interface IEmbracedResponse<PayloadType = never> {
   // TODO: [REFACTOR] 'authToken' could be always paired with 'payload' prop or be contained by it
@@ -91,16 +91,16 @@ function wrapRes<
 >(res: Response, status: Status, data: Record<DataKey, IEmbracedResponse[DataKey]>): Response;
 /**
  * It asserts that used `HTTP_STATUS_CODE` is adequate to provided optional payload shape (regarding it's key/label).
- * @param {Response} res
- * @param {HTTP_STATUS_CODE} status
- * @param {Object} [data]
- * @returns {Response}
- * @example <caption>Without payload</caption>
+ * @example Without payload
+ * ```ts
  * wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
- * @example <caption>With payload</caption>
+ * ```
+ * @example With payload
+ * ```ts
  * wrapRes(res, HTTP_STATUS_CODE.OK, { payload: someResourceValue });
  * wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Resource created!' });
  * wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Resource not found!' });
+ * ```
  */
 function wrapRes<Payload, Status extends TKeyofMappedStatusCode, DataKey extends TDataKeyExt<Status>>(
   res: Response,

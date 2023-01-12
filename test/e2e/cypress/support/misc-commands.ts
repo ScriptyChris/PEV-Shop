@@ -1,6 +1,6 @@
 import { cy, Cypress, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
-import { TE2E, IUserCart, HTTP_STATUS_CODE } from '@src/types';
+import { TE2E, IUserCart, HTTP_STATUS_CODE } from '@commons/types';
 
 Cypress.Commands.add('getFromStorage', (key) => {
   return cy.window().then((window) => JSON.parse(window.localStorage.getItem(key) as string));

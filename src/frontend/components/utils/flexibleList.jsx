@@ -1,3 +1,8 @@
+/**
+ * Flexible list component, which allows adding, editing and deleting it's items in a customizable way.
+ * @module
+ */
+
 import React, { useState, useEffect, useReducer, useMemo } from 'react';
 import classNames from 'classnames';
 

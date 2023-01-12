@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 import { TMessage } from './email-commands';
-import type { TE2EUser, IUserCart } from '@src/types';
+import type { TE2EUser, IUserCart } from '@commons/types';
 import type { TUserPublic, IUser, TProductPublic } from '@database/models';
 import type { HeadersInit } from 'node-fetch';
 

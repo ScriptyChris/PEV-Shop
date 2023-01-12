@@ -7,7 +7,7 @@ const {
 } = mockAndRequireModule('mongoose');
 mockAndRequireDBModelsModules();
 
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import { getResMock, getNextFnMock, TJestMock } from '@unitTests/inline-mocks';
 import { COLLECTION_NAMES } from '@database/models';
 

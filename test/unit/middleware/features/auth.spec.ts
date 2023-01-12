@@ -4,7 +4,7 @@ mockAndRequireDBModelsModules();
 
 import { getResMock, TJestMock } from '@unitTests/inline-mocks';
 import { IUser, COLLECTION_NAMES } from '@database/models';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import getType from 'jest-get-type';
 
 const { getFromDB: getFromDBMock } = mockAndRequireModule('src/database/api');

@@ -1,7 +1,7 @@
 import { describe, it, cy, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 
 function assertSearchParamsCount(expectedCount: number) {
   cy.location('search').should((search) => {

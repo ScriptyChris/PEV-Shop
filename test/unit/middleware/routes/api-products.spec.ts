@@ -2,7 +2,7 @@ import { findAssociatedSrcModulePath, mockAndRequireModule, mockAndRequireDBMode
 
 mockAndRequireDBModelsModules();
 
-import { HTTP_STATUS_CODE } from '@src/types';
+import { HTTP_STATUS_CODE } from '@commons/types';
 import { getNextFnMock, getResMock, TJestMock } from '@unitTests/inline-mocks';
 import { COLLECTION_NAMES, USER_ROLES_MAP } from '@database/models';
 

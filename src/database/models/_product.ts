@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @notExported
+ */
+
 import { Document, Types, Schema, model, COLLECTION_NAMES } from '@database/models/__core-and-commons';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import getLogger from '@commons/logger';
@@ -156,11 +161,17 @@ export type TProductPublic = Pick<
 
 export type TProductToPopulate = Exclude<IProduct, 'prepareUrlFieldBasedOnNameField'>;
 
+/**
+ * @internal
+ */
 export interface IReviews extends Types.Subdocument {
   list: Record<string, string | number>[];
   averageRating: number;
 }
 
+/**
+ * @internal
+ */
 export interface IProduct extends Document {
   name: string;
   url: string;

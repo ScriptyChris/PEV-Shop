@@ -1,6 +1,6 @@
 import { cy, describe, it, beforeEach, expect } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
-import { HTTP_STATUS_CODE, TE2EUser } from '@src/types';
+import { HTTP_STATUS_CODE, TE2EUser } from '@commons/types';
 import { makeCyDataSelector } from '../synchronous-helpers';
 
 describe('#register', () => {

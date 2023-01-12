@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { IPayByLinkMethod, IProductInOrder } from '@src/types';
+import { IPayByLinkMethod, IProductInOrder } from '@commons/types';
 import getLogger from '@commons/logger';
 import { dotEnv } from '@commons/dotEnvLoader';
 

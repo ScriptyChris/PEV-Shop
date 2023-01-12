@@ -1,6 +1,6 @@
 /**
  * Handles HTTP communication between frontend and backend.
- * @module HttpService
+ * @module
  */
 
 import type { IUser, TUserPublic, TUserRegistrationCredentials, IProduct } from '@database/models';
@@ -11,7 +11,7 @@ import type {
   TServerErrorHTTPStatusCodesToData,
 } from '@middleware/helpers/middleware-response-wrapper';
 import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
-import { HTTP_STATUS_CODE, IOrder, TPagination } from '@src/types';
+import { HTTP_STATUS_CODE, IOrder, TPagination } from '@commons/types';
 import storeService from '@frontend/features/storeService';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
 import { routeHelpers } from '@frontend/components/pages/_routes';
@@ -24,21 +24,25 @@ type TResDataType<T> = T[keyof T];
  * - assembling requests regarding URL, params, payload, etc. according to used HTTP method and backend expectance,
  * - initially parsing responses,
  * - initially handling HTTP errors.
- *
- * @class
  */
 class Ajax {
+  /** @internal */
   _API_PATH_NAME: string;
+  /** @internal */
   _BASE_API_URL: string;
+  /** @internal */
   _AUTH_TOKEN: string | null;
+  /** @internal */
   HTTP_METHOD_NAME = {
     GET: 'GET',
     PATCH: 'PATCH',
     POST: 'POST',
     DELETE: 'DELETE',
   } as const;
+  /** @internal */
   _isGenericErrorHandlerActive: boolean;
 
+  /** @internal */
   constructor() {
     this._API_PATH_NAME = 'api';
     this._BASE_API_URL = `${location.origin}/${this._API_PATH_NAME}`;
@@ -46,6 +50,7 @@ class Ajax {
     this._isGenericErrorHandlerActive = true;
   }
 
+  /** @internal */
   get _BASE_API_URL_OBJECT() {
     const urlObject = new URL(location.origin);
     urlObject.pathname = `${this._API_PATH_NAME}/`;
@@ -53,36 +58,43 @@ class Ajax {
     return urlObject;
   }
 
+  /** @internal */
   _getContentTypeHeader() {
     return {
       'Content-Type': 'application/json',
     };
   }
 
+  /** @internal */
   _getAuthHeader() {
     return `Bearer ${this.getAuthToken() || ''}`;
   }
 
+  /** @internal */
   getAuthToken() {
     return this._AUTH_TOKEN;
   }
 
+  /** @internal */
   setAuthToken(authToken: this['_AUTH_TOKEN']) {
     this._AUTH_TOKEN = authToken;
   }
 
+  /** @internal */
   disableGenericErrorHandler() {
     this._isGenericErrorHandlerActive = false;
 
     return this;
   }
 
+  /** @internal */
   _enableGenericErrorHandler() {
     this._isGenericErrorHandlerActive = true;
 
     return this;
   }
 
+  /** @internal */
   _fetchBaseHandler(fetchResult: ReturnType<typeof fetch>) {
     const isGenericErrorHandlerActive = this._isGenericErrorHandlerActive;
     const fetchPromise = fetchResult
@@ -132,6 +144,7 @@ class Ajax {
     return fetchPromise;
   }
 
+  /** @internal */
   _sendRequestWithPayload(methodName: string, apiEndpoint: string, data: unknown, useToken: boolean) {
     const headers = new Headers(this._getContentTypeHeader());
 
@@ -149,6 +162,7 @@ class Ajax {
   }
 
   // TODO: fix creating URL by apiEndpoint
+  /** @internal */
   getRequest(apiEndpoint: { url: string; searchParams: URLSearchParams | string } | string, useToken = false) {
     const url = this._BASE_API_URL_OBJECT;
 
@@ -177,14 +191,17 @@ class Ajax {
     return this._fetchBaseHandler(fetch(url.toString(), options));
   }
 
+  /** @internal */
   postRequest(apiEndpoint: string, data: unknown, useToken = false) {
     return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.POST, apiEndpoint, data, useToken);
   }
 
+  /** @internal */
   patchRequest(apiEndpoint: string, data: unknown, useToken = false) {
     return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.PATCH, apiEndpoint, data, useToken);
   }
 
+  /** @internal */
   deleteRequest(apiEndpoint: string, useToken = false) {
     const url = this._BASE_API_URL_OBJECT;
     url.pathname += apiEndpoint;
@@ -205,10 +222,8 @@ class Ajax {
 
 /**
  * Intermediates (high level) client actions meant to communicate with backend APIs.
- *
- * @extends Ajax
  */
-const httpService = new (class HttpService extends Ajax {
+class HttpService extends Ajax {
   private URLS = {
     PRODUCTS: 'products',
     PRODUCT_CATEGORIES: 'productCategories',
@@ -235,7 +250,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Adds a new product.
-   * @param {IProduct}
    */
   addProduct(product: IProduct) {
     return this.postRequest(this.URLS.PRODUCTS, product, true);
@@ -243,8 +257,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Gets products according to optional constraints like: name, price, pagination etc.
-   * @param {Object} initialSearchParams
-   * @param {boolean} customSearchParamsSerialization
    */
   getProducts(
     initialSearchParams: Partial<{
@@ -296,7 +308,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Gets products by list of names - mostly useful for retrieving related products of a single one.
-   * @param {IProduct.name[]} nameList
    */
   getProductsByNames(nameList: IProduct['name'][]) {
     const searchParams = new URLSearchParams({ nameList: JSON.stringify(nameList) });
@@ -309,9 +320,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Gets products by a single name - mostly useful for search feature.
-   * @param {IProduct.name} name
-   * @param {TPagination} pagination
-   * @param {boolean} getOnlyEssentialData
    */
   getProductsByName(name: IProduct['name'], pagination: TPagination, getOnlyEssentialData = true) {
     const searchParams = new URLSearchParams();
@@ -325,7 +333,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Gets product by it's URL - mostly useful for retrieving product from browser's address bar.
-   * @param {IProduct.url} url
    */
   getProductByUrl(url: IProduct['url']) {
     const searchParams = new URLSearchParams();
@@ -358,8 +365,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Modifies product.
-   * @param {IProduct.name} productName
-   * @param {IProduct} productModifications
    */
   modifyProduct(productName: IProduct['name'], productModifications: Partial<IProduct>) {
     const modifiedProductData = {
@@ -374,8 +379,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Adds a new review to chosen product.
-   * @param {IProduct.name} productName
-   * @param {Object[]} productReview
    */
   addProductReview(productName: IProduct['name'], productReview: IProduct['reviews']) {
     return this.patchRequest(`${this.URLS.PRODUCTS}/${productName}/add-review`, productReview);
@@ -383,7 +386,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Delets a product via it's name.
-   * @param {IProduct.name} productName
    */
   deleteProduct(productName: IProduct['name']) {
     return this.deleteRequest(`${this.URLS.PRODUCTS}/${productName}`, true);
@@ -404,7 +406,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Starts the process of making a new purchase according to given order details.
-   * @param {IOrder} orderDetails
    */
   makeOrder(orderDetails: IOrder) {
     return this.postRequest(this.URLS.ORDERS, orderDetails);
@@ -412,7 +413,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Logs in user based on their login and password credentials.
-   * @param {Object} loginCredentials
    */
   loginUser(loginCredentials: { login: IUser['login']; password: IUser['password'] }) {
     return this.postRequest(`${this.URLS.USERS}/login`, loginCredentials) as Promise<
@@ -422,7 +422,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Resets user password via it's email.
-   * @param {IUser.email} email
    */
   resetPassword(email: IUser['email']) {
     return this.postRequest(`${this.URLS.USERS}/reset-password`, { email });
@@ -430,7 +429,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Resends (repeats) resetting user password via it's email.
-   * @param {IUser.email} email
    */
   resendResetPassword(email: IUser['email']) {
     return this.postRequest(`${this.URLS.USERS}/resend-reset-password`, { email });
@@ -445,7 +443,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Loggs out user from all sessions; current session can be preserved if `preseveCurrentSession` param is true.
-   * @param {boolean} preseveCurrentSession
    */
   logOutUserFromSessions(preseveCurrentSession = false) {
     return this.postRequest(`${this.URLS.USERS}/logout-all`, { preseveCurrentSession }, true);
@@ -460,7 +457,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Registers a new user according to provided credentials.
-   * @param {TUserRegistrationCredentials} registrationCredentials
    */
   registerUser(registrationCredentials: TUserRegistrationCredentials) {
     return this.postRequest(`${this.URLS.USERS}/register`, registrationCredentials);
@@ -468,7 +464,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Confirms a newly registered user via token received on their email.
-   * @param {IUser.tokens.confirmRegistration} token
    */
   confirmRegistration(token: NonNullable<IUser['tokens']['confirmRegistration']>) {
     return this.postRequest(`${this.URLS.USERS}/confirm-registration`, { token });
@@ -476,7 +471,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Resends registration confirmation email.
-   * @param {IUser.email} email
    */
   resendConfirmRegistration(email: IUser['email']) {
     return this.postRequest(`${this.URLS.USERS}/resend-confirm-registration`, { email });
@@ -484,8 +478,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Sets a new password for user - mostly after reseting password.
-   * @param {IUser.password} newPassword
-   * @param {IUser.tokens.auth} token
    */
   setNewPassword(newPassword: IUser['password'], token: NonNullable<IUser['tokens']['auth']>[number]) {
     return this.patchRequest(`${this.URLS.USERS}/set-new-password`, { newPassword, token });
@@ -493,8 +485,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Changes user's current password to a new one.
-   * @param {IUser.password} password
-   * @param {IUser.password} newPassword
    */
   changePassword(password: IUser['password'], newPassword: IUser['password']) {
     return this.patchRequest(`${this.URLS.USERS}/change-password`, { password, newPassword }, true);
@@ -502,7 +492,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Adds product to observed by user, so they can more conveniently find it later.
-   * @param {string} productId
    */
   addProductToObserved(productId: string) {
     return this.postRequest(`${this.URLS.USERS}/add-product-to-observed`, { productId }, true);
@@ -510,7 +499,6 @@ const httpService = new (class HttpService extends Ajax {
 
   /**
    * Removes product from observed by user.
-   * @param {string} productId
    */
   removeProductFromObserved(productId: string) {
     return this.deleteRequest(`${this.URLS.USERS}/remove-product-from-observed/${productId}`, true);
@@ -529,13 +517,11 @@ const httpService = new (class HttpService extends Ajax {
   getObservedProducts() {
     return this.getRequest(`${this.URLS.USERS}/observed-products`, true);
   }
-})();
+}
 
 /**
- * Keeps track of {@link httpService} subscribers, which want to externally hook into any request
+ * Keeps track of {@link HttpService} subscribers, which want to externally hook into any request
  * that returns certain status.
- *
- * @namespace httpServiceSubscriber
  */
 const httpServiceSubscriber = (() => {
   const _subscribers: Record<string, TSubCallback | null> = {
@@ -546,27 +532,12 @@ const httpServiceSubscriber = (() => {
   type TSubKey = keyof typeof _subscribers;
 
   return {
-    /**
-     * asd
-     * @memberof httpServiceSubscriber~SUBSCRIPTION_TYPE
-     * @constant
-     */
     SUBSCRIPTION_TYPE: Object.freeze(Object.fromEntries(Object.keys(_subscribers).map((key) => [key, key]))),
 
-    /**
-     * @memberof httpServiceSubscriber~callSubscribers
-     * @method
-     * @inner
-     */
     callSubscribers(type: TSubKey, value: unknown) {
       return (_subscribers[type] as TSubCallback)(value);
     },
 
-    /**
-     * @memberof httpServiceSubscriber~subscribe
-     * @method
-     * @inner
-     */
     subscribe(type: TSubKey, callback: TSubCallback) {
       if (typeof _subscribers[type] === 'function') {
         throw Error(`'${type}' is already subscribing!`);
@@ -575,11 +546,6 @@ const httpServiceSubscriber = (() => {
       _subscribers[type] = callback;
     },
 
-    /**
-     * @memberof httpServiceSubscriber~unSubscribe
-     * @method
-     * @inner
-     */
     unSubscribe(type: TSubKey) {
       if (typeof _subscribers[type] !== 'function') {
         throw ReferenceError(`'${type}' is not subscribing!`);
@@ -591,8 +557,7 @@ const httpServiceSubscriber = (() => {
 })();
 
 /**
- * @constant {Object} - Recognize HTTP responses kinds
- * @static
+ * Recognize HTTP responses kinds.
  */
 const CUSTOM_RES_EXT_DICT = Object.freeze({
   __NO_CONTENT: '__NO_CONTENT',
@@ -606,11 +571,6 @@ interface ICustomResExt {
   [CUSTOM_RES_EXT_DICT.__EXCEPTION_ALREADY_HANDLED]: true;
 }
 
-export {
-  /** @see httpServiceSubscriber */
-  httpServiceSubscriber,
-  /** @see CUSTOM_RES_EXT_DICT */
-  CUSTOM_RES_EXT_DICT,
-};
+export { httpServiceSubscriber, CUSTOM_RES_EXT_DICT };
 
-export default httpService;
+export default new HttpService();
