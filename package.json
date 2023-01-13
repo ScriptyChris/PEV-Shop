@@ -42,8 +42,9 @@
     "build:backend": "rimraf dist/src/middleware dist/src/database dist/commons && tsc --project tsconfig.backend.json",
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend && npm run prepare-commons",
+    "postbuild": "npm run generate-api-docs",
     "debug": "cross-env BACKEND_ONLY=true node --inspect-brk dist/src/middleware/middleware-index.js",
-    "generate-api-docs": "tsc --project tsconfig.jsdoc.json && jsdoc2md '_tmp-compiled-scripts-for-docs/**' --configure jsdoc.json > API.md && rm -rf ./_tmp-compiled-scripts-for-docs",
+    "generate-api-docs": "node generate-grouped-api-docs.js",
     "serve": "node_modules/.bin/cross-env BACKEND_ONLY=true node dist/src/middleware/middleware-index.js"
   },
   "devDependencies": {
