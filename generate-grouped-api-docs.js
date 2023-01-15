@@ -33,6 +33,10 @@ const groups = {
 ////////
 ////////
 
+if (!require('fs').existsSync('./typedoc.json')) {
+  return console.log('TypeDoc config not found - script is probably run by Docker - abort generating docs!');
+}
+
 const { execSync } = require('child_process');
 const { rmSync } = require('fs');
 const execSyncOpts = { stdio: 'inherit' };
