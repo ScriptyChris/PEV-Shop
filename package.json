@@ -33,7 +33,7 @@
     "test:unit:dev": "jest --watch --env=node test/unit",
     "test:unit:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
     "test:e2e:dev": "cd ./docker && xhost +local: && sudo docker-compose -f docker-compose.yml -f docker-compose.e2e.yml --env-file ../.env up",
-    "test:e2e:CI_CD": "cd ./docker && sudo docker-compose -f docker-compose.yml -f docker-compose.e2e.yml -f docker-compose.services-override.yml --env-file ../.env up --abort-on-container-exit",
+    "test:e2e:CI_CD": "cd ./docker && sudo docker-compose -f docker-compose.yml -f docker-compose.app-standalone-volumes.yml -f docker-compose.e2e.yml -f docker-compose.e2e-ci_cd.yml --env-file ../.env up --abort-on-container-exit",
     "populate-db": "ts-node --files --project tsconfig.backend.json src/database/populate/populate.ts executedFromCLI=true",
     "prepare-commons": "npm run eslint:commons && npm run prettier:commons",
     "dev:frontend": "webpack-dev-server --env development",

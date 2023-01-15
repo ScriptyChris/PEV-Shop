@@ -73,7 +73,7 @@ cd docker
 
 <small>*NOTE:* installation downloads and processes a few GB of data, so it may take a while.</small>
 ```sh
-sudo docker-compose --env-file ../.env up
+sudo docker-compose --env-file ../.env -f docker-compose.yml -f docker-compose.app-standalone-volumes.yml up
 ```
 
 This will install all necessary dependencies, populate database with initial data and serve the app.
