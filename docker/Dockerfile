@@ -13,6 +13,7 @@ COPY \
     .eslintrc.js \
     .prettierrc \
     tsconfig* \
+    generate-grouped-api-docs.js \
     webpack.config.js \
     ./
 

@@ -1,3 +1,8 @@
+/**
+ * Handles HTTP communication between frontend and backend.
+ * @module
+ */
+
 import type { IUser, TUserPublic, TUserRegistrationCredentials, IProduct } from '@database/models';
 import type {
   IEmbracedResponse,
@@ -6,25 +11,38 @@ import type {
   TServerErrorHTTPStatusCodesToData,
 } from '@middleware/helpers/middleware-response-wrapper';
 import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
-import { HTTP_STATUS_CODE, IOrder, TPagination } from '@src/types';
+import { HTTP_STATUS_CODE, IOrder, TPagination } from '@commons/types';
 import storeService from '@frontend/features/storeService';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
 import { routeHelpers } from '@frontend/components/pages/_routes';
 
 type TResDataType<T> = T[keyof T];
 
+/**
+ * Handles (low level) HTTP actions as:
+ * - setting appropriate headers,
+ * - assembling requests regarding URL, params, payload, etc. according to used HTTP method and backend expectance,
+ * - initially parsing responses,
+ * - initially handling HTTP errors.
+ */
 class Ajax {
+  /** @internal */
   _API_PATH_NAME: string;
+  /** @internal */
   _BASE_API_URL: string;
+  /** @internal */
   _AUTH_TOKEN: string | null;
+  /** @internal */
   HTTP_METHOD_NAME = {
     GET: 'GET',
     PATCH: 'PATCH',
     POST: 'POST',
     DELETE: 'DELETE',
   } as const;
+  /** @internal */
   _isGenericErrorHandlerActive: boolean;
 
+  /** @internal */
   constructor() {
     this._API_PATH_NAME = 'api';
     this._BASE_API_URL = `${location.origin}/${this._API_PATH_NAME}`;
@@ -32,6 +50,7 @@ class Ajax {
     this._isGenericErrorHandlerActive = true;
   }
 
+  /** @internal */
   get _BASE_API_URL_OBJECT() {
     const urlObject = new URL(location.origin);
     urlObject.pathname = `${this._API_PATH_NAME}/`;
@@ -39,36 +58,43 @@ class Ajax {
     return urlObject;
   }
 
+  /** @internal */
   _getContentTypeHeader() {
     return {
       'Content-Type': 'application/json',
     };
   }
 
+  /** @internal */
   _getAuthHeader() {
     return `Bearer ${this.getAuthToken() || ''}`;
   }
 
+  /** @internal */
   getAuthToken() {
     return this._AUTH_TOKEN;
   }
 
+  /** @internal */
   setAuthToken(authToken: this['_AUTH_TOKEN']) {
     this._AUTH_TOKEN = authToken;
   }
 
+  /** @internal */
   disableGenericErrorHandler() {
     this._isGenericErrorHandlerActive = false;
 
     return this;
   }
 
+  /** @internal */
   _enableGenericErrorHandler() {
     this._isGenericErrorHandlerActive = true;
 
     return this;
   }
 
+  /** @internal */
   _fetchBaseHandler(fetchResult: ReturnType<typeof fetch>) {
     const isGenericErrorHandlerActive = this._isGenericErrorHandlerActive;
     const fetchPromise = fetchResult
@@ -118,6 +144,7 @@ class Ajax {
     return fetchPromise;
   }
 
+  /** @internal */
   _sendRequestWithPayload(methodName: string, apiEndpoint: string, data: unknown, useToken: boolean) {
     const headers = new Headers(this._getContentTypeHeader());
 
@@ -135,6 +162,7 @@ class Ajax {
   }
 
   // TODO: fix creating URL by apiEndpoint
+  /** @internal */
   getRequest(apiEndpoint: { url: string; searchParams: URLSearchParams | string } | string, useToken = false) {
     const url = this._BASE_API_URL_OBJECT;
 
@@ -163,14 +191,17 @@ class Ajax {
     return this._fetchBaseHandler(fetch(url.toString(), options));
   }
 
+  /** @internal */
   postRequest(apiEndpoint: string, data: unknown, useToken = false) {
     return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.POST, apiEndpoint, data, useToken);
   }
 
+  /** @internal */
   patchRequest(apiEndpoint: string, data: unknown, useToken = false) {
     return this._sendRequestWithPayload(this.HTTP_METHOD_NAME.PATCH, apiEndpoint, data, useToken);
   }
 
+  /** @internal */
   deleteRequest(apiEndpoint: string, useToken = false) {
     const url = this._BASE_API_URL_OBJECT;
     url.pathname += apiEndpoint;
@@ -189,7 +220,10 @@ class Ajax {
   }
 }
 
-const httpService = new (class HttpService extends Ajax {
+/**
+ * Intermediates (high level) client actions meant to communicate with backend APIs.
+ */
+class HttpService extends Ajax {
   private URLS = {
     PRODUCTS: 'products',
     PRODUCT_CATEGORIES: 'productCategories',
@@ -214,10 +248,16 @@ const httpService = new (class HttpService extends Ajax {
     searchParams.append('limit', String(pagination.productsPerPage));
   }
 
+  /**
+   * Adds a new product.
+   */
   addProduct(product: IProduct) {
     return this.postRequest(this.URLS.PRODUCTS, product, true);
   }
 
+  /**
+   * Gets products according to optional constraints like: name, price, pagination etc.
+   */
   getProducts(
     initialSearchParams: Partial<{
       name: IProduct['name'];
@@ -266,6 +306,9 @@ const httpService = new (class HttpService extends Ajax {
     return this.getRequest(`${this.URLS.PRODUCTS}?idList=${idList}`);
   }
 
+  /**
+   * Gets products by list of names - mostly useful for retrieving related products of a single one.
+   */
   getProductsByNames(nameList: IProduct['name'][]) {
     const searchParams = new URLSearchParams({ nameList: JSON.stringify(nameList) });
 
@@ -275,6 +318,9 @@ const httpService = new (class HttpService extends Ajax {
     });
   }
 
+  /**
+   * Gets products by a single name - mostly useful for search feature.
+   */
   getProductsByName(name: IProduct['name'], pagination: TPagination, getOnlyEssentialData = true) {
     const searchParams = new URLSearchParams();
     searchParams.append('name', name);
@@ -285,6 +331,9 @@ const httpService = new (class HttpService extends Ajax {
     return this.getRequest({ url: this.URLS.PRODUCTS, searchParams });
   }
 
+  /**
+   * Gets product by it's URL - mostly useful for retrieving product from browser's address bar.
+   */
   getProductByUrl(url: IProduct['url']) {
     const searchParams = new URLSearchParams();
 
@@ -298,16 +347,25 @@ const httpService = new (class HttpService extends Ajax {
   //   return this.getRequest(`${this.URLS.PRODUCTS}/${id}`);
   // }
 
+  /**
+   * Gets categories of all products.
+   */
   getProductCategories() {
     return this.getRequest(this.URLS.PRODUCT_CATEGORIES);
   }
 
+  /**
+   * Gets technical specifications of all products.
+   */
   getProductsSpecifications() {
     return this.getRequest(this.URLS.PRODUCTS_SPECS) as Promise<
       TProductTechnicalSpecs | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
     >;
   }
 
+  /**
+   * Modifies product.
+   */
   modifyProduct(productName: IProduct['name'], productModifications: Partial<IProduct>) {
     const modifiedProductData = {
       name: productName,
@@ -319,14 +377,23 @@ const httpService = new (class HttpService extends Ajax {
     return this.patchRequest(this.URLS.PRODUCTS, modifiedProductData);
   }
 
+  /**
+   * Adds a new review to chosen product.
+   */
   addProductReview(productName: IProduct['name'], productReview: IProduct['reviews']) {
     return this.patchRequest(`${this.URLS.PRODUCTS}/${productName}/add-review`, productReview);
   }
 
+  /**
+   * Delets a product via it's name.
+   */
   deleteProduct(productName: IProduct['name']) {
     return this.deleteRequest(`${this.URLS.PRODUCTS}/${productName}`, true);
   }
 
+  /**
+   * Gets info about currently logged in user via it's ID taken from app's state.
+   */
   getCurrentUser() {
     const userId = storeService.userAccountState?._id;
 
@@ -337,73 +404,125 @@ const httpService = new (class HttpService extends Ajax {
     return this.getRequest(`${this.URLS.USERS}/${userId}`, true);
   }
 
+  /**
+   * Starts the process of making a new purchase according to given order details.
+   */
   makeOrder(orderDetails: IOrder) {
     return this.postRequest(this.URLS.ORDERS, orderDetails);
   }
 
+  /**
+   * Logs in user based on their login and password credentials.
+   */
   loginUser(loginCredentials: { login: IUser['login']; password: IUser['password'] }) {
     return this.postRequest(`${this.URLS.USERS}/login`, loginCredentials) as Promise<
       TUserPublic | Pick<ICustomResExt, '__EXCEPTION_ALREADY_HANDLED'>
     >;
   }
 
+  /**
+   * Resets user password via it's email.
+   */
   resetPassword(email: IUser['email']) {
     return this.postRequest(`${this.URLS.USERS}/reset-password`, { email });
   }
 
+  /**
+   * Resends (repeats) resetting user password via it's email.
+   */
   resendResetPassword(email: IUser['email']) {
     return this.postRequest(`${this.URLS.USERS}/resend-reset-password`, { email });
   }
 
+  /**
+   * Loggs out user from current session.
+   */
   logoutUser() {
     return this.postRequest(`${this.URLS.USERS}/logout`, null, true);
   }
 
+  /**
+   * Loggs out user from all sessions; current session can be preserved if `preseveCurrentSession` param is true.
+   */
   logOutUserFromSessions(preseveCurrentSession = false) {
     return this.postRequest(`${this.URLS.USERS}/logout-all`, { preseveCurrentSession }, true);
   }
 
+  /**
+   * Gets all user roles.
+   */
   getUserRoles() {
     return this.getRequest(`${this.URLS.USER_ROLES}`);
   }
 
+  /**
+   * Registers a new user according to provided credentials.
+   */
   registerUser(registrationCredentials: TUserRegistrationCredentials) {
     return this.postRequest(`${this.URLS.USERS}/register`, registrationCredentials);
   }
 
+  /**
+   * Confirms a newly registered user via token received on their email.
+   */
   confirmRegistration(token: NonNullable<IUser['tokens']['confirmRegistration']>) {
     return this.postRequest(`${this.URLS.USERS}/confirm-registration`, { token });
   }
 
+  /**
+   * Resends registration confirmation email.
+   */
   resendConfirmRegistration(email: IUser['email']) {
     return this.postRequest(`${this.URLS.USERS}/resend-confirm-registration`, { email });
   }
 
+  /**
+   * Sets a new password for user - mostly after reseting password.
+   */
   setNewPassword(newPassword: IUser['password'], token: NonNullable<IUser['tokens']['auth']>[number]) {
     return this.patchRequest(`${this.URLS.USERS}/set-new-password`, { newPassword, token });
   }
 
+  /**
+   * Changes user's current password to a new one.
+   */
   changePassword(password: IUser['password'], newPassword: IUser['password']) {
     return this.patchRequest(`${this.URLS.USERS}/change-password`, { password, newPassword }, true);
   }
 
+  /**
+   * Adds product to observed by user, so they can more conveniently find it later.
+   */
   addProductToObserved(productId: string) {
     return this.postRequest(`${this.URLS.USERS}/add-product-to-observed`, { productId }, true);
   }
 
+  /**
+   * Removes product from observed by user.
+   */
   removeProductFromObserved(productId: string) {
     return this.deleteRequest(`${this.URLS.USERS}/remove-product-from-observed/${productId}`, true);
   }
 
+  /**
+   * Removes all products from observed by user.
+   */
   removeAllProductsFromObserved() {
     return this.deleteRequest(`${this.URLS.USERS}/remove-all-products-from-observed`, true);
   }
 
+  /**
+   * Retrieves all observed products by user.
+   */
   getObservedProducts() {
     return this.getRequest(`${this.URLS.USERS}/observed-products`, true);
   }
-})();
+}
 
+/**
+ * Keeps track of {@link HttpService} subscribers, which want to externally hook into any request
+ * that returns certain status.
+ */
 const httpServiceSubscriber = (() => {
   const _subscribers: Record<string, TSubCallback | null> = {
     EXCEPTION: null,
@@ -437,6 +556,9 @@ const httpServiceSubscriber = (() => {
   };
 })();
 
+/**
+ * Recognize HTTP responses kinds.
+ */
 const CUSTOM_RES_EXT_DICT = Object.freeze({
   __NO_CONTENT: '__NO_CONTENT',
   __ERROR_TO_HANDLE: '__ERROR_TO_HANDLE',
@@ -451,4 +573,4 @@ interface ICustomResExt {
 
 export { httpServiceSubscriber, CUSTOM_RES_EXT_DICT };
 
-export default httpService;
+export default new HttpService();

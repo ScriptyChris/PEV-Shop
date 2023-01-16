@@ -1,5 +1,5 @@
 import type { DeleteWriteOpResultObject } from 'mongodb';
-import type { TE2E } from './types';
+import type { TE2E } from '@commons/types';
 import type { Cypress } from 'local-cypress';
 import type { IUser } from '@database/models';
 

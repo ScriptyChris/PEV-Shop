@@ -1,8 +1,16 @@
-import type { IUserCart } from '@src/types';
+/**
+ * Handles reading and manipulating browser's LocalStorage data.
+ * @module
+ */
+
+import type { IUserCart } from '@commons/types';
 import type { IUser, TUserPublic } from '@database/models';
 
 type TStorageValue = IUserCart | TUserPublic | NonNullable<IUser['tokens']['auth']>[number] | null;
 
+/**
+ * Manipulating storage data API for various contexts, such as `UserCart` or `UserAccount`.
+ */
 const storageService = (() => {
   class StorageService {
     key: string;
@@ -11,6 +19,10 @@ const storageService = (() => {
       this.key = key;
     }
 
+    /**
+     * Update regarding storage context by either setting given `value` or removing existing one,
+     * depending on result of calling `checkIfShouldRemove`.
+     */
     update(value: TStorageValue, checkIfShouldRemove: () => boolean) {
       try {
         if (checkIfShouldRemove()) {
@@ -24,6 +36,9 @@ const storageService = (() => {
       }
     }
 
+    /**
+     * @returns Already parsed (from JSON) stored value.
+     */
     get() {
       try {
         return JSON.parse(String(window.localStorage.getItem(this.key)));
@@ -33,6 +48,9 @@ const storageService = (() => {
       }
     }
 
+    /**
+     * Removes a values.
+     */
     remove() {
       this.update(null, () => true);
     }

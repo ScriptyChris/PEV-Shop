@@ -1,6 +1,10 @@
+/**
+ * @module
+ */
+
 import { createTransport } from 'nodemailer';
-import SMTPTransport = require('nodemailer/lib/smtp-transport');
-import SendmailTransport = require('nodemailer/lib/sendmail-transport');
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import SendmailTransport from 'nodemailer/lib/sendmail-transport';
 import { dotEnv } from '@commons/dotEnvLoader';
 
 const translations = Object.freeze({

@@ -13,7 +13,19 @@
       }
     },
     {
+      "files": "*.jsx",
+      "options": {
+        "parser": "babel"
+      }
+    },
+    {
       "files": "*.ts",
+      "options": {
+        "parser": "babel-ts"
+      }
+    },
+    {
+      "files": "*.tsx",
       "options": {
         "parser": "babel-ts"
       }

@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @notExported
+ */
+
 import {
   Schema,
   model,
@@ -33,6 +38,9 @@ userRoleSchema.methods.toJSON = function () {
 export const UserRoleModel = model<IUserRole>(COLLECTION_NAMES.User_Role, userRoleSchema);
 export type TUserRoleModel = typeof UserRoleModel;
 
+/**
+ * @internal
+ */
 export interface IUserRole extends Document {
   roleName: TUserRoleName;
   owners: Schema.Types.ObjectId[];

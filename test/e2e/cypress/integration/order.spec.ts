@@ -1,5 +1,5 @@
 import { beforeEach, cy, describe, expect, it } from 'local-cypress';
-import { TE2EUser, HTTP_STATUS_CODE } from '@src/types';
+import { TE2EUser, HTTP_STATUS_CODE } from '@commons/types';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
 import * as users from '@database/populate/initialData/users.json';

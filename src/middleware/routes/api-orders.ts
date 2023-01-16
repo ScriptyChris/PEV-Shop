@@ -1,9 +1,13 @@
+/**
+ * @module
+ */
+
 import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
 import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
 import { getFromDB } from '@database/api';
 import { authToPayU as getToken } from '@middleware/features/auth';
-import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '@src/types';
+import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '@commons/types';
 import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '@middleware/helpers/payu-api';
 import { wrapRes, TypeOfHTTPStatusCodes } from '@middleware/helpers/middleware-response-wrapper';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';

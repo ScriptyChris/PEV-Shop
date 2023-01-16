@@ -1,3 +1,8 @@
+/*
+  Factory components for SVG icons, which are not provided by currently used MUI,
+  hence are either custom created or borrowed from other 3rd-party sources.
+*/
+
 import React from 'react';
 import classNames from 'classnames';
 

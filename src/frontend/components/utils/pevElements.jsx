@@ -1,3 +1,8 @@
+/**
+ * Facade over commonly used MUI and native HTML elements.
+ * @module
+ */
+
 import React, { forwardRef, useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';

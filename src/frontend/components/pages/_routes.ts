@@ -1,9 +1,15 @@
+/**
+ * Encapsulates routing paths and methods (such as helpers and guards).
+ * @module
+ */
+
 import queryString from 'query-string';
 import type { useHistory } from 'react-router-dom';
+/** @internal */
 import type { TStoreService } from '@frontend/features/storeService';
 import { ARRAY_FORMAT_SEPARATOR } from '@commons/consts';
 
-const ROUTE_GROUPS = Object.freeze({
+const ROUTE_GROUPS = {
   ROOT: '/',
   PAGES: '/pages',
   get PRODUCTS() {
@@ -12,9 +18,9 @@ const ROUTE_GROUPS = Object.freeze({
   get ACCOUNT() {
     return `${this.PAGES}/account`;
   },
-});
+} as const;
 
-export const ROUTES = Object.freeze({
+export const ROUTES = {
   ROOT: ROUTE_GROUPS.ROOT,
   PAGES: ROUTE_GROUPS.PAGES,
   REGISTER: `${ROUTE_GROUPS.PAGES}/register`,
@@ -48,14 +54,14 @@ export const ROUTES = Object.freeze({
   get ACCOUNT__ORDERS() {
     return `${this.ACCOUNT}/orders`;
   },
-});
+} as const;
 
 const QUERY_PARAMS_CONFIG = {
   arrayFormat: 'bracket-separator',
   arrayFormatSeparator: ARRAY_FORMAT_SEPARATOR,
 } as const;
 
-export const routeHelpers = Object.freeze({
+export const routeHelpers = {
   createModifyProductUrl(productName: string) {
     return ROUTES.PRODUCTS__MODIFY_PRODUCT.replace(/:\w+/, productName);
   },
@@ -88,7 +94,7 @@ export const routeHelpers = Object.freeze({
       });
     };
   },
-});
+} as const;
 
 export const useRoutesGuards = (storeService: TStoreService) => {
   return {
