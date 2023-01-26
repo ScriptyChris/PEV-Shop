@@ -1,4 +1,4 @@
-import { describe, it, cy, beforeEach, context, expect, after } from 'local-cypress';
+import { describe, it, cy, beforeEach, context, expect, after, Cypress } from 'local-cypress';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
 import { TE2EUser, HTTP_STATUS_CODE } from '@commons/types';
@@ -22,15 +22,27 @@ describe('product-form', () => {
     cy.get(makeCyDataSelector('button:product-details__edit-product')).click();
   };
 
-  const assertProductDataInsideForm = (productData: ReturnType<typeof getTestProductData>['forForm']) => {
+  const assertProductDataInsideForm = (productData: typeof testProductDataForForm) => {
+    cy.intercept(/\/public\/images\//, (req) => {
+      expect(req.method).to.eq('GET');
+      req.continue((res) => {
+        expect(res.statusCode).to.be.oneOf([HTTP_STATUS_CODE.OK, HTTP_STATUS_CODE.NOT_MODIFIED]);
+
+        if (res.statusCode === HTTP_STATUS_CODE.NOT_MODIFIED) {
+          return;
+        }
+
+        expect(res.headers).to.contain({ 'content-type': 'image/png' });
+        expect(res.headers['content-length']).not.to.be.empty;
+        expect(Number(res.headers['content-length'])).to.be.greaterThan(0);
+      });
+    }).as('loadingProductAttachedImage');
     goToProductModificationPage(productData.name);
 
     cy.get(makeCyDataSelector('input:base__name')).should('have.value', productData.name);
     cy.get(makeCyDataSelector('input:base__price')).should('have.value', productData.price);
     cy.wrap(productData.descriptions).then((descs) => {
-      cy.wrap(
-        descs.map((desc, index) => cy.contains(makeCyDataSelector(`label:product-descriptions__${index}`), desc))
-      );
+      cy.wrap(descs.map((desc, index) => cy.contains(makeCyDataSelector(`label:shortDescription__${index}`), desc)));
     });
     cy.get(makeCyDataSelector('input:category_names')).should('have.value', productData.category);
     cy.wrap(productData.specs).then((specs) => {
@@ -39,6 +51,13 @@ describe('product-form', () => {
           cy.get(makeCyDataSelector(`input:spec__${specName}`)).should('have.value', specValue)
         )
       );
+    });
+    cy.wait('@loadingProductAttachedImage');
+    cy.get(makeCyDataSelector('label:attached-images-count'))
+      .invoke('text')
+      .should('be.equal', `${productData.images.length}/3`);
+    cy.wrap(productData.images).each(({ name }: typeof productData.images[number], index) => {
+      cy.contains(makeCyDataSelector(`label:attached-image-${index}-caption`), name);
     });
     cy.wrap(productData.relatedProductNames).then((relatedProductNames) => {
       cy.wrap(
@@ -66,7 +85,22 @@ describe('product-form', () => {
 
   context('modify existing product', () => {
     beforeEach(() => {
-      cy.addTestProductByAPI(testProductDataForAPI, authToken);
+      const imageFiles: File[] = [];
+
+      cy.wrap(testProductDataForAPI.images).each(({ src }: typeof testProductDataForAPI.images[number], index) => {
+        // Don't use `.fixture()`, because it caches file affecting later usage of `.attachFile()`.
+        cy.readFile(`${Cypress.config('fixturesFolder')}/${src}`, null).then((img) => {
+          const imgFile = new File([img], src, { type: 'image/png' }) as any;
+
+          // Don't use `.push()` to avoid causing possible insertion disorder due to `.readFile()` async resolution.
+          imageFiles[index] = imgFile;
+        });
+      });
+      cy.wrap(imageFiles)
+        .should('have.length', testProductDataForAPI.images.length)
+        .then((imageFiles) => {
+          cy.addTestProductByAPI({ ...testProductDataForAPI, images: imageFiles as unknown as [] }, authToken);
+        });
     });
 
     it('form should contain proper data', () => {
@@ -81,17 +115,17 @@ describe('product-form', () => {
       // cy.get(makeCyDataSelector('input:base__name')).clear().type(testProductDataForForm.updatedName);
       cy.get(makeCyDataSelector('input:base__price')).clear().type(updatedProductFormData.raw.price);
 
-      cy.get(makeCyDataSelector('list:product-descriptions'))
+      cy.get(makeCyDataSelector('list:shortDescription'))
         .children()
         .as('productDescriptionsItems')
         .should('have.length', 3);
       // delete second (first indexed) description
-      cy.get(makeCyDataSelector('button:product-descriptions__delete-1')).click();
+      cy.get(makeCyDataSelector('button:shortDescription__delete-1')).click();
       cy.get('@productDescriptionsItems').should('have.length', 2);
       // edit first description
-      cy.get(makeCyDataSelector('button:product-descriptions__edit-0')).click();
-      cy.get(makeCyDataSelector('input:product-descriptions__0')).clear().type('Updated test description');
-      cy.get(makeCyDataSelector('button:product-descriptions__confirm-0')).click();
+      cy.get(makeCyDataSelector('button:shortDescription__edit-0')).click();
+      cy.get(makeCyDataSelector('input:shortDescription__0')).clear().type('Updated test description');
+      cy.get(makeCyDataSelector('button:shortDescription__confirm-0')).click();
       cy.get('@productDescriptionsItems').should('have.length', 2);
 
       cy.get(makeCyDataSelector('list:categories_names'))
@@ -165,13 +199,15 @@ describe('product-form', () => {
       // assert form is empty
       cy.get(makeCyDataSelector('input:base__name')).should('have.value', '');
       cy.get(makeCyDataSelector('input:base__price')).should('have.value', '');
-      cy.get(makeCyDataSelector('button:product-descriptions__add-new'))
-        .prev(makeCyDataSelector('list:product-descriptions'))
+      cy.get(makeCyDataSelector('button:shortDescription__add-new'))
+        .prev(makeCyDataSelector('list:shortDescription'))
         .children()
         .should('have.length', 0);
       cy.get(makeCyDataSelector('input:category_names')).should('have.value', '');
       cy.get(makeCyDataSelector('list:product-technical-specs')).should('not.exist');
       cy.get(makeCyDataSelector('label:product-technical-specs__category-choice-reminder')).should('be.visible');
+      cy.get(makeCyDataSelector('label:attached-images-count')).invoke('text').should('be.equal', `0/3`);
+      cy.get('[data-cy^="label:attached-image-"]').should('not.exist');
       cy.get(makeCyDataSelector('button:related-product-names__add-new'))
         .prev(makeCyDataSelector('list:related-product-names'))
         .children()
@@ -183,11 +219,11 @@ describe('product-form', () => {
       cy.wrap(testProductDataForForm.descriptions).then((descs) => {
         cy.wrap(
           descs.map((desc, index) => {
-            cy.get(makeCyDataSelector('button:product-descriptions__add-new')).click();
-            cy.get(makeCyDataSelector('input:product-descriptions__new')).type(desc);
-            cy.get(makeCyDataSelector('button:product-descriptions__confirm-new')).click();
+            cy.get(makeCyDataSelector('button:shortDescription__add-new')).click();
+            cy.get(makeCyDataSelector('input:shortDescription__new')).type(String(desc));
+            cy.get(makeCyDataSelector('button:shortDescription__confirm-new')).click();
             // assert correct description data
-            cy.contains(makeCyDataSelector(`label:product-descriptions__${index}`), desc);
+            cy.contains(makeCyDataSelector(`label:shortDescription__${index}`), desc);
           })
         );
       });
@@ -200,6 +236,10 @@ describe('product-form', () => {
             cy.get(makeCyDataSelector(`input:spec__${specName}`)).type(String(specValue))
           )
         );
+      });
+      cy.wrap(testProductDataForAPI.images).each(({ src }: typeof testProductDataForAPI.images[number]) => {
+        // Method `attachFile()` takes an image path and uses `cy.fixture()` to load actual file
+        cy.get(makeCyDataSelector('input:add-new-image')).attachFile(src);
       });
       cy.wrap(testProductDataForForm.relatedProductNames).then((relatedProductNames) => {
         cy.get(makeCyDataSelector('list:related-product-names')).within(() =>
@@ -248,6 +288,16 @@ function getTestProductData() {
       'King Song 14D, 340/420Wh Battery, 800W Motor',
       'Inmotion V10/V10F, 960Wh Battery/2000W Motor',
     ],
+    images: [
+      {
+        src: 'test image 1.png',
+        name: 'test image 1',
+      },
+      {
+        src: 'test image 2.png',
+        name: 'test image 2',
+      },
+    ],
   };
 
   const forAPI = {
@@ -294,6 +344,7 @@ function getTestProductData() {
       },
     ],
     relatedProductsNames: forForm.relatedProductNames,
+    images: forForm.images,
   };
 
   return { forForm, forAPI };
@@ -301,7 +352,7 @@ function getTestProductData() {
 
 function getUpdatedTestProductFormData() {
   const raw = {
-    name: 'Some Test Product', // 'Updated Test Product',
+    name: 'Some Test Product',
     price: '4321',
     category: 'Accessories',
     specs: {
@@ -315,6 +366,8 @@ function getUpdatedTestProductFormData() {
       part: 'Dualtron',
       whole: 'NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors',
     },
+    // TODO: [E2E] test it when image modification will work
+    //images: [],
   };
 
   const assertable = {
@@ -324,6 +377,10 @@ function getUpdatedTestProductFormData() {
     descriptions: ['Updated test description', "Like whatever. It doesn't matter"],
     specs: raw.specs,
     relatedProductNames: ['NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors'],
+    images: [
+      { src: 'some-test-product/test image 1.png', name: 'test image 1' },
+      { src: 'some-test-product/test image 2.png', name: 'test image 2' },
+    ],
   };
 
   return { raw, assertable };

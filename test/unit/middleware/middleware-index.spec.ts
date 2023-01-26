@@ -50,14 +50,14 @@ describe('#middleware-index', () => {
     middleware(appMock);
 
     expect(appMock.use).toHaveBeenCalledWith(expressJSONMock());
-    expect(appMock.use).toHaveBeenCalledWith(
+    expect(appMock.use).toHaveBeenCalledWith([
       apiConfigMock,
       apiProductsMock,
       apiProductsCategoriesMock,
       apiUsersMock,
       apiUserRolesMock,
-      apiOrdersMock
-    );
+      apiOrdersMock,
+    ]);
     expect(appMock.use).toHaveBeenCalledTimes(2);
     expect(appMock.get).toHaveBeenCalledTimes(1);
   });

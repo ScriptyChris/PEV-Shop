@@ -14,6 +14,7 @@ type TAPIReqOptions = {
   payload?: any;
   extraHeaders?: HeadersInit;
   canFail?: boolean;
+  shouldBeForm?: boolean;
 };
 
 declare global {
@@ -52,6 +53,7 @@ declare global {
 }
 
 // side effects only
+import 'cypress-file-upload';
 import './email-commands';
 import './user-commands';
 import './product-commands';
