@@ -9,15 +9,15 @@ import { Document, Types, Schema, Model, model, COLLECTION_NAMES } from '@databa
 import mongoosePaginate from 'mongoose-paginate-v2';
 import getLogger from '@commons/logger';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
-import { MAX_IMAGES_AMOUNT, IMAGES_ROOT_PATH } from '@commons/consts';
+import { MAX_IMAGES_AMOUNT, IMAGES__PRODUCTS_ROOT_PATH, IMAGES__PRODUCTS_TMP_FOLDER } from '@commons/consts';
 import { imageSizeValidator } from '@commons/validators';
 import { TFile, PersistentFile, TFiles } from '@middleware/helpers/form-data-handler';
 
 const logger = getLogger(module.filename);
 
 const projectRoot = resolve(__dirname, process.env.INIT_CWD || '');
-const imagesUploadDirPath = join(projectRoot, IMAGES_ROOT_PATH);
-const imagesUploadTmpDirPath = join(projectRoot, `${IMAGES_ROOT_PATH}/__form-parsing-tmp`);
+const imagesUploadDirPath = join(projectRoot, IMAGES__PRODUCTS_ROOT_PATH);
+const imagesUploadTmpDirPath = join(projectRoot, `${IMAGES__PRODUCTS_ROOT_PATH}/${IMAGES__PRODUCTS_TMP_FOLDER}`);
 const createProductImagesTargetDirPath = (productUrl: IProduct['url']) => {
   return join(imagesUploadDirPath, productUrl);
 };
@@ -124,13 +124,12 @@ const productSchema = new Schema<IProduct>({
   },
   images: {
     type: [Object],
-    // TODO: switch it to `true` when all products will have their images provided
-    required: false,
+    required: true,
     set(value: any) {
       return (value || []).map((file: TFile) =>
         file instanceof PersistentFile
           ? {
-              src: join(IMAGES_ROOT_PATH, file.newFilename),
+              src: file.newFilename,
               name: parse(file.newFilename).name,
             }
           : file
@@ -173,7 +172,7 @@ const productSchema = new Schema<IProduct>({
 });
 productSchema.pre('validate', function (next: () => void) {
   const product = this as IProduct;
-  product.prepareUrlFieldBasedOnNameField();
+  product.prepareUrlField();
   product.transformImagesToImagePaths();
 
   next();
@@ -187,14 +186,25 @@ productSchema.methods.toJSON = function () {
 
   return product;
 };
-productSchema.methods.prepareUrlFieldBasedOnNameField = function () {
-  this.url = replaceSpacesWithDashes(this.name);
+productSchema.methods.prepareUrlField = function () {
+  const alreadyExistingURLWithoutSpaces = this.url && !/\s/.test(this.url);
+  this.url = alreadyExistingURLWithoutSpaces ? this.url : replaceSpacesWithDashes(this.name);
 };
 productSchema.methods.transformImagesToImagePaths = function () {
-  this.images = this.images.map((file) => ({
-    src: join(file.src, '..', this.url, parse(file.src).base),
-    name: file.name,
-  }));
+  const IMAGES_KIND_FOLDER_NAME = 'products';
+  this.images = this.images.map((file) => {
+    if (typeof file === 'string') {
+      return {
+        src: join(IMAGES_KIND_FOLDER_NAME, this.url, file),
+        name: parse(file).name,
+      };
+    }
+
+    return {
+      src: join(IMAGES_KIND_FOLDER_NAME, file.src, '..', this.url, parse(file.src).base),
+      name: file.name,
+    };
+  });
 };
 productSchema.statics.validateImages = (files: TFiles) => {
   const filesValues = Object.values(files);
@@ -313,7 +323,7 @@ export type TProductPublic = Pick<
   'name' | 'url' | 'category' | 'price' | 'shortDescription' | 'technicalSpecs' | 'images' | 'relatedProductsNames'
 >;
 
-export type TProductToPopulate = Exclude<IProduct, 'prepareUrlFieldBasedOnNameField' | 'transformImagesToImagePaths'>;
+export type TProductToPopulate = Exclude<IProduct, 'prepareUrlField' | 'transformImagesToImagePaths'>;
 
 /**
  * @internal
@@ -363,6 +373,6 @@ export interface IProduct extends Document {
   relatedProductsNames: string[];
   reviews: IReviews;
 
-  prepareUrlFieldBasedOnNameField(): void;
+  prepareUrlField(): void;
   transformImagesToImagePaths(): void;
 }

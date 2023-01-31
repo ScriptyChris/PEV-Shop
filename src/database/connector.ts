@@ -8,14 +8,17 @@ const { DATABASE_PROTOCOL, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME } = dotEn
 const DATABASE_URL = `${DATABASE_PROTOCOL}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`;
 const MAX_DB_CONNECTION_ATTEMPTS = 5;
 const CONNECTION_ATTEMPT_TIMEOUT = 2000;
-const requiredCollectionNames = readdirSync(`${__dirname}/populate/initialData`).map((file) => {
-  const collectionName = file.match(/(?<collectionName>.*)\.json$/)?.groups?.collectionName;
-  if (!collectionName) {
-    throw Error(`Could not find collection name for file "${file}"!`);
-  }
+const requiredCollectionNames = readdirSync(`${__dirname}/populate/initialData`, { withFileTypes: true })
+  .filter((file) => file.isFile())
+  .map(({ name: fileName }) => {
+    const collectionName = fileName.match(/(?<collectionName>.*)\.json$/)?.groups?.collectionName;
 
-  return collectionName;
-});
+    if (!collectionName) {
+      throw Error(`Could not find collection name for file "${fileName}"!`);
+    }
+
+    return collectionName;
+  });
 
 let dbConnection: Connection;
 

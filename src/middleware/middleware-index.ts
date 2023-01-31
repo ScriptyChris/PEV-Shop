@@ -127,7 +127,7 @@ function imageHandler() {
   return [
     `/${IMAGES_ROOT_PATH}/*`,
     (req: Request, res: Response) => {
-      const imagePath = globalThis.decodeURIComponent(possiblyReEncodeURI(req.url.split('/').slice(-2).join('/')));
+      const imagePath = globalThis.decodeURIComponent(possiblyReEncodeURI(req.url.split('/').slice(3).join('/')));
 
       getImage(imagePath)
         .then((image) => res.sendFile(image))

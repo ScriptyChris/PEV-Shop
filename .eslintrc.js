@@ -24,7 +24,7 @@ const config = {
         ],
       }
     : { 'react/prop-types': 'off' },
-  ignorePatterns: ['src/database/data', 'test/**/*.js'],
+  ignorePatterns: ['src/database/data', 'src/database/populate/initialData/product-images', 'test/**/*.js'],
 };
 
 if (!isTestEnv && isBackendOnly) {

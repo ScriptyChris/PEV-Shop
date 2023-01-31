@@ -19,7 +19,8 @@ const getSearchByNameConfig = (reqQuery: TReqQuery) => {
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
   const escapedProductName = (reqQuery.name as string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const nameQuery = new RegExp(escapedProductName, 'i');
-  const projection = reqQuery.getOnlyEssentialData === 'true' ? { name: true, url: true, price: true } : {};
+  const projection =
+    reqQuery.getOnlyEssentialData === 'true' ? { name: true, url: true, price: true, images: true } : {};
 
   return { query: { name: nameQuery }, projection };
 };
