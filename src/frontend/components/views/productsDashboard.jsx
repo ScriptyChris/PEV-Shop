@@ -37,7 +37,7 @@ import TechnicalSpecsChooser from './technicalSpecsChooser';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import { routeHelpers } from '@frontend/components/pages/_routes';
 import { FILTER_RANGE_SEPARATOR } from '@commons/consts';
-import { productPriceRangeValidator } from '@commons/filterValidators';
+import { productPriceRangeValidator } from '@commons/validators';
 import { subscribeToBodyMutations, unSubscribeFromBodyMutations } from '@frontend/components/utils/bodyObserver';
 
 const translations = {
@@ -190,6 +190,7 @@ export function BaseProductsList({
               layoutType={listViewModeToProductCardLayoutMap[listViewModeType]}
               RenderedComponent={ListItem}
               isCompact={isCompactProductCardSize}
+              lazyLoadImages
             />
           ))
         : translations.lackOfProducts}

@@ -47,6 +47,7 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
     );
   });
   const buttonContent = isProductObserved ? translations.unObserveProduct : translations.observeProduct;
+  // TODO: [BUG] change data-cy and fix auth issue
   const buttonDataCy = `button:product-${isProductObserved ? 'remove-from-compare' : 'add-to-compare'}`;
 
   const toggleProductObserve = (event, shouldObserve) => {

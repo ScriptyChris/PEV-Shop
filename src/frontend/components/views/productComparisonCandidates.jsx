@@ -12,13 +12,14 @@ import DoneIcon from '@material-ui/icons/Done';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVButton, PEVIconButton, PEVLink, PEVParagraph } from '@frontend/components/utils/pevElements';
+import { PEVButton, PEVIconButton, PEVLink, PEVParagraph, PEVImage } from '@frontend/components/utils/pevElements';
 import { BalanceIcon } from '@frontend/components/svgIcons';
 import storeService from '@frontend/features/storeService';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { subscribeToBodyMutations, unSubscribeFromBodyMutations } from '@frontend/components/utils/bodyObserver';
+import { ProductCardLink } from '@frontend/components/views/productCard';
 
 const translations = {
   addToCompare: 'Add to compare',
@@ -110,7 +111,8 @@ function ComparisonCandidatesCounter({ amount }) {
   );
 }
 
-export const ProductComparisonCandidatesList = observer(function CompareProducts() {
+export const ProductComparisonCandidatesList = observer(function ProductComparisonCandidatesList() {
+  const MIN_COMPARISON_CANDIDATES_AMOUNT = 2;
   const [popupData, setPopupData] = useState(null);
   const [isContainerExpanded, setIsContainerExpanded] = useState(true);
 
@@ -122,14 +124,17 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
     storeService.clearProductComparisonState();
   };
 
-  const showOptionalWarning = (event) => {
-    if (storeService.productComparisonState.length < 2) {
+  const handleProceedComparison = (event) => {
+    if (storeService.productComparisonState.length < MIN_COMPARISON_CANDIDATES_AMOUNT) {
       event.preventDefault();
       setPopupData({
         type: POPUP_TYPES.NEUTRAL,
         message: translations.tooLittleProductsToCompare,
         buttons: [getClosePopupBtn(setPopupData)],
       });
+    } else {
+      collapseOnExit();
+      collapseOnExited();
     }
   };
 
@@ -164,6 +169,12 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
 
   const handleCompareExpandedToggle = () => setIsContainerExpanded((prevVisibility) => !prevVisibility);
 
+  const collapseOnExit = () => bodyStyleUpdaters.setMarginBottom(0);
+  const collapseOnExited = () => {
+    bodyStyleUpdaters.clearMarginBottom();
+    bodyStyleUpdaters.clearTransition();
+  };
+
   const areComparableProductsReady = storeService.productComparisonState.length > 0;
   const toggleExpandBtnA11y = isContainerExpanded ? translations.hideCandidatesList : translations.showCandidatesList;
 
@@ -174,11 +185,8 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
       className="product-comparison-candidates-container"
       onEnter={bodyStyleUpdaters.setTransition}
       onEntered={handleBodySpaceCompensation}
-      onExit={() => bodyStyleUpdaters.setMarginBottom(0)}
-      onExited={() => {
-        bodyStyleUpdaters.clearMarginBottom();
-        bodyStyleUpdaters.clearTransition();
-      }}
+      onExit={collapseOnExit}
+      onExited={collapseOnExited}
     >
       <Paper component="aside" elevation={1} className="product-comparison-candidates">
         <PEVButton
@@ -213,9 +221,19 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
                 >
                   {productComparisonState.map((product, index) => (
                     <li className="product-comparison-candidates__list-item" key={product._id}>
-                      <PEVParagraph data-cy="label:product-comparison-candidates__list-item-name">
-                        {product.name}
-                      </PEVParagraph>
+                      <ProductCardLink className="product-comparison-candidates__list-item-link" productData={product}>
+                        <PEVImage
+                          image={product.images[0]}
+                          className="product-comparison-candidates__list-item-image"
+                          width={100}
+                        />
+                        <PEVParagraph
+                          className="product-comparison-candidates__list-item-content"
+                          data-cy="label:product-comparison-candidates__list-item-name"
+                        >
+                          {product.name}
+                        </PEVParagraph>
+                      </ProductCardLink>
                       <PEVIconButton
                         onClick={() => handleRemoveComparableProduct(index)}
                         className="product-comparison-candidates__list-item-remove-button"
@@ -237,7 +255,7 @@ export const ProductComparisonCandidatesList = observer(function CompareProducts
           <PEVIconButton
             component={PEVLink}
             to={{ pathname: ROUTES.PRODUCTS__COMPARE }}
-            onClick={showOptionalWarning}
+            onClick={handleProceedComparison}
             a11y={translations.proceedComparison}
             data-cy="link:product-comparison-candidates__actions-proceed"
           >

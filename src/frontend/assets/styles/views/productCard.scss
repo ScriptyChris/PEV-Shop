@@ -21,13 +21,20 @@
       "link-with-content action-btns"
       "link-with-content action-btns";
     grid-template-columns: 5fr 1fr;
+    align-items: stretch;
 
     .product-card__link {
       grid-template-areas: "image" "content";
+      grid-template-rows: 100px auto;
     }
 
     .product-card__content {
       grid-template-rows: 2fr 1fr;
+      text-align: center;
+    }
+
+    .product-card__name {
+      align-self: start;
     }
   }
 
@@ -51,12 +58,7 @@
 
   &__image {
     grid-area: image;
-    height: 6.25rem;
-    background: radial-gradient(transparent, grey);
-
-    &--is-compact {
-      height: 4rem;
-    }
+    justify-self: center;
   }
 
   &__content {
@@ -73,6 +75,7 @@
   &__actions-bar-toggler {
     grid-area: action-btns;
     justify-self: center;
+    align-self: center;
   }
   
   &__actions-bar {

@@ -20,6 +20,7 @@ import {
   PEVHeading,
   PEVParagraph,
   PEVFieldset,
+  PEVImage,
 } from '@frontend/components/utils/pevElements';
 import ProductCard from './productCard';
 import { ProductComparisonCandidatesList } from '@frontend/components/views/productComparisonCandidates';
@@ -39,6 +40,7 @@ const productDetailsTranslations = Object.freeze({
   category: 'Category',
   name: 'Name',
   price: 'Price',
+  productDataDisclaimerPrefix: "Product's data are based on",
   shortDescription: 'Short description',
   technicalSpecs: 'Specification',
   reviews: 'Reviews',
@@ -160,10 +162,17 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
   forwardedRef
 ) {
   switch (detailName) {
-    case 'name':
+    case 'name': {
+      return (
+        <PEVParagraph className={extras.className} data-cy={`label:product-detail__name`}>
+          {extras.optionalImage}
+          <strong>{detailValue}</strong>
+        </PEVParagraph>
+      );
+    }
     case 'category': {
       return (
-        <PEVParagraph className={extras.className} data-cy={`label:product-detail__${detailName}`}>
+        <PEVParagraph className={extras.className} data-cy={`label:product-detail__category`}>
           {detailValue}
         </PEVParagraph>
       );
@@ -180,7 +189,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
         );
       }
 
-      return detailValue;
+      return <span className={extras.className}>{detailValue}</span>;
     }
 
     case 'shortDescription': {
@@ -282,7 +291,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
       );
 
       return (
-        <div className="product-reviews">
+        <div className={classNames('product-reviews', extras.className)}>
           {extras.showAddReview && <AddReview productName={extras.productName} updateReviews={extras.updateReviews} />}
           {reviewsContent}
         </div>
@@ -304,7 +313,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
                   TODO: ProductCard component in this case will not have full product info, 
                   so it has to somehow fetch it on its own
                 */}
-                <ProductCard product={relatedProduct} entryNo={index} />
+                <ProductCard product={relatedProduct} entryNo={index} lazyLoadImages />
               </ListItem>
             );
           })}
@@ -493,36 +502,51 @@ export default observer(function ProductDetails() {
           <ProductComparisonCandidatesToggler product={mergedProductData} buttonVariant="outlined" />
         </PEVParagraph>
 
-        <div className="product-details__header-image">TODO: [UI] image should go here</div>
-        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-details__header-image" />*/}
+        <div className="product-details__header-image">
+          <small>
+            {productDetailsTranslations.productDataDisclaimerPrefix}{' '}
+            <PEVLink
+              to={{ pathname: 'https://www.ewheels.com/shop/' }}
+              target="_blank"
+              referrerPolicy="no-referrer"
+              rel="noopener"
+              color="primary"
+            >
+              eWheels.com
+            </PEVLink>
+          </small>
+          <PEVImage image={mergedProductData.images[0]} />
+        </div>
 
-        <PEVHeading level={2} className="product-details__header-name">
-          <ProductSpecificDetail detailName="name" detailValue={mergedProductData.name} />
-        </PEVHeading>
-        {/* TODO: [UX] clicking on rating here should scroll to this product ratings */}
-        <RatingWidget
-          presetValue={mergedProductData.reviews.averageRating}
-          isBig={true}
-          externalClassName="product-details__header-rating"
-        />
+        <div className="product-details__base-data-container pev-flex pev-flex--columned">
+          <PEVHeading level={2} className="product-details__header-name">
+            <ProductSpecificDetail detailName="name" detailValue={mergedProductData.name} />
+          </PEVHeading>
+          {/* TODO: [UX] clicking on rating here should scroll to this product ratings */}
+          <RatingWidget
+            presetValue={mergedProductData.reviews.averageRating}
+            isBig={true}
+            externalClassName="product-details__header-rating"
+          />
 
-        <ProductSpecificDetail
-          detailName="price"
-          detailValue={mergedProductData.price}
-          extras={{
-            header: productDetailsTranslations.price,
-            className: 'product-details__header-price',
-          }}
-        />
-        <AddToCartButton
-          productInfoForCart={{
-            name: mergedProductData.name,
-            price: mergedProductData.price,
-            _id: mergedProductData._id,
-          }}
-          startOrEndIcon="startIcon"
-          className="product-details__header-buy-btn"
-        />
+          <ProductSpecificDetail
+            detailName="price"
+            detailValue={mergedProductData.price}
+            extras={{
+              header: productDetailsTranslations.price,
+              className: 'product-details__header-price',
+            }}
+          />
+          <AddToCartButton
+            productInfoForCart={{
+              name: mergedProductData.name,
+              price: mergedProductData.price,
+              _id: mergedProductData._id,
+            }}
+            startOrEndIcon="startIcon"
+            className="product-details__header-buy-btn"
+          />
+        </div>
       </Paper>
 
       <aside className="product-details__nav-menu">

@@ -23,6 +23,7 @@ import {
   PEVFieldset,
   PEVLegend,
   PEVFormFieldError,
+  PEVImage,
 } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import productSpecsService from '@frontend/features/productSpecsService';
@@ -49,6 +50,7 @@ const translations = {
 
     return 'Add a new image by clicking the button or drag and drop it inside this field.';
   },
+  uploadImageDisabledModificationHint: 'Images modification feature is currently not implemented.',
   uploadImageBtn: 'Add image',
   uploadedImagesAmount: 'Added images',
   getUploadedImageAlt(imageNumber) {
@@ -437,6 +439,8 @@ function Images({ data: { initialData = [] } }) {
   const [uploadedImages, setUploadedImages] = useState(initialData);
   const [popupData, setPopupData] = useState(null);
   const canUploadImages = uploadedImages.length < MAX_IMAGES_AMOUNT;
+  const canModifyImages = initialData.length === 0;
+  const enabledImageHandling = canUploadImages && canModifyImages;
   const { setFieldValue, setFieldTouched, setFieldError } = useFormikContext();
   const { handleChangeImg, handleDrop, handleDragOver } = Images.useHandleUploadImage({
     uploadedImages,
@@ -466,13 +470,25 @@ function Images({ data: { initialData = [] } }) {
     setUploadedImages((prev) => prev.filter((_, index) => index !== imgIndex));
   };
 
+  const getHintContent = () => {
+    let hintContent = translations.reachedMaxImagesAmount;
+
+    if (enabledImageHandling) {
+      hintContent = translations.getUploadImageHint(isMobileLayout);
+    } else if (!canModifyImages) {
+      hintContent = translations.uploadImageDisabledModificationHint;
+    }
+
+    return hintContent;
+  };
+
   return (
     <PEVFieldset className="product-form__images pev-flex pev-flex--columned">
       <PEVLegend>{translations.images}</PEVLegend>
 
       <Box
         borderRadius="borderRadius"
-        borderColor={canUploadImages ? 'primary.main' : 'text.disabled'}
+        borderColor={enabledImageHandling ? 'primary.main' : 'text.disabled'}
         className="product-form__images-drag-and-drop pev-flex pev-flex--columned"
         onDrop={isMobileLayout ? undefined : handleDrop}
         onDragOver={isMobileLayout ? undefined : handleDragOver}
@@ -480,7 +496,7 @@ function Images({ data: { initialData = [] } }) {
         <PEVParagraph
           className={classNames('pev-centered-padded-text', { 'product-form__images-limit-hint': !canUploadImages })}
         >
-          {canUploadImages ? translations.getUploadImageHint(isMobileLayout) : translations.reachedMaxImagesAmount}
+          {getHintContent()}
         </PEVParagraph>
         <input
           id="add-product-image"
@@ -490,18 +506,18 @@ function Images({ data: { initialData = [] } }) {
           // this input doesn't need a `value`, because it only serves to show OS based file explorer
           value=""
           style={{ display: 'none' }}
-          disabled={!canUploadImages}
+          disabled={!enabledImageHandling}
           data-cy="input:add-new-image"
         />
         <label htmlFor="add-product-image">
           <PEVIconButton
             component="span"
             a11y={translations.uploadImageBtn}
-            disabled={!canUploadImages}
+            disabled={!enabledImageHandling}
             name="images"
             value={imagesNamesValue}
           >
-            <AddAPhotoOutlinedIcon color={canUploadImages ? 'primary' : 'disabled'} />
+            <AddAPhotoOutlinedIcon color={enabledImageHandling ? 'primary' : 'disabled'} />
           </PEVIconButton>
         </label>
         <small>
@@ -514,33 +530,33 @@ function Images({ data: { initialData = [] } }) {
 
       <div style={{ '--images-limit': MAX_IMAGES_AMOUNT }} className="product-form__images-list">
         {/* TODO: [UX] let user choose, which image should serve as a preview on product's card */}
-        {uploadedImages.map(({ src, name }, index) => (
-          <Box
-            component="figure"
-            borderColor="primary.main"
-            borderRadius="borderRadius"
-            className="product-form__images-list-item"
-            key={name}
-          >
-            <img
-              src={src}
-              width={128}
-              height={128}
-              style={{ objectFit: 'contain' }}
-              /* TODO: use `object-fit: contain;` */ alt={translations.getUploadedImageAlt(index + 1)}
-            />
-            <figcaption data-cy={`label:attached-image-${index}-caption`}>{name}</figcaption>
-            <PEVIconButton
-              type="button"
-              color="secondary"
-              a11y={translations.getRemoveImage(index + 1)}
-              onClick={handleRemoveImg(index)}
-              data-cy={`button:remove-${index}-uploaded-image`}
+        {uploadedImages.map(({ src, name }, index) => {
+          const alt = translations.getUploadedImageAlt(index + 1);
+          const imageBasicMeta = src.startsWith('blob:') ? { src, alt } : { image: { src, name: alt } };
+
+          return (
+            <Box
+              component="figure"
+              borderColor={canModifyImages ? 'primary.main' : 'text.disabled'}
+              borderRadius="borderRadius"
+              className="product-form__images-list-item"
+              key={name}
             >
-              <DeleteOutlineIcon />
-            </PEVIconButton>
-          </Box>
-        ))}
+              <PEVImage {...imageBasicMeta} width={128} height={128} />
+              <figcaption data-cy={`label:attached-image-${index}-caption`}>{name}</figcaption>
+              <PEVIconButton
+                type="button"
+                color="secondary"
+                a11y={translations.getRemoveImage(index + 1)}
+                onClick={handleRemoveImg(index)}
+                disabled={!canModifyImages}
+                data-cy={`button:remove-${index}-uploaded-image`}
+              >
+                <DeleteOutlineIcon />
+              </PEVIconButton>
+            </Box>
+          );
+        })}
       </div>
 
       <Popup {...popupData} />
