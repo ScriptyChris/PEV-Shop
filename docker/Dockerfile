@@ -16,6 +16,7 @@ COPY \
     generate-grouped-api-docs.js \
     webpack.config.js \
     ./
+RUN mkdir --parents public/images/products/__form-parsing-tmp
 
 RUN npm run build
 

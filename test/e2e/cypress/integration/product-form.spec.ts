@@ -32,7 +32,7 @@ describe('product-form', () => {
           return;
         }
 
-        expect(res.headers).to.contain({ 'content-type': 'image/png' });
+        expect(res.headers).to.haveOwnProperty('content-type').that.contains('image/');
         expect(res.headers['content-length']).not.to.be.empty;
         expect(Number(res.headers['content-length'])).to.be.greaterThan(0);
       });
@@ -141,6 +141,15 @@ describe('product-form', () => {
           )
         );
       });
+
+      /*
+        TODO: [feature] implement modifying images
+        For now: ensure images cannot me modified.
+      */
+      cy.get(makeCyDataSelector('input:add-new-image')).should('be.disabled');
+      cy.wrap(updatedProductFormData.assertable.images).each((_, index) =>
+        cy.get(makeCyDataSelector(`button:remove-${index}-uploaded-image`)).should('be.disabled')
+      );
 
       // delete second (first indexed) related product name
       cy.get(makeCyDataSelector('list:related-product-names'))

@@ -88,7 +88,7 @@ describe('#queryBuilder', () => {
       });
       expect(getSearchByNameConfig({ name: 'test', getOnlyEssentialData: 'true' })).toStrictEqual({
         query: { name: /test/i },
-        projection: { name: true, url: true, price: true },
+        projection: { name: true, url: true, price: true, images: true },
       });
     });
 

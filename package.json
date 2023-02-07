@@ -40,6 +40,7 @@
     "dev:backend": "cross-env BACKEND_ONLY=true nodemon --config nodemon.backend.json",
     "prebuild:backend": "npm run eslint:backend && npm run prettier:backend",
     "build:backend": "rimraf dist/src/middleware dist/src/database dist/commons && tsc --project tsconfig.backend.json",
+    "postbuild:backend": "cp -r src/database/populate/initialData/product-images dist/src/database/populate/initialData/product-images",
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend && npm run prepare-commons",
     "postbuild": "npm run generate-api-docs",
