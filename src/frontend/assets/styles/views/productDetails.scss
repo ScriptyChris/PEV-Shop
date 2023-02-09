@@ -29,12 +29,13 @@
         justify-content: flex-start;
     }
 
-    &__header-image {
+    &__header-gallery {
         grid-area: image;
         justify-self: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+
+        &-image:hover {
+            cursor: pointer;
+        }
 
         small {
             text-align: center;
@@ -123,6 +124,28 @@
             display: flex;
             gap: 1rem;
         }
+    }
+}
+
+.zoom-container {
+    position: fixed;
+    // Overcome MUI navbar `z-index`
+    z-index: 1100;
+    inset: 0;
+    justify-content: center;
+    gap: 0.5rem;
+    // TODO: [UI] use MUI color
+    background:rgba(0, 0, 0, 0.5);
+
+    &__close-btn, &__close-btn:hover {
+        // TODO: [UI] use MUI color
+        background: white;
+    }
+
+    &__image {
+        width: auto;
+        max-width: 100vw;
+        max-height: 100vh;
     }
 }
 
