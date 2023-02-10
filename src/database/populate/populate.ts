@@ -211,6 +211,13 @@ async function cleanDatabase() {
     (path) => path !== IMAGES__PRODUCTS_TMP_FOLDER
   );
 
+  console.log(
+    '===(cleanDatabase) RELATIVE_IMAGES_PRODUCTS_PATH:',
+    RELATIVE_IMAGES_PRODUCTS_PATH,
+    '/matchedProductImagesFolders:',
+    matchedProductImagesFolders
+  );
+
   for (const productImagesFolder of matchedProductImagesFolders) {
     rmdirSync(join(RELATIVE_IMAGES_PRODUCTS_PATH, productImagesFolder), { recursive: true });
   }
