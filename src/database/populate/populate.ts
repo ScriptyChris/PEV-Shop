@@ -82,8 +82,6 @@ import {
   TUserRoleToPopulate,
 } from '@database/models';
 
-import { execSync } from 'child_process';
-
 const logger = getLogger(module.filename);
 logger.log('process.argv:', process.argv);
 
@@ -209,29 +207,9 @@ async function cleanDatabase() {
     })
   );
 
-  console.log(
-    '===(cleanDatabase) RELATIVE_IMAGES_PRODUCTS_PATH:',
-    RELATIVE_IMAGES_PRODUCTS_PATH,
-    '\n/__dirname:',
-    __dirname,
-    '\n/process.env.INIT_CWD:',
-    process.env.INIT_CWD,
-    '\n/rootRelativePath:',
-    rootRelativePath,
-    '\n/IMAGES__PRODUCTS_ROOT_PATH:',
-    IMAGES__PRODUCTS_ROOT_PATH
-  );
-  const lsRes = execSync(
-    'echo "listing current and public/ folders:::" && ls -la && ls -la public && ls -la public/images && ls -la public/images/products',
-    { stdio: 'inherit', encoding: 'utf-8' }
-  );
-  console.log('===(cleanDatabase) lsRes:', lsRes);
-
   const matchedProductImagesFolders = readdirSync(RELATIVE_IMAGES_PRODUCTS_PATH).filter(
     (path) => path !== IMAGES__PRODUCTS_TMP_FOLDER
   );
-
-  console.log('===(cleanDatabase) matchedProductImagesFolders:', matchedProductImagesFolders);
 
   for (const productImagesFolder of matchedProductImagesFolders) {
     rmdirSync(join(RELATIVE_IMAGES_PRODUCTS_PATH, productImagesFolder), { recursive: true });

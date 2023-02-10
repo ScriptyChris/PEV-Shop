@@ -17,23 +17,8 @@ COPY \
     generate-grouped-api-docs.js \
     webpack.config.js \
     ./
-#RUN mkdir --parents public/images/products/__form-parsing-tmp
-
-#### debugging
-RUN echo "===[Docker pre-build] listing 'public/' folder recursively below..." && \
-    ls -la public && \
-    ls -la public/images && \
-    ls -la public/images/products
-####
 
 RUN npm run build
-
-#### debugging
-RUN echo "===[Docker post-build] listing 'public/' folder recursively below..." && \
-    ls -la public && \
-    ls -la public/images && \
-    ls -la public/images/products
-####
 
 EXPOSE ${APP_PORT}
 
