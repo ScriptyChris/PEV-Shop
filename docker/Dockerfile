@@ -19,13 +19,20 @@ COPY \
 RUN mkdir --parents public/images/products/__form-parsing-tmp
 
 #### debugging
-RUN echo "listing 'public/' folder recursively below..."
-RUN ls -la public && \
+RUN echo "[pre-build] listing 'public/' folder recursively below..." && \
+    ls -la public && \
     ls -la public/images && \
     ls -la public/images/products
 ####
 
 RUN npm run build
+
+#### debugging
+RUN echo "[post-build] listing 'public/' folder recursively below..." && \
+    ls -la public && \
+    ls -la public/images && \
+    ls -la public/images/products
+####
 
 EXPOSE ${APP_PORT}
 
