@@ -40,6 +40,7 @@ const PARAMS = {
     [CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS]: 'users__InputPath',
     [CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES]: 'user_roles__InputPath',
   },
+  PRODUCT_IMAGES: 'product_images__FolderPath',
 } as const;
 /**
  * Maps default params, which are applied when regarding individual params are not provided via CLI.
@@ -50,6 +51,7 @@ const DEFAULT_PARAMS = {
   [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initialData/products.json',
   [PARAMS.JSON_FILE_PATH.USERS]: './initialData/users.json',
   [PARAMS.JSON_FILE_PATH.USER_ROLES]: './initialData/user_roles.json',
+  [PARAMS.PRODUCT_IMAGES]: './initialData/product-images',
 } as const;
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
@@ -62,6 +64,9 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   require('../../../commons/moduleAliasesResolvers.js').backend();
 }
 
+import { copyFileSync, readdirSync, mkdirSync, rmdirSync } from 'fs';
+import { join, relative } from 'path';
+import { IMAGES__PRODUCTS_ROOT_PATH, IMAGES__PRODUCTS_TMP_FOLDER } from '@commons/consts';
 import getLogger from '@commons/logger';
 import { hashPassword } from '@middleware/features/auth';
 import { connectWithDB } from '@database/connector';
@@ -79,6 +84,10 @@ import {
 
 const logger = getLogger(module.filename);
 logger.log('process.argv:', process.argv);
+
+// Explanation for using root relative path is at the top of `src/middleware/middleware-index.ts` module.
+const rootRelativePath = relative(__dirname, process.env.INIT_CWD as string);
+const RELATIVE_IMAGES_PRODUCTS_PATH = join(__dirname, rootRelativePath, IMAGES__PRODUCTS_ROOT_PATH);
 
 let relatedProductsErrors = 0;
 
@@ -108,6 +117,8 @@ const COLLECTIONS_TO_REMOVE = [
 
 if (!getScriptParamStringValue(PARAMS.JSON_FILE_PATH.PRODUCTS)) {
   throw ReferenceError(`CLI argument "${PARAMS.JSON_FILE_PATH.PRODUCTS}" must be provided as non empty string!`);
+} else if (!getScriptParamStringValue(PARAMS.PRODUCT_IMAGES)) {
+  throw ReferenceError(`CLI argument "${PARAMS.PRODUCT_IMAGES}" must be provided as non empty string!`);
 }
 
 /**
@@ -126,14 +137,7 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
   }
 
   if (getScriptParamStringValue(PARAMS.CLEAN_ALL_BEFORE) === 'true' || shouldCleanupAll) {
-    const removedData = await Promise.all(
-      COLLECTIONS_TO_REMOVE.map(async ({ name, ctor }) => {
-        const deletionRes = await ctor.deleteMany({});
-        return `\n\t-${name}: ${deletionRes.deletedCount}`;
-      })
-    );
-
-    logger.log(`Cleaning done. Removed: ${removedData}`);
+    await cleanDatabase();
   }
 
   const userRolesPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH.USER_ROLES);
@@ -153,6 +157,7 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
     const productsSourceDataList = getSourceData<TProductToPopulate>(productsPath);
     await populateProducts(productsSourceDataList);
     await updateRelatedProductsNames(productsSourceDataList);
+    relocateProductImages(productsSourceDataList);
   }
 
   const populationResults = {
@@ -190,10 +195,30 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   executeDBPopulation().then(() => {
     logger.log('Exiting from populate.ts initiated via CLI...');
-    process.exit(0);
+    return process.exit(0);
   });
 }
 
+async function cleanDatabase() {
+  const removedData = await Promise.all(
+    COLLECTIONS_TO_REMOVE.map(async ({ name, ctor }) => {
+      const deletionRes = await ctor.deleteMany({});
+      return `\n\t-${name}: ${deletionRes.deletedCount}`;
+    })
+  );
+
+  const matchedProductImagesFolders = readdirSync(RELATIVE_IMAGES_PRODUCTS_PATH).filter(
+    (path) => path !== IMAGES__PRODUCTS_TMP_FOLDER
+  );
+
+  for (const productImagesFolder of matchedProductImagesFolders) {
+    rmdirSync(join(RELATIVE_IMAGES_PRODUCTS_PATH, productImagesFolder), { recursive: true });
+  }
+
+  logger.log(
+    `Cleaning done. Removed: ${removedData}\n\t-matchedProductImagesFolders: ${matchedProductImagesFolders.length}`
+  );
+}
 function getSourceData<T extends TDataToPopulate>(sourceDataPath: string): T[] {
   logger.log('getSourceData() /sourceDataPath:', sourceDataPath);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -277,6 +302,33 @@ function updateRelatedProductsNames(sourceDataList: TProductToPopulate[]): Promi
       });
     })
   );
+}
+
+function relocateProductImages(productsSourceDataList: TProductToPopulate[]) {
+  const productInitialImagesPath = getScriptParamStringValue(PARAMS.PRODUCT_IMAGES)!;
+  // Based on https://stackoverflow.com/a/52562541/4983840
+  const copyDirSync = (src: string, dest: string) => {
+    const dirEntries = readdirSync(src, { withFileTypes: true });
+    mkdirSync(dest);
+
+    for (const dirEntry of dirEntries) {
+      const srcPath = join(src, dirEntry.name);
+      const destPath = join(dest, dirEntry.name);
+
+      if (dirEntry.isDirectory()) {
+        copyDirSync(srcPath, destPath);
+      } else {
+        copyFileSync(srcPath, destPath);
+      }
+    }
+  };
+
+  productsSourceDataList.forEach(({ url }, i) => {
+    const srcPath = join(__dirname, productInitialImagesPath, url);
+    const destPath = join(RELATIVE_IMAGES_PRODUCTS_PATH, url);
+
+    copyDirSync(srcPath, destPath);
+  });
 }
 
 function getScriptParamStringValue(paramName: string) {

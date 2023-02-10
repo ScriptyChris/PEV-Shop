@@ -39,4 +39,9 @@
             border-color: transparent;
         }
     }
+
+    &-image {
+        height: auto;
+        object-fit: contain;
+    }
 }

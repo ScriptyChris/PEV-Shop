@@ -56,9 +56,9 @@ App's [frontend](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/
 
 Backend is written on [**Node.js**](https://nodejs.org/) in **TypeScript**, with [middleware](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/middleware) based on [**Express.js**](https://expressjs.com/) (supporting Rest API) and [database](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/database) created with [**MongoDB**](https://www.mongodb.com/) (using [**Mongoose**](https://mongoosejs.com/) as ODM). Authorization is implemented via [**JWT**](https://www.npmjs.com/package/jsonwebtoken) and custom user roles system. Emails to users are send via [**Nodemailer**](https://www.npmjs.com/package/nodemailer). Payments for ordered products are handled by integrated [**PayU API**](https://developers.payu.com/en/).
 
-The app's database and middleware are covered with [*unit* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/unit) created with [**Jasmine**](https://jasmine.github.io/). Whole-feature focused scenarios are covered by [*end-to-end* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/e2e) created with [**Cypress**](https://www.cypress.io/).
+The app's database and middleware are covered with [*unit* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/unit) created with [**Jest**](https://jestjs.io/). Whole-feature focused scenarios are covered by [*end-to-end* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/e2e) created with [**Cypress**](https://www.cypress.io/).
 
-Whole app is contenerized via [**Docker**](https://docker.com/), which helps with easier setup and executing end-to-end tests. Repository is hooked with [**GitHub Actions CI/CD**](https://docs.github.com/en/actions) for integration purposes.
+Whole app is containerized via [**Docker**](https://docker.com/), which helps with easier setup and executing end-to-end tests. Repository is hooked with [**GitHub Actions CI/CD**](https://docs.github.com/en/actions) for integration purposes.
 ## 3. Setup
 Regardles of setup method, the app is locally served on [`http://localhost:3000`](http://localhost:3000) by default.
 ### Automatic setup

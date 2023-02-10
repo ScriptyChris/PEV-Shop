@@ -23,6 +23,8 @@ import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
 import Scroller from '@frontend/components/utils/scroller';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import { IMAGES_ROOT_PATH } from '@commons/consts';
 
 const useFieldsetStyles = makeStyles({
   root: {
@@ -213,8 +215,12 @@ export const PEVForm = forwardRef(function PEVForm(
 });
 
 // TODO: [DX] use Formik's `<ErrorMessage>` component
-export const PEVFormFieldError = ({ children, customMessage }) => {
-  return <PEVParagraph className="pev-element-form-field-error">{customMessage || children}</PEVParagraph>;
+export const PEVFormFieldError = ({ children, customMessage, ...restProps }) => {
+  return (
+    <PEVParagraph className="pev-element-form-field-error" {...restProps}>
+      {customMessage || children}
+    </PEVParagraph>
+  );
 };
 
 export const PEVHeading = forwardRef(function PEVHeading({ level, children, withMargin, ...restProps }, ref) {
@@ -349,5 +355,29 @@ export const PEVTabs = forwardRef(function PEVTabs(
         </div>
       ))}
     </div>
+  );
+});
+
+export const PEVImage = forwardRef(function PEVImage({ image, src, alt, className = '', ...restProps }, ref) {
+  const { isMobileLayout } = useRWDLayout();
+
+  if (image) {
+    src = `/${IMAGES_ROOT_PATH}/${image.src}`;
+    alt = image.name;
+  } else if (!image && (!src || !alt)) {
+    throw Error('When `image` prop is not provided, both `src` and `alt` must be provided!');
+  }
+
+  return (
+    <img
+      {...{
+        src,
+        alt,
+        width: isMobileLayout ? 300 : 500,
+        ...restProps,
+      }}
+      className={classNames('pev-element-image', className)}
+      ref={ref}
+    />
   );
 });

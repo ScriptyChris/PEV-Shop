@@ -3,5 +3,6 @@ services:
     volumes:
       - pev-node_modules:/app/node_modules
       - pev-dist:/app/dist
+      - pev-public:/app/public
     environment:
       - CYPRESS_TEST_MODE=CI/CD

@@ -7,10 +7,7 @@
             "category"
             "action-elements"
             "image"
-            "name"
-            "rating"
-            "price"
-            "buy-btn";
+            "base-data-container";
         row-gap: 0.5rem;
     }
 
@@ -27,28 +24,24 @@
         gap: 0.5rem;
     }
 
-    &__header-image {
+    &__base-data-container {
+        grid-area: base-data-container;
+        justify-content: flex-start;
+    }
+
+    &__header-gallery {
         grid-area: image;
-        height: 100px;
-        background: radial-gradient(transparent, grey);
-    }
+        justify-self: center;
 
-    &__header-name {
-        grid-area: name;
-    }
+        &-image:hover {
+            cursor: pointer;
+        }
 
-    &__header-rating {
-        grid-area: rating;
-    }
-
-    &__header-price {
-        grid-area: price;
-    }
-
-    &__header-buy-btn {
-        grid-area: buy-btn;
-        width: 75%;
-        margin-inline: auto;
+        small {
+            text-align: center;
+            font-style: italic;
+            font-size: x-small;
+        }
     }
 
     &__nav-menu {
@@ -134,15 +127,41 @@
     }
 }
 
+.zoom-container {
+    position: fixed;
+    // Overcome MUI navbar `z-index`
+    z-index: 1100;
+    inset: 0;
+    justify-content: center;
+    gap: 0.5rem;
+    // TODO: [UI] use MUI color
+    background:rgba(0, 0, 0, 0.5);
+
+    &__close-btn, &__close-btn:hover {
+        // TODO: [UI] use MUI color
+        background: white;
+    }
+
+    &__image {
+        width: auto;
+        max-width: 100vw;
+        max-height: 100vh;
+    }
+}
+
 @include createMediaQuery(min-width, tablet) {
     .product-details {
         &__header {
+            // grid-template-areas:
+            //     "category action-elements action-elements action-elements"
+            //     "image image name name"
+            //     "image image rating rating"
+            //     "image image price price"
+            //     "image image buy-btn buy-btn";
+            // grid-template-columns: repeat(4, 1fr);
             grid-template-areas:
                 "category action-elements action-elements action-elements"
-                "image image name name"
-                "image image rating rating"
-                "image image price price"
-                "image image buy-btn buy-btn";
+                "image image base-data-container base-data-container";
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem 3rem;
         }
@@ -157,6 +176,12 @@
                 margin-left: 10rem;
             }
         }
+    }
+}
+
+@include useMediaQuery(tablet) {
+    .product-details__header-image .pev-element-image {
+        max-width: 40vw;
     }
 }
 

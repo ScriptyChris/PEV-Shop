@@ -5,6 +5,11 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import Paper from '@material-ui/core/Paper';
+import MobileStepper from '@material-ui/core/MobileStepper';
+import Fade from '@material-ui/core/Fade';
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import CloseIcon from '@material-ui/icons/Close';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import List from '@material-ui/core/List';
@@ -15,11 +20,13 @@ import FormGroup from '@material-ui/core/FormGroup';
 import {
   PEVForm,
   PEVButton,
+  PEVIconButton,
   PEVLink,
   PEVRadio,
   PEVHeading,
   PEVParagraph,
   PEVFieldset,
+  PEVImage,
 } from '@frontend/components/utils/pevElements';
 import ProductCard from './productCard';
 import { ProductComparisonCandidatesList } from '@frontend/components/views/productComparisonCandidates';
@@ -39,6 +46,10 @@ const productDetailsTranslations = Object.freeze({
   category: 'Category',
   name: 'Name',
   price: 'Price',
+  productDataDisclaimerPrefix: "Product's data are based on",
+  prevImgBtn: 'Prev',
+  nextImgBtn: 'Next',
+  closeImageBtn: 'close image',
   shortDescription: 'Short description',
   technicalSpecs: 'Specification',
   reviews: 'Reviews',
@@ -160,10 +171,17 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
   forwardedRef
 ) {
   switch (detailName) {
-    case 'name':
+    case 'name': {
+      return (
+        <PEVParagraph className={extras.className} data-cy={`label:product-detail__name`}>
+          {extras.optionalImage}
+          <strong>{detailValue}</strong>
+        </PEVParagraph>
+      );
+    }
     case 'category': {
       return (
-        <PEVParagraph className={extras.className} data-cy={`label:product-detail__${detailName}`}>
+        <PEVParagraph className={extras.className} data-cy={`label:product-detail__category`}>
           {detailValue}
         </PEVParagraph>
       );
@@ -180,7 +198,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
         );
       }
 
-      return detailValue;
+      return <span className={extras.className}>{detailValue}</span>;
     }
 
     case 'shortDescription': {
@@ -282,7 +300,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
       );
 
       return (
-        <div className="product-reviews">
+        <div className={classNames('product-reviews', extras.className)}>
           {extras.showAddReview && <AddReview productName={extras.productName} updateReviews={extras.updateReviews} />}
           {reviewsContent}
         </div>
@@ -304,7 +322,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
                   TODO: ProductCard component in this case will not have full product info, 
                   so it has to somehow fetch it on its own
                 */}
-                <ProductCard product={relatedProduct} entryNo={index} />
+                <ProductCard product={relatedProduct} entryNo={index} lazyLoadImages />
               </ListItem>
             );
           })}
@@ -394,6 +412,83 @@ const useSectionsObserver = () => {
 
   return { productDetailsNavSections, activatedNavMenuItemIndex };
 };
+
+// Based on MUI stepper https://v4.mui.com/components/steppers/#text
+function Gallery({ images }) {
+  const [activeStep, setActiveStep] = useState(0);
+  const [imageZoomed, setImageZoomed] = useState(false);
+  const maxSteps = images.length;
+
+  const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  const getImageZoomHandler = (shouldZoomIn) => () => setImageZoomed(shouldZoomIn);
+  const handleDisablePageScroll = () => (document.body.style.overflow = 'hidden');
+  const handleEnablePageScroll = () => (document.body.style.overflow = null);
+
+  return (
+    <div className="product-details__header-gallery">
+      <PEVImage
+        image={images[activeStep]}
+        className="product-details__header-gallery-image"
+        onClick={getImageZoomHandler(true)}
+      />
+      <Fade
+        in={imageZoomed}
+        timeout={{ enter: 1000, exit: 250 }}
+        onEntering={handleDisablePageScroll}
+        onExiting={handleEnablePageScroll}
+      >
+        <div className="zoom-container pev-flex pev-flex--columned">
+          <PEVIconButton
+            className="zoom-container__close-btn"
+            onClick={getImageZoomHandler(false)}
+            a11y={productDetailsTranslations.closeImageBtn}
+            color="primary"
+          >
+            <CloseIcon />
+          </PEVIconButton>
+          <PEVImage
+            image={images[activeStep]}
+            className="product-details__header-gallery-image zoom-container__image"
+            onClick={getImageZoomHandler(false)}
+          />
+        </div>
+      </Fade>
+      <MobileStepper
+        steps={maxSteps}
+        position="static"
+        variant="text"
+        activeStep={activeStep}
+        backButton={
+          <PEVButton
+            className="pev-flex"
+            onClick={handleBack}
+            a11y={productDetailsTranslations.prevImgBtn}
+            disabled={activeStep === 0}
+            size="small"
+            variant="text"
+          >
+            <KeyboardArrowLeftIcon />
+            {productDetailsTranslations.prevImgBtn}
+          </PEVButton>
+        }
+        nextButton={
+          <PEVButton
+            className="pev-flex"
+            onClick={handleNext}
+            a11y={productDetailsTranslations.nextImgBtn}
+            disabled={activeStep === maxSteps - 1}
+            size="small"
+            variant="text"
+          >
+            {productDetailsTranslations.nextImgBtn}
+            <KeyboardArrowRightIcon />
+          </PEVButton>
+        }
+      />
+    </div>
+  );
+}
 
 export default observer(function ProductDetails() {
   const { state: initialProductData, pathname } = useLocation();
@@ -493,36 +588,37 @@ export default observer(function ProductDetails() {
           <ProductComparisonCandidatesToggler product={mergedProductData} buttonVariant="outlined" />
         </PEVParagraph>
 
-        <div className="product-details__header-image">TODO: [UI] image should go here</div>
-        {/*<img src={image} alt={`${translations.productImage}${name}`} className="product-details__header-image" />*/}
+        <Gallery images={mergedProductData.images} />
 
-        <PEVHeading level={2} className="product-details__header-name">
-          <ProductSpecificDetail detailName="name" detailValue={mergedProductData.name} />
-        </PEVHeading>
-        {/* TODO: [UX] clicking on rating here should scroll to this product ratings */}
-        <RatingWidget
-          presetValue={mergedProductData.reviews.averageRating}
-          isBig={true}
-          externalClassName="product-details__header-rating"
-        />
+        <div className="product-details__base-data-container pev-flex pev-flex--columned">
+          <PEVHeading level={2} className="product-details__header-name">
+            <ProductSpecificDetail detailName="name" detailValue={mergedProductData.name} />
+          </PEVHeading>
+          {/* TODO: [UX] clicking on rating here should scroll to this product ratings */}
+          <RatingWidget
+            presetValue={mergedProductData.reviews.averageRating}
+            isBig={true}
+            externalClassName="product-details__header-rating"
+          />
 
-        <ProductSpecificDetail
-          detailName="price"
-          detailValue={mergedProductData.price}
-          extras={{
-            header: productDetailsTranslations.price,
-            className: 'product-details__header-price',
-          }}
-        />
-        <AddToCartButton
-          productInfoForCart={{
-            name: mergedProductData.name,
-            price: mergedProductData.price,
-            _id: mergedProductData._id,
-          }}
-          startOrEndIcon="startIcon"
-          className="product-details__header-buy-btn"
-        />
+          <ProductSpecificDetail
+            detailName="price"
+            detailValue={mergedProductData.price}
+            extras={{
+              header: productDetailsTranslations.price,
+              className: 'product-details__header-price',
+            }}
+          />
+          <AddToCartButton
+            productInfoForCart={{
+              name: mergedProductData.name,
+              price: mergedProductData.price,
+              _id: mergedProductData._id,
+            }}
+            startOrEndIcon="startIcon"
+            className="product-details__header-buy-btn"
+          />
+        </div>
       </Paper>
 
       <aside className="product-details__nav-menu">

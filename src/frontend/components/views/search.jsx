@@ -70,23 +70,28 @@ const Search = memo(function Search({
   const inputId = `${searchingTarget}Search`;
 
   useEffect(() => {
+    // cancel any pending debounce as cleanup
+    return () => window.clearTimeout(debounce.current);
+  }, []);
+
+  useEffect(() => {
     setInputValue(presetValue);
     handleChange({ target: { value: presetValue } }, true);
   }, [presetValue]);
 
-  const debounceNotify = (notifier) => {
+  const debounceNotify = (notifier, immediate) => {
     if (debounce.current > -1) {
-      clearTimeout(debounce.current);
+      window.clearTimeout(debounce.current);
     }
 
-    debounce.current = window.setTimeout(notifier, debounceTimeMs);
+    debounce.current = window.setTimeout(notifier, immediate ? 0 : debounceTimeMs);
   };
 
   const handleChange = ({ target: { value } }, goWithNextTick) => {
     setInputValue(value);
 
     if (goWithNextTick) {
-      setTimeout(() => onInputChange(value));
+      debounceNotify(() => onInputChange(value), true);
     } else if (value && debounceTimeMs) {
       debounceNotify(() => onInputChange(value));
     } else {
@@ -109,11 +114,10 @@ const Search = memo(function Search({
       role="search"
       overrideRenderFn={() => (
         <PEVTextField
-          className={className}
+          {...{ className, autoFocus, placeholder, label, labelInside }}
           ref={forwardedRef}
           identity={inputId}
           type="search"
-          autoFocus={autoFocus}
           autoComplete="off"
           overrideProps={{
             onChange: handleChange,
@@ -125,9 +129,6 @@ const Search = memo(function Search({
               'data-cy': searchInputDataCy,
             },
           }}
-          placeholder={placeholder}
-          label={label}
-          labelInside={labelInside}
         />
       )}
     />
@@ -522,7 +523,7 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
     [searchRecentValues, searchResults]
   );
 
-  const handleInputSearchChange = async (searchValue) => {
+  const handleInputSearchForSingleProductChange = (searchValue) => {
     setSearchRecentValues((prev) => ({ oldValue: prev.newValue, newValue: searchValue }));
   };
 
@@ -530,7 +531,7 @@ const SearchSingleProductByName = memo(function SearchSingleProductByName({
     <>
       <Search
         {...restProps}
-        onInputChange={handleInputSearchChange}
+        onInputChange={handleInputSearchForSingleProductChange}
         searchInputDataCy="input:search-single-product-by-name"
         labelInside
       />

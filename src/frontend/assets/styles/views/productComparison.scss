@@ -37,7 +37,14 @@
     grid-template-columns: repeat(var(--compare-columns-number, auto), minmax(var(--product-list-item-width),1fr));
   }
 
-  &__cell {}
+  &__cell {
+    &-interior {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
 }
 
 .product-comparison__header {

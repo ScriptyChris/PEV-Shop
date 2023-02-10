@@ -20,7 +20,7 @@ Cypress.Commands.add('cleanupTestUsersAndEmails', () => {
 
 // TODO: remove it when `TAPIEndpointGroup` will be fixed, so type will be checked at compile time instead of runtime
 const _endpointGroups = ['users', 'products'];
-Cypress.Commands.add('sendAPIReq', ({ endpoint, method, payload, extraHeaders = {}, canFail = true }) => {
+Cypress.Commands.add('sendAPIReq', ({ endpoint, method, payload, extraHeaders = {}, canFail = true, shouldBeForm }) => {
   if (!endpoint || !method) {
     throw ReferenceError(
       `'endpoint', 'method' must be defined!
@@ -33,15 +33,31 @@ Cypress.Commands.add('sendAPIReq', ({ endpoint, method, payload, extraHeaders = 
     );
   }
 
+  const contentTypeHeader: { 'Content-Type'?: string } = {
+    'Content-Type': 'application/json',
+  };
+  let body;
+
+  if (shouldBeForm && Array.isArray(payload) && payload.length) {
+    delete contentTypeHeader['Content-Type'];
+    const fd = new FormData();
+    payload.forEach(([key, value]) => fd.append(key, value));
+    body = fd;
+  } else if (payload) {
+    body = JSON.stringify(payload);
+  }
+
+  const headers = {
+    ...contentTypeHeader,
+    ...extraHeaders,
+  };
+
   return cy.request({
     failOnStatusCode: canFail,
     url: `/api/${endpoint}`,
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...extraHeaders,
-    },
-    body: payload && JSON.stringify(payload),
+    headers,
+    body,
   });
 });
 

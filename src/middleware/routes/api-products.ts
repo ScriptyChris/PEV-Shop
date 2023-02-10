@@ -8,12 +8,12 @@ import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '@middl
 import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '@database/api';
 import { queryBuilder } from '@database/utils/queryBuilder';
 import mapProductsTechnicalSpecs from '@middleware/helpers/api-products-specs-mapper';
-import { IProduct, IReviews, COLLECTION_NAMES, USER_ROLES_MAP } from '@database/models';
+import { ProductModel, IProduct, IReviews, COLLECTION_NAMES, USER_ROLES_MAP } from '@database/models';
 import { HTTP_STATUS_CODE } from '@commons/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
+import { parseFormData } from '@middleware/helpers/form-data-handler';
 
-// import { readFileSync } from 'fs';
 const logger = getLogger(module.filename);
 const router: Router &
   Partial<{
@@ -24,8 +24,6 @@ const router: Router &
     _addReview: typeof addReview;
     _deleteProduct: typeof deleteProduct;
   }> = Router();
-// const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
-// const productList =  getProductList();
 
 router.get('/api/products/specs', getProductsSpecs);
 router.get('/api/products', getProducts);
@@ -163,6 +161,9 @@ async function getProductById(req: Request, res: Response, next: NextFunction) {
 }
 
 async function addProduct(req: Request, res: Response, next: NextFunction) {
+  const { imagesUploadTmpDirPath, addTmpImagePath, removeTmpImages, moveValidImagesToTargetLocation } =
+    ProductModel.createImageRelocator();
+
   try {
     logger.log('[products POST] req.body', req.body);
 
@@ -170,10 +171,47 @@ async function addProduct(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Product data is empty or not attached!' });
     }
 
-    await saveToDB(COLLECTION_NAMES.Product, req.body);
+    const { parsingError, fields, files } = await parseFormData(req, {
+      keepExtensions: true,
+      // TODO: [DX] use `options.fileWriteStreamHandler` to avoid temporary storing image on disk
+      uploadDir: imagesUploadTmpDirPath,
+      filename(name, ext, { name: partName = '' }) {
+        const tmpPath = `${name}${ext}`;
+        addTmpImagePath(tmpPath, partName as string);
+
+        return tmpPath;
+      },
+    });
+
+    if (parsingError) {
+      removeTmpImages();
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: parsingError });
+    } else if (!fields?.plainData) {
+      removeTmpImages();
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, {
+        error: "Couldn't extract `plainData` property from payload!",
+      });
+    } else if (!files) {
+      removeTmpImages();
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: "Couldn't extract `files` property from payload!" });
+    }
+
+    const { imagesValidationError, images } = ProductModel.validateImages(files);
+    if (imagesValidationError) {
+      removeTmpImages();
+      return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: imagesValidationError });
+    }
+
+    const newProductData = {
+      ...JSON.parse(fields.plainData as string),
+      images: ProductModel.sortImageNames(images),
+    };
+    const { url } = (await saveToDB(COLLECTION_NAMES.Product, newProductData)) as IProduct;
+    moveValidImagesToTargetLocation(url, true);
 
     return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Success!' });
   } catch (exception) {
+    removeTmpImages();
     return next(exception);
   }
 }
@@ -309,18 +347,10 @@ async function deleteProduct(req: Request, res: Response, next: NextFunction) {
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Could not find product to delete!' });
     }
 
+    ProductModel.removeImages(req.params.name);
+
     return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }
 }
-
-// function getProductList() {
-//   const [firstCategory] = JSON.parse(readFileSync(`${databaseDirname}/raw-data-formatted.json`, 'utf8'));
-//
-//   return firstCategory.products.map(({ name, url, price, images }) => {
-//     const image = '/images/' + images[0].imageSrc.split('/').pop();
-//
-//     return { name, url, price, image };
-//   });
-// }

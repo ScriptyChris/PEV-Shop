@@ -72,19 +72,26 @@
   }
 
   &__list-item {
-    position: relative;
     display: flex;
-    flex-direction: column;
     justify-content: space-between;
-    margin: 0 0.5rem;
     min-width: var(--product-list-item-width);
   }
 
-  &__list-item-remove-button {
-    position: absolute;
-    top: 0;
-    right: 0;
+  &__list-item-link {
+    display: inherit;
+    justify-content: inherit;
+    min-width: inherit;
+    margin-right: 0.5rem;
   }
+
+  &__list-item-content {
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+    width: max-content;
+    max-width: var(--product-list-item-width);
+  }
+
+  &__list-item-remove-button {}
 
   &__actions {
     display: inline-flex;

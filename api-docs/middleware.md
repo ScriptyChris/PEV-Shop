@@ -47,7 +47,7 @@ fake-pev-shopping
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:11](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L11)
+[src/middleware/helpers/middleware-response-wrapper.ts:11](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L11)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L14)
+[src/middleware/helpers/middleware-response-wrapper.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L14)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:15](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L15)
+[src/middleware/helpers/middleware-response-wrapper.ts:15](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L15)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:13](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L13)
+[src/middleware/helpers/middleware-response-wrapper.ts:13](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L13)
 
 ___
 
@@ -87,7 +87,156 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L12)
+[src/middleware/helpers/middleware-response-wrapper.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L12)
+
+[fake-pev-shopping](#readmemd) / [routes/api-users](#modulesroutes_api_usersmd) / [<internal\>](#modulesroutes_api_users_internal_md) / IProduct
+
+# Interface: IProduct
+
+[routes/api-users](#modulesroutes_api_usersmd).[<internal>](#modulesroutes_api_users_internal_md).IProduct
+
+## Hierarchy
+
+- `Document`
+
+  ↳ **`IProduct`**
+
+## Table of contents
+
+### Properties
+
+- [category](#category)
+- [images](#images)
+- [name](#name)
+- [price](#price)
+- [relatedProductsNames](#relatedproductsnames)
+- [reviews](#reviews)
+- [shortDescription](#shortdescription)
+- [technicalSpecs](#technicalspecs)
+- [url](#url)
+
+### Methods
+
+- [prepareUrlField](#prepareurlfield)
+- [transformImagesToImagePaths](#transformimagestoimagepaths)
+
+## Properties
+
+### category
+
+• **category**: `string`
+
+#### Defined in
+
+[src/database/models/_product.ts:364](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L364)
+
+___
+
+### images
+
+• **images**: { `name`: `string` ; `src`: `string`  }[]
+
+#### Defined in
+
+[src/database/models/_product.ts:372](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L372)
+
+___
+
+### name
+
+• **name**: `string`
+
+#### Defined in
+
+[src/database/models/_product.ts:362](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L362)
+
+___
+
+### price
+
+• **price**: `number`
+
+#### Defined in
+
+[src/database/models/_product.ts:365](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L365)
+
+___
+
+### relatedProductsNames
+
+• **relatedProductsNames**: `string`[]
+
+#### Defined in
+
+[src/database/models/_product.ts:373](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L373)
+
+___
+
+### reviews
+
+• **reviews**: `IReviews`
+
+#### Defined in
+
+[src/database/models/_product.ts:374](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L374)
+
+___
+
+### shortDescription
+
+• **shortDescription**: `string`[]
+
+#### Defined in
+
+[src/database/models/_product.ts:366](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L366)
+
+___
+
+### technicalSpecs
+
+• **technicalSpecs**: { `data`: `unknown` ; `defaultUnit`: `string` ; `heading`: `string`  }[]
+
+#### Defined in
+
+[src/database/models/_product.ts:367](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L367)
+
+___
+
+### url
+
+• **url**: `string`
+
+#### Defined in
+
+[src/database/models/_product.ts:363](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L363)
+
+## Methods
+
+### prepareUrlField
+
+▸ **prepareUrlField**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/database/models/_product.ts:376](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L376)
+
+___
+
+### transformImagesToImagePaths
+
+▸ **transformImagesToImagePaths**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/database/models/_product.ts:377](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L377)
 
 [fake-pev-shopping](#readmemd) / [features/auth](#modulesfeatures_authmd) / <internal\>
 
@@ -135,7 +284,7 @@ ___
 
 #### Defined in
 
-[src/middleware/features/auth.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/features/auth.ts#L38)
+[src/middleware/features/auth.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/features/auth.ts#L38)
 
 ___
 
@@ -149,7 +298,7 @@ ___
 
 #### Defined in
 
-[src/middleware/features/auth.ts:96](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/features/auth.ts#L96)
+[src/middleware/features/auth.ts:96](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/features/auth.ts#L96)
 
 ___
 
@@ -170,7 +319,7 @@ ___
 
 #### Defined in
 
-[src/middleware/features/auth.ts:22](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/features/auth.ts#L22)
+[src/middleware/features/auth.ts:22](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/features/auth.ts#L22)
 
 ___
 
@@ -190,7 +339,7 @@ ___
 
 #### Defined in
 
-[src/middleware/features/auth.ts:30](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/features/auth.ts#L30)
+[src/middleware/features/auth.ts:30](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/features/auth.ts#L30)
 
 ___
 
@@ -210,7 +359,7 @@ ___
 
 #### Defined in
 
-[src/middleware/features/auth.ts:26](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/features/auth.ts#L26)
+[src/middleware/features/auth.ts:26](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/features/auth.ts#L26)
 
 ___
 
@@ -244,7 +393,7 @@ ___
 
 #### Defined in
 
-[src/middleware/features/auth.ts:80](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/features/auth.ts#L80)
+[src/middleware/features/auth.ts:80](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/features/auth.ts#L80)
 
 ___
 
@@ -264,7 +413,7 @@ ___
 
 #### Defined in
 
-[src/middleware/features/auth.ts:34](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/features/auth.ts#L34)
+[src/middleware/features/auth.ts:34](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/features/auth.ts#L34)
 
 [fake-pev-shopping](#readmemd) / helpers/mailer
 
@@ -288,7 +437,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/mailer.ts:51](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/mailer.ts#L51)
+[src/middleware/helpers/mailer.ts:51](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/mailer.ts#L51)
 
 ## Functions
 
@@ -310,7 +459,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/mailer.ts:55](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/mailer.ts#L55)
+[src/middleware/helpers/mailer.ts:55](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/mailer.ts#L55)
 
 [fake-pev-shopping](#readmemd) / [helpers/middleware-error-handler](#moduleshelpers_middleware_error_handlermd) / <internal\>
 
@@ -348,7 +497,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-error-handler.ts:10](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-error-handler.ts#L10)
+[src/middleware/helpers/middleware-error-handler.ts:10](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-error-handler.ts#L10)
 
 [fake-pev-shopping](#readmemd) / helpers/middleware-error-handler
 
@@ -382,7 +531,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-error-handler.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-error-handler.ts#L14)
+[src/middleware/helpers/middleware-error-handler.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-error-handler.ts#L14)
 
 [fake-pev-shopping](#readmemd) / [helpers/middleware-response-wrapper](#moduleshelpers_middleware_response_wrappermd) / <internal\>
 
@@ -409,7 +558,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:45](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/commons/types.ts#L45)
+[commons/types.ts:45](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/commons/types.ts#L45)
 
 ___
 
@@ -419,7 +568,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/commons/types.ts#L39)
+[commons/types.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/commons/types.ts#L39)
 
 ## Variables
 
@@ -429,7 +578,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:19](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L19)
+[src/middleware/helpers/middleware-response-wrapper.ts:19](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L19)
 
 [fake-pev-shopping](#readmemd) / helpers/middleware-response-wrapper
 
@@ -466,7 +615,7 @@ Custom wrapper to secure consistent usage of a few [`Express#res`](https://expre
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:62](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L62)
+[src/middleware/helpers/middleware-response-wrapper.ts:62](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L62)
 
 ___
 
@@ -476,7 +625,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:65](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L65)
+[src/middleware/helpers/middleware-response-wrapper.ts:65](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L65)
 
 ___
 
@@ -486,7 +635,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:56](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L56)
+[src/middleware/helpers/middleware-response-wrapper.ts:56](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L56)
 
 ___
 
@@ -496,7 +645,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L39)
+[src/middleware/helpers/middleware-response-wrapper.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L39)
 
 ## Functions
 
@@ -531,7 +680,7 @@ wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Resource not found!' });
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:83](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L83)
+[src/middleware/helpers/middleware-response-wrapper.ts:83](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L83)
 
 ▸ **wrapRes**<`Payload`, `Status`, `DataKey`\>(`res`, `status`, `data`): `Response`
 
@@ -571,7 +720,7 @@ wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Resource not found!' });
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:87](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/helpers/middleware-response-wrapper.ts#L87)
+[src/middleware/helpers/middleware-response-wrapper.ts:87](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/middleware-response-wrapper.ts#L87)
 
 [fake-pev-shopping](#readmemd) / [routes/api-config](#modulesroutes_api_configmd) / <internal\>
 
@@ -605,7 +754,7 @@ wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Resource not found!' });
 
 #### Defined in
 
-[src/middleware/routes/api-config.ts:22](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-config.ts#L22)
+[src/middleware/routes/api-config.ts:22](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-config.ts#L22)
 
 [fake-pev-shopping](#readmemd) / routes/api-config
 
@@ -629,7 +778,7 @@ wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Resource not found!' });
 
 #### Defined in
 
-[src/middleware/routes/api-config.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-config.ts#L14)
+[src/middleware/routes/api-config.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-config.ts#L14)
 
 [fake-pev-shopping](#readmemd) / [routes/api-orders](#modulesroutes_api_ordersmd) / <internal\>
 
@@ -663,7 +812,7 @@ wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Resource not found!' });
 
 #### Defined in
 
-[src/middleware/routes/api-orders.ts:36](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-orders.ts#L36)
+[src/middleware/routes/api-orders.ts:36](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-orders.ts#L36)
 
 ___
 
@@ -685,7 +834,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-orders.ts:45](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-orders.ts#L45)
+[src/middleware/routes/api-orders.ts:45](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-orders.ts#L45)
 
 [fake-pev-shopping](#readmemd) / routes/api-orders
 
@@ -709,7 +858,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-orders.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-orders.ts#L17)
+[src/middleware/routes/api-orders.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-orders.ts#L17)
 
 [fake-pev-shopping](#readmemd) / routes/api-product-categories
 
@@ -729,7 +878,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-product-categories.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-product-categories.ts#L14)
+[src/middleware/routes/api-product-categories.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-product-categories.ts#L14)
 
 [fake-pev-shopping](#readmemd) / [routes/api-products](#modulesroutes_api_productsmd) / [<internal\>](#modulesroutes_api_products_internal_md) / addReview
 
@@ -762,7 +911,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:250](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L250)
+[src/middleware/routes/api-products.ts:288](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L288)
 
 ___
 
@@ -782,7 +931,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:249](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L249)
+[src/middleware/routes/api-products.ts:287](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L287)
 
 [fake-pev-shopping](#readmemd) / [routes/api-products](#modulesroutes_api_productsmd) / <internal\>
 
@@ -825,7 +974,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:165](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L165)
+[src/middleware/routes/api-products.ts:163](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L163)
 
 ___
 
@@ -847,7 +996,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:181](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L181)
+[src/middleware/routes/api-products.ts:219](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L219)
 
 ___
 
@@ -869,7 +1018,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:284](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L284)
+[src/middleware/routes/api-products.ts:322](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L322)
 
 ___
 
@@ -891,7 +1040,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:145](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L145)
+[src/middleware/routes/api-products.ts:143](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L143)
 
 ___
 
@@ -913,7 +1062,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:82](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L82)
+[src/middleware/routes/api-products.ts:80](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L80)
 
 ___
 
@@ -935,7 +1084,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:257](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L257)
+[src/middleware/routes/api-products.ts:295](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L295)
 
 [fake-pev-shopping](#readmemd) / routes/api-products
 
@@ -959,7 +1108,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-products.ts:18](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-products.ts#L18)
+[src/middleware/routes/api-products.ts:18](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-products.ts#L18)
 
 [fake-pev-shopping](#readmemd) / [routes/api-user-roles](#modulesroutes_api_user_rolesmd) / <internal\>
 
@@ -997,7 +1146,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-user-roles.ts:13](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-user-roles.ts#L13)
+[src/middleware/routes/api-user-roles.ts:13](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-user-roles.ts#L13)
 
 [fake-pev-shopping](#readmemd) / routes/api-user-roles
 
@@ -1021,7 +1170,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-user-roles.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-user-roles.ts#L16)
+[src/middleware/routes/api-user-roles.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-user-roles.ts#L16)
 
 [fake-pev-shopping](#readmemd) / [routes/api-users](#modulesroutes_api_usersmd) / <internal\>
 
@@ -1030,6 +1179,10 @@ ___
 [routes/api-users](#modulesroutes_api_usersmd).<internal>
 
 ## Table of contents
+
+### Interfaces
+
+- [IProduct](#interfacesroutes_api_users_internal_iproductmd)
 
 ### Type Aliases
 
@@ -1063,7 +1216,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_user.ts:242](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_user.ts#L242)
+[src/database/models/_user.ts:242](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_user.ts#L242)
 
 ## Functions
 
@@ -1085,7 +1238,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:519](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L519)
+[src/middleware/routes/api-users.ts:519](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L519)
 
 ___
 
@@ -1107,7 +1260,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:368](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L368)
+[src/middleware/routes/api-users.ts:368](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L368)
 
 ___
 
@@ -1129,7 +1282,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:266](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L266)
+[src/middleware/routes/api-users.ts:266](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L266)
 
 ___
 
@@ -1151,13 +1304,13 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:610](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L610)
+[src/middleware/routes/api-users.ts:610](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L610)
 
 ___
 
 ### getObservedProducts
 
-▸ **getObservedProducts**(`req`, `res`, `next`): `Promise`<``null`` \| `void` \| `any`[] \| `Response`<`any`, `Record`<`string`, `any`\>\> \| `IProduct` \| `IUser` \| `IUserRole` \| `PaginateResult`<`IProduct` \| `IUser` \| `IUserRole`\>\>
+▸ **getObservedProducts**(`req`, `res`, `next`): `Promise`<``null`` \| `void` \| `any`[] \| `Response`<`any`, `Record`<`string`, `any`\>\> \| [`IProduct`](#interfacesroutes_api_users_internal_iproductmd) \| `IUser` \| `IUserRole` \| `PaginateResult`<[`IProduct`](#interfacesroutes_api_users_internal_iproductmd) \| `IUser` \| `IUserRole`\>\>
 
 #### Parameters
 
@@ -1169,11 +1322,11 @@ ___
 
 #### Returns
 
-`Promise`<``null`` \| `void` \| `any`[] \| `Response`<`any`, `Record`<`string`, `any`\>\> \| `IProduct` \| `IUser` \| `IUserRole` \| `PaginateResult`<`IProduct` \| `IUser` \| `IUserRole`\>\>
+`Promise`<``null`` \| `void` \| `any`[] \| `Response`<`any`, `Record`<`string`, `any`\>\> \| [`IProduct`](#interfacesroutes_api_users_internal_iproductmd) \| `IUser` \| `IUserRole` \| `PaginateResult`<[`IProduct`](#interfacesroutes_api_users_internal_iproductmd) \| `IUser` \| `IUserRole`\>\>
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:583](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L583)
+[src/middleware/routes/api-users.ts:583](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L583)
 
 ___
 
@@ -1195,7 +1348,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:493](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L493)
+[src/middleware/routes/api-users.ts:493](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L493)
 
 ___
 
@@ -1217,7 +1370,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:325](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L325)
+[src/middleware/routes/api-users.ts:325](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L325)
 
 ___
 
@@ -1239,7 +1392,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:455](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L455)
+[src/middleware/routes/api-users.ts:455](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L455)
 
 ___
 
@@ -1261,7 +1414,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:471](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L471)
+[src/middleware/routes/api-users.ts:471](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L471)
 
 ___
 
@@ -1283,7 +1436,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:233](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L233)
+[src/middleware/routes/api-users.ts:233](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L233)
 
 ___
 
@@ -1305,7 +1458,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:567](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L567)
+[src/middleware/routes/api-users.ts:567](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L567)
 
 ___
 
@@ -1327,7 +1480,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:543](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L543)
+[src/middleware/routes/api-users.ts:543](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L543)
 
 ___
 
@@ -1349,7 +1502,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:293](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L293)
+[src/middleware/routes/api-users.ts:293](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L293)
 
 ___
 
@@ -1371,7 +1524,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:423](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L423)
+[src/middleware/routes/api-users.ts:423](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L423)
 
 ___
 
@@ -1393,7 +1546,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:391](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L391)
+[src/middleware/routes/api-users.ts:391](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L391)
 
 ___
 
@@ -1415,7 +1568,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:191](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L191)
+[src/middleware/routes/api-users.ts:191](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L191)
 
 ___
 
@@ -1437,7 +1590,7 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:159](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L159)
+[src/middleware/routes/api-users.ts:159](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L159)
 
 [fake-pev-shopping](#readmemd) / routes/api-users
 
@@ -1461,4 +1614,4 @@ ___
 
 #### Defined in
 
-[src/middleware/routes/api-users.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/middleware/routes/api-users.ts#L17)
+[src/middleware/routes/api-users.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/routes/api-users.ts#L17)

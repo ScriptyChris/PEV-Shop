@@ -8,13 +8,14 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVIconButton, PEVLink } from '@frontend/components/utils/pevElements';
+import { PEVIconButton, PEVLink, PEVImage } from '@frontend/components/utils/pevElements';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
 import { AddToCartButton } from '@frontend/components/views/cart';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
 import { ProductComparisonCandidatesToggler } from './productComparisonCandidates';
 import { DeleteProductFeature, NavigateToModifyProduct } from '@frontend/components/shared';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   productName: 'Name',
@@ -35,10 +36,10 @@ const translations = {
   productDeletionFailed: 'Deleting product failed :(',
 };
 
-function ProductCardBasicDesc({ isCompactDescription, compactLabel, dataCy, label, value }) {
+function ProductCardBasicDesc({ isCompactDescription, compactLabel, compactClassName, dataCy, label, value }) {
   return isCompactDescription ? (
     /* TODO: [a11y] presumably use `aria-description` instead, which is only supported from React v18 */
-    <span aria-label={compactLabel} data-cy={dataCy}>
+    <span className={compactClassName} aria-label={compactLabel} data-cy={dataCy}>
       {value}
     </span>
   ) : (
@@ -89,6 +90,7 @@ export default observer(function ProductCard({
   hasCompactBasicDesc = true,
   isCompact = false,
   entryNo,
+  lazyLoadImages,
 }) {
   if (!PRODUCT_CARD_LAYOUT_TYPES[layoutType]) {
     throw TypeError(`layoutType prop '${layoutType}' doesn't match PRODUCT_CARD_LAYOUT_TYPES!`);
@@ -101,7 +103,8 @@ export default observer(function ProductCard({
   const routesGuards = useRoutesGuards(storeService);
   const dataCySuffix = Number.isNaN(entryNo) ? 'unique' : entryNo;
   const [menuBtnRef, setMenuBtnRef] = useState(null);
-  const { name, price, _id } = product;
+  const { isMobileLayout } = useRWDLayout();
+  const { name, price, _id, images } = product;
   const elevation = layoutType === PRODUCT_CARD_LAYOUT_TYPES.COMPACT ? 0 : 1;
 
   const handleClickToggleActionsBarBtns = (shouldShow) => {
@@ -123,19 +126,21 @@ export default observer(function ProductCard({
   ].flat();
   /* eslint-enable react/jsx-key */
 
+  const imageSize = isCompact ? 64 : 100;
   const imageElement = (
-    <>
-      <div className={classNames('product-card__image', { 'product-card__image--is-compact': isCompact })}>
-        TODO: [UI] image should go here
-      </div>
-      {/* TODO: [UI] <img src={image} alt={`${translations.productImage}${name}`} className="product-card__image" />*/}
-    </>
+    <PEVImage
+      image={images[0]}
+      className={classNames('product-card__image', { 'product-card__image--is-compact': isCompact })}
+      {...{ width: imageSize, height: imageSize }}
+      loading={lazyLoadImages ? 'lazy' : 'eager'}
+    />
   );
 
   const nameElement = (
     <ProductCardBasicDesc
       isCompactDescription={hasCompactBasicDesc}
       compactLabel={translations.descriptiveProductName}
+      compactClassName="product-card__name"
       dataCy="label:product-card__name"
       label={translations.productName}
       value={name}

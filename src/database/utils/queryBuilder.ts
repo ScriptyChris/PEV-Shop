@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import getLogger from '@commons/logger';
 import { FILTER_RANGE_SEPARATOR, ARRAY_FORMAT_SEPARATOR } from '@root/commons/consts';
-import { productPriceRangeValidator, productSortingValidator } from '@commons/filterValidators';
+import { productPriceRangeValidator, productSortingValidator } from '@root/commons/validators';
 
 type TReqQuery = Request['query'];
 
@@ -16,8 +16,11 @@ const getSearchByNameConfig = (reqQuery: TReqQuery) => {
     );
   }
 
-  const nameQuery = new RegExp(reqQuery.name as string, 'i');
-  const projection = reqQuery.getOnlyEssentialData === 'true' ? { name: true, url: true, price: true } : {};
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
+  const escapedProductName = (reqQuery.name as string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const nameQuery = new RegExp(escapedProductName, 'i');
+  const projection =
+    reqQuery.getOnlyEssentialData === 'true' ? { name: true, url: true, price: true, images: true } : {};
 
   return { query: { name: nameQuery }, projection };
 };

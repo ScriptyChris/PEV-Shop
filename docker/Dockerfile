@@ -7,6 +7,7 @@ RUN npm ci
 
 COPY ./src ./src
 COPY ./commons ./commons
+COPY ./public ./public
 COPY \
     .env \
     .babelrc \

@@ -10,6 +10,155 @@ fake-pev-shopping
 - [models](#modulesmodelsmd)
 - [populate/populate](#modulespopulate_populatemd)
 
+[fake-pev-shopping](#readmemd) / [models](#modulesmodelsmd) / IProduct
+
+# Interface: IProduct
+
+[models](#modulesmodelsmd).IProduct
+
+## Hierarchy
+
+- `Document`
+
+  ↳ **`IProduct`**
+
+## Table of contents
+
+### Properties
+
+- [category](#category)
+- [images](#images)
+- [name](#name)
+- [price](#price)
+- [relatedProductsNames](#relatedproductsnames)
+- [reviews](#reviews)
+- [shortDescription](#shortdescription)
+- [technicalSpecs](#technicalspecs)
+- [url](#url)
+
+### Methods
+
+- [prepareUrlField](#prepareurlfield)
+- [transformImagesToImagePaths](#transformimagestoimagepaths)
+
+## Properties
+
+### category
+
+• **category**: `string`
+
+#### Defined in
+
+[src/database/models/_product.ts:364](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L364)
+
+___
+
+### images
+
+• **images**: { `name`: `string` ; `src`: `string`  }[]
+
+#### Defined in
+
+[src/database/models/_product.ts:372](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L372)
+
+___
+
+### name
+
+• **name**: `string`
+
+#### Defined in
+
+[src/database/models/_product.ts:362](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L362)
+
+___
+
+### price
+
+• **price**: `number`
+
+#### Defined in
+
+[src/database/models/_product.ts:365](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L365)
+
+___
+
+### relatedProductsNames
+
+• **relatedProductsNames**: `string`[]
+
+#### Defined in
+
+[src/database/models/_product.ts:373](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L373)
+
+___
+
+### reviews
+
+• **reviews**: `IReviews`
+
+#### Defined in
+
+[src/database/models/_product.ts:374](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L374)
+
+___
+
+### shortDescription
+
+• **shortDescription**: `string`[]
+
+#### Defined in
+
+[src/database/models/_product.ts:366](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L366)
+
+___
+
+### technicalSpecs
+
+• **technicalSpecs**: { `data`: `unknown` ; `defaultUnit`: `string` ; `heading`: `string`  }[]
+
+#### Defined in
+
+[src/database/models/_product.ts:367](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L367)
+
+___
+
+### url
+
+• **url**: `string`
+
+#### Defined in
+
+[src/database/models/_product.ts:363](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L363)
+
+## Methods
+
+### prepareUrlField
+
+▸ **prepareUrlField**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/database/models/_product.ts:376](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L376)
+
+___
+
+### transformImagesToImagePaths
+
+▸ **transformImagesToImagePaths**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/database/models/_product.ts:377](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L377)
+
 [fake-pev-shopping](#readmemd) / [api](#modulesapimd) / <internal\>
 
 # Namespace: <internal\>
@@ -35,7 +184,7 @@ fake-pev-shopping
 
 #### Defined in
 
-[src/database/utils/paginateItemsFromDB.ts:26](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/utils/paginateItemsFromDB.ts#L26)
+[src/database/utils/paginateItemsFromDB.ts:26](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/utils/paginateItemsFromDB.ts#L26)
 
 ___
 
@@ -52,13 +201,13 @@ ___
 
 #### Defined in
 
-[src/database/utils/paginateItemsFromDB.ts:25](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/utils/paginateItemsFromDB.ts#L25)
+[src/database/utils/paginateItemsFromDB.ts:25](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/utils/paginateItemsFromDB.ts#L25)
 
 ## Functions
 
 ### getPaginatedItems
 
-▸ **getPaginatedItems**(`__namedParameters`, `itemQuery`, `projection`): `Promise`<`PaginateResult`<`IProduct` \| `IUser` \| `IUserRole`\>\>
+▸ **getPaginatedItems**(`__namedParameters`, `itemQuery`, `projection`): `Promise`<`PaginateResult`<[`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`\>\>
 
 #### Parameters
 
@@ -68,16 +217,16 @@ ___
 | `__namedParameters.Model` | [`TPaginateModel`](#tpaginatemodel) |
 | `__namedParameters.pagination` | [`TPaginationConfig`](#tpaginationconfig) |
 | `__namedParameters.sort?` | [`TSort`](#tsort) |
-| `itemQuery` | `undefined` \| `MongooseFilterQuery`<`Pick`<`IProduct` \| `IUser` \| `IUserRole`, ``"_id"``\>\> |
+| `itemQuery` | `undefined` \| `MongooseFilterQuery`<`Pick`<[`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`, ``"_id"``\>\> |
 | `projection` | `any` |
 
 #### Returns
 
-`Promise`<`PaginateResult`<`IProduct` \| `IUser` \| `IUserRole`\>\>
+`Promise`<`PaginateResult`<[`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`\>\>
 
 #### Defined in
 
-[src/database/utils/paginateItemsFromDB.ts:5](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/utils/paginateItemsFromDB.ts#L5)
+[src/database/utils/paginateItemsFromDB.ts:5](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/utils/paginateItemsFromDB.ts#L5)
 
 [fake-pev-shopping](#readmemd) / api
 
@@ -117,7 +266,7 @@ Facade over database CRUD operations.
 
 #### Defined in
 
-[src/database/api.ts:150](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/api.ts#L150)
+[src/database/api.ts:150](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/api.ts#L150)
 
 ___
 
@@ -129,7 +278,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `T` | extends `IProduct` \| `IUser` \| `IUserRole` |
+| `T` | extends [`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole` |
 
 #### Parameters
 
@@ -151,13 +300,13 @@ ___
 
 #### Defined in
 
-[src/database/api.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/api.ts#L38)
+[src/database/api.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/api.ts#L38)
 
 ___
 
 ### saveToDB
 
-▸ **saveToDB**(`modelName`, `itemData`): `Promise`<`IProduct` \| `IUser` \| `IUserRole`\>
+▸ **saveToDB**(`modelName`, `itemData`): `Promise`<[`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`\>
 
 #### Parameters
 
@@ -168,41 +317,57 @@ ___
 
 #### Returns
 
-`Promise`<`IProduct` \| `IUser` \| `IUserRole`\>
+`Promise`<[`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`\>
 
 #### Defined in
 
-[src/database/api.ts:25](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/api.ts#L25)
+[src/database/api.ts:25](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/api.ts#L25)
 
 ___
 
 ### updateOneModelInDB
 
-▸ **updateOneModelInDB**(`modelName`, `itemQuery`, `updateData`): `Promise`<``null`` \| `IProduct` \| `IUser` \| `IUserRole`\>
+▸ **updateOneModelInDB**(`modelName`, `itemQuery`, `updateData`): `Promise`<``null`` \| [`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `modelName` | ``"Product"`` \| ``"User"`` \| ``"User_Role"`` |
-| `itemQuery` | `string` \| `MongooseFilterQuery`<`Pick`<`IProduct`, ``"technicalSpecs"`` \| ``"_id"`` \| ``"name"`` \| ``"url"`` \| ``"category"`` \| ``"price"`` \| ``"shortDescription"`` \| ``"images"`` \| ``"relatedProductsNames"`` \| ``"reviews"`` \| ``"prepareUrlFieldBasedOnNameField"``\>\> \| `MongooseFilterQuery`<`Pick`<`IUser`, ``"_id"`` \| ``"login"`` \| ``"email"`` \| ``"observedProductsIDs"`` \| ``"password"`` \| ``"isConfirmed"`` \| ``"tokens"`` \| ``"accountType"`` \| ``"generateAuthToken"`` \| ``"matchPassword"`` \| ``"setSingleToken"`` \| ``"deleteSingleToken"`` \| ``"confirmUser"`` \| ``"addProductToObserved"`` \| ``"removeProductFromObserved"`` \| ``"removeAllProductsFromObserved"``\>\> \| `MongooseFilterQuery`<`Pick`<`IUserRole`, ``"_id"`` \| ``"roleName"`` \| ``"owners"``\>\> |
+| `itemQuery` | `string` \| `MongooseFilterQuery`<`Pick`<[`IProduct`](#interfacesmodelsiproductmd), ``"technicalSpecs"`` \| ``"_id"`` \| ``"name"`` \| ``"url"`` \| ``"category"`` \| ``"price"`` \| ``"shortDescription"`` \| ``"images"`` \| ``"relatedProductsNames"`` \| ``"reviews"`` \| ``"prepareUrlField"`` \| ``"transformImagesToImagePaths"``\>\> \| `MongooseFilterQuery`<`Pick`<`IUser`, ``"_id"`` \| ``"login"`` \| ``"email"`` \| ``"observedProductsIDs"`` \| ``"password"`` \| ``"isConfirmed"`` \| ``"tokens"`` \| ``"accountType"`` \| ``"generateAuthToken"`` \| ``"matchPassword"`` \| ``"setSingleToken"`` \| ``"deleteSingleToken"`` \| ``"confirmUser"`` \| ``"addProductToObserved"`` \| ``"removeProductFromObserved"`` \| ``"removeAllProductsFromObserved"``\>\> \| `MongooseFilterQuery`<`Pick`<`IUserRole`, ``"_id"`` \| ``"roleName"`` \| ``"owners"``\>\> |
 | `updateData` | `Object` |
 | `updateData.action` | `string` |
 | `updateData.data` | `unknown` |
 
 #### Returns
 
-`Promise`<``null`` \| `IProduct` \| `IUser` \| `IUserRole`\>
+`Promise`<``null`` \| [`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`\>
 
 #### Defined in
 
-[src/database/api.ts:110](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/api.ts#L110)
+[src/database/api.ts:110](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/api.ts#L110)
 
 [fake-pev-shopping](#readmemd) / [models](#modulesmodelsmd) / <internal\>
 
 # Namespace: <internal\>
 
 [models](#modulesmodelsmd).<internal>
+
+## Table of contents
+
+### Type Aliases
+
+- [TFiles](#tfiles)
+
+## Type Aliases
+
+### TFiles
+
+Ƭ **TFiles**: `Parameters`<`NonNullable`<`Parameters`<`ReturnType`<typeof `formidable`\>[``"parse"``]\>[``1``]\>\>[``2``]
+
+#### Defined in
+
+[src/middleware/helpers/form-data-handler.ts:7](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/middleware/helpers/form-data-handler.ts#L7)
 
 [fake-pev-shopping](#readmemd) / models
 
@@ -215,6 +380,10 @@ Groups and re-exports lower level types and values related to working with datab
 ### Namespaces
 
 - [&lt;internal\&gt;](#modulesmodels_internal_md)
+
+### Interfaces
+
+- [IProduct](#interfacesmodelsiproductmd)
 
 ### Type Aliases
 
@@ -253,17 +422,17 @@ Groups and re-exports lower level types and values related to working with datab
 
 #### Defined in
 
-[src/database/models/__core-and-commons.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/__core-and-commons.ts#L17)
+[src/database/models/__core-and-commons.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/__core-and-commons.ts#L17)
 
 ___
 
 ### TDocuments
 
-Ƭ **TDocuments**: `IProduct` \| `IUser` \| `IUserRole`
+Ƭ **TDocuments**: [`IProduct`](#interfacesmodelsiproductmd) \| `IUser` \| `IUserRole`
 
 #### Defined in
 
-[src/database/models/index.ts:18](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/index.ts#L18)
+[src/database/models/index.ts:18](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/index.ts#L18)
 
 ___
 
@@ -273,27 +442,27 @@ ___
 
 #### Defined in
 
-[src/database/models/_product.ts:155](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_product.ts#L155)
+[src/database/models/_product.ts:319](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L319)
 
 ___
 
 ### TProductPublic
 
-Ƭ **TProductPublic**: `Pick`<`IProduct`, ``"name"`` \| ``"url"`` \| ``"category"`` \| ``"price"`` \| ``"shortDescription"`` \| ``"technicalSpecs"`` \| ``"relatedProductsNames"``\>
+Ƭ **TProductPublic**: `Pick`<[`IProduct`](#interfacesmodelsiproductmd), ``"name"`` \| ``"url"`` \| ``"category"`` \| ``"price"`` \| ``"shortDescription"`` \| ``"technicalSpecs"`` \| ``"images"`` \| ``"relatedProductsNames"``\>
 
 #### Defined in
 
-[src/database/models/_product.ts:157](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_product.ts#L157)
+[src/database/models/_product.ts:321](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L321)
 
 ___
 
 ### TProductToPopulate
 
-Ƭ **TProductToPopulate**: `Exclude`<`IProduct`, ``"prepareUrlFieldBasedOnNameField"``\>
+Ƭ **TProductToPopulate**: `Exclude`<[`IProduct`](#interfacesmodelsiproductmd), ``"prepareUrlField"`` \| ``"transformImagesToImagePaths"``\>
 
 #### Defined in
 
-[src/database/models/_product.ts:162](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_product.ts#L162)
+[src/database/models/_product.ts:326](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L326)
 
 ___
 
@@ -307,7 +476,7 @@ ___
 
 #### Defined in
 
-[src/database/models/index.ts:19](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/index.ts#L19)
+[src/database/models/index.ts:19](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/index.ts#L19)
 
 ___
 
@@ -317,7 +486,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_user.ts:240](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_user.ts#L240)
+[src/database/models/_user.ts:240](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_user.ts#L240)
 
 ___
 
@@ -327,7 +496,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_user.ts:242](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_user.ts#L242)
+[src/database/models/_user.ts:242](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_user.ts#L242)
 
 ___
 
@@ -337,7 +506,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_user.ts:285](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_user.ts#L285)
+[src/database/models/_user.ts:285](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_user.ts#L285)
 
 ___
 
@@ -347,7 +516,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_userRole.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_userRole.ts#L39)
+[src/database/models/_userRole.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_userRole.ts#L39)
 
 ___
 
@@ -357,7 +526,7 @@ ___
 
 #### Defined in
 
-[src/database/models/__core-and-commons.ts:24](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/__core-and-commons.ts#L24)
+[src/database/models/__core-and-commons.ts:24](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/__core-and-commons.ts#L24)
 
 ___
 
@@ -367,7 +536,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_userRole.ts:49](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_userRole.ts#L49)
+[src/database/models/_userRole.ts:49](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_userRole.ts#L49)
 
 ___
 
@@ -377,7 +546,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_user.ts:247](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_user.ts#L247)
+[src/database/models/_user.ts:247](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_user.ts#L247)
 
 ## Variables
 
@@ -387,17 +556,17 @@ ___
 
 #### Defined in
 
-[src/database/models/__core-and-commons.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/__core-and-commons.ts#L12)
+[src/database/models/__core-and-commons.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/__core-and-commons.ts#L12)
 
 ___
 
 ### ProductModel
 
-• `Const` **ProductModel**: `Model`<`IProduct`, {}\>
+• `Const` **ProductModel**: `IProductModel`
 
 #### Defined in
 
-[src/database/models/_product.ts:154](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_product.ts#L154)
+[src/database/models/_product.ts:318](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_product.ts#L318)
 
 ___
 
@@ -407,7 +576,7 @@ ___
 
 #### Defined in
 
-[src/database/models/__core-and-commons.ts:20](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/__core-and-commons.ts#L20)
+[src/database/models/__core-and-commons.ts:20](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/__core-and-commons.ts#L20)
 
 ___
 
@@ -417,7 +586,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_user.ts:239](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_user.ts#L239)
+[src/database/models/_user.ts:239](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_user.ts#L239)
 
 ___
 
@@ -427,13 +596,13 @@ ___
 
 #### Defined in
 
-[src/database/models/_userRole.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/_userRole.ts#L38)
+[src/database/models/_userRole.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/_userRole.ts#L38)
 
 ## Functions
 
 ### getModel
 
-▸ **getModel**<`T`\>(`modelName`): { `Product`: `Model`<`IProduct`, {}\> = ProductModel; `User`: `IUserModel` = UserModel; `User_Role`: `Model`<`IUserRole`, {}\> = UserRoleModel }[`T`]
+▸ **getModel**<`T`\>(`modelName`): { `Product`: `IProductModel` = ProductModel; `User`: `IUserModel` = UserModel; `User_Role`: `Model`<`IUserRole`, {}\> = UserRoleModel }[`T`]
 
 #### Type parameters
 
@@ -449,11 +618,11 @@ ___
 
 #### Returns
 
-{ `Product`: `Model`<`IProduct`, {}\> = ProductModel; `User`: `IUserModel` = UserModel; `User_Role`: `Model`<`IUserRole`, {}\> = UserRoleModel }[`T`]
+{ `Product`: `IProductModel` = ProductModel; `User`: `IUserModel` = UserModel; `User_Role`: `Model`<`IUserRole`, {}\> = UserRoleModel }[`T`]
 
 #### Defined in
 
-[src/database/models/index.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/index.ts#L17)
+[src/database/models/index.ts:17](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/index.ts#L17)
 
 ___
 
@@ -473,7 +642,7 @@ ___
 
 #### Defined in
 
-[src/database/models/__core-and-commons.ts:8](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/models/__core-and-commons.ts#L8)
+[src/database/models/__core-and-commons.ts:8](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/models/__core-and-commons.ts#L8)
 
 [fake-pev-shopping](#readmemd) / populate/populate
 
@@ -519,13 +688,14 @@ Maps default params, which are applied when regarding individual params are not 
 | Name | Type |
 | :------ | :------ |
 | `cleanAllBefore` | ``"true"`` |
+| `product_images__FolderPath` | ``"./initialData/product-images"`` |
 | `products__InputPath` | ``"./initialData/products.json"`` |
 | `user_roles__InputPath` | ``"./initialData/user_roles.json"`` |
 | `users__InputPath` | ``"./initialData/users.json"`` |
 
 #### Defined in
 
-[src/database/populate/populate.ts:48](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/populate/populate.ts#L48)
+[src/database/populate/populate.ts:49](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/populate/populate.ts#L49)
 
 ___
 
@@ -547,10 +717,11 @@ Maps supported params passed via CLI.
 | `JSON_FILE_PATH.PRODUCTS` | ``"products__InputPath"`` |
 | `JSON_FILE_PATH.USERS` | ``"users__InputPath"`` |
 | `JSON_FILE_PATH.USER_ROLES` | ``"user_roles__InputPath"`` |
+| `PRODUCT_IMAGES` | ``"product_images__FolderPath"`` |
 
 #### Defined in
 
-[src/database/populate/populate.ts:35](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/populate/populate.ts#L35)
+[src/database/populate/populate.ts:35](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/populate/populate.ts#L35)
 
 ## Functions
 
@@ -572,4 +743,4 @@ Executes database population. May be called from other module or it's automatica
 
 #### Defined in
 
-[src/database/populate/populate.ts:117](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/9a4d1fa/src/database/populate/populate.ts#L117)
+[src/database/populate/populate.ts:128](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/c34ba4a/src/database/populate/populate.ts#L128)

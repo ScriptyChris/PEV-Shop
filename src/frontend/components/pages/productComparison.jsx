@@ -8,7 +8,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
-import { PEVHeading } from '@frontend/components/utils/pevElements';
+import { PEVHeading, PEVImage } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import { ProductSpecificDetail, getProductDetailsHeaders } from '@frontend/components/views/productDetails';
 import Scroller from '@frontend/components/utils/scroller';
@@ -42,6 +42,7 @@ export default function Compare() {
   const getTableHeadContent = (headRowRefGetter) =>
     function TableHeadContent(detailHeader, headerIndex) {
       return (
+        // TODO: [UI] on mobile, shift table headers to be interleaved (instead of occupy single column) between data/body
         <TableRow
           className={getClassForNameHeader(headerIndex)}
           ref={headRowRefGetter}
@@ -68,14 +69,27 @@ export default function Compare() {
           key={`body-row-${headerIndex}`}
         >
           {comparisonData.comparableProductsData.map((productData, dataIndex) => {
+            const extrasProp = {
+              className: 'product-comparison__cell-interior',
+            };
+            const isNameHeader = detailHeader === 'name';
+
+            if (isNameHeader) {
+              extrasProp.optionalImage = <PEVImage image={productData.images[0]} width={200} />;
+            }
+
             const preparedProductDetail = (
-              <ProductSpecificDetail detailName={detailHeader} detailValue={productData[detailHeader]} />
+              <ProductSpecificDetail
+                detailName={detailHeader}
+                detailValue={productData[detailHeader]}
+                extras={extrasProp}
+              />
             );
 
             return (
               // TODO: [UX] hovering over certain spec could highlight regarding specs in other compared products
               <TableCell className="product-comparison__cell" component="div" role="cell" key={`cell-${dataIndex}`}>
-                {detailHeader === 'name' ? (
+                {isNameHeader ? (
                   <ProductCardLink
                     productData={toJS(storeService.productComparisonState[dataIndex], { recurseEverything: true })}
                   >

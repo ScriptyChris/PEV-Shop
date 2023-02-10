@@ -82,7 +82,7 @@ const NavMenu = observer(({ logOutUser, closeMenu = () => void 0 }) => {
               aria-label={translations.getAccountLinkLabel(storeService.userAccountState.login)}
             >
               <AccountCircleIcon fontSize="inherit" />
-              {storeService.userAccountState.login}
+              <span className="nav-menu__links-account-login">{storeService.userAccountState.login}</span>
             </PEVLink>
           ) : (
             <PEVLink to={ROUTES.REGISTER} onClick={handleLinkClick} data-cy={`link:${ROUTES.REGISTER}`}>

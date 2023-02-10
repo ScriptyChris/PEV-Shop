@@ -1,6 +1,7 @@
 import { findAssociatedSrcModulePath, mockAndRequireModule, mockAndRequireDBModelsModules } from '@unitTests/utils';
 
 mockAndRequireDBModelsModules();
+mockAndRequireModule('src/middleware/helpers/form-data-handler');
 
 import { HTTP_STATUS_CODE } from '@commons/types';
 import { getNextFnMock, getResMock, TJestMock } from '@unitTests/inline-mocks';
@@ -257,6 +258,7 @@ describe('#api-products', () => {
     });
   });
 
+  // TODO: [unit tests] cover image files upload
   describe('addProduct(..)', () => {
     describe('when succeeded', () => {
       const getReqMock = () => ({
@@ -276,7 +278,10 @@ describe('#api-products', () => {
 
         await apiProductsRouter._addProduct(reqMock, getResMock());
 
-        expect(saveToDBMock).toHaveBeenCalledWith(COLLECTION_NAMES.Product, reqMock.body);
+        expect(saveToDBMock).toHaveBeenCalledWith(COLLECTION_NAMES.Product, {
+          images: [],
+          name: 'fields plainData mock',
+        });
       });
 
       it('should call res.status(..).json(..) with correct params', async () => {

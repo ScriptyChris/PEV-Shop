@@ -1,6 +1,7 @@
 .app-root {
+    --main-row-calc: calc(100vh - 4rem);
     display: grid;
-    grid-template-rows: 3.5rem max-content 4rem;
+    grid-template-rows: 3.5rem minmax(var(--main-row-calc), max-content) minmax(4rem, auto);
     grid-template-areas:
         "header"
         "main"
@@ -32,11 +33,35 @@
   
 .footer {
     grid-area: footer;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    // TODO: [UI] use MUI color
+    background: #3f51b5;
+    color: white;
+    margin-top: 1rem;
+    
+    & :first-child {
+      margin-top: 0.5rem;
+    }
+
+    & :last-child {
+      margin-bottom: 0.5rem;
+    }
+    
+    p {
+      font-size: small;
+    }
+
+    hr {
+      width: 50%;
+      background-color: currentColor;
+    }
 }
 
 @include createMediaQuery(min-width, tablet) {
   .app-root {
-    grid-template-rows: 4.5rem max-content 4rem;
+    grid-template-rows: 4.5rem minmax(var(--main-row-calc), max-content) 4rem;
   }
 
   .main {
@@ -51,6 +76,18 @@
 
   .header__main-heading {
     flex-grow: 0;
+  }
+
+  .footer {
+    gap: 1rem;
+
+    & :first-child, & :last-child {
+      margin-block: 0;
+    }
+
+    hr {
+      width: 1px;
+    }
   }
 }
 

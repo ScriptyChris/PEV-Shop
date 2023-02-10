@@ -197,7 +197,8 @@ describe('product-comparing', () => {
             .invoke('text')
             .then((productDetailName) => {
               const $candidatesListProductLabelText = $candidateListItemRemoveBtn
-                .prev(makeCyDataSelector('label:product-comparison-candidates__list-item-name'))
+                .prev(makeCyDataSelector('link:product-card__link'))
+                .children(makeCyDataSelector('label:product-comparison-candidates__list-item-name'))
                 .text();
 
               expect($candidatesListProductLabelText).to.equal(productDetailName);

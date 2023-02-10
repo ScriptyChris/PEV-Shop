@@ -13,7 +13,7 @@ require(`${rootRelativePath}/commons/moduleAliasesResolvers`).backend();
 import Express, { Request, Response, NextFunction, Application, json } from 'express';
 import getLogger from '@commons/logger';
 import glob from 'glob';
-import { resolve, sep } from 'path';
+import { resolve, sep, join } from 'path';
 import { existsSync } from 'fs';
 import apiConfig from './routes/api-config';
 import apiProducts from './routes/api-products';
@@ -25,26 +25,18 @@ import { HTTP_STATUS_CODE } from '@commons/types';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getPopulationState } from '@database/connector';
 import { dotEnv } from '@commons/dotEnvLoader';
+import { possiblyReEncodeURI } from '@commons/uriReEncoder';
+import { IMAGES_ROOT_PATH } from '@root/commons/consts';
 
 const logger = getLogger(module.filename);
-const databaseDirname = 'E:/Projects/eWheels-Custom-App-Scraped-Data/database';
 
 // TODO: [SECURITY] https://expressjs.com/en/advanced/best-practice-security.html
 const middleware = (app: Application): void => {
+  const API_MIDDLEWARES = [apiConfig, apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders];
+
   app.use(json());
-  app.use(apiConfig, apiProducts, apiProductCategories, apiUsers, apiUserRoles, apiOrders);
-
-  app.get('/images/*', (req: Request, res: Response) => {
-    const imagePath = req.url.split('/').pop() as string;
-
-    getImage(imagePath)
-      .then((image) => res.sendFile(image))
-      .catch((error) => {
-        logger.log('Image searching error: ', error, ' /imagePath: ', imagePath);
-
-        return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND).end();
-      });
-  });
+  app.use(API_MIDDLEWARES);
+  app.get(...imageHandler());
 };
 
 if (process.env.BACKEND_ONLY === 'true') {
@@ -67,13 +59,16 @@ function wrappedMiddleware(): void {
 
   // TODO: [REFACTOR] this probably should detect what resource the URL wants and maybe not always return index.html
   app.use('/', (req: Request, res: Response) => {
+    // TODO: inspect what's /sockjs-node/ path
+    if (req.url.startsWith('/sockjs-node/')) {
+      return res.sendStatus(HTTP_STATUS_CODE.NO_CONTENT);
+    }
+
     logger.log('global (404?) req.url:', req.url);
 
     return res.sendFile(`${frontendPath}/index.html`);
   });
-  app.listen(dotEnv.APP_PORT, () => {
-    logger.log(`Server is listening on port ${dotEnv.APP_PORT}`);
-  });
+  app.listen(dotEnv.APP_PORT, () => logger.log(`Server is listening on port ${dotEnv.APP_PORT}`));
 }
 
 function getDatabaseReadinessHandler() {
@@ -108,29 +103,47 @@ function getFrontendPath(): string {
   return resolve(__dirname, `../../${relativeDist}src/frontend`);
 }
 
-// TODO: change string type to probably ArrayBuffer
-const getImage = (() => {
-  const imageCache: { [prop: string]: string } = {};
+function imageHandler() {
+  // TODO: change string type to probably ArrayBuffer
+  const getImage = (() => {
+    const imageCache: { [prop: string]: string } = {};
+    const projectRoot = resolve(__dirname, rootRelativePath);
+    const imagesFolder = join(projectRoot, IMAGES_ROOT_PATH);
 
-  return (fileName: string) => {
-    const cachedImage = imageCache[fileName];
+    return async (fileName: string) => {
+      const cachedImage = imageCache[fileName];
 
-    if (!cachedImage) {
-      return findFileRecursively(fileName).then(([image]) => {
-        imageCache[fileName] = image;
+      if (cachedImage) {
+        return cachedImage;
+      }
 
-        return image;
-      });
-    }
+      const [image] = await findFileRecursively(`${imagesFolder}/${fileName}`);
+      imageCache[fileName] = image;
 
-    return Promise.resolve(cachedImage);
-  };
-})();
+      return image;
+    };
+  })();
+
+  return [
+    `/${IMAGES_ROOT_PATH}/*`,
+    (req: Request, res: Response) => {
+      const imagePath = globalThis.decodeURIComponent(possiblyReEncodeURI(req.url.split('/').slice(3).join('/')));
+
+      getImage(imagePath)
+        .then((image) => res.sendFile(image))
+        .catch((error) => {
+          logger.log('Image searching error: ', error, ' /imagePath: ', imagePath);
+
+          return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND).end();
+        });
+    },
+  ] as const;
+}
 
 function findFileRecursively(fileName: string) {
   return new Promise<string[]>((resolve, reject) => {
     // TODO: wrap it with util.promisify and handle error case typing
-    glob(`${databaseDirname}/web-scraped/images/**/${fileName}`, (err: Error | null, files: string[]) => {
+    glob(fileName, (err: Error | null, files: string[]) => {
       if (err || !files.length) {
         reject(err || 'No files found!');
         return;
