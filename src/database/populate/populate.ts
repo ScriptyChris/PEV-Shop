@@ -222,8 +222,8 @@ async function cleanDatabase() {
     IMAGES__PRODUCTS_ROOT_PATH
   );
   const lsRes = execSync(
-    'echo "listing public/ folder" && ls -la public && ls -la public/images && ls -la public/images/products',
-    { /* stdio: 'inherit', */ encoding: 'utf-8' }
+    'echo "listing current and public/ folders:::" && ls -la && ls -la public && ls -la public/images && ls -la public/images/products',
+    { stdio: 'inherit', encoding: 'utf-8' }
   );
   console.log('===(cleanDatabase) lsRes:', lsRes);
 
