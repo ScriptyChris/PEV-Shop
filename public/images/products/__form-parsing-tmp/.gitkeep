@@ -1,0 +1,2 @@
+# This folder is used to keep temporary image files, parsed by `formidable` library, which are then either removed 
+# (if initiating process gets aborted) or eventually moved to their target directory.

@@ -7,6 +7,7 @@ RUN npm ci
 
 COPY ./src ./src
 COPY ./commons ./commons
+COPY ./public ./public
 COPY \
     .env \
     .babelrc \
@@ -16,10 +17,10 @@ COPY \
     generate-grouped-api-docs.js \
     webpack.config.js \
     ./
-RUN mkdir --parents public/images/products/__form-parsing-tmp
+#RUN mkdir --parents public/images/products/__form-parsing-tmp
 
 #### debugging
-RUN echo "[pre-build] listing 'public/' folder recursively below..." && \
+RUN echo "===[Docker pre-build] listing 'public/' folder recursively below..." && \
     ls -la public && \
     ls -la public/images && \
     ls -la public/images/products
@@ -28,7 +29,7 @@ RUN echo "[pre-build] listing 'public/' folder recursively below..." && \
 RUN npm run build
 
 #### debugging
-RUN echo "[post-build] listing 'public/' folder recursively below..." && \
+RUN echo "===[Docker post-build] listing 'public/' folder recursively below..." && \
     ls -la public && \
     ls -la public/images && \
     ls -la public/images/products
