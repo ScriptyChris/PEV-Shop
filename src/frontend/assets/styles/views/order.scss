@@ -14,6 +14,12 @@
 
     &__form-submit-btn {
         align-self: center;
+        background: $greenColor;
+        color: $whiteColor;
+
+        &:hover {
+            background: $darkGreenColor;
+        }
     }
 
     &__basic-receiver-info,
@@ -113,15 +119,17 @@
         height: 5rem;
         border: 1px solid;
         border-radius: 0.5rem;
-        // TODO: [UI] set proper MUI color
-        --chosen-payment-color: #3f51b5;
 
         &--checked {
-            background: var(--chosen-payment-color);
-            color: white;
+            background: $blueColor;
+            color: $whiteColor;
+
+            .MuiIconButton-label {
+                color: $whiteColor;
+            }
 
             svg {
-                fill: white;
+                fill: $whiteColor;
             }
         }
     }
@@ -148,7 +156,7 @@
 }
 
 .summary {
-    border: 2px solid #3f51b5;
+    border: 2px solid $blueColor;
 
     &__heading {
         align-self: start;

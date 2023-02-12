@@ -82,7 +82,16 @@
 
   &__save-btn {
     margin-inline: auto;
-    width: 30%;
+    background: $greenColor;
+    color: $whiteColor;
+
+    &:hover {
+      background: $darkGreenColor;
+    }
+
+    .MuiButton-label {
+      gap: 0.5rem;
+    }
   }
 }
 

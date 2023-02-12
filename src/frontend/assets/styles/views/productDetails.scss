@@ -49,8 +49,7 @@
         display: flex;
         align-items: center;
         margin-block: 1rem;
-        // TODO: [UI] use better (MUI) color
-        border-block: 1px solid lightgrey;
+        border-block: 1px solid $greyColor;
         position: sticky;
         top: 4rem;
         background: white;
@@ -79,8 +78,7 @@
             padding: 0;
 
             &.activated {
-                // TODO: [DX] find better way to take MUI's style
-                background: rgba(0, 0, 0, 0.04);
+                background: $lightGreyColor;
             }
         }
 
@@ -129,17 +127,15 @@
 
 .zoom-container {
     position: fixed;
-    // Overcome MUI navbar `z-index`
+    // override MUI navbar `z-index`
     z-index: 1100;
     inset: 0;
     justify-content: center;
     gap: 0.5rem;
-    // TODO: [UI] use MUI color
-    background:rgba(0, 0, 0, 0.5);
+    background: $transparentGrey;
 
     &__close-btn, &__close-btn:hover {
-        // TODO: [UI] use MUI color
-        background: white;
+        background: $whiteColor;
     }
 
     &__image {
@@ -193,7 +189,7 @@
         padding: 0.75rem 1rem;
     
         &:nth-of-type(2n - 1) {
-            background: lightgrey;
+            background: $greyColor;
         }
     
         dt {
@@ -234,5 +230,14 @@
 
     cite {
         white-space: normal;
+    }
+
+    &__submit-btn {
+        background: $greenColor;
+        color: $whiteColor;
+
+        &:hover {
+            background: $darkGreenColor;
+        }
     }
 }

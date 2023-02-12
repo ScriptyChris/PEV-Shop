@@ -12,12 +12,42 @@
     width: max-content;
   }
 
-  &__table {}
+  &__table {
+    thead {
+      border-bottom: 2px solid $darkGreyColor;
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+    tfoot {
+      border-top: 2px solid $darkGreyColor;
+    }
+  }
 
   &__action-buttons {
     width: 100%;
     display: flex;
     justify-content: space-evenly;
+
+    &-submit {
+      background: $greenColor;
+      color: $whiteColor;
+
+      &:hover {
+        background: $darkGreenColor;
+      }
+    }
+  }
+}
+
+.add-to-cart-btn {
+  background: $greenColor;
+  color: $whiteColor;
+
+  &:hover {
+      background: $darkGreenColor;
   }
 }
 

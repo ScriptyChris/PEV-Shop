@@ -18,9 +18,8 @@
     margin-block: 0.25rem;
     
     &--active {
-      // TODO: [UI] reuse MUI color
-      background: #3f51b5;
-      color: white;
+      background: $blueColor;
+      color: $whiteColor;
       border-radius: 0.25rem;
     }
   }

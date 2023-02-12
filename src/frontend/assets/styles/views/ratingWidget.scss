@@ -1,6 +1,7 @@
 .rating-widget {
     &__btn {
         border: none;
+        background: $whiteColor;
     }
 
     &__icon {
@@ -24,7 +25,7 @@
         }
 
         &--hover {
-            background: orange;
+            background: $blueColor;
         }
 
         &--active {
