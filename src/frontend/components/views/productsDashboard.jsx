@@ -537,9 +537,9 @@ function Filters({
           {translations.clear}
         </PEVButton>
         <PEVButton
+          className="products-dashboard__filters-common-actions-apply"
           onClick={handleApplyFilters}
           variant="contained"
-          color="primary"
           disabled={filtersCommonParentAPI.isSubmitBtnDisabled}
           data-cy="button:apply-filters"
         >

@@ -1,5 +1,12 @@
 .rating-widget {
-    &__btn {
+    --icon-polygon: polygon(88% 35%, 100% 0, 100% 75%, 64% 100%, 80% 60%, 50% 35%);
+    --icon-flip: rotateY(180deg);
+    --icon-big-size: 25px;
+    --icon-small-size: 15px;
+
+    justify-content: normal;
+
+    &__icon-btn {
         border: none;
         background: $whiteColor;
     }
@@ -8,9 +15,9 @@
         display: block;
         width: var(--rating-widget-icon-size, 1em);
         height: var(--rating-widget-icon-size, 1em);
-        background: grey;
-        
-        clip-path: polygon(88% 35%, 100% 0, 100% 75%, 64% 100%, 80% 60%, 50% 35%);
+        background: $darkGreyColor;
+
+        clip-path: var(--icon-polygon);
 
         &--big {
             --rating-widget-icon-size: 25px;
@@ -21,7 +28,7 @@
         }
 
         &--odd {
-            transform: rotateY(180deg);
+            transform: var(--icon-flip);
         }
 
         &--hover {
@@ -29,7 +36,23 @@
         }
 
         &--active {
-            background: green;
+            background: $orangeColor;
         }
+
+        &--single {
+            display: flex;
+            margin-right: -1rem;
+        }
+    }
+
+    &__stat-numeric--fluid {
+        display: inline-flex;
+        justify-content: end;
+        min-width: 2.75rem;
+    }
+
+    &__stat-numeric--standalone {
+        font-weight: bold;
+        margin-right: 0.25rem;
     }
 }

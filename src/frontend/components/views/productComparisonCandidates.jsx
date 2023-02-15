@@ -280,10 +280,7 @@ export const ProductComparisonCandidatesList = observer(function ProductComparis
   );
 });
 
-export const ProductComparisonCandidatesToggler = observer(function ToggleProductComparable({
-  product,
-  buttonVariant,
-}) {
+export const ProductComparisonCandidatesToggler = observer(function ToggleProductComparable({ product }) {
   const [isProductComparable, setIsProductComparable] = useState(false);
   const btnDataCy = isProductComparable ? 'button:remove-product-from-comparison' : 'button:add-product-to-comparison';
 
@@ -307,11 +304,10 @@ export const ProductComparisonCandidatesToggler = observer(function ToggleProduc
   return (
     <PEVButton
       onClick={handleComparableToggle}
-      variant={buttonVariant}
+      color="primary"
+      variant="contained"
       size="small"
-      startIcon={
-        <BalanceIcon extraClassNames={{ 'product-comparison-candidates-toggle-icon--checked': isProductComparable }} />
-      }
+      startIcon={<BalanceIcon />}
       data-cy={btnDataCy}
     >
       {isProductComparable ? translations.removeFromCompare : translations.addToCompare}

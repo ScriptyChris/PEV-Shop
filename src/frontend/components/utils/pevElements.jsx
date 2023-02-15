@@ -3,7 +3,7 @@
  * @module
  */
 
-import React, { forwardRef, useState, useMemo, useEffect } from 'react';
+import React, { forwardRef, useState, useMemo, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
@@ -21,10 +21,12 @@ import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
+import Popover from '@material-ui/core/Popover';
 
 import Scroller from '@frontend/components/utils/scroller';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import { IMAGES_ROOT_PATH } from '@commons/consts';
+import { MINOR_INFO_AUTO_CLOSE_TIME } from '@commons/consts';
 
 const useFieldsetStyles = makeStyles({
   root: {
@@ -379,5 +381,62 @@ export const PEVImage = forwardRef(function PEVImage({ image, src, alt, classNam
       className={classNames('pev-element-image', className)}
       ref={ref}
     />
+  );
+});
+
+export const PEVPopover = forwardRef(function PEVPopover(
+  { anchorSetterRef, shouldAutoClose = true, children, dataCy },
+  ref
+) {
+  if (typeof anchorSetterRef !== 'object' || !('current' in anchorSetterRef)) {
+    throw TypeError(
+      `'anchorSetterRef' prop should be an object containing 'current' prop! Received "${anchorSetterRef}".`
+    );
+  } else if (!children) {
+    throw TypeError(`'children' prop should be a truthy value! Received "${children}".`);
+  }
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const isOpened = !!anchorEl;
+  const autoCloseTimeoutIdRef = useRef(-1);
+  const handleCloseConfirmation = () => {
+    abortAutoClose();
+    setAnchorEl(null);
+  };
+  const abortAutoClose = () => window.clearTimeout(autoCloseTimeoutIdRef.current);
+  const scheduleAutoClose = () => {
+    abortAutoClose();
+    autoCloseTimeoutIdRef.current = window.setTimeout(handleCloseConfirmation, MINOR_INFO_AUTO_CLOSE_TIME);
+  };
+
+  useEffect(() => {
+    // expose anchor setter to the parent, so it can toggle Popover from outside
+    anchorSetterRef.current = setAnchorEl;
+  }, []);
+
+  useEffect(() => {
+    if (shouldAutoClose && isOpened) {
+      scheduleAutoClose();
+    }
+  }, [shouldAutoClose, isOpened, scheduleAutoClose, handleCloseConfirmation]);
+
+  return (
+    <Popover
+      open={isOpened}
+      anchorEl={anchorEl}
+      onClose={handleCloseConfirmation}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+      ref={ref}
+      data-cy={dataCy}
+    >
+      <PEVParagraph className="pev-element-popover-content">{children}</PEVParagraph>
+    </Popover>
   );
 });

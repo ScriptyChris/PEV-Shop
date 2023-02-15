@@ -1,4 +1,8 @@
 .cart {
+  &--empty__info {
+    margin-inline: 1rem;
+  }
+
   &__header {
     position: relative;
     width: 100%;

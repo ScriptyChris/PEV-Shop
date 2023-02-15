@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
+import classNames from 'classnames';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import CloseIcon from '@material-ui/icons/Close';
@@ -15,16 +16,19 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
-import { PEVButton, PEVIconButton, PEVHeading } from '@frontend/components/utils/pevElements';
+import { PEVButton, PEVIconButton, PEVHeading, PEVPopover, PEVParagraph } from '@frontend/components/utils/pevElements';
 import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
+import Price from '@frontend/components/views/price';
 
 const translations = {
   addToCartBtn: 'Add to cart',
+  productAddedToCart: 'Product added to cart!',
   addingToCartAuthFailure: 'Adding product to cart is not available for your account type.',
   header: 'Cart',
+  emptyCart: "You haven't added any product to cart yet!",
   goBackLabel: 'go back',
   productNameHeader: 'Product',
   productCountHeader: 'Count',
@@ -37,23 +41,19 @@ const translations = {
   cleanupCart: 'Cleanup',
 };
 
-export function AddToCartButton({ productInfoForCart, startOrEndIcon = null, className }) {
+export function AddToCartButton({ productInfoForCart, isSmallIcon, className }) {
   if (!productInfoForCart.name || !productInfoForCart.price || !productInfoForCart._id) {
     throw TypeError(
       `productInfoForCart must be an object containing: 'name', 'price', and '_id'! 
       Received: '${JSON.stringify(productInfoForCart)}'.`
     );
-  } else if (startOrEndIcon !== null && !(startOrEndIcon === 'startIcon' || startOrEndIcon === 'endIcon')) {
-    throw TypeError(
-      `startOrEndIcon must have value of either 'startIcon' or 'endIcon'! 
-      Received: '${JSON.stringify(startOrEndIcon)}'.`
-    );
   }
+
   const [popupData, setPopupData] = useState(null);
   const routesGuards = useRoutesGuards(storeService);
-  const ButtonTag = startOrEndIcon ? PEVButton : PEVIconButton;
+  const cartButtonAnchorSetterRef = useRef(null);
 
-  const handleAddToCartClick = () => {
+  const handleAddToCartClick = ({ target }) => {
     if (!routesGuards.isGuest() && !routesGuards.isClient()) {
       return setPopupData({
         type: POPUP_TYPES.FAILURE,
@@ -63,23 +63,28 @@ export function AddToCartButton({ productInfoForCart, startOrEndIcon = null, cla
     }
 
     storeService.addProductToUserCartState(productInfoForCart /* TODO: [TS] `as IUserCart['products']` */);
+    cartButtonAnchorSetterRef.current(target.closest('[data-cy="button:add-product-to-cart"]'));
   };
 
   // TODO: [UX] add list of product's amount to be added to cart (defaulted to 1) with an option to type custom amount
-  // TODO: [UX] add info tooltip after product is added to cart
   // TODO: [UX] set different color for button depending on it's usage availability
   return (
     <>
-      <ButtonTag
+      <PEVButton
         onClick={handleAddToCartClick}
         a11y={translations.addToCartBtn}
-        className={className}
-        {...{ [startOrEndIcon]: startOrEndIcon ? <AddShoppingCart /> : null }}
-        variant={startOrEndIcon ? 'contained' : null}
+        className={classNames('add-to-cart-btn', className)}
+        size={isSmallIcon ? 'small' : undefined}
+        startIcon={<AddShoppingCart />}
+        variant="contained"
         data-cy="button:add-product-to-cart"
       >
-        {startOrEndIcon ? translations.addToCartBtn : <AddShoppingCart />}
-      </ButtonTag>
+        {translations.addToCartBtn}
+      </PEVButton>
+      <PEVPopover anchorSetterRef={cartButtonAnchorSetterRef} dataCy="popup:add-to-cart-confirmation">
+        {translations.productAddedToCart}
+      </PEVPopover>
+
       <Popup {...popupData} />
     </>
   );
@@ -152,66 +157,83 @@ export default observer(function Cart() {
             </PEVIconButton>
           </header>
 
-          <TableContainer className="cart__table">
-            <Table size="small" aria-label={translations.header}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{translations.productNameHeader}</TableCell>
-                  <TableCell>{translations.productCountHeader}</TableCell>
-                  <TableCell>{translations.productPriceHeader}</TableCell>
-                  <TableCell>{translations.actions}</TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {isCartEmpty ? (
-                  <TableRow>
-                    <TableCell>{translations.lackOfProducts}</TableCell>
-                  </TableRow>
-                ) : (
-                  storeService.userCartProducts.map((productItem) => (
-                    <TableRow key={productItem.name}>
-                      <TableCell data-cy="label:cart-product-name">{productItem.name}</TableCell>
-                      <TableCell>{productItem.count}</TableCell>
-                      <TableCell data-cy="label:cart-product-price">{productItem.price}</TableCell>
-                      <TableCell>
-                        <PEVIconButton
-                          onClick={() => handleRemoveProductFromCart(productItem)}
-                          a11y={translations.removeProductFromCart}
-                        >
-                          <DeleteIcon />
-                        </PEVIconButton>
-                      </TableCell>
+          {storeService.userCartProducts.length ? (
+            <>
+              <TableContainer className="cart__table">
+                <Table size="small" aria-label={translations.header}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{translations.productNameHeader}</TableCell>
+                      <TableCell>{translations.productCountHeader}</TableCell>
+                      <TableCell>{translations.productPriceHeader}</TableCell>
+                      <TableCell>{translations.actions}</TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
+                  </TableHead>
 
-              <TableFooter>
-                <TableRow>
-                  <TableCell component="th">
-                    <strong>{translations.productsTotals}</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>{storeService.userCartProductsCount}</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>{storeService.userCartTotalPrice}</strong>
-                  </TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </TableContainer>
+                  <TableBody>
+                    {isCartEmpty ? (
+                      <TableRow>
+                        <TableCell>{translations.lackOfProducts}</TableCell>
+                      </TableRow>
+                    ) : (
+                      storeService.userCartProducts.map((productItem) => (
+                        <TableRow key={productItem.name}>
+                          <TableCell data-cy="label:cart-product-name">{productItem.name}</TableCell>
+                          <TableCell>{productItem.count}</TableCell>
+                          <TableCell data-cy="label:cart-product-price">
+                            <Price valueInUSD={productItem.price}>{({ currencyAndPrice }) => currencyAndPrice}</Price>
+                          </TableCell>
+                          <TableCell>
+                            <PEVIconButton
+                              onClick={() => handleRemoveProductFromCart(productItem)}
+                              a11y={translations.removeProductFromCart}
+                            >
+                              <DeleteIcon />
+                            </PEVIconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
 
-          <footer className="cart__action-buttons">
-            <PEVButton onClick={handleCartSubmission} data-cy="button:submit-cart" disabled={isCartEmpty}>
-              {translations.submitCart}
-            </PEVButton>
-            <PEVButton onClick={handleCartCleanup} disabled={isCartEmpty}>
-              {translations.cleanupCart}
-            </PEVButton>
-          </footer>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell component="th">
+                        <strong>{translations.productsTotals}</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>{storeService.userCartProductsCount}</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>
+                          <Price valueInUSD={storeService.userCartTotalPrice}>
+                            {({ currencyAndPrice }) => currencyAndPrice}
+                          </Price>
+                        </strong>
+                      </TableCell>
+                      <TableCell></TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </TableContainer>
+
+              <footer className="cart__action-buttons">
+                <PEVButton
+                  onClick={handleCartSubmission}
+                  className="cart__action-buttons-submit"
+                  data-cy="button:submit-cart"
+                  disabled={isCartEmpty}
+                >
+                  {translations.submitCart}
+                </PEVButton>
+                <PEVButton onClick={handleCartCleanup} disabled={isCartEmpty}>
+                  {translations.cleanupCart}
+                </PEVButton>
+              </footer>
+            </>
+          ) : (
+            <PEVParagraph className="cart--empty__info">{translations.emptyCart}</PEVParagraph>
+          )}
         </section>
       </Drawer>
     </>

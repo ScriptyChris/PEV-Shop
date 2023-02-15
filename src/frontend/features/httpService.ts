@@ -396,15 +396,15 @@ class HttpService extends Ajax {
   /**
    * Adds a new review to chosen product.
    */
-  addProductReview(productName: IProduct['name'], productReview: IProduct['reviews']) {
-    return this.patchRequest(`${this.URLS.PRODUCTS}/${productName}/add-review`, productReview);
+  addProductReview(productUrl: IProduct['url'], productReview: IProduct['reviews']) {
+    return this.patchRequest(`${this.URLS.PRODUCTS}/${productUrl}/add-review`, productReview, true);
   }
 
   /**
    * Delets a product via it's name.
    */
-  deleteProduct(productName: IProduct['name']) {
-    return this.deleteRequest(`${this.URLS.PRODUCTS}/${productName}`, true);
+  deleteProduct(productUrl: IProduct['url']) {
+    return this.deleteRequest(`${this.URLS.PRODUCTS}/${productUrl}`, true);
   }
 
   /**

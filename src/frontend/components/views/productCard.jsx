@@ -6,7 +6,6 @@ import Paper from '@material-ui/core/Paper';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import Divider from '@material-ui/core/Divider';
 
 import { PEVIconButton, PEVLink, PEVImage } from '@frontend/components/utils/pevElements';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
@@ -16,6 +15,8 @@ import { ProductObservabilityToggler } from '@frontend/components/views/productO
 import { ProductComparisonCandidatesToggler } from './productComparisonCandidates';
 import { DeleteProductFeature, NavigateToModifyProduct } from '@frontend/components/shared';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import RatingWidget from '@frontend/components/utils/ratingWidget';
+import Price from '@frontend/components/views/price';
 
 const translations = {
   productName: 'Name',
@@ -104,8 +105,7 @@ export default observer(function ProductCard({
   const dataCySuffix = Number.isNaN(entryNo) ? 'unique' : entryNo;
   const [menuBtnRef, setMenuBtnRef] = useState(null);
   const { isMobileLayout } = useRWDLayout();
-  const { name, price, _id, images } = product;
-  const elevation = layoutType === PRODUCT_CARD_LAYOUT_TYPES.COMPACT ? 0 : 1;
+  const { name, price, _id, url, images } = product;
 
   const handleClickToggleActionsBarBtns = (shouldShow) => {
     return ({ currentTarget }) => setMenuBtnRef(shouldShow ? currentTarget : null);
@@ -114,10 +114,10 @@ export default observer(function ProductCard({
   /* eslint-disable react/jsx-key */
   const menuItems = [
     routesGuards.isSeller()
-      ? [<NavigateToModifyProduct productData={product} />, <DeleteProductFeature productName={name} />]
+      ? [<NavigateToModifyProduct productData={product} />, <DeleteProductFeature productUrl={url} />]
       : [],
     routesGuards.isGuest() || routesGuards.isClient() ? (
-      <AddToCartButton productInfoForCart={{ name, price, _id }} />
+      <AddToCartButton productInfoForCart={{ name, price, _id }} isSmallIcon />
     ) : (
       []
     ),
@@ -150,10 +150,20 @@ export default observer(function ProductCard({
   const priceElement = (
     <ProductCardBasicDesc
       isCompactDescription={hasCompactBasicDesc}
+      compactClassName="product-card__price"
       compactLabel={translations.descriptiveProductPrice}
       dataCy="label:product-price"
       label={translations.price}
-      value={price}
+      value={<Price valueInUSD={price}>{({ currencyAndPrice }) => currencyAndPrice}</Price>}
+    />
+  );
+
+  const reviewsRateElement = product.reviews && (
+    <RatingWidget
+      externalClassName="product-card__compact-rating-widget"
+      presetValue={product.reviews.averageRating}
+      reviewsAmount={product.reviews.list.length}
+      asSingleIcon
     />
   );
 
@@ -164,7 +174,6 @@ export default observer(function ProductCard({
         'product-card--is-compact': isCompact,
       })}
       data-cy={`container:product-card_${dataCySuffix}`}
-      elevation={elevation}
       {...(isCompact ? { disableGutters: true } : {})}
     >
       {isCompact ? (
@@ -181,10 +190,15 @@ export default observer(function ProductCard({
           <ProductCardLink className="product-card__link" productData={product}>
             {imageElement}
 
-            <p className="product-card__content">
+            <div
+              className={classNames('product-card__content', {
+                'product-card__content--with-reviews': reviewsRateElement,
+              })}
+            >
               {nameElement}
+              {reviewsRateElement}
               {priceElement}
-            </p>
+            </div>
           </ProductCardLink>
 
           <PEVIconButton
@@ -210,34 +224,21 @@ export default observer(function ProductCard({
               horizontal: 'right',
             }}
             MenuListProps={{
-              className: 'product-card__actions-bar',
+              className: classNames('product-card__actions-bar pev-flex', { 'pev-flex--columned': isMobileLayout }),
               'data-cy': 'container:product-card__actions-bar',
             }}
             data-cy="popup:product-card__actions-bar"
           >
-            {menuItems.flatMap((item, index) => {
-              const result = [
-                <MenuItem button={false} className="product-card__actions-bar-item" key={`menu-item-${index}`}>
-                  {item}
-                </MenuItem>,
-              ];
-
-              if (index < menuItems.length - 1) {
-                const MenuItemDivider = (
-                  <MenuItem
-                    button={false}
-                    disableGutters={true}
-                    className="product-card__actions-bar-item"
-                    key={`menu-divider-${index}`}
-                  >
-                    <Divider orientation="vertical" flexItem />
-                  </MenuItem>
-                );
-                result.push(MenuItemDivider);
-              }
-
-              return result;
-            })}
+            {menuItems.map((item, index) => (
+              <MenuItem
+                button={false}
+                disableGutters
+                className="product-card__actions-bar-item"
+                key={`menu-item-${index}`}
+              >
+                {item}
+              </MenuItem>
+            ))}
           </Menu>
         </>
       )}

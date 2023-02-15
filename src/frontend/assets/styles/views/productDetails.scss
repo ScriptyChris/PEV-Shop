@@ -17,24 +17,81 @@
 
     &__header-action-elements {
         grid-area: action-elements;
+        justify-self: center;
+        width: max-content;
+        max-width: 90vw;
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 1rem;
+
+        li {
+            max-width: max-content;
+        }
+
+        a {
+            flex-direction: column;
+            color: $whiteColor;
+        }
+
+        .MuiButton-root {
+            width: max-content;
+        }
+
+        .MuiButton-label {
+            flex-direction: column;
+        }
+
+        .MuiButton-startIcon {
+            margin-inline: 0;
+        }
     }
 
-    &__base-data-container {
+    &__header-base-data-container {
         grid-area: base-data-container;
-        justify-content: flex-start;
+        display: grid;
+        grid-template-areas: "name name"
+            "rating rating"
+            "price add-to-cart";
+        grid-template-rows: repeat(3, max-content);
+        grid-template-columns: 1fr 1.5fr;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    &__header-name {
+        grid-area: name;
+
+        p {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+    }
+
+    &__header-rating.rating-widget {
+        grid-area: rating;
+        justify-content: center;
+    }
+
+    &__header-price {
+        grid-area: price;
+        justify-self: end;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     &__header-gallery {
         grid-area: image;
         justify-self: center;
 
-        &-image:hover {
-            cursor: pointer;
+        &-image {
+            max-width: 90vw;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
 
         small {
@@ -44,6 +101,12 @@
         }
     }
 
+    &__header-buy-btn {
+        grid-area: add-to-cart;
+        min-width: max-content;
+        max-width: 75%;
+    }
+
     &__nav-menu {
         position: relative;
         display: flex;
@@ -51,8 +114,8 @@
         margin-block: 1rem;
         border-block: 1px solid $greyColor;
         position: sticky;
-        top: 4rem;
-        background: white;
+        top: 3.4rem;
+        background: $whiteColor;
         z-index: $productDetailsNavMenuZIndex;
 
         button {
@@ -92,16 +155,6 @@
 
         h3 {
             scroll-margin-top: 8rem;
-        }
-    }
-
-    &__nav-section-specs {
-        display: grid;
-        grid-template-columns: 1.75fr 2fr;
-        padding: 0.75rem 1rem;
-
-        &:nth-of-type(2n - 1) {
-            background: lightgrey;
         }
     }
 
@@ -145,21 +198,18 @@
     }
 }
 
-@include createMediaQuery(min-width, tablet) {
+@include createMediaQuery(min-width, desktop) {
     .product-details {
         &__header {
-            // grid-template-areas:
-            //     "category action-elements action-elements action-elements"
-            //     "image image name name"
-            //     "image image rating rating"
-            //     "image image price price"
-            //     "image image buy-btn buy-btn";
-            // grid-template-columns: repeat(4, 1fr);
             grid-template-areas:
                 "category action-elements action-elements action-elements"
                 "image image base-data-container base-data-container";
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem 3rem;
+        }
+
+        &__nav-menu {
+            top: 4.4rem;
         }
 
         &__nav-menu-list {
@@ -176,8 +226,14 @@
 }
 
 @include useMediaQuery(tablet) {
-    .product-details__header-image .pev-element-image {
-        max-width: 40vw;
+    .product-details {
+        &__header-image .pev-element-image {
+            max-width: 40vw;
+        }
+
+        &__nav-menu {
+            top: 4rem;
+        }
     }
 }
 
@@ -223,9 +279,45 @@
 }
 
 .product-reviews {
-    &__new-author {
-        display: flex;
-        align-items: center;
+    align-items: start;
+    margin-top: 1rem;
+
+    .rating-widget {
+        order: -1;
+    }
+
+    &__list-entry {
+        figcaption {
+            display: flex;
+            gap: 0.5rem;
+            order: 2;
+        }
+
+        blockquote {
+            margin: 0.5rem;
+            font-style: italic;
+
+            & p::before {
+                content: '\201C';
+            }
+
+            & p::after {
+                content: '\201D';
+            }
+        }
+    }
+
+    &__form {
+        align-self: center;
+    }
+
+    &__textarea {
+        resize: none;
+        padding: 0.5rem;
+    }
+
+    &__is-author-anonymous-checkbox {
+        flex-direction: row-reverse;
     }
 
     cite {

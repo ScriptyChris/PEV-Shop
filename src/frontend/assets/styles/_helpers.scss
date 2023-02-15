@@ -25,3 +25,15 @@
     text-align: center;
     padding: 1rem;
 }
+
+.price {
+    &--grouped {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25em;
+
+        .price-currency {
+            font-size: 1.3em;
+        }
+    }
+}

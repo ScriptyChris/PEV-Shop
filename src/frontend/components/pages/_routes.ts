@@ -33,7 +33,7 @@ export const ROUTES = {
   SET_NEW_PASSWORD: `${ROUTE_GROUPS.PAGES}/set-new-password`,
   // product related
   PRODUCTS: ROUTE_GROUPS.PRODUCTS,
-  PRODUCTS__PRODUCT: `${ROUTE_GROUPS.PRODUCTS}/:productName`,
+  PRODUCTS__PRODUCT: `${ROUTE_GROUPS.PRODUCTS}/:productUrl`,
   PRODUCTS__COMPARE: `${ROUTE_GROUPS.PRODUCTS}/compare`,
   PRODUCTS__ADD_NEW_PRODUCT: `${ROUTE_GROUPS.PRODUCTS}/add-new-product`,
   get PRODUCTS__MODIFY_PRODUCT() {
@@ -62,8 +62,8 @@ const QUERY_PARAMS_CONFIG = {
 } as const;
 
 export const routeHelpers = {
-  createModifyProductUrl(productName: string) {
-    return ROUTES.PRODUCTS__MODIFY_PRODUCT.replace(/:\w+/, productName);
+  createModifyProductUrl(productUrl: string) {
+    return ROUTES.PRODUCTS__MODIFY_PRODUCT.replace(/:\w+/, productUrl);
   },
   extractProductUrlFromPathname(pathname: string) {
     const productUrlRegExpSource = ROUTES.PRODUCTS__PRODUCT.replace(/:.*?(?=\/|$)/, '(?<productUrl>[^/]*)');

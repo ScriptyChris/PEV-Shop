@@ -15,14 +15,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
-import FormGroup from '@material-ui/core/FormGroup';
+import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 
 import {
   PEVForm,
   PEVButton,
   PEVIconButton,
   PEVLink,
-  PEVRadio,
+  PEVCheckbox,
   PEVHeading,
   PEVParagraph,
   PEVFieldset,
@@ -41,6 +41,8 @@ import { ProductObservabilityToggler } from '@frontend/components/views/productO
 import { ProductComparisonCandidatesToggler } from '@frontend/components/views/productComparisonCandidates';
 import Scroller from '@frontend/components/utils/scroller';
 import { DeleteProductFeature, NavigateToModifyProduct } from '@frontend/components/shared';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import Price from '@frontend/components/views/price';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -60,98 +62,139 @@ const productDetailsTranslations = Object.freeze({
   technicalSpecsNavLabel: 'Specification',
   reviewsNavLabel: 'Reviews',
   relatedProductsNavLabel: 'Related products',
+  listOfUserReviews: 'List of user reviews',
+  noReviews: "This product hasn't received any reviews yet!",
   addReview: 'Add review',
-  anonymously: 'Anonymous',
+  attemptToAddReviewAgain: 'You already added a review for this product! User can add only single review per product.',
+  addedReview: 'Review added!',
+  failedToAddReview: 'Failed to add review.',
+  addingReviewAuthFailure: "To add a product's review, you have to log in as a client.",
+  anonymousAuthor: 'Anonymous',
+  isAuthorAnonymous: 'Publish anonymously?',
   reviewContentPlaceholder: 'You can share your opinion here...',
   cancelReview: 'Cancel',
-  submitReview: 'Submit',
+  saveReview: 'Save',
   emptyData: 'No data!',
 });
 
-function AddReview({ productName, updateReviews }) {
-  const [showReviewForm, setShowReviewForm] = useState(false);
+function AddReview({ productUrl, usersWhoMaybeAlreadyAddedReview, updateReviews }) {
+  const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const formInitials = {
-    author: '',
+    isAuthorAnonymous: false,
     rating: 0,
     content: '',
   };
+  const routesGuards = useRoutesGuards(storeService);
+  const { isMobileLayout } = useRWDLayout();
   const [popupData, setPopupData] = useState(null);
+  const userLogin = storeService.userAccountState?.login;
+
+  const reviewFormVisibilityToggler = (shouldShow) => {
+    return () => {
+      if (shouldShow) {
+        if (!routesGuards.isClient()) {
+          return setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: productDetailsTranslations.addingReviewAuthFailure,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        } // TODO: [consistency] make more robust check, which will also detect anonymous case
+        else if (usersWhoMaybeAlreadyAddedReview.has(userLogin)) {
+          return setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: productDetailsTranslations.attemptToAddReviewAgain,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+        }
+      }
+
+      setIsReviewFormVisible(shouldShow);
+    };
+  };
 
   const onSubmitHandler = (values) => {
     httpService
       .disableGenericErrorHandler()
-      .addProductReview(productName, values)
+      .addProductReview(productUrl, values)
       .then((res) => {
         if (res.__EXCEPTION_ALREADY_HANDLED) {
           return;
-        } else if (res.list && res.averageRating) {
+        } else if (Array.isArray(res.list) && 'averageRating' in res) {
           setPopupData({
             type: POPUP_TYPES.SUCCESS,
-            message: 'Review added!',
+            message: productDetailsTranslations.addedReview,
             buttons: [getClosePopupBtn(setPopupData)],
           });
           updateReviews({ list: res.list, averageRating: res.averageRating });
+          setIsReviewFormVisible(false);
+        } else if (res.__ERROR_TO_HANDLE === 'Given author already added review for this product!') {
+          setPopupData({
+            type: POPUP_TYPES.FAILURE,
+            message: productDetailsTranslations.attemptToAddReviewAgain,
+            buttons: [getClosePopupBtn(setPopupData)],
+          });
+          setIsReviewFormVisible(false);
         } else {
           setPopupData({
             type: POPUP_TYPES.FAILURE,
-            message: 'Failed to add review :(',
+            message: productDetailsTranslations.failedToAddReview,
             buttons: [getClosePopupBtn(setPopupData)],
           });
         }
       });
   };
 
-  if (showReviewForm) {
-    return (
-      <>
-        <PEVForm onSubmit={onSubmitHandler} initialValues={formInitials} className="pev-flex pev-flex--columned">
+  return (
+    <>
+      {isReviewFormVisible ? (
+        <PEVForm
+          onSubmit={onSubmitHandler}
+          initialValues={formInitials}
+          className="product-reviews__form pev-flex pev-flex--columned"
+        >
           <PEVFieldset className="pev-flex pev-flex--columned">
             <Field component={RatingWidget} name="rating" isBig required />
 
-            {/* TODO: [UX] adjust <textarea> size to device */}
             <Field
-              component="textarea"
+              as={TextareaAutosize}
+              className="product-reviews__textarea"
               name="content"
               placeholder={productDetailsTranslations.reviewContentPlaceholder}
+              minLength={5}
+              maxLength={500}
+              cols={isMobileLayout ? 30 : 60}
+              minRows={5}
+              maxRows={15}
             />
 
-            <div className="pev-flex">
-              <PEVParagraph>{productDetailsTranslations.reviewNewAuthor}:</PEVParagraph>
-              <FormGroup>
-                <div className="product-reviews__new-author">
-                  <PEVRadio
-                    label="TODO: put user nick here"
-                    value="TODO: put user nick here"
-                    name="author"
-                    identity="namedAuthor"
-                    required
-                  />
-                </div>
-                <div className="product-reviews__new-author">
-                  <PEVRadio
-                    label={productDetailsTranslations.anonymously}
-                    value={productDetailsTranslations.anonymously}
-                    name="author"
-                    identity="anonymousAuthor"
-                    required
-                  />
-                </div>
-              </FormGroup>
+            <div className="product-reviews__is-author-anonymous-checkbox pev-flex">
+              <PEVCheckbox
+                label={productDetailsTranslations.isAuthorAnonymous}
+                name="isAuthorAnonymous"
+                identity="isAuthorAnonymous"
+                color="primary"
+              />
             </div>
           </PEVFieldset>
 
           <div className="pev-flex">
-            <PEVButton type="submit">{productDetailsTranslations.submitReview}</PEVButton>
-            <PEVButton onClick={() => setShowReviewForm(false)}>{productDetailsTranslations.cancelReview}</PEVButton>
+            <PEVButton className="product-reviews__submit-btn" type="submit">
+              {productDetailsTranslations.saveReview}
+            </PEVButton>
+            <PEVButton onClick={reviewFormVisibilityToggler(false)}>
+              {productDetailsTranslations.cancelReview}
+            </PEVButton>
           </div>
         </PEVForm>
+      ) : (
+        <PEVButton color="primary" variant="contained" onClick={reviewFormVisibilityToggler(true)}>
+          {productDetailsTranslations.addReview}
+        </PEVButton>
+      )}
 
-        <Popup {...popupData} />
-      </>
-    );
-  }
-
-  return <PEVButton onClick={() => setShowReviewForm(true)}>{productDetailsTranslations.addReview}</PEVButton>;
+      <Popup {...popupData} />
+    </>
+  );
 }
 
 export function getProductDetailsHeaders(ignoredHeadersList = []) {
@@ -191,14 +234,22 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
     case 'price': {
       if (extras.header) {
         return (
-          <PEVParagraph className={extras.className}>
-            {extras.header}
-            {detailValue}
-          </PEVParagraph>
+          <Price valueInUSD={detailValue}>
+            {({ currencyAndPrice }) => (
+              <PEVParagraph className={extras.className}>
+                <b>{extras.header}:</b>
+                {currencyAndPrice}
+              </PEVParagraph>
+            )}
+          </Price>
         );
       }
 
-      return <span className={extras.className}>{detailValue}</span>;
+      return (
+        <Price valueInUSD={detailValue}>
+          {({ currencyAndPrice }) => <PEVParagraph className={extras.className}>{currencyAndPrice}</PEVParagraph>}
+        </Price>
+      );
     }
 
     case 'shortDescription': {
@@ -239,10 +290,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
             const hasNestedData = typeof productDetail.data === 'object';
 
             return (
-              <div
-                className={classNames('product-technical-specs-list__item', extras.classNames?.listItem)}
-                key={`spec-${index}`}
-              >
+              <div className="product-technical-specs-list__item" key={`spec-${index}`}>
                 <dt>{productDetail.heading}</dt>
                 <dd
                   className={classNames({
@@ -259,49 +307,55 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
     }
 
     case 'reviews': {
-      const RATING_MAX_VALUE = 5; /* TODO: get this from API */
       // TODO: move to separate component as it will likely has some additional logic (like pagination, sorting, filtering)
       const reviewsContent = detailValue.list.length ? (
         <>
-          <RatingWidget presetValue={Math.round(detailValue.averageRating)} />
-          <PEVParagraph>
-            {detailValue.averageRating} / {RATING_MAX_VALUE} [{detailValue.list.length}]
-          </PEVParagraph>
-
+          <RatingWidget presetValue={detailValue.averageRating} reviewsAmount={detailValue.list.length} />
           {extras.showReviewsList && (
             /* TODO: [UX] refactor to pagination/"load more" */
             <details>
+              <summary>{productDetailsTranslations.listOfUserReviews}</summary>
               <List>
-                {detailValue.list.map((reviewEntry, index) => {
-                  return (
-                    <ListItem divider={true} key={`review-${index}`}>
-                      <article>
-                        <header>
-                          <RatingWidget presetValue={reviewEntry.rating} />
-                          <PEVParagraph>
-                            <b>
-                              {productDetailsTranslations.reviewAuthor}: {reviewEntry.author}
-                            </b>
-                            &nbsp;
+                {detailValue.list
+                  .sort((prev, next) => next.timestamp - prev.timestamp)
+                  .map((reviewEntry, index) => {
+                    return (
+                      <ListItem className="product-reviews__list-entry" divider={true} key={`review-${index}`}>
+                        <figure>
+                          <figcaption>
+                            <RatingWidget
+                              presetValue={reviewEntry.rating}
+                              asSingleIcon={extras.isMobileLayout}
+                              decorateSingleIcon={extras.isMobileLayout}
+                            />
+                            {' - '}
+                            {reviewEntry.author || productDetailsTranslations.anonymousAuthor}
                             <time>[{getLocalizedDate(reviewEntry.timestamp)}]</time>
-                          </PEVParagraph>
-                        </header>
-                        <cite>{reviewEntry.content}</cite>
-                      </article>
-                    </ListItem>
-                  );
-                })}
+                          </figcaption>
+                          <blockquote>
+                            {reviewEntry.content && <PEVParagraph>{reviewEntry.content}</PEVParagraph>}
+                          </blockquote>
+                        </figure>
+                      </ListItem>
+                    );
+                  })}
               </List>
             </details>
           )}
         </>
       ) : (
-        productDetailsTranslations.emptyData
+        <PEVParagraph>{productDetailsTranslations.noReviews}</PEVParagraph>
       );
 
       return (
-        <div className={classNames('product-reviews', extras.className)}>
-          {extras.showAddReview && <AddReview productName={extras.productName} updateReviews={extras.updateReviews} />}
+        <div className={classNames('product-reviews pev-flex pev-flex--columned', extras.className)}>
+          {extras.showAddReview && (
+            <AddReview
+              productUrl={extras.productUrl}
+              usersWhoMaybeAlreadyAddedReview={extras.usersWhoMaybeAlreadyAddedReview}
+              updateReviews={extras.updateReviews}
+            />
+          )}
           {reviewsContent}
         </div>
       );
@@ -497,6 +551,7 @@ export default observer(function ProductDetails() {
   const routesGuards = useRoutesGuards(storeService);
   const [mergedProductData, setMergedProductData] = useState(initialProductData);
   const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
+  const { isMobileLayout } = useRWDLayout();
 
   useEffect(() => {
     if (mergedProductData && recentPathName.current === pathname) {
@@ -562,6 +617,17 @@ export default observer(function ProductDetails() {
     return null;
   }
 
+  const actionElements = /* eslint-disable react/jsx-key */ [
+    routesGuards.isSeller()
+      ? [
+          <NavigateToModifyProduct productData={mergedProductData} />,
+          <DeleteProductFeature productUrl={mergedProductData.url} />,
+        ]
+      : [],
+    <ProductObservabilityToggler productId={mergedProductData._id} />,
+    <ProductComparisonCandidatesToggler product={mergedProductData} />,
+  ].flat(); /* eslint-enable react/jsx-key */
+
   return (
     <article className="product-details">
       <Paper
@@ -577,27 +643,25 @@ export default observer(function ProductDetails() {
             className: 'product-details__header-category',
           }}
         />
-        <PEVParagraph className="product-details__header-action-elements">
-          {routesGuards.isSeller() && (
-            <>
-              <NavigateToModifyProduct productData={mergedProductData} />
-              <DeleteProductFeature productName={mergedProductData.name} />
-            </>
-          )}
-          <ProductObservabilityToggler productId={mergedProductData._id} />
-          <ProductComparisonCandidatesToggler product={mergedProductData} buttonVariant="outlined" />
-        </PEVParagraph>
+        <List className="product-details__header-action-elements">
+          {actionElements.map((element, index) => (
+            <ListItem disableGutters key={index}>
+              {element}
+            </ListItem>
+          ))}
+        </List>
 
         <Gallery images={mergedProductData.images} />
 
-        <div className="product-details__base-data-container pev-flex pev-flex--columned">
+        <div className="product-details__header-base-data-container">
           <PEVHeading level={2} className="product-details__header-name">
             <ProductSpecificDetail detailName="name" detailValue={mergedProductData.name} />
           </PEVHeading>
           {/* TODO: [UX] clicking on rating here should scroll to this product ratings */}
           <RatingWidget
             presetValue={mergedProductData.reviews.averageRating}
-            isBig={true}
+            reviewsAmount={mergedProductData.reviews.list.length}
+            isBig
             externalClassName="product-details__header-rating"
           />
 
@@ -678,15 +742,7 @@ export default observer(function ProductDetails() {
         >
           {productDetailsNavSections.technicalSpecs.label}
         </PEVHeading>
-        <ProductSpecificDetail
-          detailName="technicalSpecs"
-          detailValue={mergedProductData.technicalSpecs}
-          extras={{
-            classNames: {
-              listItem: 'product-details__nav-section-specs',
-            },
-          }}
-        />
+        <ProductSpecificDetail detailName="technicalSpecs" detailValue={mergedProductData.technicalSpecs} />
       </section>
 
       <Divider />
@@ -695,10 +751,12 @@ export default observer(function ProductDetails() {
         <PEVHeading level={3} id={productDetailsNavSections.reviews.id} ref={productDetailsNavSections.reviews.ref}>
           {productDetailsNavSections.reviews.label}
         </PEVHeading>
+
         <ProductSpecificDetail
           detailName="reviews"
           detailValue={mergedProductData.reviews}
           extras={{
+            isMobileLayout,
             showReviewsList: true,
             showAddReview: true,
             updateReviews: (reviews) =>
@@ -706,6 +764,8 @@ export default observer(function ProductDetails() {
                 ...prev,
                 reviews,
               })),
+            productUrl: mergedProductData.url,
+            usersWhoMaybeAlreadyAddedReview: new Set(mergedProductData.reviews?.list?.map(({ author }) => author)),
           }}
         />
       </section>

@@ -6,9 +6,8 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
 import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
-import DeleteIcon from '@material-ui/icons/Delete';
 
-import { PEVButton, PEVIconButton } from '@frontend/components/utils/pevElements';
+import { PEVButton, PEVIconButton, PEVParagraph } from '@frontend/components/utils/pevElements';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout.tsx';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
@@ -18,6 +17,7 @@ import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils
 import ProductCard, { PRODUCT_CARD_LAYOUT_TYPES } from '@frontend/components/views/productCard';
 
 const translations = {
+  lackOfObservedProducts: "You don't oberve any product yet.",
   observeProduct: 'Observe',
   unObserveProduct: 'Unobserve',
   unobserveAllProducts: 'Unobserve all',
@@ -101,6 +101,8 @@ export const ProductObservabilityToggler = observer(({ productId, getCustomButto
       ) : (
         <PEVButton
           size="small"
+          color="primary"
+          variant="contained"
           startIcon={isProductObserved ? <RemoveFromQueueIcon /> : <AddToQueueIcon />}
           onClick={toggleProductObserve}
           data-cy={buttonDataCy}
@@ -148,6 +150,7 @@ export default observer(function ObservedProducts() {
         return;
       }
 
+      // TODO: [BUG] fix "Can't perform a React state update on an unmounted component" error
       setCanUnobserveAllProducts(!!res.length);
       setObservedProducts(res);
     });
@@ -161,38 +164,43 @@ export default observer(function ObservedProducts() {
   };
 
   return (
-    <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:observed-products">
+    <section
+      className="account__menu-tab observed-products pev-flex pev-flex--columned"
+      data-cy="section:observed-products"
+    >
       {/* TODO: [UX] add searching and filtering for observed products */}
 
       <PEVButton onClick={unobserveAllProducts} disabled={!canUnobserveAllProducts}>
         {translations.unobserveAllProducts}
       </PEVButton>
 
-      <List component="ol" className="account__menu-tab-observed-products-list" disablePadding={isMobileLayout}>
-        {observedProducts.length
-          ? observedProducts.map((product, index) => (
-              <ListItem
-                key={product.name}
-                disableGutters={isMobileLayout}
-                divider={index < observedProducts.length - 1}
-              >
-                <ProductObservabilityToggler
-                  productId={product._id}
-                  getCustomButton={(toggleProductObserve) => (
-                    <PEVIconButton
-                      onClick={getUnobserveProductHandler(toggleProductObserve)}
-                      onFocus={(event) => event.stopPropagation()}
-                      a11y={translations.unobserveProduct}
-                    >
-                      <DeleteIcon />
-                    </PEVIconButton>
-                  )}
-                />
-                <ProductCard product={product} entryNo={index} layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED} />
-              </ListItem>
-            ))
-          : translations.lackOfData}
-      </List>
+      {observedProducts.length ? (
+        <List
+          component="ol"
+          className="observed-products__list pev-flex pev-flex--columned"
+          disablePadding={isMobileLayout}
+        >
+          {observedProducts.map((product, index) => (
+            <ListItem key={product.name} disableGutters={isMobileLayout}>
+              <ProductObservabilityToggler
+                productId={product._id}
+                getCustomButton={(toggleProductObserve) => (
+                  <PEVIconButton
+                    onClick={getUnobserveProductHandler(toggleProductObserve)}
+                    onFocus={(event) => event.stopPropagation()}
+                    a11y={translations.unobserveProduct}
+                  >
+                    <RemoveFromQueueIcon />
+                  </PEVIconButton>
+                )}
+              />
+              <ProductCard product={product} entryNo={index} layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED} />
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <PEVParagraph className="observed-products__empty-info">{translations.lackOfObservedProducts}</PEVParagraph>
+      )}
 
       <Popup {...popupData} />
     </section>
