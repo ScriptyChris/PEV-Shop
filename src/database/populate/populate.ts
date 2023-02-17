@@ -244,6 +244,7 @@ function populateProducts(productsSourceDataList: TProductToPopulate[]): Promise
     productsSourceDataList.map((productData) => {
       const product = new ProductModel(productData);
       product.set('relatedProductsNames', undefined);
+      product.reviews.list.forEach((review) => (review.isAuthorAnonymous = false));
 
       return product.save().catch((productSaveError) => {
         logger.error('productSaveError:', productSaveError, ' /productData:', productData);

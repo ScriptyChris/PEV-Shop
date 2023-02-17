@@ -22,15 +22,37 @@ const createProductImagesTargetDirPath = (productUrl: IProduct['url']) => {
   return join(imagesUploadDirPath, productUrl);
 };
 const replaceSpacesWithDashes = (value: string) => value.toLowerCase().replace(/\s/g, '-');
+const prepareReviewsOutput = (reviews: TReviews) => {
+  // this may happen when product is retrieved with projection, which picks only certain fields
+  if (!reviews) {
+    return undefined;
+  }
 
-const reviewsItemSchema = new Schema<IReviews['list'][number]>({
+  return {
+    ...reviews,
+    list: reviews.list.map((reviewItem) => ({
+      ...reviewItem,
+      author: reviewItem.isAuthorAnonymous ? '' : reviewItem.author,
+      isAuthorAnonymous: undefined,
+      _id: undefined,
+    })),
+    _id: undefined,
+  };
+};
+
+const reviewsItemSchema = new Schema<IReviewItem>({
   content: String,
   timestamp: {
     type: Number,
     required: true,
   },
+  // TODO: refactor to populating via ObjectID
   author: {
     type: String,
+    required: true,
+  },
+  isAuthorAnonymous: {
+    type: Boolean,
     required: true,
   },
   rating: {
@@ -49,6 +71,9 @@ const reviewsSchema = new Schema<IReviews>({
     required: true,
   },
 });
+reviewsSchema.methods.toJSON = function () {
+  return prepareReviewsOutput(this.toObject() as TReviews);
+};
 
 const technicalSpecs = new Schema<IProduct['technicalSpecs']>({
   // TODO: restrict that to predefined (and extendable) values
@@ -184,7 +209,10 @@ productSchema.methods.toJSON = function () {
 
   delete product.__v;
 
-  return product;
+  return {
+    ...product,
+    reviews: prepareReviewsOutput(product.reviews),
+  };
 };
 productSchema.methods.prepareUrlField = function () {
   const alreadyExistingURLWithoutSpaces = this.url && !/\s/.test(this.url);
@@ -192,6 +220,12 @@ productSchema.methods.prepareUrlField = function () {
 };
 productSchema.methods.transformImagesToImagePaths = function () {
   const IMAGES_KIND_FOLDER_NAME = 'products';
+
+  // TODO: find a better way to fix overwriting images when it's not actually desired behavior (like on every other product's save/update action)
+  if (this.images.every((file) => file?.src?.startsWith(IMAGES_KIND_FOLDER_NAME))) {
+    return;
+  }
+
   this.images = this.images.map((file) => {
     if (typeof file === 'string') {
       return {
@@ -206,6 +240,22 @@ productSchema.methods.transformImagesToImagePaths = function () {
     };
   });
 };
+productSchema.methods.validateReviewDuplicatedAuthor = function (reviewAuthor) {
+  return this.reviews.list.some(({ author }) => reviewAuthor === author);
+};
+productSchema.methods.addReview = function (newReviewEntry, reviewAuthor) {
+  this.reviews.list.push({
+    content: newReviewEntry.content,
+    timestamp: Date.now(),
+    author: reviewAuthor,
+    isAuthorAnonymous: newReviewEntry.isAuthorAnonymous,
+    rating: newReviewEntry.rating,
+  });
+  this.reviews.averageRating = Number(
+    (this.reviews.list.reduce((sum, { rating }) => sum + rating, 0) / this.reviews.list.length).toFixed(1)
+  );
+};
+
 productSchema.statics.validateImages = (files: TFiles) => {
   const filesValues = Object.values(files);
   let imagesValidationError = '';
@@ -308,9 +358,8 @@ productSchema.statics.createImageRelocator = () => {
     },
   };
 };
-productSchema.statics.removeImages = (productName: IProduct['name']) => {
-  const productImagesDirName = replaceSpacesWithDashes(productName);
-  const targetDirPath = createProductImagesTargetDirPath(productImagesDirName);
+productSchema.statics.removeImages = (productUrl: IProduct['url']) => {
+  const targetDirPath = createProductImagesTargetDirPath(productUrl);
 
   rmSync(targetDirPath, { recursive: true });
 };
@@ -328,10 +377,31 @@ export type TProductToPopulate = Exclude<IProduct, 'prepareUrlField' | 'transfor
 /**
  * @internal
  */
-export interface IReviews extends Types.Subdocument {
-  list: Record<string, string | number>[];
+type TReviewItem = {
+  content: string;
+  timestamp: number;
+  author: string;
+  isAuthorAnonymous: boolean;
+  rating: number;
+};
+
+/**
+ * @internal
+ */
+interface IReviewItem extends TReviewItem, Types.Subdocument {}
+
+/**
+ * @internal
+ */
+type TReviews = {
+  list: TReviewItem[];
   averageRating: number;
-}
+};
+
+/**
+ * @internal
+ */
+export interface IReviews extends TReviews, Types.Subdocument {}
 
 /**
  * @internal
@@ -355,7 +425,7 @@ interface IProductModel extends Model<IProduct> {
     removeTmpImages: () => void;
     moveValidImagesToTargetLocation: (imageTargetDirName: IProduct['url'], shouldCreateTargetDir?: boolean) => void;
   };
-  removeImages(productName: IProduct['name']): void;
+  removeImages(productUrl: IProduct['url']): void;
 }
 
 export interface IProduct extends Document {
@@ -375,4 +445,8 @@ export interface IProduct extends Document {
 
   prepareUrlField(): void;
   transformImagesToImagePaths(): void;
+  validateReviewDuplicatedAuthor(
+    reviewAuthor: string /* TOOD: type should be taken from `_user.ts` somehow */
+  ): boolean;
+  addReview(newReviewEntry: IReviewItem, reviewAuthor: string): void;
 }
