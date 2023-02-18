@@ -3,7 +3,15 @@
  * @notExported
  */
 
-import { model, Schema, Document, Model, TUserRoleName, COLLECTION_NAMES } from '@database/models/__core-and-commons';
+import {
+  model,
+  Schema,
+  Types,
+  Document,
+  Model,
+  TUserRoleName,
+  COLLECTION_NAMES,
+} from '@database/models/__core-and-commons';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '@middleware/features/auth';
 
@@ -137,7 +145,7 @@ userSchema.methods.confirmUser = function (): Promise<IUser> {
 
 userSchema.methods.addProductToObserved = function (productId: string): string {
   const user = this as IUser;
-  const productObjectId = new Schema.Types.ObjectId(productId);
+  const productObjectId = new Types.ObjectId(productId);
 
   if (!user.observedProductsIDs) {
     user.observedProductsIDs = [productObjectId];
@@ -152,7 +160,7 @@ userSchema.methods.addProductToObserved = function (productId: string): string {
 
 userSchema.methods.removeProductFromObserved = function (productId: string): string {
   const user = this as IUser;
-  const productObjectId = new Schema.Types.ObjectId(productId);
+  const productObjectId = new Types.ObjectId(productId);
 
   if (!user.observedProductsIDs || !user.observedProductsIDs.includes(productObjectId)) {
     return 'Product was not observed by user!';
@@ -161,7 +169,7 @@ userSchema.methods.removeProductFromObserved = function (productId: string): str
   const lengthBeforeRemoval = user.observedProductsIDs.length;
   user.observedProductsIDs = user.observedProductsIDs.filter(
     (observedProductId) => observedProductId.toString() !== productObjectId.toString()
-  ) as [Schema.Types.ObjectId];
+  ) as [Types.ObjectId];
 
   if (lengthBeforeRemoval - 1 === user.observedProductsIDs.length) {
     if (user.observedProductsIDs.length === 0) {
@@ -241,7 +249,7 @@ export type TUserModel = typeof UserModel;
 
 export type TUserPublic = Pick<IUser, 'login' | 'email' | 'observedProductsIDs'> & {
   accountType: NonNullable<IUser['accountType']>['roleName'];
-  _id: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
 };
 
 export type TUserToPopulate = Pick<IUser, 'login' | 'password' | 'email' | 'isConfirmed'> & {
@@ -264,7 +272,7 @@ export interface IUser extends Document {
   password: string;
   email: string;
   isConfirmed: boolean;
-  observedProductsIDs: Schema.Types.ObjectId[] | undefined;
+  observedProductsIDs: Types.ObjectId[] | undefined;
   tokens: {
     auth: string[] | undefined;
     confirmRegistration: string | undefined;

@@ -74,12 +74,12 @@ describe('product-form', () => {
     cy.get('@_authToken').then((_authToken) => {
       // cache `authToken` for each test
       authToken = _authToken as unknown as string;
-      cy.removeTestProducts(testProductDataForAPI.name, authToken);
+      cy.removeTestProducts(testProductDataForAPI.url, authToken);
     });
   });
 
   after(() => {
-    cy.removeTestProducts(testProductDataForAPI.name, authToken);
+    cy.removeTestProducts(testProductDataForAPI.url, authToken);
     cy.logoutUserFromAllSessions(authToken);
   });
 

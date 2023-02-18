@@ -15,10 +15,6 @@
 
     &__menu-nav-list {
         display: flex;
-
-        .activeClassName {
-            background: green;
-        }
     }
 
     &__menu-tab-profile-table-container {
@@ -49,14 +45,6 @@
             justify-content: space-evenly;
         }
 
-        &-observed-products-list {
-            list-style: none;
-
-            &-item-summary > div {
-                align-items: center;
-            }
-        }
-
         &-divider {
             margin-inline: 1rem;
         }
@@ -64,6 +52,21 @@
         button {
             align-self: center;
         }
+    }
+}
+
+.observed-products {
+    &__list {
+        list-style: none;
+
+        li {
+            margin-inline: 2rem;
+            gap: 2rem;
+        }
+    }
+
+    &__empty-info {
+        text-align: center;
     }
 }
 

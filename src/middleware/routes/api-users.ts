@@ -593,7 +593,7 @@ async function getObservedProducts(req: Request, res: Response & { _OMIT_HTTP?: 
     }
 
     const observedProducts = await getFromDB(
-      { modelName: COLLECTION_NAMES.Product },
+      { modelName: COLLECTION_NAMES.Product, findMultiple: true },
       { _id: req.user!.observedProductsIDs }
     );
 

@@ -77,7 +77,8 @@ const translations = {
   addNewSpec: 'Add new spec',
   confirm: 'Confirm',
   cancel: 'Cancel',
-  save: 'Save',
+  addProduct: 'Add product',
+  updateProduct: 'Update product',
   relatedProductsNames: 'Related products names',
   relatedProductName: 'Product name',
   shortDescription: 'Short description',
@@ -716,6 +717,7 @@ RelatedProductsNames._EditItemComponentHoC = function EditItemComponentHoC({
 
 // TODO: [UX] show a validation ornament at each form section to indicate user, which section is required/valid/invalid
 const ProductForm = ({ initialData = {}, doSubmit }) => {
+  const initialDataKeys = Object.keys(initialData);
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
@@ -877,7 +879,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   };
 
   const onSubmitHandler = (values, { setSubmitting }) => {
-    const isProductModification = Object.keys(initialData).length > 0;
+    const isProductModification = initialDataKeys.length > 0;
     let submission;
 
     if (isProductModification) {
@@ -919,6 +921,8 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
     return { isColourFieldError: !isColorFieldText, colourFieldKey };
   };
 
+  const addOrUpdateTranslation = initialDataKeys.length ? translations.updateProduct : translations.addProduct;
+
   return (
     <section className="product-form pev-fixed-container">
       <PEVForm
@@ -930,7 +934,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
         {(formikProps) => (
           <>
             <PEVHeading className="pev-centered-padded-text" level={2}>
-              {translations.getIntro(!!Object.keys(initialData).length)}
+              {translations.getIntro(!!initialDataKeys.length)}
             </PEVHeading>
 
             <Paper className="product-form__fields-group">
@@ -964,12 +968,13 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 
             <PEVButton
               type="submit"
-              className="product-form__save-btn MuiButton-outlined"
-              a11y={translations.save}
+              className="product-form__save-btn"
+              a11y={addOrUpdateTranslation}
               onClick={() => !formikProps.touched.category && formikProps.setFieldTouched('category')}
               data-cy="button:product-form__save"
             >
               <SaveIcon fontSize="large" />
+              {addOrUpdateTranslation}
             </PEVButton>
           </>
         )}

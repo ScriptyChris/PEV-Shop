@@ -1,6 +1,6 @@
 .pev-element {
     &-form-field-error {
-        color: red;
+        color: $redColor;
     }
 
     &-tabs__chooser {
@@ -33,9 +33,8 @@
         }
 
         &[aria-selected="true"]::before {
-            // TODO: [UI] set proper MUI color
-            background: #3f51b5;
-            color: white;
+            background: $blueColor;
+            color: $whiteColor;
             border-color: transparent;
         }
     }
@@ -43,5 +42,11 @@
     &-image {
         height: auto;
         object-fit: contain;
+    }
+
+    &-popover-content {
+        padding: 0.5rem 1.5rem;
+        background: $blueColor;
+        color: $whiteColor;
     }
 }

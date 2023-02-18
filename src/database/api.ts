@@ -156,7 +156,7 @@ async function deleteFromDB(modelName: TCOLLECTION_NAMES, fieldValue: string | R
       break;
     }
     case COLLECTION_NAMES.Product: {
-      fieldName = 'name';
+      fieldName = 'url';
       break;
     }
     default: {

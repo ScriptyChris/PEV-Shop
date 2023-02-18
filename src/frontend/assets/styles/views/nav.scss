@@ -66,9 +66,8 @@
 
             &-account-login {
                 border: none;
-                background-color: white;
-                // TODO: [UI] reuse MUI color
-                color: #3f51b5;
+                background-color: $whiteColor;
+                color: $blueColor;
             }
         }
     }

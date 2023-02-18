@@ -22,7 +22,7 @@ const translations = {
   goTologIn: 'Log in',
 };
 
-export function DeleteProductFeature({ productName }) {
+export function DeleteProductFeature({ productUrl }) {
   const history = useHistory();
   const [popupData, setPopupData] = useState(null);
 
@@ -36,7 +36,7 @@ export function DeleteProductFeature({ productName }) {
           onClick: () => {
             httpService
               .disableGenericErrorHandler()
-              .deleteProduct(productName)
+              .deleteProduct(productUrl)
               .then((res) => {
                 if (res.__EXCEPTION_ALREADY_HANDLED) {
                   return;
@@ -71,7 +71,13 @@ export function DeleteProductFeature({ productName }) {
 
   return (
     <>
-      <PEVButton size="small" startIcon={<DeleteIcon />} onClick={handleProductDelete}>
+      <PEVButton
+        color="primary"
+        variant="contained"
+        size="small"
+        startIcon={<DeleteIcon />}
+        onClick={handleProductDelete}
+      >
         {translations.deleteProduct}
       </PEVButton>
       <Popup {...popupData} />
@@ -83,10 +89,10 @@ export function NavigateToModifyProduct({ productData }) {
   return (
     <PEVLink
       to={{ pathname: routeHelpers.createModifyProductUrl(productData.url), state: productData }}
-      className="navigate-to-modify-product"
+      className="navigate-to-modify-product MuiButton-root MuiButton-contained MuiButton-containedSizeSmall MuiButton-containedPrimary"
       data-cy="button:product-details__edit-product"
     >
-      <EditIcon />
+      <EditIcon fontSize="small" />
       {translations.editProduct}
     </PEVLink>
   );

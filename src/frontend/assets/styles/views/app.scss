@@ -36,9 +36,8 @@
     justify-content: center;
     flex-wrap: nowrap;
     gap: 0.5rem;
-    // TODO: [UI] use MUI color
-    background: #3f51b5;
-    color: white;
+    background: $blueColor;
+    color: $whiteColor;
     margin-top: 1rem;
     
     & :first-child {

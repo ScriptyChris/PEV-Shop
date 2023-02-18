@@ -18,9 +18,9 @@ Cypress.Commands.add('addTestProductByAPI', (productData, authToken) => {
   });
 });
 
-Cypress.Commands.add('removeTestProducts', (productName, authToken) => {
+Cypress.Commands.add('removeTestProducts', (productUrl, authToken) => {
   return cy.sendAPIReq({
-    endpoint: `products/${productName}`,
+    endpoint: `products/${productUrl}`,
     method: 'DELETE',
     extraHeaders: {
       Authorization: `Bearer ${authToken}`,
