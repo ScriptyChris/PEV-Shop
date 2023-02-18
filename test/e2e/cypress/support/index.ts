@@ -44,7 +44,7 @@ declare global {
       getFromStorage<T = any>(key: string): Cypress.Chainable<T>;
       cleanupTestUsersAndEmails(): void;
       addTestProductByAPI(productData: TProductPublic, authToken: string): Cypress.Chainable<any>;
-      removeTestProducts(productName: string, authToken: string): Cypress.Chainable<Cypress.Response<void>>;
+      removeTestProducts(productUrl: string, authToken: string): Cypress.Chainable<Cypress.Response<void>>;
       sendAPIReq(apiReqOptions: TAPIReqOptions): Cypress.Chainable<Cypress.Response<any>>;
       cleanupCartState(): void;
       findProductByNameInCartStore(productName: string): Cypress.Chainable<NonNullable<IUserCart['products'][number]>>;

@@ -62,7 +62,7 @@ describe('#api-products', () => {
     );
     expect(userRoleMiddlewareMock.mock.calls[0][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.patch).toHaveBeenCalledWith(
-      '/api/products/:name/add-review',
+      '/api/products/:url/add-review',
       authMiddlewareFnMock,
       expect.any(Function),
       apiProductsRouter._addReview
@@ -76,7 +76,7 @@ describe('#api-products', () => {
     );
     expect(userRoleMiddlewareMock.mock.calls[2][0]).toBe(USER_ROLES_MAP.seller);
     expect(apiProductsRouter.delete).toHaveBeenCalledWith(
-      '/api/products/:name',
+      '/api/products/:url',
       authMiddlewareFnMock,
       expect.any(Function),
       apiProductsRouter._deleteProduct
@@ -319,12 +319,16 @@ describe('#api-products', () => {
   describe('addReview(..)', () => {
     const getReqMock = () => ({
       params: {
-        name: 'test product',
+        url: 'test-product',
       },
       body: {
         author: 'Anonymous',
         rating: 3.5,
         content: 'some text',
+        isAuthorAnonymous: false,
+      },
+      user: {
+        login: 'Test Client',
       },
     });
 
@@ -334,6 +338,8 @@ describe('#api-products', () => {
           list: [],
         },
         save: getFromDBMock._succeededCall._clazz.prototype.save,
+        validateReviewDuplicatedAuthor: jest.fn(() => false),
+        addReview: jest.fn(),
       });
 
       afterEach(() => {
@@ -347,7 +353,7 @@ describe('#api-products', () => {
         getFromDBMock.mockImplementationOnce(() => reviewsMock);
         await apiProductsRouter._addReview(reqMock, getResMock());
 
-        expect(getFromDBMock).toBeCalledWith({ modelName: COLLECTION_NAMES.Product }, { name: reqMock.params.name });
+        expect(getFromDBMock).toBeCalledWith({ modelName: COLLECTION_NAMES.Product }, { url: reqMock.params.url });
       });
 
       it('should call .save(..) with correct params', async () => {
@@ -412,9 +418,9 @@ describe('#api-products', () => {
               ...getReqMock(),
               body: {
                 ...getReqMock().body,
-                author: null,
+                isAuthorAnonymous: null,
               },
-              __error: 'Author value',
+              __error: 'value must be a boolean!',
             },
           ].map(async (reqMock) => {
             const resMock = getResMock();
@@ -540,7 +546,7 @@ describe('#api-products', () => {
     const getReqMock = () => ({
       userPermissions: true,
       params: {
-        name: 'test',
+        url: 'test-product',
       },
     });
 
@@ -558,7 +564,7 @@ describe('#api-products', () => {
 
         await apiProductsRouter._deleteProduct(reqMock, getResMock());
 
-        expect(deleteFromDBMock).toBeCalledWith(COLLECTION_NAMES.Product, reqMock.params.name);
+        expect(deleteFromDBMock).toBeCalledWith(COLLECTION_NAMES.Product, reqMock.params.url);
       });
 
       it('should call res.sendStatus(..) with correct params', async () => {
@@ -577,7 +583,7 @@ describe('#api-products', () => {
         const resMock0 = getResMock();
         await apiProductsRouter._deleteProduct({}, resMock0);
         expect(resMock0.status).toBeCalledWith(HTTP_STATUS_CODE.BAD_REQUEST);
-        expect(resMock0._jsonMethod).toBeCalledWith({ error: 'Name param is empty or not attached!' });
+        expect(resMock0._jsonMethod).toBeCalledWith({ error: 'Url param is empty or not attached!' });
 
         const resMock1 = getResMock();
         deleteFromDBMock.mockImplementationOnce(deleteFromDBMock._failedCall.general);

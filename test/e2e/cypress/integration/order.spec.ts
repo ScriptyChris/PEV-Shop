@@ -136,8 +136,12 @@ describe('order', () => {
     cy.get(makeCyDataSelector('container:product-card__actions-bar')).as('productCardActionBar');
     cy.get('@productCardActionBar').find(makeCyDataSelector('button:add-product-to-cart')).click();
 
-    // close menu overlay
-    cy.get('@productCardActionBar').closest('[role="presentation"]').children('[aria-hidden="true"]').click();
+    // close menu overlays
+    cy.get(makeCyDataSelector('popup:add-to-cart-confirmation')).children('[aria-hidden="true"]').click();
+    cy.get('@productCardActionBar')
+      .closest(makeCyDataSelector('popup:product-card__actions-bar'))
+      .children('[aria-hidden="true"]')
+      .click();
 
     cy.get(makeCyDataSelector('container:cart')).as('cartContainer').should('not.exist');
     cy.get(makeCyDataSelector('button:toggle-cart')).click();
