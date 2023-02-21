@@ -46,7 +46,7 @@ const NavMenu = observer(({ logOutUser, closeMenu = () => void 0 }) => {
 
   return (
     <nav className="nav-menu">
-      <MenuList className="nav-menu__links" disablePadding>
+      <MenuList component="ol" className="nav-menu__links" disablePadding>
         <MenuItem>
           <PEVLink to={ROUTES.PRODUCTS} onClick={handleLinkClick}>
             <ListIcon fontSize="inherit" />

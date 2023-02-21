@@ -320,7 +320,7 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
                   .sort((prev, next) => next.timestamp - prev.timestamp)
                   .map((reviewEntry, index) => {
                     return (
-                      <ListItem className="product-reviews__list-entry" divider={true} key={`review-${index}`}>
+                      <ListItem className="product-reviews__list-entry" divider key={`review-${index}`}>
                         <figure>
                           <figcaption>
                             <RatingWidget
@@ -390,81 +390,49 @@ export const ProductSpecificDetail = forwardRef(function _ProductSpecificDetail(
   }
 });
 
-const useSectionsObserver = () => {
-  const [activatedNavMenuItemIndex, setActivatedNavMenuItemIndex] = useState(-1);
-  const productDetailsNavSections = {
+const useProductDetailsNavSections = () => {
+  const navSections = Object.freeze({
     heading: {
       ignored: true,
       ref: useRef(),
     },
     description: {
-      id: 'productDetailsDescription',
+      id: 'description',
       label: productDetailsTranslations.descriptionNavLabel,
       ref: useRef(),
     },
     technicalSpecs: {
-      id: 'productDetailsTechnicalSpecs',
+      id: 'specification',
       label: productDetailsTranslations.technicalSpecsNavLabel,
       ref: useRef(),
     },
     reviews: {
-      id: 'productDetailsReviews',
+      id: 'reviews',
       label: productDetailsTranslations.reviewsNavLabel,
       ref: useRef(),
     },
     relatedProducts: {
-      id: 'productDetailsRelatedProducts',
+      id: 'relatedProducts',
       label: productDetailsTranslations.relatedProductsNavLabel,
       ref: useRef(),
     },
-  };
-
-  const refObjsList = Object.values(productDetailsNavSections).map(({ ref }) => ref.current);
+  });
 
   useEffect(() => {
-    if (!refObjsList.every(Boolean)) {
-      return;
-    }
+    if (window.location.hash) {
+      const hashTargetScrollTimeoutId = window.setTimeout(() => {
+        const scrollingTarget = document.querySelector(window.location.hash);
 
-    let intersectionObserver;
-
-    // wait for React to render the DOM tree
-    setTimeout(setupIntersectionObserver, 0, intersectionObserver);
-
-    return () => intersectionObserver?.disconnect();
-  }, refObjsList);
-
-  const setupIntersectionObserver = (intersectionObserver) => {
-    const TOP_BOUNDARY = 155;
-    const sectionHeadingsToObserve = refObjsList;
-    const scrollingElement = document.documentElement;
-    let previousScrollValue = scrollingElement.scrollTop;
-
-    intersectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        const currentScrollValue = scrollingElement.scrollTop;
-        const isScrollingDown = previousScrollValue < currentScrollValue;
-        const currentHeadingIndex = sectionHeadingsToObserve.findIndex((heading) => entry.target === heading);
-        const previousHeading = sectionHeadingsToObserve[currentHeadingIndex - 1];
-
-        // TODO: [a11y] handle changing URL's hash on scrolling through sections
-        if (isScrollingDown && !entry.isIntersecting) {
-          setActivatedNavMenuItemIndex(currentHeadingIndex);
-        } else if (!isScrollingDown && entry.isIntersecting && previousHeading) {
-          setActivatedNavMenuItemIndex(currentHeadingIndex - 1);
+        if (scrollingTarget) {
+          scrollingTarget.scrollIntoView({ behavior: 'smooth' });
         }
+      });
 
-        previousScrollValue = scrollingElement.scrollTop;
-      },
-      {
-        rootMargin: `-${TOP_BOUNDARY}px 0px 0px 0px`,
-      }
-    );
+      return () => window.clearTimeout(hashTargetScrollTimeoutId);
+    }
+  }, [window.location.hash]);
 
-    sectionHeadingsToObserve.forEach((sectionHeading) => intersectionObserver.observe(sectionHeading));
-  };
-
-  return { productDetailsNavSections, activatedNavMenuItemIndex };
+  return navSections;
 };
 
 // Based on MUI stepper https://v4.mui.com/components/steppers/#text
@@ -550,7 +518,7 @@ export default observer(function ProductDetails() {
   const history = useHistory();
   const routesGuards = useRoutesGuards(storeService);
   const [mergedProductData, setMergedProductData] = useState(initialProductData);
-  const { productDetailsNavSections, activatedNavMenuItemIndex } = useSectionsObserver();
+  const navSections = useProductDetailsNavSections();
   const { isMobileLayout } = useRWDLayout();
 
   useEffect(() => {
@@ -588,18 +556,6 @@ export default observer(function ProductDetails() {
       });
   }, [pathname]);
 
-  useEffect(() => {
-    if (location.hash) {
-      setTimeout(() => {
-        const scrollingTarget = document.querySelector(location.hash);
-
-        if (scrollingTarget) {
-          scrollingTarget.scrollIntoView({ behavior: 'smooth' });
-        }
-      });
-    }
-  }, [location.hash]);
-
   const getRelatedProducts = (product) => {
     httpService
       .getProductsByNames(product.relatedProductsNames)
@@ -630,12 +586,7 @@ export default observer(function ProductDetails() {
 
   return (
     <article className="product-details">
-      <Paper
-        component="header"
-        elevation={0}
-        className="product-details__header"
-        ref={productDetailsNavSections.heading.ref}
-      >
+      <Paper component="header" elevation={0} className="product-details__header" ref={navSections.heading.ref}>
         <ProductSpecificDetail
           detailName="category"
           detailValue={mergedProductData.category}
@@ -695,23 +646,25 @@ export default observer(function ProductDetails() {
               <MenuList
                 className="product-details__nav-menu-list"
                 component="ol"
-                disablePadding={true}
+                disablePadding
                 // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
                 aria-label={productDetailsTranslations.productDetailsNavMenuLabel}
               >
-                {Object.entries(productDetailsNavSections).map(([, navSection], index) => {
+                {Object.entries(navSections).map(([, navSection], index) => {
                   if (navSection.ignored) {
                     return null;
                   }
 
+                  const hash = `#${navSection.id}`;
+
                   return (
-                    <MenuItem
-                      key={navSection.id}
-                      className={classNames({
-                        activated: activatedNavMenuItemIndex === index,
-                      })}
-                    >
-                      <PEVLink to={{ hash: `#${navSection.id}`, state: mergedProductData }}>{navSection.label}</PEVLink>
+                    <MenuItem {...routeHelpers.getPossibleNavItemSelectedState(hash, true)} key={navSection.id}>
+                      <PEVLink
+                        to={{ hash, state: mergedProductData }}
+                        {...routeHelpers.getPossibleAriaCurrentPage(hash, true)}
+                      >
+                        {navSection.label}
+                      </PEVLink>
                     </MenuItem>
                   );
                 })}
@@ -722,12 +675,8 @@ export default observer(function ProductDetails() {
       </aside>
 
       <section className="product-details__nav-section">
-        <PEVHeading
-          level={3}
-          id={productDetailsNavSections.description.id}
-          ref={productDetailsNavSections.description.ref}
-        >
-          {productDetailsNavSections.description.label}
+        <PEVHeading level={3} id={navSections.description.id} ref={navSections.description.ref}>
+          {navSections.description.label}
         </PEVHeading>
         <ProductSpecificDetail detailName="shortDescription" detailValue={mergedProductData.shortDescription} />
       </section>
@@ -735,12 +684,8 @@ export default observer(function ProductDetails() {
       <Divider />
 
       <section className="product-details__nav-section">
-        <PEVHeading
-          level={3}
-          id={productDetailsNavSections.technicalSpecs.id}
-          ref={productDetailsNavSections.technicalSpecs.ref}
-        >
-          {productDetailsNavSections.technicalSpecs.label}
+        <PEVHeading level={3} id={navSections.technicalSpecs.id} ref={navSections.technicalSpecs.ref}>
+          {navSections.technicalSpecs.label}
         </PEVHeading>
         <ProductSpecificDetail detailName="technicalSpecs" detailValue={mergedProductData.technicalSpecs} />
       </section>
@@ -748,8 +693,8 @@ export default observer(function ProductDetails() {
       <Divider />
 
       <section className="product-details__nav-section">
-        <PEVHeading level={3} id={productDetailsNavSections.reviews.id} ref={productDetailsNavSections.reviews.ref}>
-          {productDetailsNavSections.reviews.label}
+        <PEVHeading level={3} id={navSections.reviews.id} ref={navSections.reviews.ref}>
+          {navSections.reviews.label}
         </PEVHeading>
 
         <ProductSpecificDetail
@@ -773,12 +718,8 @@ export default observer(function ProductDetails() {
       <Divider />
 
       <section className="product-details__nav-section">
-        <PEVHeading
-          level={3}
-          id={productDetailsNavSections.relatedProducts.id}
-          ref={productDetailsNavSections.relatedProducts.ref}
-        >
-          {productDetailsNavSections.relatedProducts.label}
+        <PEVHeading level={3} id={navSections.relatedProducts.id} ref={navSections.relatedProducts.ref}>
+          {navSections.relatedProducts.label}
         </PEVHeading>
 
         {mergedProductData.relatedProducts?.length && (

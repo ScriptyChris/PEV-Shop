@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, Route, Switch } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useHistory, useLocation, Route, Switch, Redirect } from 'react-router-dom';
+import classNames from 'classnames';
 
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -25,6 +26,7 @@ import { ROUTES } from './_routes';
 const translations = Object.freeze({
   accountHeader: 'Account',
   accountNavMenuLabel: 'account nav menu',
+  accountNavCrumbs: 'Account navigation crumbs',
   goToUserProfile: 'Profile',
   goToSecurity: 'Security',
   goToObservedProducts: 'Observed products',
@@ -186,43 +188,25 @@ function Orders() {
 export default function Account() {
   const { isMobileLayout } = useRWDLayout();
   const { pathname } = useLocation();
-  // TODO: [PERFORMANCE]? fix rendering component twice when redirected from LogIn page
-  const MENU_ITEMS = Object.freeze([
-    {
-      url: ROUTES.ACCOUNT__USER_PROFILE,
-      translation: translations.goToUserProfile,
-      component: <UserProfile />,
-    },
-    {
-      url: ROUTES.ACCOUNT__SECURITY,
-      translation: translations.goToSecurity,
-      component: <Security />,
-    },
-    {
-      url: ROUTES.ACCOUNT__OBSERVED_PRODUCTS,
-      translation: translations.goToObservedProducts,
-      component: <ObservedProducts />,
-    },
-    {
-      url: ROUTES.ACCOUNT__ORDERS,
-      translation: translations.goToOrders,
-      component: <Orders />,
-    },
-  ]);
+
   const TabsLayoutWrapper = ({ children }) =>
     isMobileLayout ? children : <Paper className="account__menu-tabs">{children}</Paper>;
-
-  useEffect(() => {
-    // TODO: [DX] automatically select first link (user profile) in a better way
-    const userProfileURL = pathname.endsWith(ROUTES.ACCOUNT) ? MENU_ITEMS[0].url : pathname;
-    document.querySelector(`a[href$="${userProfileURL}"]`).click();
-  }, []);
+  const subMenuNavCrumb = Object.values(Account.MENU_ITEMS).find(
+    ({ url }) => window.location.pathname === url
+  )?.translation;
 
   return (
     <article className="account">
-      <PEVHeading level={2} className="account__header">
-        {translations.accountHeader}
-      </PEVHeading>
+      {isMobileLayout ? (
+        <PEVHeading level={2} className="account__header">
+          {translations.accountHeader}
+        </PEVHeading>
+      ) : (
+        <Breadcrumbs component={Paper} className="account__header" aria-label={translations.accountNavCrumbs}>
+          <PEVHeading level={2}>{translations.accountHeader}</PEVHeading>
+          {subMenuNavCrumb && <PEVHeading level={3}>{subMenuNavCrumb}</PEVHeading>}
+        </Breadcrumbs>
+      )}
 
       <nav className="account__menu-nav">
         {isMobileLayout ? (
@@ -233,18 +217,19 @@ export default function Account() {
             render={({ ScrollerHookingParent }) => (
               <ScrollerHookingParent>
                 <MenuList
+                  component="ol"
                   className="account__menu-nav-list"
-                  component="ul"
-                  disablePadding={true}
+                  disablePadding
                   // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
                   aria-label={translations.accountNavMenuLabel}
                 >
-                  {MENU_ITEMS.map((item) => (
-                    <MenuItem
-                      key={item.url}
-                      // TODO: [UX] highlight active link
-                    >
-                      <PEVLink to={item.url} data-cy="link:account-feature">
+                  {Account.MENU_ITEMS.map((item) => (
+                    <MenuItem {...routeHelpers.getPossibleNavItemSelectedState(item.url)} key={item.url}>
+                      <PEVLink
+                        to={item.url}
+                        {...routeHelpers.getPossibleAriaCurrentPage(item.url)}
+                        data-cy="link:account-feature"
+                      >
                         {item.translation}
                       </PEVLink>
                     </MenuItem>
@@ -255,10 +240,14 @@ export default function Account() {
           />
         ) : (
           <Paper>
-            <MenuList className="account__menu-nav-list">
-              {MENU_ITEMS.map((item) => (
-                <MenuItem disableGutters key={item.url}>
-                  <PEVLink to={item.url} data-cy="link:account-feature">
+            <MenuList component="ol" className="account__menu-nav-list" aria-label={translations.accountNavMenuLabel}>
+              {Account.MENU_ITEMS.map((item) => (
+                <MenuItem {...routeHelpers.getPossibleNavItemSelectedState(item.url)} disableGutters key={item.url}>
+                  <PEVLink
+                    to={item.url}
+                    {...routeHelpers.getPossibleAriaCurrentPage(item.url)}
+                    data-cy="link:account-feature"
+                  >
                     {item.translation}
                   </PEVLink>
                 </MenuItem>
@@ -270,13 +259,39 @@ export default function Account() {
 
       <TabsLayoutWrapper>
         <Switch>
-          {MENU_ITEMS.map((item) => (
-            <Route path={item.url} key={item.url}>
-              {item.component}
-            </Route>
-          ))}
+          {pathname === ROUTES.ACCOUNT ? (
+            <Redirect to={Account.MENU_ITEMS[0].url} />
+          ) : (
+            Account.MENU_ITEMS.map((item) => (
+              <Route path={item.url} key={item.url}>
+                {item.component}
+              </Route>
+            ))
+          )}
         </Switch>
       </TabsLayoutWrapper>
     </article>
   );
 }
+Account.MENU_ITEMS = Object.freeze([
+  {
+    url: ROUTES.ACCOUNT__USER_PROFILE,
+    translation: translations.goToUserProfile,
+    component: <UserProfile />,
+  },
+  {
+    url: ROUTES.ACCOUNT__SECURITY,
+    translation: translations.goToSecurity,
+    component: <Security />,
+  },
+  {
+    url: ROUTES.ACCOUNT__OBSERVED_PRODUCTS,
+    translation: translations.goToObservedProducts,
+    component: <ObservedProducts />,
+  },
+  {
+    url: ROUTES.ACCOUNT__ORDERS,
+    translation: translations.goToOrders,
+    component: <Orders />,
+  },
+]);

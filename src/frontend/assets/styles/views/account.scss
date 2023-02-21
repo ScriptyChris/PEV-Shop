@@ -1,6 +1,7 @@
 .account {
     display: grid;
     grid-template-rows: 3rem auto auto;
+    grid-gap: 0.5rem;
 
     &__header {
         align-self: center;
@@ -76,10 +77,14 @@
             "nav header"
             "nav tab";
         grid-template-columns: 1fr 3fr;
-        grid-column-gap: 2rem;
+        grid-gap: 1rem 2rem;
+        margin: 1rem;
 
         &__header {
             grid-area: header;
+            background: $blueColor;
+            color: $whiteColor;
+            padding: 0.25rem 2rem;
         }
 
         &__menu-nav {
