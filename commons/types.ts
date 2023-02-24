@@ -15,9 +15,17 @@ import storageService from '@frontend/features/storageService';
  * @ignore
  */
 import storeService from '@frontend/features/storeService';
+/**
+ * @ignore
+ */
+import type { Schema } from '@database/models/__core-and-commons';
+/**
+ * @ignore
+ */
+import { PAYMENT_METHODS, SHIPMENT_METHODS } from '@commons/consts';
 
 export interface IProductInOrder {
-  name: string;
+  id: Schema.Types.ObjectId;
   unitPrice: number;
   quantity: number;
 }
@@ -54,28 +62,26 @@ export interface IUserCart {
     name: string;
     price: number;
     _id: string;
+    quantity: number;
   }[];
   totalCount: number;
   totalPrice: number;
 }
 
-export interface IOrder {
+export interface IOrderPayload {
   receiver: {
-    baseInfo: {
-      name: string;
-      email: string;
-      phone: string;
-    };
+    name: string;
+    email: string;
+    phone: string;
+  };
+  payment: {
+    method: typeof PAYMENT_METHODS[keyof typeof PAYMENT_METHODS];
+  };
+  shipment: {
+    method: typeof SHIPMENT_METHODS[keyof typeof SHIPMENT_METHODS];
     address: string;
   };
-  shipmentType: 'inPerson' | 'home' | 'parcelLocker';
-  // TODO: [DX] get that from PayU API
-  paymentType: 'Cash' | 'Card' | 'Transfer' | 'BLIK';
-  products: (IUserCart['products'] & { count: number })[];
-  price: {
-    shipment: number;
-    total: number;
-  };
+  products: Omit<IProductInOrder, 'unitPrice'>[];
 }
 
 export type TPagination = { pageNumber: number; productsPerPage: number };

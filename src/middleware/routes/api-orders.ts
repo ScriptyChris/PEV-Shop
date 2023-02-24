@@ -4,15 +4,12 @@
 
 import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
-import fetch, { RequestInit, Response as FetchResponse } from 'node-fetch';
-import { getFromDB } from '@database/api';
-import { authToPayU as getToken } from '@middleware/features/auth';
-import { HTTP_STATUS_CODE, IPayByLinkMethod, IProductInOrder } from '@commons/types';
-import { getMinAndMaxPrice, getOrderBody, getOrderHeaders, getOrderPaymentMethod } from '@middleware/helpers/payu-api';
-import { wrapRes, TypeOfHTTPStatusCodes } from '@middleware/helpers/middleware-response-wrapper';
+import { getFromDB, saveToDB, deleteFromDB } from '@database/api';
+import { authMiddlewareFn, userRoleMiddlewareFn } from '@middleware/features/auth';
+import { HTTP_STATUS_CODE, IProductInOrder } from '@commons/types';
+import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
-import { COLLECTION_NAMES, IProduct } from '@database/models';
-import { dotEnv } from '@commons/dotEnvLoader';
+import { COLLECTION_NAMES, IProduct, USER_ROLES_MAP, OrderModel } from '@database/models';
 
 const router: Router &
   Partial<{
@@ -20,13 +17,17 @@ const router: Router &
     _makeOrder: typeof makeOrder;
   }> = Router();
 const logger = getLogger(module.filename);
-const PAYU_PAYMENT_URL =
-  process.env.NODE_ENV === 'development'
-    ? `http://${dotEnv.APP_PRODUCTION_HOST}:3001/dev-proxy`
-    : dotEnv.PAYU_ORDERS_URL;
 
 router.options('/api/orders', handleOrderPreflight);
-router.post('/api/orders', makeOrder);
+router.post('/api/orders', authMiddlewareFn, userRoleMiddlewareFn(USER_ROLES_MAP.client), makeOrder);
+router.get(
+  '/api/orders/current-user',
+  authMiddlewareFn,
+  userRoleMiddlewareFn(USER_ROLES_MAP.client),
+  getCurrentUserOrders
+);
+router.get('/api/orders/all', authMiddlewareFn, userRoleMiddlewareFn(USER_ROLES_MAP.seller), getAllOrders);
+router.delete('/api/orders', /* TODO: [security] add auth */ removeAllOrders);
 router.use(getMiddlewareErrorHandler(logger));
 
 // expose for unit tests
@@ -44,11 +45,11 @@ function handleOrderPreflight(req: Request, res: Response) {
 
 async function makeOrder(req: Request, res: Response, next: NextFunction) {
   try {
-    logger.log('POST /api/orders env:', process.env.NODE_ENV, ' /req.body:', req.body);
+    logger.log('(makeOrder) req.body:', req.body);
 
     // TODO: refactor getFromDB function to handle searching by query array
     const products: IProductInOrder[] = await Promise.all(
-      req.body.products.map(async (product: { _id: string; count: number }): Promise<IProductInOrder> => {
+      req.body.products.map(async (product: { _id: string; quantity: number }): Promise<IProductInOrder> => {
         const productDocument = (await getFromDB({ modelName: COLLECTION_NAMES.Product }, product._id)) as IProduct;
 
         if (!productDocument) {
@@ -56,46 +57,47 @@ async function makeOrder(req: Request, res: Response, next: NextFunction) {
         }
 
         return {
-          name: productDocument.name,
-          unitPrice: productDocument.price * 100,
-          quantity: product.count,
+          id: productDocument._id,
+          unitPrice: productDocument.price,
+          quantity: product.quantity,
         };
       })
     );
-    logger.log('products:', products);
 
-    const token: string | Error = await getToken();
-    if (typeof token !== 'string') {
-      // TODO: improve error handling
-      return wrapRes(res, HTTP_STATUS_CODE.NETWORK_AUTH_REQUIRED, {
-        exception: Error(`Server failed to auth to PayU API due to: ${token?.message}`),
-      });
-    }
+    const newOrder = OrderModel.createOrder(req.body, products, req.user!._id);
+    await saveToDB(COLLECTION_NAMES.Order, newOrder);
 
-    const [minPrice, maxPrice] = getMinAndMaxPrice(products);
-    const payMethod: Partial<IPayByLinkMethod> = await getOrderPaymentMethod(token as string, minPrice, maxPrice);
-    logger.log('PayU order /minPrice:', minPrice, ' /maxPrice:', maxPrice, ' /payMethod:', payMethod);
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: { orderTimestamp: newOrder.timestamp } });
+  } catch (exception) {
+    return next(exception);
+  }
+}
 
-    const requestOptions = {
-      method: 'POST',
-      redirect: 'manual',
-      headers: getOrderHeaders(token as string),
-      body: JSON.stringify(getOrderBody(products, payMethod)),
-    };
+async function getCurrentUserOrders(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userOrders = await req.user!.findCurrentUserOrders();
 
-    logger.log('PayU order /PAYU_PAYMENT_URL:', PAYU_PAYMENT_URL, ' /requestOptions:', requestOptions);
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: userOrders });
+  } catch (exception) {
+    return next(exception);
+  }
+}
 
-    return await fetch(PAYU_PAYMENT_URL, requestOptions as RequestInit).then(async (response: FetchResponse) => {
-      const resValue = await response.json();
-      logger.log('PayU order response:', resValue, ' /status:', response.status, ' /statusText:', response.statusText);
+async function getAllOrders(req: Request, res: Response, next: NextFunction) {
+  try {
+    const allOrders = await req.user!.findAllUsersOrders(getFromDB);
 
-      // TODO: [REFACTOR] respond with either 'msg', 'payload' or 'error' depending or `response.status`
-      return wrapRes(
-        res,
-        response.status as Extract<TypeOfHTTPStatusCodes, 'SUCCESSFUL' | 'CLIENT_ERROR' | 'SERVER_ERROR'>,
-        { payload: resValue }
-      );
-    });
+    return wrapRes(res, HTTP_STATUS_CODE.OK, { payload: allOrders });
+  } catch (exception) {
+    return next(exception);
+  }
+}
+
+async function removeAllOrders(req: Request, res: Response, next: NextFunction) {
+  try {
+    await deleteFromDB(COLLECTION_NAMES.Order, {});
+
+    return wrapRes(res, HTTP_STATUS_CODE.NO_CONTENT);
   } catch (exception) {
     return next(exception);
   }

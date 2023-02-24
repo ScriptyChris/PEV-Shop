@@ -4,7 +4,7 @@
 
 import getLogger from '@commons/logger';
 import { Router, Request, Response, NextFunction } from 'express';
-import { authMiddlewareFn as authMiddleware, userRoleMiddlewareFn } from '@middleware/features/auth';
+import { authMiddlewareFn, userRoleMiddlewareFn } from '@middleware/features/auth';
 import { getFromDB, saveToDB, updateOneModelInDB, deleteFromDB } from '@database/api';
 import { queryBuilder } from '@database/utils/queryBuilder';
 import mapProductsTechnicalSpecs from '@middleware/helpers/api-products-specs-mapper';
@@ -29,10 +29,10 @@ const router: Router &
 router.get('/api/products/specs', getProductsSpecs);
 router.get('/api/products', getProducts);
 router.get('/api/products/:id', getProductById);
-router.post('/api/products', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.seller), addProduct);
-router.patch('/api/products/:url/add-review', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.client), addReview);
-router.patch('/api/products/', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.seller), modifyProduct);
-router.delete('/api/products/:url', authMiddleware, userRoleMiddlewareFn(USER_ROLES_MAP.seller), deleteProduct);
+router.post('/api/products', authMiddlewareFn, userRoleMiddlewareFn(USER_ROLES_MAP.seller), addProduct);
+router.patch('/api/products/:url/add-review', authMiddlewareFn, userRoleMiddlewareFn(USER_ROLES_MAP.client), addReview);
+router.patch('/api/products/', authMiddlewareFn, userRoleMiddlewareFn(USER_ROLES_MAP.seller), modifyProduct);
+router.delete('/api/products/:url', authMiddlewareFn, userRoleMiddlewareFn(USER_ROLES_MAP.seller), deleteProduct);
 router.use(getMiddlewareErrorHandler(logger));
 
 // expose for unit tests

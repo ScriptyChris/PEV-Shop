@@ -147,12 +147,16 @@ async function updateOneModelInDB(
   return Model.findOneAndUpdate(itemQuery, updateDataQueries, { new: true });
 }
 
-async function deleteFromDB(modelName: TCOLLECTION_NAMES, fieldValue: string | RegExp) {
+async function deleteFromDB(modelName: TCOLLECTION_NAMES, fieldValue: string | RegExp | Record<never, never>) {
   let fieldName = '';
 
   switch (modelName) {
     case COLLECTION_NAMES.User: {
       fieldName = 'login';
+      break;
+    }
+    case COLLECTION_NAMES.Order: {
+      fieldName = '';
       break;
     }
     case COLLECTION_NAMES.Product: {
@@ -165,7 +169,7 @@ async function deleteFromDB(modelName: TCOLLECTION_NAMES, fieldValue: string | R
   }
 
   const Model = getModel(modelName);
-  const query = { [fieldName]: fieldValue };
+  const query = fieldName === '' ? fieldValue : { [fieldName]: fieldValue };
 
   if (typeof fieldValue === 'string') {
     return Model.deleteOne(query);

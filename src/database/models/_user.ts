@@ -11,6 +11,7 @@ import {
   Model,
   TUserRoleName,
   COLLECTION_NAMES,
+  USER_ROLES_MAP,
 } from '@database/models/__core-and-commons';
 import { randomBytes } from 'crypto';
 import { getToken, comparePasswords } from '@middleware/features/auth';
@@ -36,6 +37,22 @@ const SINGLE_TOKEN_EXPIRE_TIME_MS = 1000 * 60 * 60;
 type TTokensKeys = keyof IUser['tokens'];
 type TDeclaredTokens = { [k in TTokensKeys]: string };
 type TSingleTokensKeys = Exclude<keyof TDeclaredTokens, 'auth'>;
+
+const populateOrderProducts = (order: Document, optionalUserLogin?: IUser['login']) =>
+  order
+    .execPopulate(
+      // @ts-ignore
+      'regardingProducts.productRef'
+    )
+    .then((populatedOrder: any) => ({
+      ...populatedOrder.toObject(),
+      regardingProducts: populatedOrder.regardingProducts.map(({ quantity, unitPrice, productRef: { name } }: any) => ({
+        name,
+        quantity,
+        unitPrice,
+      })),
+      regardingUser: optionalUserLogin || undefined,
+    }));
 
 const userSchema = new Schema<IUser>(
   {
@@ -87,6 +104,12 @@ userSchema.virtual('accountType', {
   localField: '_id',
   foreignField: 'owners',
   justOne: true,
+});
+userSchema.virtual('orders', {
+  ref: COLLECTION_NAMES.Order,
+  localField: '_id',
+  foreignField: 'regardingUser',
+  justOne: false,
 });
 
 userSchema.methods.generateAuthToken = async function (): Promise<string> {
@@ -195,6 +218,39 @@ userSchema.methods.removeAllProductsFromObserved = function (): string {
   return '';
 };
 
+userSchema.methods.findCurrentUserOrders = async function () {
+  const userWithOrders = (await this.execPopulate(
+    // @ts-ignore
+    'orders accountType'
+  )) as IUser & {
+    orders: ({ regardingUser: Record<string, any>[]; regardingProducts: Record<string, any>[] } & Document)[];
+  };
+
+  const userOrdersWithProducts = await Promise.all(userWithOrders.orders.map((order) => populateOrderProducts(order)));
+
+  return userOrdersWithProducts;
+};
+
+userSchema.methods.findAllUsersOrders = async function (getFromDB: any) {
+  const allUsersOrders = (await getFromDB(
+    { modelName: COLLECTION_NAMES.User, findMultiple: true, population: 'orders accountType' },
+    {},
+    { orders: 1, login: 1, accountType: 1 }
+  )) as (IUser & {
+    orders: ({ regardingUser: Record<string, any>[]; regardingProducts: Record<string, any>[] } & Document)[];
+  })[];
+
+  const usersOrdersWithProducts = (
+    await Promise.all(
+      allUsersOrders
+        .filter(({ accountType }) => accountType!.roleName === USER_ROLES_MAP.client)
+        .map(({ login, orders }) => Promise.all(orders.map((order) => populateOrderProducts(order, login))))
+    )
+  ).flat();
+
+  return usersOrdersWithProducts;
+};
+
 userSchema.statics.validateNewUserPayload = (newUser: any) => {
   if (!newUser) {
     return 'New user payload not provided!';
@@ -279,6 +335,7 @@ export interface IUser extends Document {
     resetPassword: string | undefined;
   };
   accountType?: { roleName: TUserRoleName };
+
   generateAuthToken(): Promise<string>;
   toJSON(): TUserPublic;
   matchPassword(password: string): Promise<boolean>;
@@ -288,6 +345,8 @@ export interface IUser extends Document {
   addProductToObserved(productId: string): string;
   removeProductFromObserved(productId: string): string;
   removeAllProductsFromObserved(): string;
+  findCurrentUserOrders(): Promise<any>;
+  findAllUsersOrders(getFromDB: any): Promise<any>;
 }
 
 export type TUserRegistrationCredentials = Pick<IUser, 'login' | 'password' | 'email'> & {
