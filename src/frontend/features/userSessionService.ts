@@ -39,7 +39,13 @@ const userSessionService = {
         return res;
       }
 
-      storeService.clearUserAccountState();
+      // TODO: user cart state should be stored on backend
+      {
+        storeService.clearUserAccountState();
+        storeService.clearUserCartState();
+        storageService.userCart.remove();
+      }
+
       storageService.userAccount.remove();
       storageService.userAuthToken.remove();
 

@@ -14,7 +14,7 @@ const USER_CART_STATE: IUserCart = {
 
 const INITIAL_USER_ACCOUNT_STATE = null;
 
-type TUserCartProduct = IUserCart['products'][number] & { count: number };
+type TUserCartProduct = IUserCart['products'][number];
 
 class StoreService {
   /** @internal */
@@ -44,6 +44,7 @@ class StoreService {
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
   }
 
+  // TODO: [UX/bug] prevent product from adding it to cart when it's quantity will exceed availability
   addProductToUserCartState(newUserCartState: TUserCartProduct) {
     this._userCartState.totalPrice += newUserCartState.price;
     const productIndexInCart = this._getProductIndex(newUserCartState.name);
@@ -68,12 +69,12 @@ class StoreService {
 
     const product = this._userCartState.products[productIndexInCart] as TUserCartProduct;
 
-    if (product.count > 0) {
-      product.count--;
+    if (product.quantity > 0) {
+      product.quantity--;
       this._userCartState.totalCount--;
     }
 
-    if (product.count === 0) {
+    if (product.quantity === 0) {
       this._userCartState.products.splice(productIndexInCart, 1);
     }
   }
