@@ -105,7 +105,7 @@ export default observer(function ProductCard({
   const dataCySuffix = Number.isNaN(entryNo) ? 'unique' : entryNo;
   const [menuBtnRef, setMenuBtnRef] = useState(null);
   const { isMobileLayout } = useRWDLayout();
-  const { name, price, _id, url, images } = product;
+  const { name, price, _id, url, images, availability } = product;
 
   const handleClickToggleActionsBarBtns = (shouldShow) => {
     return ({ currentTarget }) => setMenuBtnRef(shouldShow ? currentTarget : null);
@@ -117,7 +117,7 @@ export default observer(function ProductCard({
       ? [<NavigateToModifyProduct productData={product} />, <DeleteProductFeature productUrl={url} />]
       : [],
     routesGuards.isGuest() || routesGuards.isClient() ? (
-      <AddToCartButton productInfoForCart={{ name, price, _id }} isSmallIcon />
+      <AddToCartButton productInfoForCart={{ name, price, availability, _id }} isSmallIcon flattenUnavailableInfo />
     ) : (
       []
     ),

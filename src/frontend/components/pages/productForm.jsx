@@ -34,7 +34,7 @@ import { routeHelpers } from '@frontend/components/pages/_routes';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { imageSizeValidator } from '@commons/validators';
-import { ARRAY_FORMAT_SEPARATOR, MAX_IMAGES_AMOUNT } from '@commons/consts';
+import { ARRAY_FORMAT_SEPARATOR, MAX_IMAGES_AMOUNT, MIN_PRODUCT_UNITS, MAX_PRODUCT_UNITS } from '@commons/consts';
 
 const translations = {
   getIntro(isProductUpdate) {
@@ -74,6 +74,7 @@ const translations = {
   chooseCategoryFirst: 'A category needs to be chosen first...',
   name: 'Name',
   price: 'Price',
+  availability: 'Available units',
   addNewSpec: 'Add new spec',
   confirm: 'Confirm',
   cancel: 'Cancel',
@@ -140,6 +141,22 @@ function BaseInfo({ data: { initialData = {} } }) {
           required
         />
         {/* TODO: [feature] add currency chooser */}
+      </div>
+
+      <div className="product-form__base-info-group pev-flex">
+        <PEVTextField
+          name="availability"
+          identity="newProductAvailability"
+          label={translations.availability}
+          inputProps={{
+            type: 'number',
+            min: MIN_PRODUCT_UNITS,
+            max: MAX_PRODUCT_UNITS,
+            'data-cy': 'input:base__availability',
+          }}
+          defaultValue={initialData.availability}
+          required
+        />
       </div>
     </PEVFieldset>
   );
@@ -985,6 +1002,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 ProductForm.initialFormEntries = [
   ['name', ''],
   ['price', ''],
+  ['availability', ''],
   ['shortDescription', []],
   ['category', ''],
   ['images', []],

@@ -35,7 +35,8 @@
       "Electric Scooter: Inner-tube 10”x 2”",
       "Electric Scooter: Tire 8”x 2”",
       "Electric Scooter: Inner-tube 8”x 2”"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": ["A 16″ inner-tube, suitable for the Inmotion V8, King Song 16, & Gotway ACMs+."],
@@ -69,7 +70,8 @@
       "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
       "Inner-tube: 18” x 2.5”, Kenda",
       "New: Speedway Mini4 5A/54.6v Charger"
-    ]
+    ],
+    "availability": 20
   },
   {
     "shortDescription": [
@@ -107,7 +109,8 @@
       "Tire: 18” x 2.5”, Kenda",
       "Protective Padding/Bumper Strip",
       "Electric Scooter: Inner-tube 10”x 2”"
-    ]
+    ],
+    "availability": 15
   },
   {
     "shortDescription": ["King Song 18″ replacement tire, 2.5″ wide\nFits other 18″ Wheels as well"],
@@ -141,7 +144,8 @@
       "Inner-Tube: 14” x 2.125”, Kenda",
       "Tire: 14” x 2.125”, Kenda",
       "NEW: Gotway Tesla 16” 1020Wh/2000W Motor"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -222,7 +226,8 @@
       "KS 16B: Replacement Control-Board",
       "KS 14C & 16B: 840Wh Battery Pack Pair",
       "KS 14B/C: Pair of Replacement LED Covers, Black"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -262,7 +267,8 @@
       "GW Telsa: Replacement Control-Board",
       "GW MSuper: Set of Pedals",
       "GW Monster: Pair of Shells"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -300,7 +306,8 @@
       "GW MTen3: Replacement Control-Board",
       "GW MSuper: Set of Pedals",
       "GW Monster: Seat/Cushion"
-    ]
+    ],
+    "availability": 7
   },
   {
     "shortDescription": [
@@ -340,7 +347,8 @@
       "GW MSuper V3s+: Replacement Control-Board",
       "GW MTen3: Replacement Control-Board",
       "GW MSuper V3s+: Set of Side Panels, Black"
-    ]
+    ],
+    "availability": 16
   },
   {
     "shortDescription": [
@@ -382,7 +390,8 @@
       "Inner-tube: 14” x 1.50″",
       "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
       "Speedway Mini4 Seat Kit"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": [
@@ -420,7 +429,8 @@
       "Dualtron 2- Rear Fender/Mud-guard",
       "Dualtron Spider- Controller",
       "Dualtron Thunder-Ultra- Handlebar Locking Latch"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -458,7 +468,8 @@
       "Dualtron- Side-panel to Controller Splitter Cable",
       "Dualtron- Seat Kit",
       "Dualtron- Front Fender/Mud-guard"
-    ]
+    ],
+    "availability": 2
   },
   {
     "shortDescription": [
@@ -497,7 +508,8 @@
       "Dualtron Thunder-Ultra- Handlebar Locking Latch",
       "Dualtron 2-3- Handlebar Locking Latch",
       "Dualtron- Side Panels"
-    ]
+    ],
+    "availability": 10
   },
   {
     "shortDescription": [
@@ -541,7 +553,8 @@
       "Dualtron 2- Handlebar Support Strut & Suspension",
       "Dualtron- Charging Flap",
       "Dualtron 2- Rear Fender/Mud-guard"
-    ]
+    ],
+    "availability": 15
   },
   {
     "shortDescription": [
@@ -579,7 +592,8 @@
       "Dualtron Thunder-Ultra- Handlebar Locking Latch",
       "Dualtron- Front Fender/Mud-guard",
       "Dualtron 2- Handlebar Support Strut & Suspension"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -618,7 +632,8 @@
       "Dualtron- Side Panels",
       "Dualtron 2- Rear Fender/Mud-guard",
       "Dualtron Thunder-Ultra- Handlebar Locking Latch"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -657,7 +672,8 @@
       "Dualtron 2- Handlebar Support Strut & Suspension",
       "Dualtron- EYE Dashboard/Throttle Control",
       "Dualtron- Side Panels"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -697,7 +713,8 @@
       "Dualtron- Charging Flap",
       "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
       "Dualtron 2- Handlebar Support Strut & Suspension"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -736,7 +753,8 @@
       "Dualtron- Single-Dual Motor Activation Switch",
       "Dualtron- EYE Dashboard/Throttle Control",
       "Dualtron- Fingerprint Security Scanner"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -774,7 +792,8 @@
       "Dualtron Ultra-Thunder- Rear Fender/Mud-guard",
       "Dualtron- Side-panel to Controller Splitter Cable",
       "Dualtron Spider- Controller"
-    ]
+    ],
+    "availability": 1
   },
   {
     "shortDescription": [
@@ -812,7 +831,8 @@
       "Dualtron 2- Handlebar Support Strut & Suspension",
       "Dualtron- EYE Dashboard/Throttle Control",
       "Dualtron Ultra-Thunder- Rear Fender/Mud-guard"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -857,7 +877,8 @@
       "Dualtron 2- Rear Fender/Mud-guard",
       "Dualtron- Charging Flap",
       "Dualtron Thunder-Ultra- Handlebar Locking Latch"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -895,7 +916,8 @@
       "Dualtron 2- Rear Fender/Mud-guard",
       "Dualtron- Fingerprint Security Scanner",
       "Dualtron Thunder-Ultra- Handlebar Locking Latch"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": [
@@ -935,7 +957,8 @@
       "Dualtron- Single-Dual Motor Activation Switch",
       "Dualtron Thunder-Ultra- Handlebar Locking Latch",
       "Dualtron- Seat Kit"
-    ]
+    ],
+    "availability": 1
   },
   {
     "shortDescription": [
@@ -974,7 +997,8 @@
       "Speedway Mini4 Seat Kit",
       "Inner-tube: 18” x 2.5”, Kenda",
       "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": [
@@ -1012,7 +1036,8 @@
       "Dualtron- Single-Dual Motor Activation Switch",
       "Dualtron- Front Fender/Mud-guard",
       "Dualtron Ultra-Thunder- Rear Fender/Mud-guard"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -1051,7 +1076,8 @@
       "Dualtron 2- Rear Fender/Mud-guard",
       "Dualtron- Side Panels",
       "Dualtron 2- Handlebar Support Strut & Suspension"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -1090,7 +1116,8 @@
       "Inner-tube: 14” x 1.50″",
       "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
       "Tire: 18” x 2.5”, Kenda"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -1129,7 +1156,8 @@
       "Electric Scooter: Tire 8”x 2”",
       "New: Speedway PRO III/IV (NOT Mini4), 5A/58.8v Charger",
       "Inner-tube: 18” x 2.5”, Kenda"
-    ]
+    ],
+    "availability": 1
   },
   {
     "shortDescription": [
@@ -1166,7 +1194,8 @@
       "V5F: Set of Outer Shells, Black",
       "Electric Scooter: Inner-tube 8”x 2”",
       "L6/Lively: Replacement Control-Board"
-    ]
+    ],
+    "availability": 13
   },
   {
     "shortDescription": [
@@ -1203,7 +1232,8 @@
       "Electric Scooter: Inner-tube 8”x 2”",
       "V5F: Set of Outer Shells, Black",
       "V3Pro: Set of Pads"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -1437,7 +1467,8 @@
       "Dualtron Ultra- Tube Road Tire",
       "Protective Padding/Bumper Strip",
       "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2"
-    ]
+    ],
+    "availability": 39
   },
   {
     "shortDescription": [
@@ -1501,7 +1532,8 @@
       "KS 14C: Replacement Control-Board",
       "Tire: 16” x 1.95″ Kenda for V8/Glide 3",
       "Tire: 18” x 2.5”, Kenda"
-    ]
+    ],
+    "availability": 16
   },
   {
     "shortDescription": [
@@ -1815,7 +1847,8 @@
       "18L/XL Bodyguard Protective Neoprene Covers Roll.nz",
       "eWheels Branded Wrist-guards",
       "KS 14C: Replacement Control-Board"
-    ]
+    ],
+    "availability": 50
   },
   {
     "shortDescription": [
@@ -1858,7 +1891,8 @@
       "GW Monster: Seat/Cushion",
       "GW Telsa: Replacement Control-Board",
       "GW MSuper V3s+: Set of Side Panels, Black"
-    ]
+    ],
+    "availability": 3
   },
   {
     "shortDescription": [
@@ -1897,7 +1931,8 @@
       "GW Telsa: Replacement Control-Board",
       "GW Monster: Replacement Control-Board",
       "GW Monster: Seat/Cushion"
-    ]
+    ],
+    "availability": 10
   },
   {
     "shortDescription": [
@@ -1936,7 +1971,8 @@
       "GW Monster: Pair of Shells",
       "GW Monster: Set of Side Panels, Black",
       "GW ACM/ACMS+: Replacement Control-Board"
-    ]
+    ],
+    "availability": 10
   },
   {
     "shortDescription": [
@@ -1973,7 +2009,8 @@
       "V8: Pair of Structural Inner/shells",
       "V8: Pair of Outer Shells",
       "V5F: Set of Outer Shells, White"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -2366,7 +2403,8 @@
       "Tire: 16” x 1.95″ Kenda for V8/Glide 3",
       "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
       "NEW: King Song 18S, 840Wh & 1500W Motor"
-    ]
+    ],
+    "availability": 55
   },
   {
     "shortDescription": [
@@ -2449,7 +2487,8 @@
         "defaultUnit": "inch"
       }
     ],
-    "relatedProductsNames": ["King Song 14D, 340/420Wh Battery, 800W Motor"]
+    "relatedProductsNames": ["King Song 14D, 340/420Wh Battery, 800W Motor"],
+    "availability": 6
   },
   {
     "shortDescription": [
@@ -2485,7 +2524,8 @@
       "KS 14B: 174Wh Battery Pack",
       "KS 14B/C: Pair of Replacement LED Covers, Black",
       "KS 16: Set of 2x LED Strips"
-    ]
+    ],
+    "availability": 6
   },
   {
     "shortDescription": [
@@ -2521,7 +2561,8 @@
       "NEW: MTen3 10”, ‘The Pocket Rocket’, 512Wh/800W Motor",
       "KS 14C & 16B: 840Wh Battery Pack Pair",
       "King Song 16X Seat"
-    ]
+    ],
+    "availability": 17
   },
   {
     "shortDescription": [
@@ -2557,7 +2598,8 @@
       "KS 14B: 174Wh Battery Pack",
       "KS 16: Set of Unbranded Upper Pads",
       "KS16: Top Cover with Switch & Charging Port, Black Gloss"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": ["14″ replacement tire"],
@@ -2591,7 +2633,8 @@
       "KS 16S: Replacement Control-Board",
       "NEW: King Song 18S, 840Wh & 1500W Motor",
       "KS 14C: Replacement Control-Board"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": [
@@ -2802,7 +2845,8 @@
       "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
       "NEW: King Song 16X 1554Wh Battery/2000W Motor, 3″ Wide Tire",
       "King Song 16S, 1200W Motor/840Wh Battery"
-    ]
+    ],
+    "availability": 34
   },
   {
     "shortDescription": [
@@ -2838,7 +2882,8 @@
       "KS 14C: Replacement Control-Board",
       "King Song 16X Seat",
       "Inner-Tube: 14” x 2.125”, Kenda"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": ["King Song 16″ Retractable Handle"],
@@ -2872,7 +2917,8 @@
       "KS 14D: Replacement Control-Board",
       "KS 16S: Replacement Control-Board",
       "KS16: Top Cover with Switch & Charging Port, Black Matte"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -2908,7 +2954,8 @@
       "KS 16: LED Panel Cover",
       "KS 14C: Replacement Control-Board",
       "KS 14B: 174Wh Battery Pack"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": ["LED Cover of a black tinted semi-transparent polycarbonate"],
@@ -2942,7 +2989,8 @@
       "KS16: Top Cover with Switch & Charging Port, Black Matte",
       "KS 14S: Set of Unbranded Pads",
       "Inner-Tube: 14” x 2.125”, Kenda"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": ["King Song 16″ Multi-colored LED strips, consisting of one pair, x2"],
@@ -2976,7 +3024,8 @@
       "KS 16B: Replacement Control-Board",
       "King Song 16X Seat",
       "NEW: King Song 18S, 840Wh & 1500W Motor"
-    ]
+    ],
+    "availability": 20
   },
   {
     "shortDescription": [
@@ -3040,7 +3089,8 @@
       "Inner-Tube: 14” x 2.125”, Kenda",
       "KS 16S: Replacement Control-Board",
       "KS 14S: Set of Unbranded Pads"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": [
@@ -3179,7 +3229,8 @@
       "Tire: 18” x 2.5”, Kenda",
       "KS 16: Set of 2x LED Strips",
       "Solowheel Glide 3, 480Wh Battery/800W Motor"
-    ]
+    ],
+    "availability": 30
   },
   {
     "shortDescription": [
@@ -3215,7 +3266,8 @@
       "KS 16S: Replacement Control-Board",
       "KS 18: Set of Unbranded Upper Pads",
       "Inner-Tube: 14” x 2.125”, Kenda"
-    ]
+    ],
+    "availability": 15
   },
   {
     "shortDescription": [
@@ -3251,7 +3303,8 @@
       "NEW: King Song 18S, 840Wh & 1500W Motor",
       "KS16: Top Cover with Switch & Charging Port, Black Gloss",
       "KS 16B: Replacement Control-Board"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -3686,7 +3739,8 @@
       "Tire: 16” x 2.125”, Kenda",
       "KS 16: Set of 2x LED Strips",
       "NEW: King Song 18S, 840Wh & 1500W Motor"
-    ]
+    ],
+    "availability": 70
   },
   {
     "shortDescription": [
@@ -3716,7 +3770,8 @@
       "KS 14C & 16B: 840Wh Battery Pack Pair",
       "KS 14B/C: Telescopic Handle Add-on",
       "KS16: Top Cover with Switch & Charging Port, Black Matte"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -3755,7 +3810,8 @@
       "KS 16: Retractable Handle Kit",
       "Tire: 14” x 2.125”, Kenda",
       "KS 14B/C: Telescopic Handle Add-on"
-    ]
+    ],
+    "availability": 2
   },
   {
     "shortDescription": [
@@ -3791,7 +3847,8 @@
       "KS 16S: Replacement Control-Board",
       "KS 16: Set of 2x LED Strips",
       "KS 14C: Replacement Control-Board"
-    ]
+    ],
+    "availability": 8
   },
   {
     "shortDescription": [
@@ -3827,7 +3884,8 @@
       "KS14C: Replacement Set of Shells, Black Gloss",
       "KS 16: LED Panel Cover",
       "KS16: Top Cover with Switch & Charging Port, Black Matte"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -3866,7 +3924,8 @@
       "KS 14D: Replacement Control-Board",
       "Tire: 14” x 2.125”, Kenda",
       "KS 14C: Replacement Control-Board"
-    ]
+    ],
+    "availability": 20
   },
   {
     "shortDescription": [
@@ -3902,7 +3961,8 @@
       "KS 16: Set of Unbranded Upper Pads",
       "KS16: Replacement Set of Outer Shells, Black Gloss",
       "KS 14D: Replacement Control-Board"
-    ]
+    ],
+    "availability": 15
   },
   {
     "shortDescription": [
@@ -3940,7 +4000,8 @@
       "KS 16: Set of 2x LED Strips",
       "KS16: Replacement Set of Outer Shells, Black Gloss",
       "KS 16: Retractable Handle Kit"
-    ]
+    ],
+    "availability": 7
   },
   {
     "shortDescription": [
@@ -3978,7 +4039,8 @@
       "KS 14B/C: Pair of Replacement LED Covers, Black",
       "KS 14C & 16B: 840Wh Battery Pack Pair",
       "KS14C: Replacement Set of Shells, Black Gloss"
-    ]
+    ],
+    "availability": 9
   },
   {
     "shortDescription": [
@@ -4015,7 +4077,8 @@
       "KS 18AY+(1200W): Replacement Control-board",
       "KS16: Top Cover with Switch & Charging Port, Black Gloss",
       "KS16: Replacement Set of Outer Shells, Black Gloss"
-    ]
+    ],
+    "availability": 15
   },
   {
     "shortDescription": [
@@ -4053,7 +4116,8 @@
       "KS 14B: 174Wh Battery Pack",
       "KS 18: Set of Unbranded Upper Pads",
       "KS16: Replacement Set of Outer Shells, Black Gloss"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": [
@@ -4091,7 +4155,8 @@
       "KS 16: LED Panel Cover",
       "KS 14D: Replacement Control-Board",
       "KS 16B: Replacement Control-Board"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -4129,7 +4194,8 @@
       "KS 14S: Set of Unbranded Pads",
       "KS 16: Set of Unbranded Upper Pads",
       "KS 14D: Replacement Control-Board"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -4168,7 +4234,8 @@
       "KS 18: Set of Unbranded Upper Pads",
       "KS16: Top Cover with Switch & Charging Port, Black Gloss",
       "KS 14B/C: Telescopic Handle Add-on"
-    ]
+    ],
+    "availability": 4
   },
   {
     "shortDescription": [
@@ -4204,7 +4271,8 @@
       "Tire: 18” x 2.5”, Kenda",
       "Dualtron Thunder- Tubeless Road Tire",
       "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2"
-    ]
+    ],
+    "availability": 16
   },
   {
     "shortDescription": [
@@ -4241,7 +4309,8 @@
       "V3Pro: 144Wh Replacement Battery Pack",
       "L6/Lively: Replacement Control-Board",
       "L6/Lively: Kickstand"
-    ]
+    ],
+    "availability": 10
   },
   {
     "shortDescription": [
@@ -4277,7 +4346,8 @@
       "V8: Extendable Handle",
       "L6/Lively: Replacement Control-Board",
       "V5F/+ Handle Kit"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": ["L6 Scooter Front Spring Set"],
@@ -4311,7 +4381,8 @@
       "V5F: Charger Port Flap",
       "L6/Lively: Standing Mat",
       "V8: Extendable Handle"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": ["Pair of spring for the Inmotion L6 Electric Scooter"],
@@ -4329,7 +4400,8 @@
       "V8: Pair of Structural Inner/shells",
       "V3Pro: Set of Pads",
       "V5/V8: Front LED Headlight"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -4365,7 +4437,8 @@
       "V8: Charger Port Flap",
       "V8: Rear LED Light",
       "V5F/V5F+: Replacement Control-board"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": ["Replacement control-board for the L6 Scooter."],
@@ -4399,7 +4472,8 @@
       "L6/Lively: Kickstand",
       "V5F: Charger Port Flap",
       "V3Pro: 144Wh Replacement Battery Pack"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": [
@@ -4437,7 +4511,8 @@
       "L6: Rear Spring Set",
       "Electric Scooter: Inner-tube 8”x 2”",
       "L6/Lively: Replacement Control-Board"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -4475,7 +4550,8 @@
       "Scooter Brake Disc Rotor",
       "Mini4- Rear Brake Lever",
       "Mini4- Dashboard Data Cable"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": [
@@ -4514,7 +4590,8 @@
       "Mini4- Front Fork",
       "Speedway III/IV- 600W Motor",
       "Mini4- Bare Handlebar with Folding Extensions"
-    ]
+    ],
+    "availability": 3
   },
   {
     "shortDescription": [
@@ -4552,7 +4629,8 @@
       "Mini4- Bare Handlebar with Folding Extensions",
       "Mini4- Solid Rubber Front Tire",
       "Mini4- Handle Grip Set"
-    ]
+    ],
+    "availability": 9
   },
   {
     "shortDescription": [
@@ -4590,7 +4668,8 @@
       "Mini4- Rear Mud-guard",
       "Mini4- Front Fork",
       "Mini4- Front Fender/Mud-guard"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -4629,7 +4708,8 @@
       "Mini4- Handle Grip Set",
       "Mini4- Trolley-wheel Kit",
       "4x Scooter Brake Pads"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": [
@@ -4667,7 +4747,8 @@
       "Mini4- Front Fork",
       "Mini4- Dashboard Data Cable",
       "Mini 4- Rear Drum Brake Shoe"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": [
@@ -4706,7 +4787,8 @@
       "Mini4- Dashboard/Throttle Unit",
       "Mini4- Handle Grip Set",
       "Speedway III- Rear Fender/Mud-guard"
-    ]
+    ],
+    "availability": 13
   },
   {
     "shortDescription": [
@@ -4750,7 +4832,8 @@
       "Scooter Rear Brake Line Cable",
       "Mini 4- Rear Drum Brake Shoe",
       "Mini4- Rear Brake Lever"
-    ]
+    ],
+    "availability": 9
   },
   {
     "shortDescription": [
@@ -4790,7 +4873,8 @@
       "Mini4- Deck Anti-slip Mat",
       "Mini 4- Rear Drum Brake Shoe",
       "Mini4- Handle Grip Set"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -4828,7 +4912,8 @@
       "Mini4- Front Fender/Mud-guard",
       "Mini4- Dashboard Data Cable",
       "Mini4- Solid Rubber Front Tire"
-    ]
+    ],
+    "availability": 1
   },
   {
     "shortDescription": [
@@ -4867,7 +4952,8 @@
       "Mini4- Rear Mud-guard",
       "Mini4- Handlebar Base",
       "Mini4- Solid Rubber Front Tire"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -4905,7 +4991,8 @@
       "Mini4- Dashboard Data Cable",
       "Mini4- Bare Handlebar with Folding Extensions",
       "Mini4- Handle Grip Set"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -4945,7 +5032,8 @@
       "Mini4- Handlebar Base",
       "Mini4- Side Panels",
       "Mini4- Solid Rubber Front Tire"
-    ]
+    ],
+    "availability": 9
   },
   {
     "shortDescription": [
@@ -4983,7 +5071,8 @@
       "Mini4- Deck Anti-slip Mat",
       "Mini4- Dashboard/Throttle Unit",
       "Mini4- Dashboard Data Cable"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -5023,7 +5112,8 @@
       "Mini4- Front Fork",
       "Mini4- Solid Rubber Front Tire",
       "Mini4- Front Fender/Mud-guard"
-    ]
+    ],
+    "availability": 17
   },
   {
     "shortDescription": [
@@ -5062,7 +5152,8 @@
       "GW ACM/ACMS+: Set of Pedals",
       "GW Telsa: Replacement Control-Board",
       "GW ACM/ACMS+: Replacement Control-Board"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -5100,7 +5191,8 @@
       "GW Monster: Replacement Control-Board",
       "GW Telsa: Replacement Control-Board",
       "GW Monster: Set of Side Panels, Black"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": [
@@ -5138,7 +5230,8 @@
       "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack",
       "GW MSuper V3s+: Set of Side Panels, Black",
       "GW MSuper V3s+: Replacement Control-Board"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -5176,7 +5269,8 @@
       "GW ACM/ACMS+: Replacement Control-Board",
       "GW Monster: Pair of Shells",
       "GW MTen3: Replacement Control-Board"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -5214,7 +5308,8 @@
       "GW ACM/ACMS+: Set of Pedals",
       "GW Monster: Set of Side Panels, Black",
       "GW MSuper V3s+: Replacement Control-Board"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -5254,7 +5349,8 @@
       "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack",
       "GW MSuper V3s+: Set of Side Panels, Black",
       "GW Telsa: Replacement Control-Board"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": [
@@ -5323,7 +5419,8 @@
       "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
       "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
       "NEW: Turbowheel Dart, T9 600W/614Wh"
-    ]
+    ],
+    "availability": 8
   },
   {
     "shortDescription": [
@@ -5385,7 +5482,8 @@
       "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike",
       "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors",
       "NEW: Turbowheel Dart, T9 600W/614Wh"
-    ]
+    ],
+    "availability": 1
   },
   {
     "shortDescription": [
@@ -5496,7 +5594,8 @@
       "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
       "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
       "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor"
-    ]
+    ],
+    "availability": 23
   },
   {
     "shortDescription": [
@@ -5564,7 +5663,8 @@
       "Tire: 18” x 2.5”, Kenda",
       "New: Speedway Mini4 5A/54.6v Charger",
       "Dualtron Thunder- Tubeless Road Tire"
-    ]
+    ],
+    "availability": 8
   },
   {
     "shortDescription": [
@@ -5733,7 +5833,8 @@
       "NEW: King Song 16X 1554Wh Battery/2000W Motor, 3″ Wide Tire",
       "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
       "King Song 14S, 840Wh Battery/800W Motor"
-    ]
+    ],
+    "availability": 27
   },
   {
     "shortDescription": [
@@ -5858,7 +5959,8 @@
       "King Song 14S, 840Wh Battery/800W Motor",
       "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
       "Inmotion V10/V10F, 960Wh Battery/2000W Motor"
-    ]
+    ],
+    "availability": 19
   },
   {
     "shortDescription": [
@@ -6029,7 +6131,8 @@
       "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
       "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
       "King Song 16S, 1200W Motor/840Wh Battery"
-    ]
+    ],
+    "availability": 36
   },
   {
     "shortDescription": [
@@ -6090,7 +6193,8 @@
       "King Song 14S, 840Wh Battery/800W Motor",
       "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
       "NEW: King Song 18XL 1554Wh Battery/2000W Motor"
-    ]
+    ],
+    "availability": 2
   },
   {
     "shortDescription": [
@@ -6320,7 +6424,8 @@
       "KS 14B/C: Telescopic Handle Add-on",
       "KS 16: LED Panel Cover",
       "Inner-Tube: 14” x 2.125”, Kenda"
-    ]
+    ],
+    "availability": 32
   },
   {
     "shortDescription": [
@@ -6525,7 +6630,8 @@
       "NEW: Gotway MCM5 14”. ‘The Mountain Climber’. 800Wh Battery/1500W Motor",
       "Solowheel Glide 3, 480Wh Battery/800W Motor",
       "NEW: Gotway Monster, 22”, 100V/1845Wh, 84V/2400Wh"
-    ]
+    ],
+    "availability": 43
   },
   {
     "shortDescription": [
@@ -6661,7 +6767,8 @@
       "12” x 9” Piece of Jessup Skate Grip Tape",
       "New: Speedway Mini4 5A/54.6v Charger",
       "Inner-tube: 16” x 2.125”, Kenda"
-    ]
+    ],
+    "availability": 23
   },
   {
     "shortDescription": [
@@ -6845,7 +6952,8 @@
       "NEW: Inmotion XL Pedals for V10/F, V8/Glide 3, V5F/Glide 2",
       "Tire: 14” x 2.125”, Kenda",
       "Tire: 16” x 2.125”, Kenda"
-    ]
+    ],
+    "availability": 38
   },
   {
     "shortDescription": [
@@ -7155,7 +7263,8 @@
         "iconSrc": "https://www.ewheels.com/wp-content/uploads/2019/07/Range-Graph-1.png"
       }
     ],
-    "relatedProductsNames": ["IPS a130 Turbo Edition"]
+    "relatedProductsNames": ["IPS a130 Turbo Edition"],
+    "availability": 45
   },
   {
     "shortDescription": [
@@ -7216,7 +7325,8 @@
       "NEW: Gotway MSuper X MSX. 1600Wh Battery/2000W Motor",
       "NEW: King Song 18XL 1554Wh Battery/2000W Motor",
       "Inmotion V10/V10F, 960Wh Battery/2000W Motor"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -7631,7 +7741,8 @@
       "NEW: Gotway Tesla 16” 1020Wh/2000W Motor",
       "King Song 16S, 1200W Motor/840Wh Battery",
       "King Song 14S, 840Wh Battery/800W Motor"
-    ]
+    ],
+    "availability": 79
   },
   {
     "shortDescription": [
@@ -7712,7 +7823,8 @@
       "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
       "NEW: Turbowheel Hornet, 921Wh Battery/2x 500W (2400W) Motors",
       "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors"
-    ]
+    ],
+    "availability": 17
   },
   {
     "shortDescription": [
@@ -7816,7 +7928,8 @@
       "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors",
       "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
       "NEW: Dualtron 3. 1,658Wh/2x 800W (1600W) Motors"
-    ]
+    ],
+    "availability": 23
   },
   {
     "shortDescription": [
@@ -7855,7 +7968,8 @@
       "Electric Scooter Tire- 10″ x 2.5″",
       "Tire: 18” x 2.5”, Kenda",
       "Electric Scooter: Inner-tube 10”x 2”"
-    ]
+    ],
+    "availability": 16
   },
   {
     "shortDescription": [
@@ -7914,7 +8028,8 @@
       "Electric Scooter: Inner-tube 8”x 2”",
       "Inner-tube: 18” x 2.5”, Kenda",
       "Inner-Tube: 14” x 2.125”, Kenda"
-    ]
+    ],
+    "availability": 10
   },
   {
     "shortDescription": [
@@ -8001,7 +8116,8 @@
       "NEW: Turbowheel Dart, T9 600W/614Wh",
       "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
       "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -8280,7 +8396,8 @@
       "NEW: Dualtron Spider 1,050Wh Battery/3000W Peak Power",
       "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
       "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power"
-    ]
+    ],
+    "availability": 42
   },
   {
     "shortDescription": [
@@ -8373,7 +8490,8 @@
       "NEW: Turbowheel Lightning, 957Wh/1165Wh Battery, 2x 1000W (3600W) Motors",
       "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
       "NEW: Dualtron Thunder 2,060Wh/2x 1,200W (2,400W) Motors"
-    ]
+    ],
+    "availability": 13
   },
   {
     "shortDescription": [
@@ -8567,7 +8685,8 @@
       "NEW: Ninebot-Segway ES2/ES4. 187Wh Battery/300W Motor",
       "NEW: Speedway 5, 1,404Wh Battery/3600W Peak Power",
       "NEW: Stigo B1 480Wh Battery/350W Electric Folding Bike"
-    ]
+    ],
+    "availability": 29
   },
   {
     "shortDescription": [
@@ -8607,7 +8726,8 @@
       "Electric Scooter: Tire 8”x 2”",
       "Speedway Mini4 Seat Kit",
       "Tire: 14” x 1.5 Tire, for V3Pro"
-    ]
+    ],
+    "availability": 16
   },
   {
     "shortDescription": [
@@ -8646,7 +8766,8 @@
       "Mini4- Deck Anti-slip Mat",
       "Mini4- Rear Mud-guard",
       "Mini4- Rear Brake Lever"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -8685,7 +8806,8 @@
       "Turbowheel Dart- Brake Lever Set",
       "Turbowheel Dart- LED Strips",
       "Turbowheel- Dashboard/Throttle Unit"
-    ]
+    ],
+    "availability": 8
   },
   {
     "shortDescription": [
@@ -8725,7 +8847,8 @@
       "Dualtron Thunder- Tubeless Road Tire",
       "84.2v Rapid-charger for Gotway, KS18L/XL, Glide3/V8",
       "Tire: 14” x 1.5 Tire, for V3Pro"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -8765,7 +8888,8 @@
       "Mini4- Trolley-wheel Kit",
       "Mini4- Handle Grip Set",
       "Mini4- Deck Anti-slip Mat"
-    ]
+    ],
+    "availability": 7
   },
   {
     "shortDescription": [
@@ -8804,7 +8928,8 @@
       "Mini4- Deck Anti-slip Mat",
       "Mini 4- Rear Drum Brake Shoe",
       "Mini4- Dashboard/Throttle Unit"
-    ]
+    ],
+    "availability": 16
   },
   {
     "shortDescription": [
@@ -8845,7 +8970,8 @@
       "New: King Song 10″/25cm Extended Length Pedal",
       "Dualtron Ultra- Tube Road Tire",
       "12” x 9” Piece of Jessup Skate Grip Tape"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -8881,7 +9007,8 @@
       "V5F/V5F+: Replacement Control-board",
       "KS 14C: Replacement Control-Board",
       "18L/XL Bodyguard Protective Neoprene Covers Roll.nz"
-    ]
+    ],
+    "availability": 13
   },
   {
     "shortDescription": [
@@ -8921,7 +9048,8 @@
       "4x Scooter Brake Pads",
       "Turbowheel Hornet- Rear Fender/Mud-guard",
       "Turbowheel Hornet- Front Fender/Mud-guard"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -8960,7 +9088,8 @@
       "4x Scooter Brake Pads",
       "Turbowheel Dart- LED Strips",
       "Turbowheel Hornet- Rear Fender/Mud-guard"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -8998,7 +9127,8 @@
       "Turbowheel- Dashboard/Throttle Unit",
       "Scooter Rear Brake Line Cable",
       "Turbowheel Dart- Front Cover Panel"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": [
@@ -9038,7 +9168,8 @@
       "Scooter Rear Brake Line Cable",
       "Turbowheel Hornet- Front Fender/Mud-guard",
       "Turbowheel Dart- Front Cover Panel"
-    ]
+    ],
+    "availability": 6
   },
   {
     "shortDescription": [
@@ -9078,7 +9209,8 @@
       "Turbowheel Dart- Front Cover Panel",
       "Turbowheel Dart- LED Strips",
       "Turbowheel Hornet- Key Ignition & Voltmeter"
-    ]
+    ],
+    "availability": 3
   },
   {
     "shortDescription": [
@@ -9117,7 +9249,8 @@
       "Turbowheel Hornet- Key Ignition & Voltmeter",
       "4x Scooter Brake Pads",
       "Scooter Rear Brake Line Cable"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -9155,7 +9288,8 @@
       "Turbowheel Hornet- Rear Fender/Mud-guard",
       "Turbowheel Dart- LED Strips",
       "Turbowheel Dart- Front Fender/Mud-guard"
-    ]
+    ],
+    "availability": 7
   },
   {
     "shortDescription": [
@@ -9195,7 +9329,8 @@
       "Turbowheel Dart- Front Fender/Mud-guard",
       "Turbowheel- Dashboard/Throttle Unit",
       "Scooter Rear Brake Line Cable"
-    ]
+    ],
+    "availability": 18
   },
   {
     "shortDescription": [
@@ -9234,7 +9369,8 @@
       "Turbowheel Dart- Brake Lever Set",
       "Scooter Rear Brake Line Cable",
       "4x Scooter Brake Pads"
-    ]
+    ],
+    "availability": 6
   },
   {
     "shortDescription": [
@@ -9270,7 +9406,8 @@
       "Solowheel Glide 3, 480Wh Battery/800W Motor",
       "Electric Scooter: Tire 8”x 2”",
       "12” x 9” Piece of Jessup Skate Grip Tape"
-    ]
+    ],
+    "availability": 17
   },
   {
     "shortDescription": [
@@ -9306,7 +9443,8 @@
       "L6/Lively: Standing Mat",
       "V3S: Replacement Control-Board",
       "V8: 800W Motor"
-    ]
+    ],
+    "availability": 2
   },
   {
     "shortDescription": [
@@ -9342,7 +9480,8 @@
       "V5F: Charger Port Flap",
       "V8: Pair of Structural Inner/shells",
       "V8/Glide 3: Protective Cover"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": ["Compatible with the Inmotion V3Pro & IPS i5, the 14″ x 1.50″ innertube."],
@@ -9376,7 +9515,8 @@
       "Tire: 14” x 2.125”, Kenda",
       "Inner-tube: 18” x 2.5”, Kenda",
       "12” x 9” Piece of Jessup Skate Grip Tape"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -9413,7 +9553,8 @@
       "V8: Rear LED Light",
       "V3S: Replacement Control-Board",
       "V5F/V5F+: Replacement Control-board"
-    ]
+    ],
+    "availability": 9
   },
   {
     "shortDescription": [
@@ -9451,7 +9592,8 @@
       "V5F: Set of Outer Shells, White",
       "L6/Lively: Standing Mat",
       "V8/Glide 3: Protective Cover"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -9489,7 +9631,8 @@
       "V5F: Set of Outer Shells, Black",
       "V3Pro: Replacement Control-Board",
       "L6: Front Spring Set"
-    ]
+    ],
+    "availability": 13
   },
   {
     "shortDescription": [
@@ -9525,7 +9668,8 @@
       "L6/Lively: Replacement Control-Board",
       "V3Pro: Charging Slot & Panel",
       "V5/V8: Front LED Headlight"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -9561,7 +9705,8 @@
       "V8: Rear LED Light",
       "Electric Scooter: Inner-tube 8”x 2”",
       "V3Pro: Replacement Control-Board"
-    ]
+    ],
+    "availability": 8
   },
   {
     "shortDescription": [
@@ -9597,7 +9742,8 @@
       "V8: Extendable Handle",
       "V8: Rear LED Light",
       "V3Pro: Replacement Control-Board"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": ["Front headlight module for the Inmotion V5 &  V8.\nEstimated time to install, 45 minutes."],
@@ -9631,7 +9777,8 @@
       "L6/Lively: Kickstand",
       "V3Pro: 144Wh Replacement Battery Pack",
       "V3Pro: Resting Bumpers"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": ["Replacement flap to cover the charging port on the V5F"],
@@ -9665,7 +9812,8 @@
       "V8: Rear LED Light",
       "V8/Glide 3: Protective Cover",
       "V8: Charger Port Flap"
-    ]
+    ],
+    "availability": 9
   },
   {
     "shortDescription": [
@@ -9704,7 +9852,8 @@
       "V5F: Set of Outer Shells, White",
       "V3Pro: Replacement Control-Board",
       "L6/Lively: Standing Mat"
-    ]
+    ],
+    "availability": 4
   },
   {
     "shortDescription": [
@@ -9740,7 +9889,8 @@
       "V8/Glide 3: Protective Cover",
       "Tire: 18” x 2.5”, Kenda",
       "Tire: 14” x 1.5 Tire, for V3Pro"
-    ]
+    ],
+    "availability": 1
   },
   {
     "shortDescription": [
@@ -9779,7 +9929,8 @@
       "L6: Rear Spring Set",
       "V8: Pair of Outer Shells",
       "V5F/V5F+: Replacement Control-board"
-    ]
+    ],
+    "availability": 15
   },
   {
     "shortDescription": [
@@ -9817,7 +9968,8 @@
       "V3Pro: Resting Bumpers",
       "V5F/+ Handle Kit",
       "V8/Glide 3: Protective Cover"
-    ]
+    ],
+    "availability": 12
   },
   {
     "shortDescription": [
@@ -9855,7 +10007,8 @@
       "V5F: Charger Port Flap",
       "L6/Lively: Kickstand",
       "L6/Lively: Standing Mat"
-    ]
+    ],
+    "availability": 14
   },
   {
     "shortDescription": [
@@ -9893,7 +10046,8 @@
       "V8/Glide 3: Protective Cover",
       "V8: Rear LED Light",
       "L6/Lively: Kickstand"
-    ]
+    ],
+    "availability": 7
   },
   {
     "shortDescription": [
@@ -9932,7 +10086,8 @@
       "V3Pro: Replacement Control-Board",
       "V5F/+ Handle Kit",
       "L6/Lively: Replacement Control-Board"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -9969,7 +10124,8 @@
       "V3S: Replacement Control-Board",
       "V8: Extendable Handle",
       "V5F/+ Handle Kit"
-    ]
+    ],
+    "availability": 2
   },
   {
     "shortDescription": [
@@ -10007,7 +10163,8 @@
       "L6/Lively: Replacement Control-Board",
       "L6: Front Spring Set",
       "V8: Pair of Structural Inner/shells"
-    ]
+    ],
+    "availability": 6
   },
   {
     "shortDescription": [
@@ -10043,7 +10200,8 @@
       "Tire: 18” x 2.5”, Kenda",
       "Solowheel Glide 3, 480Wh Battery/800W Motor",
       "V5F/+ Handle Kit"
-    ]
+    ],
+    "availability": 11
   },
   {
     "shortDescription": [
@@ -10081,7 +10239,8 @@
       "V5F: Set of Outer Shells, Black",
       "V8/Glide 3: Protective Cover",
       "V5/V8: Front LED Headlight"
-    ]
+    ],
+    "availability": 10
   },
   {
     "shortDescription": [
@@ -10119,7 +10278,8 @@
       "L6: Rear Spring Set",
       "King Song 16X Seat",
       "V8: Pair of Structural Inner/shells"
-    ]
+    ],
+    "availability": 7
   },
   {
     "shortDescription": ["Rubber flap that seals the charging connector from the elements"],
@@ -10153,7 +10313,8 @@
       "V5F: Set of Outer Shells, White",
       "V5F/V5F+: Replacement Control-board",
       "V8: Extendable Handle"
-    ]
+    ],
+    "availability": 8
   },
   {
     "shortDescription": [
@@ -10189,7 +10350,8 @@
       "V5F/+ Handle Kit",
       "V8: Pair of Outer Shells",
       "V3S: Replacement Control-Board"
-    ]
+    ],
+    "availability": 0
   },
   {
     "shortDescription": ["Retractable handle for the Inmotion V8."],
@@ -10223,7 +10385,8 @@
       "V8: Charger Port Flap",
       "V5F: Set of Outer Shells, White",
       "V3Pro: 144Wh Replacement Battery Pack"
-    ]
+    ],
+    "availability": 6
   },
   {
     "shortDescription": [
@@ -10259,7 +10422,8 @@
       "V8: Pair of Outer Shells",
       "V3Pro: Set of Pads",
       "L6/Lively: Kickstand"
-    ]
+    ],
+    "availability": 3
   },
   {
     "shortDescription": [
@@ -10295,7 +10459,8 @@
       "L6: Front Spring Set",
       "V5F: Set of Outer Shells, Black",
       "V8: Charger Port Flap"
-    ]
+    ],
+    "availability": 10
   },
   {
     "shortDescription": [
@@ -10332,7 +10497,8 @@
       "V5F: Set of Outer Shells, White",
       "V5F: Charger Port Flap",
       "V8: Extendable Handle"
-    ]
+    ],
+    "availability": 1
   },
   {
     "shortDescription": ["Rear illumination for the Inmotion V8"],
@@ -10366,7 +10532,8 @@
       "V5F: Charger Port Flap",
       "V3Pro: Resting Bumpers",
       "V8: Pair of Structural Inner/shells"
-    ]
+    ],
+    "availability": 5
   },
   {
     "shortDescription": [
@@ -10403,7 +10570,8 @@
       "L6: Rear Spring Set",
       "V5F/+ Handle Kit",
       "V8: Pair of Structural Inner/shells"
-    ]
+    ],
+    "availability": 4
   },
   {
     "shortDescription": [
@@ -10439,7 +10607,8 @@
       "V8/Glide 3: Protective Cover",
       "V5F/+ Handle Kit",
       "L6/Lively: Replacement Control-Board"
-    ]
+    ],
+    "availability": 4
   },
   {
     "shortDescription": [
@@ -10480,7 +10649,8 @@
       "Electric Scooter: Inner-tube 8”x 2”",
       "L6: Front Spring Set",
       "V3S: Replacement Control-Board"
-    ]
+    ],
+    "availability": 17
   },
   {
     "shortDescription": [
@@ -10518,6 +10688,7 @@
       "V8: Extendable Handle",
       "V8/Glide 3: Protective Cover",
       "V8: Rear LED Light"
-    ]
+    ],
+    "availability": 20
   }
 ]

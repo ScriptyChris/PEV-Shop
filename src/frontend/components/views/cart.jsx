@@ -26,6 +26,7 @@ import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   addToCartBtn: 'Add to cart',
+  productIsUnavailable: 'Product is unavailable!',
   productAddedToCart: 'Product added to cart!',
   addingToCartAuthFailure: 'Adding product to cart is not available for your account type.',
   header: 'Cart',
@@ -46,14 +47,16 @@ export function AddToCartButton({
   productInfoForCart /* TODO: [TS] `as IUserCart['products']` */,
   isSmallIcon,
   className,
+  flattenUnavailableInfo,
 }) {
   if (
     !productInfoForCart.name ||
     productInfoForCart.price === undefined ||
     !productInfoForCart._id ||
+    productInfoForCart.availability === undefined
   ) {
     throw TypeError(
-      `productInfoForCart must be an object containing: 'name', 'price' and '_id'! 
+      `productInfoForCart must be an object containing: 'name', 'price', 'availability' and '_id'! 
       Received: '${JSON.stringify(productInfoForCart)}'.`
     );
   }
@@ -61,6 +64,8 @@ export function AddToCartButton({
   const [popupData, setPopupData] = useState(null);
   const routesGuards = useRoutesGuards(storeService);
   const cartButtonAnchorSetterRef = useRef(null);
+  const [productRemainingAvailability, setProductRemainingAvailability] = useState(productInfoForCart.availability);
+  const productRemainingAvailabilityRef = useRef(productRemainingAvailability);
 
   const handleAddToCartClick = ({ target }) => {
     if (!routesGuards.isGuest() && !routesGuards.isClient()) {
@@ -71,9 +76,30 @@ export function AddToCartButton({
       });
     }
 
-    storeService.addProductToUserCartState(productInfoForCart);
+    const addedProductQuantity = storeService.addProductToUserCartState(productInfoForCart);
+    if (addedProductQuantity === -1) {
+      return setProductRemainingAvailability(0);
+    }
+
+    productRemainingAvailabilityRef.current = productInfoForCart.availability - addedProductQuantity;
     cartButtonAnchorSetterRef.current(target.closest('[data-cy="button:add-product-to-cart"]'));
   };
+
+  const handlerClosingAddToCartConfirmation = () => {
+    setProductRemainingAvailability(productRemainingAvailabilityRef.current);
+  };
+
+  if (!productRemainingAvailability) {
+    return (
+      <span
+        className={classNames('product-unavailable', className, {
+          'product-unavailable--flatten': !!flattenUnavailableInfo,
+        })}
+      >
+        {translations.productIsUnavailable}
+      </span>
+    );
+  }
 
   // TODO: [UX] add list of product's amount to be added to cart (defaulted to 1) with an option to type custom amount
   // TODO: [UX] set different color for button depending on it's usage availability
@@ -90,7 +116,11 @@ export function AddToCartButton({
       >
         {translations.addToCartBtn}
       </PEVButton>
-      <PEVPopover anchorSetterRef={cartButtonAnchorSetterRef} dataCy="popup:add-to-cart-confirmation">
+      <PEVPopover
+        anchorSetterRef={cartButtonAnchorSetterRef}
+        onClose={handlerClosingAddToCartConfirmation}
+        dataCy="popup:add-to-cart-confirmation"
+      >
         {translations.productAddedToCart}
       </PEVPopover>
 

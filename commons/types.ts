@@ -63,6 +63,7 @@ export interface IUserCart {
     price: number;
     _id: string;
     quantity: number;
+    availability: number;
   }[];
   totalCount: number;
   totalPrice: number;

@@ -628,6 +628,7 @@ export default observer(function ProductDetails() {
             productInfoForCart={{
               name: mergedProductData.name,
               price: mergedProductData.price,
+              availability: mergedProductData.availability,
               _id: mergedProductData._id,
             }}
             startOrEndIcon="startIcon"

@@ -65,6 +65,18 @@
   }
 }
 
+.product-unavailable {
+  background: $greyColor;
+  color: $veryDarkGreyColor;
+  border-radius: 0.5rem;
+  text-align: center;
+  padding: 0.5rem;
+
+  &--flatten {
+    padding-block: 0.25rem;
+  }
+}
+
 @include useMediaQuery(desktop) {
   .cart-toggler-btn {
     justify-self: start;

@@ -142,6 +142,7 @@ export default function Popup(props) {
       data-cy={dataCy}
       TransitionProps={{ onEntered: handleOpen }}
       aria-labelledby="popup-description" /* TODO: [a11y] use aria-describedby, which requires React > v16 */
+      PaperProps={{ className: 'popup' }}
     >
       <DialogContent>
         <DialogContentText data-cy="popup:message" id="popup-description" color="textPrimary">

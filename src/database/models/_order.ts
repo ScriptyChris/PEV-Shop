@@ -22,7 +22,7 @@ const orderedProductSchema = new Schema<IProductInOrder>(
       type: Number,
       required: true,
       validate(value: number) {
-        return value > 0;
+        return value > 0 && value <= (this as unknown as IProductInOrder & Document).$locals.productRef.availability;
       },
     },
   },
@@ -37,6 +37,10 @@ orderedProductSchema.virtual('productRef', {
   localField: 'id',
   foreignField: '_id',
   justOne: true,
+});
+orderedProductSchema.post('save', async (doc: IProductInOrder & Document) => {
+  doc.$locals.productRef.availability -= doc.quantity;
+  await doc.$locals.productRef.save();
 });
 
 const orderSchema = new Schema<IOrder>(
@@ -125,6 +129,16 @@ orderSchema.virtual('cost').get(function (value: any, virtual: any, doc: IOrder)
     shipment: shipmentCost,
     total: totalCost,
   };
+});
+orderSchema.pre('validate', async function () {
+  await this!.execPopulate(
+    // @ts-ignore
+    'regardingProducts.productRef'
+  );
+  (
+    (this as unknown as IOrder & Document).regardingProducts as (IProductInOrder &
+      Document & { productRef: Document })[]
+  ).forEach((product) => (product.$locals.productRef = product.productRef));
 });
 
 type TCreateOrderParams = Parameters<IOrderModel['createOrder']>;

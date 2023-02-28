@@ -31,3 +31,6 @@ export const SHIPMENT_METHODS_TO_COSTS = {
 
 // TODO: [UX] get it from backend - seller should be able to configure it
 export const SHOP_ADDRESS = ['PEV Shop', 'ul. Testable 1', '12-345 Testland'] as const;
+
+export const MIN_PRODUCT_UNITS = 0;
+export const MAX_PRODUCT_UNITS = 999;
