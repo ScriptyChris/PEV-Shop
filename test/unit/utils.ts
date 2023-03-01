@@ -32,7 +32,7 @@ const mockAndRequireModule = (path: string) => {
 };
 
 export const mockAndRequireDBModelsModules = () => {
-  return ['product', 'user', 'userRole'].map((modelName) =>
+  return ['product', 'order', 'user', 'userRole'].map((modelName) =>
     mockAndRequireModule(`src/database/models/_${modelName}.ts`)
   );
 };

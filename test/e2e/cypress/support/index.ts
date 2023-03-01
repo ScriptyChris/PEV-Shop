@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 import { TMessage } from './email-commands';
-import type { TE2EUser, IUserCart } from '@commons/types';
+import type { TE2EUser, IUserCart, IOrderPayload } from '@commons/types';
 import type { TUserPublic, IUser, TProductPublic } from '@database/models';
 import type { HeadersInit } from 'node-fetch';
 
@@ -48,6 +48,12 @@ declare global {
       sendAPIReq(apiReqOptions: TAPIReqOptions): Cypress.Chainable<Cypress.Response<any>>;
       cleanupCartState(): void;
       findProductByNameInCartStore(productName: string): Cypress.Chainable<NonNullable<IUserCart['products'][number]>>;
+      makeOrder(
+        orderData: IOrderPayload,
+        authToken: NonNullable<IUser['tokens']['auth']>[number]
+      ): Cypress.Chainable<any>;
+      removeOrders(): Cypress.Chainable<any>;
+      getProducts(): Cypress.Chainable<any>;
     }
   }
 }
@@ -57,4 +63,5 @@ import 'cypress-file-upload';
 import './email-commands';
 import './user-commands';
 import './product-commands';
+import './order-commands';
 import './misc-commands';

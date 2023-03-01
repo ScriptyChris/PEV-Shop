@@ -41,6 +41,7 @@ describe('product-form', () => {
 
     cy.get(makeCyDataSelector('input:base__name')).should('have.value', productData.name);
     cy.get(makeCyDataSelector('input:base__price')).should('have.value', productData.price);
+    cy.get(makeCyDataSelector('input:base__availability')).should('have.value', productData.availability);
     cy.wrap(productData.descriptions).then((descs) => {
       cy.wrap(descs.map((desc, index) => cy.contains(makeCyDataSelector(`label:shortDescription__${index}`), desc)));
     });
@@ -114,6 +115,7 @@ describe('product-form', () => {
       // TODO: [E2E] uncomment this when API will only recognize products by their ID instead of name
       // cy.get(makeCyDataSelector('input:base__name')).clear().type(testProductDataForForm.updatedName);
       cy.get(makeCyDataSelector('input:base__price')).clear().type(updatedProductFormData.raw.price);
+      cy.get(makeCyDataSelector('input:base__availability')).clear().type(updatedProductFormData.raw.availability);
 
       cy.get(makeCyDataSelector('list:shortDescription'))
         .children()
@@ -208,6 +210,7 @@ describe('product-form', () => {
       // assert form is empty
       cy.get(makeCyDataSelector('input:base__name')).should('have.value', '');
       cy.get(makeCyDataSelector('input:base__price')).should('have.value', '');
+      cy.get(makeCyDataSelector('input:base__availability')).should('have.value', '');
       cy.get(makeCyDataSelector('button:shortDescription__add-new'))
         .prev(makeCyDataSelector('list:shortDescription'))
         .children()
@@ -225,6 +228,7 @@ describe('product-form', () => {
       // fill form with new data
       cy.get(makeCyDataSelector('input:base__name')).type(testProductDataForForm.name);
       cy.get(makeCyDataSelector('input:base__price')).type(testProductDataForForm.price);
+      cy.get(makeCyDataSelector('input:base__availability')).type(testProductDataForForm.availability);
       cy.wrap(testProductDataForForm.descriptions).then((descs) => {
         cy.wrap(
           descs.map((desc, index) => {
@@ -282,6 +286,7 @@ function getTestProductData() {
   const forForm = {
     name: 'Some Test Product',
     price: '1234',
+    availability: '3',
     descriptions: ['A dummy sentence', 'Test something', "Like whatever. It doesn't matter"],
     category: 'Advanced Electric Wheels',
     specs: {
@@ -312,6 +317,7 @@ function getTestProductData() {
   const forAPI = {
     name: forForm.name,
     url: 'some-test-product',
+    availability: Number(forForm.availability),
     category: forForm.category,
     price: Number(forForm.price),
     shortDescription: forForm.descriptions,
@@ -363,6 +369,7 @@ function getUpdatedTestProductFormData() {
   const raw = {
     name: 'Some Test Product',
     price: '4321',
+    availability: '5',
     category: 'Accessories',
     specs: {
       weight: 50,
@@ -382,6 +389,7 @@ function getUpdatedTestProductFormData() {
   const assertable = {
     name: raw.name,
     price: raw.price,
+    availability: raw.availability,
     category: raw.category,
     descriptions: ['Updated test description', "Like whatever. It doesn't matter"],
     specs: raw.specs,
