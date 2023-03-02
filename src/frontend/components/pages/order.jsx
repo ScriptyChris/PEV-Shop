@@ -1,6 +1,7 @@
 import React, { memo, useState, useEffect, useRef, useMemo } from 'react';
 import classNames from 'classnames';
 import { useFormikContext } from 'formik';
+import { useHistory } from 'react-router-dom';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import Paper from '@material-ui/core/Paper';
@@ -36,16 +37,19 @@ import {
   PEVFormFieldError,
   PEVTabs,
 } from '@frontend/components/utils/pevElements';
+import { ROUTES } from '@frontend/components/pages/_routes';
+import { SHIPMENT_METHODS, SHOP_ADDRESS } from '@commons/consts';
+import Popup, { POPUP_TYPES } from '@frontend/components/utils/popup';
 
 const translations = Object.freeze({
-  mainHeading: 'Shipment and payment',
+  mainHeading: 'Prepare order',
   summaryHeading: 'Summary',
   orderReceiver: 'Receiver',
   orderShipmentChooser: 'Order shipment chooser',
   shipmentHeading: 'Shipment',
   paymentHeading: 'Payment',
   inPersonShipment: 'In person',
-  inPersonShipmentHeading: 'Pick up your purchase personally at our store',
+  inPersonShipmentHeading: 'Pick up your purchase personally at our store!',
   homeShipment: 'Home',
   homeShipmentHeading: 'Fill address information',
   parcelLockerShipment: 'Parcel locker',
@@ -56,9 +60,9 @@ const translations = Object.freeze({
   receiverName: 'Name',
   receiverEmail: 'Email',
   receiverPhone: 'Phone number',
-  receiverAddress1: 'Street and apartment number',
-  receiverAddress2: 'Postal code',
-  receiverAddress3: 'City',
+  shipmentAddress1: 'Street and apartment number',
+  shipmentAddress2: 'Postal code',
+  shipmentAddress3: 'City',
   forFree: 'free',
   paymentMethods: {
     cash: 'Cash',
@@ -69,7 +73,9 @@ const translations = Object.freeze({
   productsValue: 'Products',
   shipmentValue: 'Shipment',
   totalValue: 'Total',
-  makeOrder: 'Make order',
+  completeOrder: 'Complete order',
+  orderSuccessMsg: 'Order created!',
+  goToAccountOrders: 'Go to your orders',
   errorUnchosenShipmentMethod: 'Choose shipment method!',
   errorUnchosenParcelLocker: 'Choose parcel locker location!',
 });
@@ -141,20 +147,20 @@ const ParcelsMap = memo(
 function BasicReceiverInfo() {
   const basicFields = [
     {
-      name: 'receiver.baseInfo.name',
+      name: 'receiver.name',
       identity: 'name',
       label: translations.receiverName,
       'data-cy': 'input:receiver-name',
     },
     {
-      name: 'receiver.baseInfo.email',
+      name: 'receiver.email',
       identity: 'email',
       type: 'email',
       label: translations.receiverEmail,
       'data-cy': 'input:receiver-email',
     },
     {
-      name: 'receiver.baseInfo.phone',
+      name: 'receiver.phone',
       identity: 'phone',
       type: 'tel',
       label: translations.receiverPhone,
@@ -179,16 +185,76 @@ function BasicReceiverInfo() {
   );
 }
 
-function InPersonShipment({ formInitialsShipmentExtender }) {
-  // TODO: [UX] get it from backend - seller should be able to configure it
-  const shopAddress = ['PEV Shop', 'ul. Testowa 1', '12-345 Testolandia'];
+const Shipment = memo(function _Shipment({ formInitialsShipmentExtender, updateChosenShipmentPrice }) {
+  const { setFieldValue, errors, setFieldError } = useFormikContext();
+
+  // TODO: this should be (at least partially) received from backend and be configurable by seller
+  const tabsConfig = useMemo(
+    () => ({
+      groupName: 'shipment',
+      initialData: [
+        {
+          name: SHIPMENT_METHODS.IN_PERSON,
+          translation: translations.inPersonShipment,
+          icon: <EmojiPeopleIcon />,
+          content: <Shipment.InPerson formInitialsShipmentExtender={formInitialsShipmentExtender} />,
+          ribbon: {
+            value: 0,
+            transformer: getPresentedPrice,
+          },
+        },
+        {
+          name: SHIPMENT_METHODS.HOME,
+          translation: translations.homeShipment,
+          icon: <HomeIcon />,
+          content: <Shipment.Home formInitialsShipmentExtender={formInitialsShipmentExtender} />,
+          ribbon: {
+            value: 5,
+            transformer: getPresentedPrice,
+          },
+        },
+        {
+          name: SHIPMENT_METHODS.PARCEL_LOCKER,
+          translation: translations.parcelLockerShipment,
+          icon: <MailboxIcon />,
+          content: <Shipment.ParcelLocker formInitialsShipmentExtender={formInitialsShipmentExtender} />,
+          ribbon: {
+            value: 2,
+            transformer: getPresentedPrice,
+          },
+        },
+      ],
+      onTabChangeCallbacks: [
+        ({ name }) => setFieldValue('shipment.method', name),
+        ({ ribbon: { value: shipmentPrice } }) => updateChosenShipmentPrice(shipmentPrice),
+        () => setFieldError('shipment.method', ''),
+      ],
+    }),
+    [formInitialsShipmentExtender]
+  );
+
+  return (
+    <Paper component="section" className="order__shipment" data-cy="container:order-shipment">
+      <header>
+        <PEVHeading level={3} className="order-heading">
+          {translations.shipmentHeading}
+        </PEVHeading>
+      </header>
+
+      <PEVTabs config={tabsConfig} label={translations.orderShipmentChooser} areChoosersScrollable />
+
+      {errors.shipment?.method && <PEVFormFieldError customMessage={errors.shipment.method} />}
+    </Paper>
+  );
+});
+Shipment.InPerson = function InPerson({ formInitialsShipmentExtender }) {
   const { setFieldValue } = useFormikContext();
 
   useEffect(() => {
-    const address = shopAddress.join(',');
+    const address = SHOP_ADDRESS.join(',');
 
     formInitialsShipmentExtender('inPerson', address);
-    setFieldValue('receiver.address.inPerson', address);
+    setFieldValue('shipment.address.inPerson', address);
   }, []);
 
   return (
@@ -199,37 +265,37 @@ function InPersonShipment({ formInitialsShipmentExtender }) {
         </PEVHeading>
       </header>
       <address className="shipment-in-person__address">
-        {shopAddress.map((address) => (
+        {SHOP_ADDRESS.map((address) => (
           <span key={address}>{address}</span>
         ))}
       </address>
     </section>
   );
-}
+};
 
-function HomeShipment({ formInitialsShipmentExtender }) {
+Shipment.Home = function Home({ formInitialsShipmentExtender }) {
   const { setFieldValue, values } = useFormikContext();
   const fields = [
     {
-      identity: 'receiver.address.home.streetAndApartmentNumber',
-      label: translations.receiverAddress1,
-      'data-cy': 'input:receiver-address1',
+      identity: 'shipment.address.home.streetAndApartmentNumber',
+      label: translations.shipmentAddress1,
+      'data-cy': 'input:home-shipment-address1',
     },
     {
-      identity: 'receiver.address.home.postalCode',
-      label: translations.receiverAddress2,
-      'data-cy': 'input:receiver-address2',
+      identity: 'shipment.address.home.postalCode',
+      label: translations.shipmentAddress2,
+      'data-cy': 'input:home-shipment-address2',
     },
     {
-      identity: 'receiver.address.home.city',
-      label: translations.receiverAddress3,
-      'data-cy': 'input:receiver-address3',
+      identity: 'shipment.address.home.city',
+      label: translations.shipmentAddress3,
+      'data-cy': 'input:home-shipment-address3',
     },
   ];
   fields.createDefaultValue = (identity) => {
     const fieldIdentitySuffix = identity.split('.').pop();
 
-    return values.receiver?.address?.home?.[fieldIdentitySuffix] ?? '';
+    return values.shipment?.address?.home?.[fieldIdentitySuffix] ?? '';
   };
   fields.forEach((field) => (field.defaultValue = fields.createDefaultValue(field.identity)));
 
@@ -242,7 +308,7 @@ function HomeShipment({ formInitialsShipmentExtender }) {
     );
 
     formInitialsShipmentExtender('home', homeAddressSchema);
-    setFieldValue('receiver.address.home', homeAddressSchema);
+    setFieldValue('shipment.address.home', homeAddressSchema);
   }, []);
 
   return (
@@ -258,13 +324,13 @@ function HomeShipment({ formInitialsShipmentExtender }) {
       ))}
     </PEVFieldset>
   );
-}
+};
 
-function PackageShipment({ formInitialsShipmentExtender }) {
+Shipment.ParcelLocker = function ParcelLocker({ formInitialsShipmentExtender }) {
   const { values, setFieldValue, errors, setFieldError } = useFormikContext();
   const [parcelLocker, setParcelLocker] = useState(() =>
-    Object.values(values.receiver?.address?.parcelLocker || {}).every(Boolean)
-      ? values.receiver.address.parcelLocker
+    Object.values(values.shipment?.address?.parcelLocker || {}).every(Boolean)
+      ? values.shipment.address.parcelLocker
       : null
   );
   const [isMapRendered, setIsMapRendered] = useState(false);
@@ -284,9 +350,9 @@ function PackageShipment({ formInitialsShipmentExtender }) {
     };
 
     formInitialsShipmentExtender('parcelLocker', parcelLockerAddress);
-    setFieldValue('receiver.address.parcelLocker', parcelLockerAddress);
+    setFieldValue('shipment.address.parcelLocker', parcelLockerAddress);
 
-    return () => setFieldError('receiver.address.parcelLocker', '');
+    return () => setFieldError('shipment.address.parcelLocker', '');
   }, []);
 
   useEffect(() => {
@@ -294,8 +360,8 @@ function PackageShipment({ formInitialsShipmentExtender }) {
       return;
     }
 
-    setFieldValue('receiver.address.parcelLocker.name', parcelLocker.name);
-    setFieldValue('receiver.address.parcelLocker.location', parcelLocker.location);
+    setFieldValue('shipment.address.parcelLocker.name', parcelLocker.name);
+    setFieldValue('shipment.address.parcelLocker.location', parcelLocker.location);
   }, [parcelLocker]);
 
   return (
@@ -332,75 +398,12 @@ function PackageShipment({ formInitialsShipmentExtender }) {
 
         <ParcelsMap setParcelLocker={setParcelLocker} isRendered={isMapRendered} mapOpenerSetterRef={mapOpener} />
       </div>
-      {errors.receiver?.address?.parcelLocker && (
-        <PEVFormFieldError customMessage={errors.receiver.address.parcelLocker} />
+      {errors.shipment?.address?.parcelLocker && (
+        <PEVFormFieldError customMessage={errors.shipment.address.parcelLocker} />
       )}
     </>
   );
-}
-
-const Shipment = memo(function Shipment({ formInitialsShipmentExtender, updateChosenShipmentPrice }) {
-  const { setFieldValue, errors, setFieldError } = useFormikContext();
-
-  // TODO: this should be (at least partially) received from backend and be configurable by seller
-  const tabsConfig = useMemo(
-    () => ({
-      groupName: 'shipment',
-      initialData: [
-        {
-          name: 'inPerson',
-          translation: translations.inPersonShipment,
-          icon: <EmojiPeopleIcon />,
-          content: <InPersonShipment formInitialsShipmentExtender={formInitialsShipmentExtender} />,
-          ribbon: {
-            value: 0,
-            transformer: getPresentedPrice,
-          },
-        },
-        {
-          name: 'home',
-          translation: translations.homeShipment,
-          icon: <HomeIcon />,
-          content: <HomeShipment formInitialsShipmentExtender={formInitialsShipmentExtender} />,
-          ribbon: {
-            value: 5,
-            transformer: getPresentedPrice,
-          },
-        },
-        {
-          name: 'parcelLocker',
-          translation: translations.parcelLockerShipment,
-          icon: <MailboxIcon />,
-          content: <PackageShipment formInitialsShipmentExtender={formInitialsShipmentExtender} />,
-          ribbon: {
-            value: 2,
-            transformer: getPresentedPrice,
-          },
-        },
-      ],
-      onTabChangeCallbacks: [
-        ({ name }) => setFieldValue('shipmentMethod', name),
-        ({ ribbon: { value: shipmentPrice } }) => updateChosenShipmentPrice(shipmentPrice),
-        () => setFieldError('shipmentMethod', ''),
-      ],
-    }),
-    [formInitialsShipmentExtender]
-  );
-
-  return (
-    <Paper component="section" className="order__shipment" data-cy="container:order-shipment">
-      <header>
-        <PEVHeading level={3} className="order-heading">
-          {translations.shipmentHeading}
-        </PEVHeading>
-      </header>
-
-      <PEVTabs config={tabsConfig} label={translations.orderShipmentChooser} areChoosersScrollable />
-
-      {errors.shipmentMethod && <PEVFormFieldError customMessage={errors.shipmentMethod} />}
-    </Paper>
-  );
-});
+};
 
 function Payment() {
   const [chosenPayment, setChosenPayment] = useState('');
@@ -457,7 +460,7 @@ function Payment() {
           >
             <PEVRadio
               className="payment-option__input"
-              name="paymentMethod"
+              name="payment.method"
               label={label}
               icon={icon}
               checkedIcon={icon}
@@ -481,25 +484,27 @@ function Payment() {
 const useOrderFormInitials = () => {
   const [formInitials, setFormInitials] = useState({
     receiver: {
-      baseInfo: {
-        name: '',
-        email: '',
-        phone: '',
-      },
+      name: '',
+      email: '',
+      phone: '',
+    },
+    payment: {
+      method: '',
+    },
+    shipment: {
+      method: '',
       address: '',
     },
-    shipmentMethod: '',
-    paymentMethod: '',
   });
 
   const formInitialsExtender = {
     shipment: (method, newAddress) => {
       setFormInitials((prev) => ({
         ...prev,
-        receiver: {
-          ...prev.receiver,
+        shipment: {
+          ...prev.shipment,
           address: {
-            ...prev.receiver.address,
+            ...prev.shipment.address,
             [method]: newAddress,
           },
         },
@@ -510,23 +515,60 @@ const useOrderFormInitials = () => {
   return { formInitials, formInitialsExtender };
 };
 
+export function OrderSummary({ headingLevel, containerClassName, shipmentPrice, productsPrice, totalCost }) {
+  return (
+    <>
+      <PEVHeading level={headingLevel} className="summary__heading">
+        {translations.summaryHeading}
+      </PEVHeading>
+
+      <TableContainer elevation={0} className={classNames('summary__table-container', containerClassName)}>
+        <Table size="small">
+          <TableBody>
+            <TableRow>
+              <TableCell component="th" scope="row">
+                {translations.productsValue}
+              </TableCell>
+              <TableCell>{getPresentedPrice(productsPrice)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" scope="row">
+                {translations.shipmentValue}
+              </TableCell>
+              <TableCell>{getPresentedPrice(shipmentPrice)}</TableCell>
+            </TableRow>
+          </TableBody>
+          <TableFooter className="summary__total-value">
+            <TableRow>
+              <TableCell component="th" scope="row">
+                <strong>{translations.totalValue}</strong>
+              </TableCell>
+              <TableCell>
+                <strong>{getPresentedPrice(totalCost)}</strong>
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </>
+  );
+}
+
 export default function Order() {
   const { formInitials, formInitialsExtender } = useOrderFormInitials();
   const [chosenShipmentPrice, setChosenShipmentPrice] = useState(null);
-  const totalPrice = storeService.userCartTotalPrice + chosenShipmentPrice;
+  const [popupData, setPopupData] = useState(null);
+  const history = useHistory();
+  const totalCost = storeService.userCartTotalPrice + chosenShipmentPrice;
 
   const handleSubmit = (values) => {
     const orderDetails = {
       ...values,
-      receiver: {
-        ...values.receiver,
-        address: values.receiver.address[values.shipmentMethod],
+      shipment: {
+        ...values.shipment,
+        address: values.shipment.address[values.shipment.method],
       },
-      products: storeService.userCartProducts,
-      price: {
-        shipment: chosenShipmentPrice,
-        total: totalPrice,
-      },
+      products: storeService.userCartProducts.map(({ quantity, _id }) => ({ quantity, _id })),
     };
 
     httpService.makeOrder(orderDetails).then((res) => {
@@ -535,19 +577,35 @@ export default function Order() {
       }
 
       storeService.clearUserCartState();
-      window.location = res.redirectUri;
+
+      // TODO: [feature] recover integration with PayU API
+      // window.location = res.redirectUri;
+
+      setPopupData({
+        type: POPUP_TYPES.SUCCESS,
+        dataCy: 'popup:order-successfully-created',
+        message: translations.orderSuccessMsg,
+        singleAltBtn: {
+          onClick: () => {
+            setPopupData(null);
+            history.replace({ pathname: ROUTES.ACCOUNT__ORDERS, search: `?chosenTimestamp=${res.orderTimestamp}` });
+          },
+          text: translations.goToAccountOrders,
+          dataCy: 'button:go-to-orders',
+        },
+      });
     });
   };
 
   const handleValidate = (values) => {
     const errors = {};
 
-    if (!values.shipmentMethod) {
-      errors.shipmentMethod = translations.errorUnchosenShipmentMethod;
+    if (!values.shipment.method) {
+      errors.shipment.method = translations.errorUnchosenShipmentMethod;
     }
     // TODO: [DX] rather move to ParcelShipment component (and expose function), because "it should know" best how to validate itself
-    else if (values.shipmentMethod === 'parcelLocker') {
-      const parcelLockerAddress = values.receiver?.address?.parcelLocker;
+    else if (values.shipment.method === 'parcelLocker') {
+      const parcelLockerAddress = values.shipment?.address?.parcelLocker;
 
       if (
         parcelLockerAddress &&
@@ -555,7 +613,7 @@ export default function Order() {
           parcelLockerAddress.location.length === 0 ||
           parcelLockerAddress.name === '')
       ) {
-        errors.receiver = {
+        errors.shipment = {
           address: {
             parcelLocker: translations.errorUnchosenParcelLocker,
           },
@@ -591,38 +649,12 @@ export default function Order() {
         <Payment />
 
         <Paper component="footer" className="order__summary pev-flex pev-flex--columned">
-          <PEVHeading level={3} className="summary__heading">
-            {translations.summaryHeading}
-          </PEVHeading>
-
-          <TableContainer elevation={0} className="summary__table-container">
-            <Table size="small">
-              <TableBody>
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    {translations.productsValue}
-                  </TableCell>
-                  <TableCell>{getPresentedPrice(storeService.userCartTotalPrice)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    {translations.shipmentValue}
-                  </TableCell>
-                  <TableCell>{getPresentedPrice(chosenShipmentPrice)}</TableCell>
-                </TableRow>
-              </TableBody>
-              <TableFooter className="summary__total-value">
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    <strong>{translations.totalValue}</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>{getPresentedPrice(totalPrice)}</strong>
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </TableContainer>
+          <OrderSummary
+            headingLevel={3}
+            shipmentPrice={chosenShipmentPrice}
+            productsPrice={storeService.userCartTotalPrice}
+            totalCost={totalCost}
+          />
         </Paper>
       </PEVForm>
 
@@ -635,8 +667,10 @@ export default function Order() {
         type="submit"
         data-cy="button:submit-order"
       >
-        {translations.makeOrder}
+        {translations.completeOrder}
       </PEVButton>
+
+      <Popup {...popupData} />
     </article>
   );
 }

@@ -28,3 +28,10 @@ Cypress.Commands.add('removeTestProducts', (productUrl, authToken) => {
     canFail: false,
   });
 });
+
+Cypress.Commands.add('getProducts', () => {
+  return cy.sendAPIReq({
+    endpoint: 'products',
+    method: 'GET',
+  });
+});

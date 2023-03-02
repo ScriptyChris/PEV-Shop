@@ -385,13 +385,15 @@ export const PEVImage = forwardRef(function PEVImage({ image, src, alt, classNam
 });
 
 export const PEVPopover = forwardRef(function PEVPopover(
-  { anchorSetterRef, shouldAutoClose = true, children, dataCy },
+  { anchorSetterRef, shouldAutoClose = true, onClose = () => void 0, children, dataCy },
   ref
 ) {
   if (typeof anchorSetterRef !== 'object' || !('current' in anchorSetterRef)) {
     throw TypeError(
       `'anchorSetterRef' prop should be an object containing 'current' prop! Received "${anchorSetterRef}".`
     );
+  } else if (typeof onClose !== 'function') {
+    throw TypeError(`'onClose' prop should be a function! Received "${onClose}".`);
   } else if (!children) {
     throw TypeError(`'children' prop should be a truthy value! Received "${children}".`);
   }
@@ -402,6 +404,7 @@ export const PEVPopover = forwardRef(function PEVPopover(
   const handleCloseConfirmation = () => {
     abortAutoClose();
     setAnchorEl(null);
+    onClose();
   };
   const abortAutoClose = () => window.clearTimeout(autoCloseTimeoutIdRef.current);
   const scheduleAutoClose = () => {

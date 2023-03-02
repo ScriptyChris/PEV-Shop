@@ -14,7 +14,7 @@ const USER_CART_STATE: IUserCart = {
 
 const INITIAL_USER_ACCOUNT_STATE = null;
 
-type TUserCartProduct = IUserCart['products'][number] & { count: number };
+type TUserCartProduct = IUserCart['products'][number];
 
 class StoreService {
   /** @internal */
@@ -44,18 +44,26 @@ class StoreService {
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
   }
 
+  // TODO: [UX/bug] prevent product from adding it to cart when it's quantity will exceed availability
   addProductToUserCartState(newUserCartState: TUserCartProduct) {
     this._userCartState.totalPrice += newUserCartState.price;
-    const productIndexInCart = this._getProductIndex(newUserCartState.name);
+    let productIndexInCart = this._getProductIndex(newUserCartState.name);
 
     if (productIndexInCart === -1) {
-      newUserCartState.count = 1;
-      this._userCartState.products.push(newUserCartState);
+      newUserCartState.quantity = 1;
+      productIndexInCart = this._userCartState.products.push(newUserCartState) - 1;
+    } else if (
+      this._userCartState.products[productIndexInCart].quantity >=
+      this._userCartState.products[productIndexInCart].availability
+    ) {
+      return -1;
     } else {
-      (this._userCartState.products[productIndexInCart] as TUserCartProduct).count++;
+      this._userCartState.products[productIndexInCart].quantity++;
     }
 
     this._userCartState.totalCount++;
+
+    return this._userCartState.products[productIndexInCart].quantity;
   }
 
   removeProductFromUserCartState(newUserCartState: TUserCartProduct) {
@@ -68,12 +76,12 @@ class StoreService {
 
     const product = this._userCartState.products[productIndexInCart] as TUserCartProduct;
 
-    if (product.count > 0) {
-      product.count--;
+    if (product.quantity > 0) {
+      product.quantity--;
       this._userCartState.totalCount--;
     }
 
-    if (product.count === 0) {
+    if (product.quantity === 0) {
       this._userCartState.products.splice(productIndexInCart, 1);
     }
   }

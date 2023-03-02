@@ -11,6 +11,7 @@ export { Schema, Document, model, Model, Types, MongooseDocument, ModelPopulateO
 
 export const COLLECTION_NAMES = Object.freeze({
   Product: 'Product',
+  Order: 'Order',
   User: 'User',
   User_Role: 'User_Role',
 } as const);

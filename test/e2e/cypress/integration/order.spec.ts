@@ -1,5 +1,6 @@
 import { beforeEach, cy, describe, expect, it } from 'local-cypress';
 import { TE2EUser, HTTP_STATUS_CODE } from '@commons/types';
+import { PAYMENT_METHODS, SHIPMENT_METHODS } from '@commons/consts';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { makeCyDataSelector } from '../synchronous-helpers';
 import * as users from '@database/populate/initialData/users.json';
@@ -14,23 +15,23 @@ const testReceiver = {
   city: 'Testowo',
 };
 
-const shipmentMethods = ['inPerson', 'home', 'parcelLocker'] as const;
+const shipmentMethods = Object.values(SHIPMENT_METHODS);
 function checkDifferentShipmentMethods(shipmentMethod: typeof shipmentMethods[number]) {
   cy.get(makeCyDataSelector(`button:choose-${shipmentMethod}-tab`)).click();
   cy.get(makeCyDataSelector('button:submit-order')).click();
   cy.wait(`@${shipmentMethod}`).then((interception) =>
-    expect(interception.request.body.shipmentMethod).to.eq(shipmentMethod)
+    expect(interception.request.body.shipment.method).to.eq(shipmentMethod)
   );
   cy.contains(makeCyDataSelector('popup:message'), 'Sorry, but an unexpected error occured :(');
   cy.get(makeCyDataSelector('button:popup-close')).click();
 }
 
-const paymentMethods = ['cash', 'card', 'transfer', 'blik'] as const;
+const paymentMethods = Object.values(PAYMENT_METHODS);
 function checkDifferentPaymentMethods(paymentMethod: typeof paymentMethods[number]) {
   cy.get(makeCyDataSelector(`input:choose-${paymentMethod}-payment`)).check();
   cy.get(makeCyDataSelector('button:submit-order')).click();
   cy.wait(`@${paymentMethod}`).then((interception) =>
-    expect(interception.request.body.paymentMethod).to.eq(paymentMethod)
+    expect(interception.request.body.payment.method).to.eq(paymentMethod)
   );
   cy.contains(makeCyDataSelector('popup:message'), 'Sorry, but an unexpected error occured :(');
   cy.get(makeCyDataSelector('button:popup-close')).click();
@@ -116,6 +117,7 @@ describe('order', () => {
   beforeEach(() => {
     cy.cleanupTestUsersAndEmails();
     cy.cleanupCartState();
+    cy.removeOrders();
   });
 
   const addProductToCart = () => {
@@ -211,43 +213,40 @@ describe('order', () => {
     cy.intercept('/api/orders', (req) => {
       expect(req.body).to.deep.equal({
         receiver: {
-          baseInfo: {
-            name: testReceiver.name,
-            email: testReceiver.email,
-            phone: testReceiver.phone,
-          },
-          address: 'PEV Shop,ul. Testowa 1,12-345 Testolandia',
+          name: testReceiver.name,
+          email: testReceiver.email,
+          phone: testReceiver.phone,
         },
-        shipmentMethod: 'inPerson',
-        paymentMethod: 'card',
+        shipment: {
+          method: 'inPerson',
+          address: 'PEV Shop,ul. Testable 1,12-345 Testland',
+        },
+        payment: {
+          method: 'card',
+        },
         products: [
           {
-            name: '12” x 9” Piece of Jessup Skate Grip Tape',
-            price: 15,
             _id: productIdInCart,
-            count: 1,
+            quantity: 1,
           },
         ],
-        price: {
-          shipment: 0,
-          total: 15,
-        },
       });
 
-      // TODO: do not stub response when backend will be adjusted to handle extended order form
-      req.reply({
-        // NON_AUTHORITATIVE_INFORMATION
-        statusCode: 203,
-        body: {
-          payload: {
-            redirectUri: ROUTES.ROOT,
-          },
-        },
+      req.continue((res) => {
+        expect(res.statusCode).to.eq(HTTP_STATUS_CODE.OK);
+        expect(res.body.payload).to.have.property('orderTimestamp').to.be.a('number').greaterThan(orderSubmissionTime);
       });
     }).as('orderRequest');
+    const orderSubmissionTime = Date.now();
     cy.get(makeCyDataSelector('button:submit-order')).click();
-    cy.wait('@orderRequest');
-    cy.location('pathname').should('eq', ROUTES.ROOT);
+    cy.wait('@orderRequest').then((interception) => {
+      cy.wrap(interception.response!.body.payload.orderTimestamp).as('chosenTimestamp');
+    });
+    cy.get(makeCyDataSelector('button:go-to-orders')).click();
+    cy.location('pathname').should('eq', ROUTES.ACCOUNT__ORDERS);
+    cy.get('@chosenTimestamp').then((chosenTimestamp) =>
+      cy.location('search').should('eq', `?chosenTimestamp=${chosenTimestamp}`)
+    );
   });
 
   it('should offer multiple shipment and payment methods', () => {
@@ -267,11 +266,11 @@ describe('order', () => {
       cy.get(makeCyDataSelector('container:shipment-tab-panel__inPerson'))
         .as('shipmentInPersonContainer')
         .should('be.hidden')
-        .and('not.contain', 'Pick up your purchase personally at our store');
+        .and('not.contain', 'Pick up your purchase personally at our store!');
       cy.get(makeCyDataSelector('button:choose-inPerson-tab')).click();
       cy.get('@shipmentInPersonContainer')
         .should('be.visible')
-        .and('contain', 'Pick up your purchase personally at our store');
+        .and('contain', 'Pick up your purchase personally at our store!');
 
       cy.get(makeCyDataSelector('container:shipment-tab-panel__home'))
         .as('shipmentHomeContainer')
@@ -279,9 +278,9 @@ describe('order', () => {
         .and('not.contain', 'Fill address information');
       cy.get(makeCyDataSelector('button:choose-home-tab')).click();
       cy.get('@shipmentHomeContainer').should('be.visible').and('contain', 'Fill address information');
-      cy.get(makeCyDataSelector('input:receiver-address1')).type(testReceiver.street);
-      cy.get(makeCyDataSelector('input:receiver-address2')).type(testReceiver.postalCode);
-      cy.get(makeCyDataSelector('input:receiver-address3')).type(testReceiver.city);
+      cy.get(makeCyDataSelector('input:home-shipment-address1')).type(testReceiver.street);
+      cy.get(makeCyDataSelector('input:home-shipment-address2')).type(testReceiver.postalCode);
+      cy.get(makeCyDataSelector('input:home-shipment-address3')).type(testReceiver.city);
 
       cy.get(makeCyDataSelector('container:shipment-tab-panel__parcelLocker'))
         .as('shipmentParcelLockerContainer')
@@ -340,25 +339,25 @@ describe('order', () => {
         });
     }
 
-    let checkFor: 'paymentMethod' | 'shipmentMethod';
+    let checkForOrderMetaDetail: 'payment_method' | 'shipment_method';
 
     cy.intercept('/api/orders', (req) => {
-      switch (checkFor) {
-        case 'paymentMethod': {
-          if (!paymentMethods.includes(req.body.paymentMethod)) {
-            throw Error(`Unrecognized paymentMethod: "${req.body.paymentMethod}}"!`);
+      switch (checkForOrderMetaDetail) {
+        case 'payment_method': {
+          if (!paymentMethods.includes(req.body.payment.method)) {
+            throw Error(`Unrecognized paymentMethod: "${req.body.payment.method}}"!`);
           }
           break;
         }
-        case 'shipmentMethod': {
-          if (!shipmentMethods.includes(req.body.shipmentMethod)) {
-            throw Error(`Unrecognized shipmentMethod: "${req.body.shipmentMethod}}"!`);
+        case 'shipment_method': {
+          if (!shipmentMethods.includes(req.body.shipment.method)) {
+            throw Error(`Unrecognized shipmentMethod: "${req.body.shipment.method}}"!`);
           }
           break;
         }
       }
 
-      req.alias = req.body[checkFor];
+      req.alias = req.body[checkForOrderMetaDetail.replace('_method', '')].method;
       req.reply({
         statusCode: HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR,
         body: { exception: 'Cypress is just testing different "order" variations' },
@@ -366,10 +365,10 @@ describe('order', () => {
     });
 
     // check different payment methods
-    checkFor = 'paymentMethod';
+    checkForOrderMetaDetail = 'payment_method';
     cy.wrap(paymentMethods)
       .each((paymentMethod: typeof paymentMethods[number]) => checkDifferentPaymentMethods(paymentMethod))
-      .then(() => (checkFor = 'shipmentMethod'));
+      .then(() => (checkForOrderMetaDetail = 'shipment_method'));
 
     // check different shipment methods
     cy.wrap(shipmentMethods).each((shipmentMethod: typeof shipmentMethods[number]) =>

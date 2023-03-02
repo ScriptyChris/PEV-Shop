@@ -1,4 +1,4 @@
-import { cy, Cypress, it, describe, context, beforeEach, expect } from 'local-cypress';
+import { cy, Cypress, it, describe, context, beforeEach, expect, after } from 'local-cypress';
 import type { TUserPublic } from '@database/models';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { HTTP_STATUS_CODE, TE2EUser } from '@commons/types';
@@ -139,5 +139,86 @@ describe('#account', () => {
       cy.get(makeCyDataSelector('button:close-ended-other-sessions-confirmation')).click();
       cy.get('@loggedOutConfirmationPopup').should('not.exist');
     });
+  });
+
+  context('orders', () => {
+    beforeEach(() => {
+      cy.removeOrders();
+    });
+
+    after(() => {
+      cy.removeOrders();
+    });
+
+    it('should show current client user orders', () => {
+      let clientUserAuthToken = '';
+
+      // assert no orders were made yet
+      cy.registerAndLoginTestUser(ACCOUNT_TEST_USER);
+      cy.getFromStorage('userAuthToken').then((authToken) => (clientUserAuthToken = authToken));
+      cy.visit(ROUTES.ACCOUNT__ORDERS);
+      cy.contains(makeCyDataSelector('section:orders'), 'No orders made yet!');
+
+      // create some orders
+      cy.getProducts()
+        .then((productsResponse) => {
+          const firstProductId = productsResponse.body.payload[0]._id;
+
+          return cy.makeOrder(
+            {
+              receiver: {
+                name: 'Test client name',
+                email: 'test-client@example.org',
+                phone: '123456789',
+              },
+              shipment: {
+                method: 'inPerson',
+                address: 'PEV Shop,ul. Testable 1,12-345 Testland',
+              },
+              payment: {
+                method: 'cash',
+              },
+              products: [
+                {
+                  id: firstProductId,
+                  quantity: 1,
+                },
+              ],
+            },
+            clientUserAuthToken
+          );
+        })
+        .then((madeOrderResponse) => {
+          expect(madeOrderResponse.body.payload).to.haveOwnProperty('orderTimestamp');
+
+          return madeOrderResponse.body.payload.orderTimestamp;
+        })
+        // assert correct order data
+        .then((orderTimestamp) => {
+          cy.reload();
+
+          cy.contains(
+            makeCyDataSelector('label:order__summary-date'),
+            new Date(orderTimestamp).toLocaleString()
+          ).click();
+          cy.get(makeCyDataSelector('label:order__receiver-name'))
+            .should('have.text', 'Name')
+            .next()
+            .should('have.text', 'Test client name');
+          cy.get(makeCyDataSelector('label:order__receiver-email'))
+            .should('have.text', 'Email')
+            .next()
+            .should('have.text', 'test-client@example.org');
+          cy.get(makeCyDataSelector('label:order__receiver-phone'))
+            .should('have.text', 'Phone number')
+            .next()
+            .should('have.text', '123456789');
+          cy.contains(makeCyDataSelector('label:order__in-person-shipment'), 'PEV Shopul. Testable 112-345 Testland');
+          cy.contains(makeCyDataSelector('label:order__payment'), 'Cash');
+        });
+    });
+
+    // TODO: [E2E] add test
+    // it('should show all client users orders', () => {})
   });
 });

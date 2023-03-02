@@ -11,3 +11,26 @@ export const MINOR_INFO_AUTO_CLOSE_TIME = 5000;
 
 export const REVIEW_RATING_MIN_VALUE = 0;
 export const REVIEW_RATING_MAX_VALUE = 5;
+
+export const PAYMENT_METHODS = {
+  CASH: 'cash',
+  CARD: 'card',
+  TRANSFER: 'transfer',
+  BLIK: 'blik',
+} as const;
+export const SHIPMENT_METHODS = {
+  IN_PERSON: 'inPerson',
+  HOME: 'home',
+  PARCEL_LOCKER: 'parcelLocker',
+} as const;
+export const SHIPMENT_METHODS_TO_COSTS = {
+  [SHIPMENT_METHODS.IN_PERSON]: 0,
+  [SHIPMENT_METHODS.HOME]: 5,
+  [SHIPMENT_METHODS.PARCEL_LOCKER]: 2,
+} as const;
+
+// TODO: [UX] get it from backend - seller should be able to configure it
+export const SHOP_ADDRESS = ['PEV Shop', 'ul. Testable 1', '12-345 Testland'] as const;
+
+export const MIN_PRODUCT_UNITS = 0;
+export const MAX_PRODUCT_UNITS = 999;

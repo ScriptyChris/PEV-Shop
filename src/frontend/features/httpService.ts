@@ -11,7 +11,7 @@ import type {
   TServerErrorHTTPStatusCodesToData,
 } from '@middleware/helpers/middleware-response-wrapper';
 import type { TProductTechnicalSpecs } from '@middleware/helpers/api-products-specs-mapper';
-import { HTTP_STATUS_CODE, IOrder, TPagination } from '@commons/types';
+import { HTTP_STATUS_CODE, IOrderPayload, TPagination } from '@commons/types';
 import storeService from '@frontend/features/storeService';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
 import { routeHelpers } from '@frontend/components/pages/_routes';
@@ -256,6 +256,16 @@ class HttpService extends Ajax {
     searchParams.append('limit', String(pagination.productsPerPage));
   }
 
+  _getUserId() {
+    const userId = storeService.userAccountState?._id;
+
+    if (!userId) {
+      throw Error(`Current user's id is not available! User is probably not logged in.`);
+    }
+
+    return userId;
+  }
+
   /**
    * Adds a new product.
    */
@@ -411,20 +421,28 @@ class HttpService extends Ajax {
    * Gets info about currently logged in user via it's ID taken from app's state.
    */
   getCurrentUser() {
-    const userId = storeService.userAccountState?._id;
+    return this.getRequest(`${this.URLS.USERS}/${this._getUserId()}`, true);
+  }
 
-    if (!userId) {
-      throw Error(`Current user's id is not available! User is probably not logged in.`);
-    }
+  /**
+   * Gets orders of currently logged in client user.
+   */
+  getCurrentUserOrders() {
+    return this.getRequest(`${this.URLS.ORDERS}/current-user`, true);
+  }
 
-    return this.getRequest(`${this.URLS.USERS}/${userId}`, true);
+  /**
+   * Gets orders of all client users.
+   */
+  getAllOrders() {
+    return this.getRequest(`${this.URLS.ORDERS}/all`, true);
   }
 
   /**
    * Starts the process of making a new purchase according to given order details.
    */
-  makeOrder(orderDetails: IOrder) {
-    return this.postRequest(this.URLS.ORDERS, orderDetails);
+  makeOrder(orderDetails: IOrderPayload) {
+    return this.postRequest(this.URLS.ORDERS, orderDetails, true);
   }
 
   /**

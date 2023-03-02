@@ -72,6 +72,7 @@ import { hashPassword } from '@middleware/features/auth';
 import { connectWithDB } from '@database/connector';
 import {
   ProductModel,
+  OrderModel,
   UserModel,
   UserRoleModel,
   IProduct,
@@ -111,6 +112,7 @@ let relatedProductsErrors = 0;
 type TDataToPopulate = TUserRoleToPopulate | TUserToPopulate | TProductToPopulate;
 const COLLECTIONS_TO_REMOVE = [
   { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.PRODUCTS, ctor: ProductModel },
+  { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.ORDERS, ctor: OrderModel },
   { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS, ctor: UserModel },
   { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES, ctor: UserRoleModel },
 ] as const;

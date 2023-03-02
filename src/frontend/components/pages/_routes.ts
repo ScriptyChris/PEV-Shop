@@ -94,6 +94,16 @@ export const routeHelpers = {
       });
     };
   },
+  getPossibleAriaCurrentPage(url: string, shouldCheckHash = false) {
+    const locationProp = shouldCheckHash ? 'hash' : 'pathname';
+
+    return { 'aria-current': window.location[locationProp] === url ? 'page' : false };
+  },
+  getPossibleNavItemSelectedState(url: string, shouldCheckHash = false) {
+    const locationProp = shouldCheckHash ? 'hash' : 'pathname';
+
+    return { selected: window.location[locationProp] === url };
+  },
 } as const;
 
 export const useRoutesGuards = (storeService: TStoreService) => {

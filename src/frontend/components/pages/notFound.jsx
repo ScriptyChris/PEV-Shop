@@ -4,21 +4,21 @@ import { PEVParagraph } from '@frontend/components/utils/pevElements';
 
 const translations = Object.freeze({
   header: 'Page not found!',
-  createCustomHeader(label, url) {
-    if (label && url) {
-      return (
-        <PEVParagraph>
-          Page for {label} with url <b>{url}</b> not found!
-        </PEVParagraph>
-      );
+  createCustomHeader({ label, url } = {}) {
+    if (!label || !url) {
+      return translations.header;
     }
 
-    return '';
+    return (
+      <PEVParagraph>
+        Page for {label} with url <b>{url}</b> not found!
+      </PEVParagraph>
+    );
   },
 });
 
 export default function NotFound() {
   const { state } = useLocation();
 
-  return translations.createCustomHeader(state.label, state.url) || translations.header;
+  return translations.createCustomHeader(state);
 }

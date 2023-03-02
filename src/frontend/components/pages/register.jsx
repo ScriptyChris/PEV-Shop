@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
@@ -16,6 +17,7 @@ import {
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { PasswordField } from '@frontend/components/views/password';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -55,6 +57,7 @@ export default function Register() {
     };
   }, []);
   const [accountTypes, setAccountTypes] = useState();
+  const history = useHistory();
 
   useEffect(() => {
     httpService.getUserRoles().then((res) => {
@@ -111,15 +114,23 @@ export default function Register() {
             dataCy: 'popup:user-successfully-registered',
             message: translations.registrationSuccessMsg,
             altMessage: translations.registrationSuccessAltMsg,
-            singleAltBtn: {
-              onClick: () => resendConfirmRegistration(values.email),
-              text: translations.popupReSendEmail,
-              dataCy: 'button:resend-register-email',
-            },
+            buttons: [
+              {
+                onClick: redirectToLogInPage,
+                text: translations.popupGoToLogin,
+              },
+              {
+                onClick: () => resendConfirmRegistration(values.email),
+                text: translations.popupReSendEmail,
+                dataCy: 'button:resend-register-email',
+              },
+            ],
           });
         }
       });
   };
+
+  const redirectToLogInPage = () => history.replace(ROUTES.LOG_IN);
 
   // TODO: [PERFORMANCE] set some debounce to limit number of sent requests per time
   const resendConfirmRegistration = (email) => {

@@ -9,7 +9,13 @@ import { Document, Types, Schema, Model, model, COLLECTION_NAMES } from '@databa
 import mongoosePaginate from 'mongoose-paginate-v2';
 import getLogger from '@commons/logger';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
-import { MAX_IMAGES_AMOUNT, IMAGES__PRODUCTS_ROOT_PATH, IMAGES__PRODUCTS_TMP_FOLDER } from '@commons/consts';
+import {
+  MAX_IMAGES_AMOUNT,
+  IMAGES__PRODUCTS_ROOT_PATH,
+  IMAGES__PRODUCTS_TMP_FOLDER,
+  MIN_PRODUCT_UNITS,
+  MAX_PRODUCT_UNITS,
+} from '@commons/consts';
 import { imageSizeValidator } from '@commons/validators';
 import { TFile, PersistentFile, TFiles } from '@middleware/helpers/form-data-handler';
 
@@ -192,6 +198,13 @@ const productSchema = new Schema<IProduct>({
         list: [],
         averageRating: 0,
       };
+    },
+  },
+  availability: {
+    type: Number,
+    required: true,
+    validate(value: number) {
+      return value >= MIN_PRODUCT_UNITS && value <= MAX_PRODUCT_UNITS;
     },
   },
 });
@@ -442,6 +455,7 @@ export interface IProduct extends Document {
   images: { src: string; name: string }[];
   relatedProductsNames: string[];
   reviews: IReviews;
+  availability: number;
 
   prepareUrlField(): void;
   transformImagesToImagePaths(): void;

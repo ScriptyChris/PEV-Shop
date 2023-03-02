@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import classNames from 'classnames';
 
@@ -22,9 +22,11 @@ import storeService from '@frontend/features/storeService';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import Price from '@frontend/components/views/price';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = {
   addToCartBtn: 'Add to cart',
+  productIsUnavailable: 'Product is unavailable!',
   productAddedToCart: 'Product added to cart!',
   addingToCartAuthFailure: 'Adding product to cart is not available for your account type.',
   header: 'Cart',
@@ -37,14 +39,24 @@ const translations = {
   actions: 'Actions',
   removeProductFromCart: 'remove from cart',
   productsTotals: 'Totals',
-  submitCart: 'Submit',
-  cleanupCart: 'Cleanup',
+  prepareOrder: 'Prepare order',
+  clearCart: 'Clear',
 };
 
-export function AddToCartButton({ productInfoForCart, isSmallIcon, className }) {
-  if (!productInfoForCart.name || !productInfoForCart.price || !productInfoForCart._id) {
+export function AddToCartButton({
+  productInfoForCart /* TODO: [TS] `as IUserCart['products']` */,
+  isSmallIcon,
+  className,
+  flattenUnavailableInfo,
+}) {
+  if (
+    !productInfoForCart.name ||
+    productInfoForCart.price === undefined ||
+    !productInfoForCart._id ||
+    productInfoForCart.availability === undefined
+  ) {
     throw TypeError(
-      `productInfoForCart must be an object containing: 'name', 'price', and '_id'! 
+      `productInfoForCart must be an object containing: 'name', 'price', 'availability' and '_id'! 
       Received: '${JSON.stringify(productInfoForCart)}'.`
     );
   }
@@ -52,6 +64,8 @@ export function AddToCartButton({ productInfoForCart, isSmallIcon, className }) 
   const [popupData, setPopupData] = useState(null);
   const routesGuards = useRoutesGuards(storeService);
   const cartButtonAnchorSetterRef = useRef(null);
+  const [productRemainingAvailability, setProductRemainingAvailability] = useState(productInfoForCart.availability);
+  const productRemainingAvailabilityRef = useRef(productRemainingAvailability);
 
   const handleAddToCartClick = ({ target }) => {
     if (!routesGuards.isGuest() && !routesGuards.isClient()) {
@@ -62,9 +76,30 @@ export function AddToCartButton({ productInfoForCart, isSmallIcon, className }) 
       });
     }
 
-    storeService.addProductToUserCartState(productInfoForCart /* TODO: [TS] `as IUserCart['products']` */);
+    const addedProductQuantity = storeService.addProductToUserCartState(productInfoForCart);
+    if (addedProductQuantity === -1) {
+      return setProductRemainingAvailability(0);
+    }
+
+    productRemainingAvailabilityRef.current = productInfoForCart.availability - addedProductQuantity;
     cartButtonAnchorSetterRef.current(target.closest('[data-cy="button:add-product-to-cart"]'));
   };
+
+  const handlerClosingAddToCartConfirmation = () => {
+    setProductRemainingAvailability(productRemainingAvailabilityRef.current);
+  };
+
+  if (!productRemainingAvailability) {
+    return (
+      <span
+        className={classNames('product-unavailable', className, {
+          'product-unavailable--flatten': !!flattenUnavailableInfo,
+        })}
+      >
+        {translations.productIsUnavailable}
+      </span>
+    );
+  }
 
   // TODO: [UX] add list of product's amount to be added to cart (defaulted to 1) with an option to type custom amount
   // TODO: [UX] set different color for button depending on it's usage availability
@@ -81,7 +116,11 @@ export function AddToCartButton({ productInfoForCart, isSmallIcon, className }) 
       >
         {translations.addToCartBtn}
       </PEVButton>
-      <PEVPopover anchorSetterRef={cartButtonAnchorSetterRef} dataCy="popup:add-to-cart-confirmation">
+      <PEVPopover
+        anchorSetterRef={cartButtonAnchorSetterRef}
+        onClose={handlerClosingAddToCartConfirmation}
+        dataCy="popup:add-to-cart-confirmation"
+      >
         {translations.productAddedToCart}
       </PEVPopover>
 
@@ -90,10 +129,77 @@ export function AddToCartButton({ productInfoForCart, isSmallIcon, className }) 
   );
 }
 
+export function CartContent({
+  containerClassName,
+  productsList,
+  handleRemoveProductFromCart,
+  totalProductsCount,
+  totalProductsCost,
+}) {
+  const { isMobileLayout } = useRWDLayout();
+  const isHandleRemoveProductFromCart = typeof handleRemoveProductFromCart === 'function';
+
+  return (
+    <TableContainer
+      className={classNames('cart__table', containerClassName, { 'cart-small-cells-inline-padding': isMobileLayout })}
+    >
+      <Table size="small" aria-label={translations.header}>
+        <TableHead>
+          <TableRow>
+            <TableCell>{translations.productNameHeader}</TableCell>
+            <TableCell>{translations.productCountHeader}</TableCell>
+            <TableCell>{translations.productPriceHeader}</TableCell>
+            {isHandleRemoveProductFromCart && <TableCell>{translations.actions}</TableCell>}
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {productsList.map((productItem) => (
+            <TableRow key={productItem.name}>
+              <TableCell data-cy="label:cart-product-name">{productItem.name}</TableCell>
+              <TableCell data-cy="label:cart-product-quantity">{productItem.quantity}</TableCell>
+              <TableCell data-cy="label:cart-product-price">
+                <Price valueInUSD={productItem.price}>{({ currencyAndPrice }) => currencyAndPrice}</Price>
+              </TableCell>
+              {isHandleRemoveProductFromCart && (
+                <TableCell>
+                  <PEVIconButton
+                    onClick={() => handleRemoveProductFromCart(productItem)}
+                    a11y={translations.removeProductFromCart}
+                  >
+                    <DeleteIcon />
+                  </PEVIconButton>
+                </TableCell>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+
+        <TableFooter>
+          <TableRow>
+            <TableCell component="th">
+              <strong>{translations.productsTotals}</strong>
+            </TableCell>
+            <TableCell>
+              <strong>{totalProductsCount}</strong>
+            </TableCell>
+            <TableCell>
+              <strong>
+                <Price valueInUSD={totalProductsCost}>{({ currencyAndPrice }) => currencyAndPrice}</Price>
+              </strong>
+            </TableCell>
+            {isHandleRemoveProductFromCart && <TableCell>{/* empty cell to keep table's structure */}</TableCell>}
+          </TableRow>
+        </TableFooter>
+      </Table>
+    </TableContainer>
+  );
+}
+
 export default observer(function Cart() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const history = useHistory();
-  const isCartEmpty = storeService.userCartProducts?.length === 0;
+  const { pathname } = useLocation();
 
   useEffect(() => {
     storeService.replaceUserCartState(storageService.userCart.get());
@@ -101,7 +207,9 @@ export default observer(function Cart() {
     window.addEventListener(
       'beforeunload',
       () => {
-        storageService.userCart.update(storeService.userCartState);
+        if (storeService.userAccountState?.accountType === 'client') {
+          storageService.userCart.update(storeService.userCartState);
+        }
       },
       { once: true }
     );
@@ -157,78 +265,24 @@ export default observer(function Cart() {
             </PEVIconButton>
           </header>
 
-          {storeService.userCartProducts.length ? (
+          {storeService.userCartProducts?.length ? (
             <>
-              <TableContainer className="cart__table">
-                <Table size="small" aria-label={translations.header}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{translations.productNameHeader}</TableCell>
-                      <TableCell>{translations.productCountHeader}</TableCell>
-                      <TableCell>{translations.productPriceHeader}</TableCell>
-                      <TableCell>{translations.actions}</TableCell>
-                    </TableRow>
-                  </TableHead>
-
-                  <TableBody>
-                    {isCartEmpty ? (
-                      <TableRow>
-                        <TableCell>{translations.lackOfProducts}</TableCell>
-                      </TableRow>
-                    ) : (
-                      storeService.userCartProducts.map((productItem) => (
-                        <TableRow key={productItem.name}>
-                          <TableCell data-cy="label:cart-product-name">{productItem.name}</TableCell>
-                          <TableCell>{productItem.count}</TableCell>
-                          <TableCell data-cy="label:cart-product-price">
-                            <Price valueInUSD={productItem.price}>{({ currencyAndPrice }) => currencyAndPrice}</Price>
-                          </TableCell>
-                          <TableCell>
-                            <PEVIconButton
-                              onClick={() => handleRemoveProductFromCart(productItem)}
-                              a11y={translations.removeProductFromCart}
-                            >
-                              <DeleteIcon />
-                            </PEVIconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-
-                  <TableFooter>
-                    <TableRow>
-                      <TableCell component="th">
-                        <strong>{translations.productsTotals}</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>{storeService.userCartProductsCount}</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>
-                          <Price valueInUSD={storeService.userCartTotalPrice}>
-                            {({ currencyAndPrice }) => currencyAndPrice}
-                          </Price>
-                        </strong>
-                      </TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  </TableFooter>
-                </Table>
-              </TableContainer>
-
+              <CartContent
+                productsList={storeService.userCartProducts}
+                handleRemoveProductFromCart={handleRemoveProductFromCart}
+                totalProductsCount={storeService.userCartProductsCount}
+                totalProductsCost={storeService.userCartTotalPrice}
+              />
               <footer className="cart__action-buttons">
                 <PEVButton
                   onClick={handleCartSubmission}
                   className="cart__action-buttons-submit"
                   data-cy="button:submit-cart"
-                  disabled={isCartEmpty}
+                  disabled={pathname === ROUTES.PRODUCTS__ORDER}
                 >
-                  {translations.submitCart}
+                  {translations.prepareOrder}
                 </PEVButton>
-                <PEVButton onClick={handleCartCleanup} disabled={isCartEmpty}>
-                  {translations.cleanupCart}
-                </PEVButton>
+                <PEVButton onClick={handleCartCleanup}>{translations.clearCart}</PEVButton>
               </footer>
             </>
           ) : (
