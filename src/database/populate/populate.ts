@@ -37,6 +37,7 @@ const PARAMS = {
   CLEAN_ALL_BEFORE: 'cleanAllBefore',
   JSON_FILE_PATH: {
     [CAPITALIZED_PLURAL_COLLECTION_NAMES.PRODUCTS]: 'products__InputPath',
+    [CAPITALIZED_PLURAL_COLLECTION_NAMES.ORDERS]: 'orders__InputPath',
     [CAPITALIZED_PLURAL_COLLECTION_NAMES.USERS]: 'users__InputPath',
     [CAPITALIZED_PLURAL_COLLECTION_NAMES.USER_ROLES]: 'user_roles__InputPath',
   },
@@ -49,6 +50,7 @@ const PARAMS = {
 const DEFAULT_PARAMS = {
   [PARAMS.CLEAN_ALL_BEFORE]: 'true',
   [PARAMS.JSON_FILE_PATH.PRODUCTS]: './initialData/products.json',
+  [PARAMS.JSON_FILE_PATH.ORDERS]: './initialData/orders.json',
   [PARAMS.JSON_FILE_PATH.USERS]: './initialData/users.json',
   [PARAMS.JSON_FILE_PATH.USER_ROLES]: './initialData/user_roles.json',
   [PARAMS.PRODUCT_IMAGES]: './initialData/product-images',
@@ -77,6 +79,8 @@ import {
   UserRoleModel,
   IProduct,
   TProductToPopulate,
+  IOrder,
+  TOrderToPopulate,
   IUser,
   TUserToPopulate,
   IUserRole,
@@ -109,7 +113,7 @@ let relatedProductsErrors = 0;
 //   },
 // })
 
-type TDataToPopulate = TUserRoleToPopulate | TUserToPopulate | TProductToPopulate;
+type TDataToPopulate = TUserRoleToPopulate | TUserToPopulate | TProductToPopulate | TOrderToPopulate;
 const COLLECTIONS_TO_REMOVE = [
   { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.PRODUCTS, ctor: ProductModel },
   { name: CAPITALIZED_PLURAL_COLLECTION_NAMES.ORDERS, ctor: OrderModel },
@@ -162,8 +166,15 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
     relocateProductImages(productsSourceDataList);
   }
 
+  const ordersPath = getScriptParamStringValue(PARAMS.JSON_FILE_PATH.ORDERS);
+  if (ordersPath) {
+    const ordersSourceDataList = getSourceData<TOrderToPopulate>(ordersPath);
+    await populateOrders(ordersSourceDataList);
+  }
+
   const populationResults = {
     productsAmount: await ProductModel.find({}).countDocuments(),
+    ordersAmount: await OrderModel.find({}).countDocuments(),
     usersAmount: await UserModel.find({}).countDocuments(),
     userRolesAmount: await UserRoleModel.find({}).countDocuments(),
   };
@@ -177,6 +188,8 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
     relatedProductsErrors,
     '\n\t- users amount:',
     populationResults.usersAmount,
+    '\n\t- orders amount:',
+    populationResults.ordersAmount,
     '\n\t- user roles amount:',
     populationResults.userRolesAmount
   );
@@ -273,6 +286,37 @@ function populateUsers(usersSourceDataList: TUserToPopulate[]): Promise<IUser[]>
         logger.error('userSaveError:', userSaveError, ' /userDataToPopulate:', userDataToPopulate);
 
         return userSaveError;
+      });
+    })
+  );
+}
+
+function populateOrders(ordersSourceDataList: TOrderToPopulate[]): Promise<IOrder[]> {
+  return Promise.all(
+    ordersSourceDataList.map(async (orderData) => {
+      const regardingUserId = (await UserModel.findOne({ login: orderData.__regardingUser }, { _id: 1 }))!._id;
+      const matchedRegardingProducts = await ProductModel.find({
+        name: orderData.regardingProducts.map(({ __name }: typeof orderData.regardingProducts[number]) => __name, {
+          _id: 1,
+          price: 1,
+        }),
+      });
+
+      const order = new OrderModel({
+        ...orderData,
+        timestamp: Date.now(),
+        regardingUser: regardingUserId,
+        regardingProducts: orderData.regardingProducts.map((product, index) => ({
+          ...product,
+          id: matchedRegardingProducts[index]._id,
+          unitPrice: matchedRegardingProducts[index].price,
+        })),
+      });
+
+      return order.save().catch((orderSaveError) => {
+        logger.error('orderSaveError:', orderSaveError, ' /orderData:', orderData);
+
+        return orderSaveError;
       });
     })
   );

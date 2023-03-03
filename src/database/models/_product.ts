@@ -236,6 +236,13 @@ const productSchema = new Schema<IProduct>({
       return value >= MIN_PRODUCT_UNITS && value <= MAX_PRODUCT_UNITS;
     },
   },
+  orderedUnits: {
+    type: Number,
+    default: 0,
+    validate(value: number) {
+      return value >= 0;
+    },
+  },
 });
 productSchema.pre('validate', function (next: () => void) {
   const product = this as IProduct;
@@ -486,6 +493,7 @@ export interface IProduct extends Document {
   relatedProductsNames: string[];
   reviews: IReviews;
   availability: number;
+  orderedUnits: number;
 
   prepareUrlField(): void;
   transformImagesToImagePaths(): void;
