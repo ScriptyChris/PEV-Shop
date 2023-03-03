@@ -45,6 +45,19 @@ const prepareReviewsOutput = (reviews: TReviews) => {
     _id: undefined,
   };
 };
+const calculateRatingScore = (averageRating: IReviews['averageRating'], numberOfRating: IReviews['list']['length']) => {
+  const RATING_TO_SCORE = Object.freeze({
+    5: 4,
+    4: 3,
+    3: 1,
+    2: 1,
+    1: 1,
+    0: 1,
+  });
+  const flooredRating = Math.floor(averageRating) as keyof typeof RATING_TO_SCORE;
+
+  return averageRating * numberOfRating * RATING_TO_SCORE[flooredRating];
+};
 
 const reviewsItemSchema = new Schema<IReviewItem>({
   content: String,
@@ -75,6 +88,21 @@ const reviewsSchema = new Schema<IReviews>({
   averageRating: {
     type: Number,
     required: true,
+    set(value: number) {
+      const that = this as IReviews;
+      /*
+        TODO: [db] find better way to calculate `ratingScore` and make it noticable by Mongoose sorting mechanism.
+        Virtual field is not picked up during sorting. Getter doesn't seem to be picked either (despite it gets called).
+      */
+      that.ratingScore = calculateRatingScore(value, that.list.length);
+
+      return value;
+    },
+  },
+  ratingScore: {
+    type: Number,
+    required: false,
+    default: 0,
   },
 });
 reviewsSchema.methods.toJSON = function () {
@@ -197,6 +225,7 @@ const productSchema = new Schema<IProduct>({
       return {
         list: [],
         averageRating: 0,
+        ratingScore: 0,
       };
     },
   },
@@ -409,6 +438,7 @@ interface IReviewItem extends TReviewItem, Types.Subdocument {}
 type TReviews = {
   list: TReviewItem[];
   averageRating: number;
+  ratingScore: number;
 };
 
 /**

@@ -9,6 +9,7 @@ import TuneIcon from '@material-ui/icons/Tune';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SortByAlphaIcon from '@material-ui/icons/SortByAlpha';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import StarRateIcon from '@material-ui/icons/StarRate';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ViewModuleIcon from '@material-ui/icons/ViewModule';
@@ -50,6 +51,7 @@ const translations = {
   sortByNameDesc: 'Name descending',
   sortByPriceAsc: 'Price ascending',
   sortByPriceDesc: 'Price descending',
+  sortByRatingScoreDesc: 'Rating descending',
   tabletFiltersToggleBtn: 'toggle filters',
   filtersHeading: 'Filters',
   priceFilterHeading: 'Price',
@@ -601,26 +603,6 @@ function Sorting({ sortBy = '', updateProductsDashboardQuery }) {
   };
   const sortOptions = [
     {
-      value: 'nameAsc',
-      translation: translations.sortByNameAsc,
-      icons: (
-        <>
-          <SortByAlphaIcon className="products-dashboard__sorting-alpha-icon" {...iconCommonProps} />
-          <ArrowUpwardIcon {...iconCommonProps} />
-        </>
-      ),
-    },
-    {
-      value: 'nameDesc',
-      translation: translations.sortByNameDesc,
-      icons: (
-        <>
-          <SortByAlphaIcon className="products-dashboard__sorting-alpha-icon" {...iconCommonProps} />
-          <ArrowDownwardIcon {...iconCommonProps} />
-        </>
-      ),
-    },
-    {
       value: 'priceAsc',
       translation: translations.sortByPriceAsc,
       icons: (
@@ -636,6 +618,36 @@ function Sorting({ sortBy = '', updateProductsDashboardQuery }) {
       icons: (
         <>
           <AttachMoneyIcon {...iconCommonProps} />
+          <ArrowDownwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+    {
+      value: 'reviews.ratingScoreDesc',
+      translation: translations.sortByRatingScoreDesc,
+      icons: (
+        <>
+          <StarRateIcon {...iconCommonProps} />
+          <ArrowDownwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+    {
+      value: 'nameAsc',
+      translation: translations.sortByNameAsc,
+      icons: (
+        <>
+          <SortByAlphaIcon className="products-dashboard__sorting-alpha-icon" {...iconCommonProps} />
+          <ArrowUpwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+    {
+      value: 'nameDesc',
+      translation: translations.sortByNameDesc,
+      icons: (
+        <>
+          <SortByAlphaIcon className="products-dashboard__sorting-alpha-icon" {...iconCommonProps} />
           <ArrowDownwardIcon {...iconCommonProps} />
         </>
       ),
