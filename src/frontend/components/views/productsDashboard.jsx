@@ -11,6 +11,7 @@ import SortByAlphaIcon from '@material-ui/icons/SortByAlpha';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import StarRateIcon from '@material-ui/icons/StarRate';
 import ShopIcon from '@material-ui/icons/Shop';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ViewModuleIcon from '@material-ui/icons/ViewModule';
@@ -54,6 +55,7 @@ const translations = {
   sortByPriceDesc: 'Price descending',
   sortByRatingScoreDesc: 'Rating descending',
   sortByOrderedUnitsDesc: 'Sold descending',
+  sortByCreatedAtDesc: 'Newest descending',
   tabletFiltersToggleBtn: 'toggle filters',
   filtersHeading: 'Filters',
   priceFilterHeading: 'Price',
@@ -620,6 +622,16 @@ function Sorting({ sortBy = '', updateProductsDashboardQuery }) {
       icons: (
         <>
           <ShopIcon {...iconCommonProps} />
+          <ArrowDownwardIcon {...iconCommonProps} />
+        </>
+      ),
+    },
+    {
+      value: 'createdAtDesc',
+      translation: translations.sortByCreatedAtDesc,
+      icons: (
+        <>
+          <CalendarTodayIcon {...iconCommonProps} />
           <ArrowDownwardIcon {...iconCommonProps} />
         </>
       ),

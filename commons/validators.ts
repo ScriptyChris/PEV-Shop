@@ -8,7 +8,7 @@ const VALIDATOR_SCHEMAS = {
     return { regExps, PRICE_MODIFIERS };
   })(),
   PRODUCT_SORTING: (() => {
-    const SORTING_MODIFIERS = ['name', 'price', 'reviews.ratingScore', 'orderedUnits'] as const;
+    const SORTING_MODIFIERS = ['name', 'price', 'reviews.ratingScore', 'orderedUnits', 'createdAt'] as const;
     const SORTING_ORDER_MAP = {
       Asc: 'Asc',
       Desc: 'Desc',

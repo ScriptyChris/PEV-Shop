@@ -243,6 +243,11 @@ const productSchema = new Schema<IProduct>({
       return value >= 0;
     },
   },
+  createdAt: {
+    type: Number,
+    default: Date.now(),
+    immutable: true,
+  },
 });
 productSchema.pre('validate', function (next: () => void) {
   const product = this as IProduct;
@@ -494,6 +499,7 @@ export interface IProduct extends Document {
   reviews: IReviews;
   availability: number;
   orderedUnits: number;
+  createdAt: number;
 
   prepareUrlField(): void;
   transformImagesToImagePaths(): void;
