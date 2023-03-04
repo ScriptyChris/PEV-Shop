@@ -180,12 +180,12 @@ describe('product-form', () => {
 
       // modify product
       cy.intercept('/api/products', (req) => {
-        req.headers.Authorization = `Bearer ${authToken}`;
         req.continue((res) => {
           expect(res.statusCode).to.eq(HTTP_STATUS_CODE.OK);
         });
       });
       cy.get(makeCyDataSelector('button:product-form__save')).click();
+      cy.contains(makeCyDataSelector('popup:message'), 'Product modified!');
 
       // assert update succeeded
       assertProductDataInsideForm(updatedProductFormData.assertable);
@@ -267,7 +267,6 @@ describe('product-form', () => {
 
       // save new product
       cy.intercept('/api/products', (req) => {
-        req.headers.Authorization = `Bearer ${authToken}`;
         req.continue((res) => {
           expect(res.body).to.include({
             message: 'Success!',
@@ -275,6 +274,7 @@ describe('product-form', () => {
         });
       });
       cy.get(makeCyDataSelector('button:product-form__save')).click();
+      cy.contains(makeCyDataSelector('popup:message'), 'Product added!');
 
       // assert new product has been saved by checking it's modification form
       assertProductDataInsideForm(testProductDataForForm);

@@ -42,7 +42,15 @@ const FormikTextFieldForwarder = ({ field: _field, form, defaultValue, ...props 
     [defaultValue === null || defaultValue === undefined ? 'value' : 'defaultValue']: defaultValue ?? value,
   };
 
-  return <TextField {...restProps} {...field} {...overrideProps} {...valueOrDefaultValue} />;
+  return (
+    <TextField
+      className="pev-element-text-field-wrapper"
+      {...restProps}
+      {...field}
+      {...overrideProps}
+      {...valueOrDefaultValue}
+    />
+  );
 };
 
 export const PEVButton = forwardRef(function PEVButton({ children, ...props }, ref) {

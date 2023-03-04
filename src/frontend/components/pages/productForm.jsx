@@ -89,6 +89,9 @@ const translations = {
   emptyImagesError: 'At least one image must be added!',
   colourIsNotTextError: 'Colour value must be a text!',
   modificationError: 'Cannot modify, because no changes were made!',
+  additionSuccess: 'Product added!',
+  modificationSuccess: 'Product modified!',
+  formSubmissionError: 'Form submission failed :(',
 };
 
 const FIELD_TYPE_MAP = Object.freeze({
@@ -108,7 +111,7 @@ const FIELD_NAME_PREFIXES = Object.freeze({
 });
 const swapSpaceForGap = (text) => text.replace(/\s/g, SPEC_NAMES_SEPARATORS.GAP);
 
-function BaseInfo({ data: { initialData = {} } }) {
+function BaseInfo({ data: { initialData = {}, isProductModification } }) {
   return (
     <PEVFieldset className="pev-flex pev-flex--columned">
       <PEVLegend>{translations.baseInformation}</PEVLegend>
@@ -120,6 +123,10 @@ function BaseInfo({ data: { initialData = {} } }) {
           label={translations.name}
           inputProps={{
             'data-cy': 'input:base__name',
+          }}
+          InputProps={{
+            // TODO: let modifying `name` when backend will match product by `_id` instead of `name`
+            readOnly: isProductModification,
           }}
           defaultValue={initialData.name}
           required
@@ -735,6 +742,7 @@ RelatedProductsNames._EditItemComponentHoC = function EditItemComponentHoC({
 // TODO: [UX] show a validation ornament at each form section to indicate user, which section is required/valid/invalid
 const ProductForm = ({ initialData = {}, doSubmit }) => {
   const initialDataKeys = Object.keys(initialData);
+  const isProductModification = initialDataKeys.length > 0;
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
@@ -816,6 +824,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
 
     return _getNestedEntries;
   }, []);
+  const [popupData, setPopupData] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -896,7 +905,6 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
   };
 
   const onSubmitHandler = (values, { setSubmitting }) => {
-    const isProductModification = initialDataKeys.length > 0;
     let submission;
 
     if (isProductModification) {
@@ -907,8 +915,32 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
     }
 
     submission
+      .then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        } else if (res.__ERROR_TO_HANDLE) {
+          throw res.__ERROR_TO_HANDLE;
+        }
+
+        const successfulAdditionOrModificationTranslation = isProductModification
+          ? translations.modificationSuccess
+          : translations.additionSuccess;
+
+        setPopupData({
+          type: POPUP_TYPES.SUCCESS,
+          message: successfulAdditionOrModificationTranslation,
+          buttons: [getClosePopupBtn(setPopupData)],
+        });
+
+        return res;
+      })
       .catch((errorMessage) => {
-        console.error('Submission error:', errorMessage);
+        console.error(errorMessage);
+        setPopupData({
+          type: POPUP_TYPES.FAILURE,
+          message: translations.formSubmissionError,
+          buttons: [getClosePopupBtn(setPopupData)],
+        });
       })
       .finally(() => setSubmitting(false));
   };
@@ -938,7 +970,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
     return { isColourFieldError: !isColorFieldText, colourFieldKey };
   };
 
-  const addOrUpdateTranslation = initialDataKeys.length ? translations.updateProduct : translations.addProduct;
+  const addOrUpdateTranslation = isProductModification ? translations.updateProduct : translations.addProduct;
 
   return (
     <section className="product-form pev-fixed-container">
@@ -951,11 +983,11 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
         {(formikProps) => (
           <>
             <PEVHeading className="pev-centered-padded-text" level={2}>
-              {translations.getIntro(!!initialDataKeys.length)}
+              {translations.getIntro(isProductModification)}
             </PEVHeading>
 
             <Paper className="product-form__fields-group">
-              <BaseInfo data={{ initialData: formikProps.values }} />
+              <BaseInfo data={{ initialData: formikProps.values, isProductModification }} />
             </Paper>
             <Paper className="product-form__fields-group">
               <Field name="shortDescription" data={{ initialData: formikProps.values }} component={ShortDescription} />
@@ -996,6 +1028,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
           </>
         )}
       </PEVForm>
+      <Popup {...popupData} />
     </section>
   );
 };
@@ -1016,14 +1049,7 @@ const NewProduct = () => {
 
     fd.append('plainData', JSON.stringify(plainData));
     images.forEach((img, index) => fd.append(`image${index}`, img));
-    return httpService.addProduct(fd).then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
-        return;
-      }
-
-      // TODO: [UX] show a popup
-      console.log('Product successfully saved');
-    });
+    return httpService.addProduct(fd);
   };
 
   return <ProductForm doSubmit={doSubmit} />;
@@ -1109,11 +1135,8 @@ const ModifyProduct = () => {
       setModificationError(false);
 
       return httpService.modifyProduct(values.name, Object.fromEntries(changedFields)).then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
-          return;
-        }
-
         setMergedProductData(res);
+        return res;
       });
     }
 
