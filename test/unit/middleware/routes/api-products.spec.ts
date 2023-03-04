@@ -286,11 +286,18 @@ describe('#api-products', () => {
 
       it('should call res.status(..).json(..) with correct params', async () => {
         const resMock = getResMock();
+        const newProductUrlMock = 'new-product-url';
+        saveToDBMock.mockReset().mockImplementationOnce(async () => {
+          const mockResult = await saveToDBMock._succeededCall();
+          mockResult.url = newProductUrlMock;
+
+          return mockResult;
+        });
 
         await apiProductsRouter._addProduct(getReqMock(), resMock);
 
         expect(resMock.status).toHaveBeenCalledWith(HTTP_STATUS_CODE.CREATED);
-        expect(resMock._jsonMethod).toHaveBeenCalledWith({ message: 'Success!' });
+        expect(resMock._jsonMethod).toHaveBeenCalledWith({ payload: { productUrl: newProductUrlMock } });
       });
     });
 

@@ -6,6 +6,7 @@ import { PEVHeading, PEVLink } from '@frontend/components/utils/pevElements';
 import Scroller from '@frontend/components/utils/scroller';
 import { ProductSpecificDetail } from '@frontend/components/views/productDetails';
 import httpService from '@frontend/features/httpService';
+import { ROUTES } from '@frontend/components/pages/_routes';
 
 const translations = Object.freeze({
   bestSellersHeading: 'Best sellers:',
@@ -15,70 +16,80 @@ const translations = Object.freeze({
   seeAll: 'see all',
 });
 
+const PRODUCTS_SECTIONS_PER_SORTING_ORDER = Object.freeze([
+  {
+    heading: translations.bestSellersHeading,
+    sortBy: 'orderedUnitsDesc',
+  },
+  {
+    heading: translations.topRatedHeading,
+    sortBy: 'reviews.ratingScoreDesc',
+  },
+  {
+    heading: translations.recentlyAddedHeading,
+    sortBy: 'createdAtDesc',
+  },
+]);
+
 export default function Home() {
-  const [products, setProducts] = useState([]);
-  const sections = [
-    {
-      heading: translations.bestSellersHeading,
-      productList: <p>TODO: fetch the data</p>,
-      seeAllUrl: '#',
-    },
-    {
-      heading: translations.topRatedHeading,
-      productList: <p>TODO: fetch the data</p>,
-      seeAllUrl: '#',
-    },
-    {
-      heading: translations.recentlyAddedHeading,
-      productList: (
-        <ProductSpecificDetail
-          detailName="relatedProducts"
-          detailValue={products}
-          extras={{
-            disableListItemGutters: true,
-          }}
-        />
-      ),
-      seeAllUrl: '#',
-    },
-    {
-      heading: translations.recentlyViewedHeading,
-      productList: <p>TODO: fetch the data</p>,
-      seeAllUrl: '#',
-    },
-  ];
+  const [productListForSortedSection, setProductListForSortedSection] = useState(() =>
+    Object.fromEntries(PRODUCTS_SECTIONS_PER_SORTING_ORDER.map(({ sortBy }) => [sortBy, []]))
+  );
 
   useEffect(() => {
     const pagination = { pageNumber: 1, productsPerPage: 5 };
 
-    httpService.getProducts({ pagination }).then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
-        return;
-      }
+    PRODUCTS_SECTIONS_PER_SORTING_ORDER.forEach(({ sortBy }) => {
+      httpService.getProducts({ pagination, sortBy }, true).then((res) => {
+        if (res.__EXCEPTION_ALREADY_HANDLED) {
+          return;
+        }
 
-      setProducts(res.productsList);
+        setProductListForSortedSection((prev) => ({
+          ...prev,
+          [sortBy]: res.productsList,
+        }));
+      });
     });
   }, []);
 
   return (
-    <article className="home pev-fixed-container pev-flex pev-flex--columned">
-      {sections.map(({ heading, productList, seeAllUrl }) => (
+    <article className="home pev-flex pev-flex--columned">
+      {PRODUCTS_SECTIONS_PER_SORTING_ORDER.map(({ heading, sortBy }) => (
         <section className="home-section pev-flex pev-flex--columned" key={heading}>
-          <PEVHeading level={2}>{heading}</PEVHeading>
+          <PEVHeading level={2} className="pev-centered-padded-text">
+            {heading}
+          </PEVHeading>
 
           <div className="home-section__product-list">
-            <Scroller
-              scrollerBaseValueMeta={{
-                selector: '.home-section__product-list',
-                varName: '--product-card-width',
-              }}
-              render={({ ScrollerHookingParent }) => <ScrollerHookingParent>{productList}</ScrollerHookingParent>}
-            />
+            {productListForSortedSection[sortBy].length && (
+              <Scroller
+                scrollerBaseValueMeta={{
+                  selector: '.home-section__product-list',
+                  varName: '--product-card-width',
+                }}
+                render={({ ScrollerHookingParent }) => (
+                  <ScrollerHookingParent>
+                    <ProductSpecificDetail
+                      detailName="relatedProducts"
+                      detailValue={productListForSortedSection[sortBy]}
+                      extras={{
+                        disableListItemGutters: true,
+                      }}
+                    />
+                  </ScrollerHookingParent>
+                )}
+              />
+            )}
           </div>
 
           <Divider />
 
-          <PEVLink to={seeAllUrl} color="primary" className="home-section__link-to-see-all">
+          <PEVLink
+            to={{ pathname: ROUTES.PRODUCTS, search: `?sortBy=${sortBy}` }}
+            color="primary"
+            className="home-section__link-to-see-all"
+          >
             {translations.seeAll}
           </PEVLink>
         </section>

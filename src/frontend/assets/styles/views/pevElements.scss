@@ -49,4 +49,9 @@
         background: $blueColor;
         color: $whiteColor;
     }
+
+    &-text-field-wrapper input[readonly] {
+        background: $greyColor;
+        color: $veryDarkGreyColor;
+    }
 }

@@ -400,7 +400,7 @@ class HttpService extends Ajax {
         data: productModifications,
       },
     };
-    return this.patchRequest(this.URLS.PRODUCTS, modifiedProductData);
+    return this.patchRequest(this.URLS.PRODUCTS, modifiedProductData, true);
   }
 
   /**

@@ -210,7 +210,7 @@ async function addProduct(req: Request, res: Response, next: NextFunction) {
     const { url } = (await saveToDB(COLLECTION_NAMES.Product, newProductData)) as IProduct;
     moveValidImagesToTargetLocation(url, true);
 
-    return wrapRes(res, HTTP_STATUS_CODE.CREATED, { message: 'Success!' });
+    return wrapRes(res, HTTP_STATUS_CODE.CREATED, { payload: { productUrl: url } });
   } catch (exception) {
     removeTmpImages();
     return next(exception);

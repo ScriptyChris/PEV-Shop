@@ -40,6 +40,7 @@ orderedProductSchema.virtual('productRef', {
 });
 orderedProductSchema.post('save', async (doc: IProductInOrder & Document) => {
   doc.$locals.productRef.availability -= doc.quantity;
+  doc.$locals.productRef.orderedUnits += doc.quantity;
   await doc.$locals.productRef.save();
 });
 
@@ -165,6 +166,10 @@ orderSchema.statics.createOrder = (
 };
 
 export const OrderModel = model<IOrder, IOrderModel>(COLLECTION_NAMES.Order, orderSchema);
+export type TOrderToPopulate = IOrder & {
+  __regardingUser: string;
+  regardingProducts: (IOrder['regardingProducts'][number] & { __name: string })[];
+};
 
 interface IOrderModel extends Model<IOrder> {
   createOrder(

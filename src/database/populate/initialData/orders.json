@@ -1,0 +1,48 @@
+[
+  {
+    "receiver": {
+      "name": "Test client's name",
+      "email": "test_client@example.org",
+      "phone": "123456789"
+    },
+    "payment": {
+      "method": "cash"
+    },
+    "shipment": {
+      "method": "inPerson",
+      "address": "PEV Shop,ul. Testable 1,12-345 Testland"
+    },
+    "__regardingUser": "test client",
+    "regardingProducts": [
+      {
+        "quantity": 2,
+        "__name": "GW ACMs+/MSuper V3s+: 800Wh, 84.2v Battery Pack"
+      }
+    ]
+  },
+  {
+    "receiver": {
+      "name": "Test client's name",
+      "email": "test_client@example.org",
+      "phone": "123456789"
+    },
+    "payment": {
+      "method": "card"
+    },
+    "shipment": {
+      "method": "inPerson",
+      "address": "PEV Shop,ul. Testable 1,12-345 Testland"
+    },
+    "__regardingUser": "test client",
+    "regardingProducts": [
+      {
+        "quantity": 1,
+        "__name": "Dualtron 2- Handlebar Support Strut & Suspension"
+      },
+      {
+        "quantity": 3,
+        "__name": "King Song 14D, 340/420Wh Battery, 800W Motor"
+      }
+    ]
+  }
+]

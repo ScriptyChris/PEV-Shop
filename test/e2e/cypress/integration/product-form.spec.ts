@@ -9,6 +9,7 @@ const exampleSellerUser = (users as TE2EUser[])[1];
 describe('product-form', () => {
   const { forForm: testProductDataForForm, forAPI: testProductDataForAPI } = getTestProductData();
   let authToken: string;
+  let imgCacheInvalidationIndex = 0;
 
   const goToProductModificationPage = (productName: string) => {
     cy.visit(ROUTES.PRODUCTS);
@@ -22,7 +23,7 @@ describe('product-form', () => {
     cy.get(makeCyDataSelector('button:product-details__edit-product')).click();
   };
 
-  const assertProductDataInsideForm = (productData: typeof testProductDataForForm) => {
+  const assertProductDataInsideForm = (productData: typeof testProductDataForForm, goToModifyBySearch = true) => {
     cy.intercept(/\/public\/images\//, (req) => {
       expect(req.method).to.eq('GET');
       req.continue((res) => {
@@ -37,7 +38,18 @@ describe('product-form', () => {
         expect(Number(res.headers['content-length'])).to.be.greaterThan(0);
       });
     }).as('loadingProductAttachedImage');
-    goToProductModificationPage(productData.name);
+    if (goToModifyBySearch) {
+      goToProductModificationPage(productData.name);
+    } else {
+      cy.get(makeCyDataSelector('button:navigate-to-product')).click();
+      cy.get(makeCyDataSelector('button:product-details__edit-product')).click();
+      cy.get(makeCyDataSelector('container:product-form-images'))
+        .find('img')
+        .each(($img) => {
+          const currentImgSrc = $img.prop('src');
+          $img.prop('src', `${currentImgSrc}?invalidateCache=${imgCacheInvalidationIndex++}`);
+        });
+    }
 
     cy.get(makeCyDataSelector('input:base__name')).should('have.value', productData.name);
     cy.get(makeCyDataSelector('input:base__price')).should('have.value', productData.price);
@@ -180,15 +192,15 @@ describe('product-form', () => {
 
       // modify product
       cy.intercept('/api/products', (req) => {
-        req.headers.Authorization = `Bearer ${authToken}`;
         req.continue((res) => {
           expect(res.statusCode).to.eq(HTTP_STATUS_CODE.OK);
         });
       });
       cy.get(makeCyDataSelector('button:product-form__save')).click();
+      cy.contains(makeCyDataSelector('popup:message'), 'Product modified!');
 
       // assert update succeeded
-      assertProductDataInsideForm(updatedProductFormData.assertable);
+      assertProductDataInsideForm(updatedProductFormData.assertable, false);
     });
   });
 
@@ -267,17 +279,19 @@ describe('product-form', () => {
 
       // save new product
       cy.intercept('/api/products', (req) => {
-        req.headers.Authorization = `Bearer ${authToken}`;
         req.continue((res) => {
-          expect(res.body).to.include({
-            message: 'Success!',
+          expect(res.body).to.deep.eq({
+            payload: {
+              productUrl: testProductDataForAPI.url,
+            },
           });
         });
       });
       cy.get(makeCyDataSelector('button:product-form__save')).click();
+      cy.contains(makeCyDataSelector('popup:message'), 'Product added!');
 
       // assert new product has been saved by checking it's modification form
-      assertProductDataInsideForm(testProductDataForForm);
+      assertProductDataInsideForm(testProductDataForForm, false);
     });
   });
 });
