@@ -4,16 +4,18 @@
 
 .home-section {
     &__product-list {
+        --product-card-width: 200px;
+        --scrollable-min-height: 8rem;
         display: flex;
         align-items: center;
-        --product-card-width: 200px;
+        min-height: var(--scrollable-min-height);
 
         [data-compare-btn-scroll-dir] button {
             width: 2rem;
         }
 
         [data-scrollable-parent] {
-            --scrollable-min-height: 8rem;
+            --scrollable-min-height: inherit;
         }
 
         ul {
