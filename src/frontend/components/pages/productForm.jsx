@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo, createContext, useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Field, ErrorMessage, useFormikContext } from 'formik';
 import classNames from 'classnames';
 
@@ -30,7 +30,7 @@ import productSpecsService from '@frontend/features/productSpecsService';
 import { CategoriesTreeFormField } from '@frontend/components/views/categoriesTree';
 import { SearchSingleProductByName } from '@frontend/components/views/search';
 import FlexibleList from '@frontend/components/utils/flexibleList';
-import { routeHelpers } from '@frontend/components/pages/_routes';
+import { routeHelpers, ROUTES } from '@frontend/components/pages/_routes';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { imageSizeValidator } from '@commons/validators';
@@ -92,6 +92,9 @@ const translations = {
   additionSuccess: 'Product added!',
   modificationSuccess: 'Product modified!',
   formSubmissionError: 'Form submission failed :(',
+  navigateToProduct: 'See product',
+  modifyProductAgain: 'Modify product again',
+  addAnotherProduct: 'Add another product',
 };
 
 const FIELD_TYPE_MAP = Object.freeze({
@@ -553,7 +556,11 @@ function Images({ data: { initialData = [] } }) {
         </small>
       </Box>
 
-      <div style={{ '--images-limit': MAX_IMAGES_AMOUNT }} className="product-form__images-list">
+      <div
+        style={{ '--images-limit': MAX_IMAGES_AMOUNT }}
+        className="product-form__images-list"
+        data-cy="container:product-form-images"
+      >
         {/* TODO: [UX] let user choose, which image should serve as a preview on product's card */}
         {uploadedImages.map(({ src, name }, index) => {
           const alt = translations.getUploadedImageAlt(index + 1);
@@ -743,6 +750,10 @@ RelatedProductsNames._EditItemComponentHoC = function EditItemComponentHoC({
 const ProductForm = ({ initialData = {}, doSubmit }) => {
   const initialDataKeys = Object.keys(initialData);
   const isProductModification = initialDataKeys.length > 0;
+  // Use it to force reset form by re-mounting it and its children. Apparently, form logic has to be refactored in order to
+  // make Formik's `handleReset` function to do a proper form reset.
+  const [formRenderIndex, setFormRenderIndex] = useState(0);
+  const history = useHistory();
   const [productCurrentSpecs, setProductCurrentSpecs] = useState([]);
   const productSpecsMap = useRef({
     specs: null,
@@ -922,15 +933,58 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
           throw res.__ERROR_TO_HANDLE;
         }
 
-        const successfulAdditionOrModificationTranslation = isProductModification
-          ? translations.modificationSuccess
-          : translations.additionSuccess;
-
-        setPopupData({
-          type: POPUP_TYPES.SUCCESS,
-          message: successfulAdditionOrModificationTranslation,
-          buttons: [getClosePopupBtn(setPopupData)],
-        });
+        if (isProductModification) {
+          setPopupData({
+            type: POPUP_TYPES.SUCCESS,
+            message: translations.modificationSuccess,
+            buttons: [
+              {
+                text: translations.navigateToProduct,
+                dataCy: 'button:navigate-to-product',
+                onClick: () => {
+                  setPopupData(null);
+                  history.replace({
+                    pathname: `${ROUTES.PRODUCTS}/${initialData.url}`,
+                  });
+                },
+              },
+              {
+                text: translations.modifyProductAgain,
+                dataCy: 'button:modify-product-again',
+                onClick: () => {
+                  setPopupData(null);
+                  window.scroll({ top: 0, behavior: 'smooth' });
+                },
+              },
+            ],
+          });
+        } else {
+          setPopupData({
+            type: POPUP_TYPES.SUCCESS,
+            message: translations.additionSuccess,
+            buttons: [
+              {
+                text: translations.navigateToProduct,
+                dataCy: 'button:navigate-to-product',
+                onClick: () => {
+                  setPopupData(null);
+                  history.replace({
+                    pathname: `${ROUTES.PRODUCTS}/${res.productUrl}`,
+                  });
+                },
+              },
+              {
+                text: translations.addAnotherProduct,
+                dataCy: 'button:add-another-product',
+                onClick: () => {
+                  setPopupData(null);
+                  setFormRenderIndex((prev) => ++prev);
+                  window.scroll({ top: 0, behavior: 'smooth' });
+                },
+              },
+            ],
+          });
+        }
 
         return res;
       })
@@ -979,6 +1033,7 @@ const ProductForm = ({ initialData = {}, doSubmit }) => {
         onSubmit={onSubmitHandler}
         initialValues={formInitials}
         validate={validateHandler}
+        key={formRenderIndex}
       >
         {(formikProps) => (
           <>
