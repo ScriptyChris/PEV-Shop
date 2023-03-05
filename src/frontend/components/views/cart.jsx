@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/cart.scss';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';

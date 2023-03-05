@@ -1,3 +1,5 @@
+@use '../_var' as *;
+
 .rating-widget {
     --icon-polygon: polygon(88% 35%, 100% 0, 100% 75%, 64% 100%, 80% 60%, 50% 35%);
     --icon-flip: rotateY(180deg);

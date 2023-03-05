@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productForm.scss';
+
 import React, { useEffect, useState, useRef, useCallback, useMemo, createContext, useContext } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Field, ErrorMessage, useFormikContext } from 'formik';

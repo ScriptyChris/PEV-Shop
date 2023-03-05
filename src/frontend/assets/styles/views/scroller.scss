@@ -1,4 +1,4 @@
-@import '../_var';
+@use '../_var' as *;
 
 [data-scrollable-parent] {
   overflow: hidden;

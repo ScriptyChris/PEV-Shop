@@ -2,6 +2,7 @@
  * Facade over commonly used MUI and native HTML elements.
  * @module
  */
+import '@frontend/assets/styles/views/pevElements.scss';
 
 import React, { forwardRef, useState, useMemo, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';

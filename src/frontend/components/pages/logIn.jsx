@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/login.scss';
+
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 

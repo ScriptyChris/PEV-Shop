@@ -1,6 +1,7 @@
 /**
  * @module
  */
+import '@frontend/assets/styles/views/ratingWidget.scss';
 
 import React, { useState } from 'react';
 import classNames from 'classnames';

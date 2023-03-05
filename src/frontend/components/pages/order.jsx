@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/order.scss';
+
 import React, { memo, useState, useEffect, useRef, useMemo } from 'react';
 import classNames from 'classnames';
 import { useFormikContext } from 'formik';

@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .product-card {
   display: grid;
   gap: 1rem;

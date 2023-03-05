@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productDetails.scss';
+
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Field } from 'formik';

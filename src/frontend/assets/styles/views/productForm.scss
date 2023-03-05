@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .product-form {
   legend {
     font-weight: bold;

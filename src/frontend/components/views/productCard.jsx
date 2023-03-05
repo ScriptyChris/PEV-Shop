@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productCard.scss';
+
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';

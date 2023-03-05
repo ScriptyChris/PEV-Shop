@@ -53,9 +53,9 @@ $mergedBreakpointsMap: map-merge(
 
 $mediaQueriesMap: (
   "mobile": unquote("(max-width: #{map-get($mediaBreakpointsMap, tablet)}px)"),
-  "tablet": unquote("
-    (min-width: #{(map-get($mediaBreakpointsMap, tablet))}px) 
-    and 
+  "tablet": unquote("\
+    (min-width: #{(map-get($mediaBreakpointsMap, tablet))}px) \
+    and \
     (max-width: #{(map-get($mediaBreakpointsMap, desktop) - 1)}px)"
   ),
   "desktop": unquote("(min-width: #{(map-get($mediaBreakpointsMap, desktop))}px)"),

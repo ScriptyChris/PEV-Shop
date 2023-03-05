@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productComparisonCandidates.scss';
+
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { reaction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';

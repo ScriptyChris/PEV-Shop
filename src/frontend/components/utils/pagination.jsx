@@ -1,6 +1,7 @@
 /**
  * @module
  */
+import '@frontend/assets/styles/views/pagination.scss';
 
 import React from 'react';
 import ReactPaginate from 'react-paginate';

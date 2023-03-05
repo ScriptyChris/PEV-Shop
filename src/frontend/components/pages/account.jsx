@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/account.scss';
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useHistory, useLocation, Route, Switch, Redirect } from 'react-router-dom';
 import classNames from 'classnames';

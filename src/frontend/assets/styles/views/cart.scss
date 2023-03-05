@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .cart {
   &--empty__info {
     margin-inline: 1rem;

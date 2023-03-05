@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/register.scss';
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 

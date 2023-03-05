@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productComparison.scss';
+
 import { toJS } from 'mobx';
 import React, { useRef, useEffect, useCallback } from 'react';
 

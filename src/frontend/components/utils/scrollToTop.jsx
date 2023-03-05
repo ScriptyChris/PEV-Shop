@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/scrollToTop.scss';
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import Zoom from '@material-ui/core/Zoom';

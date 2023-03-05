@@ -1,6 +1,7 @@
 /**
  * @module
  */
+import '@frontend/assets/styles/views/scroller.scss';
 
 import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';

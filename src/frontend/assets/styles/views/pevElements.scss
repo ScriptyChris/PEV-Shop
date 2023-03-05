@@ -1,3 +1,5 @@
+@use '../_var' as *;
+
 .pev-element {
     &-form-field-error {
         color: $redColor;

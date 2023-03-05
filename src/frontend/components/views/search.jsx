@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/search.scss';
+
 import React, { memo, useRef, useCallback, useMemo, useState, forwardRef, useEffect } from 'react';
 
 import Drawer from '@material-ui/core/Drawer';

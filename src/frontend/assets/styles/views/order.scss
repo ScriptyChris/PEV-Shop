@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .order {
     align-items: stretch;
     flex-wrap: nowrap;

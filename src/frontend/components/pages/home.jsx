@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/home.scss';
+
 import React, { useState, useEffect } from 'react';
 
 import Divider from '@material-ui/core/Divider';

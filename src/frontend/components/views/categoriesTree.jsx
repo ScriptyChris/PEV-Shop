@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/categoriesTree.scss';
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import TreeMenu, { ItemComponent } from 'react-simple-tree-menu';
 

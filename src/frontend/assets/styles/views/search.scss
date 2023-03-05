@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .search-container {
   position: relative;
 

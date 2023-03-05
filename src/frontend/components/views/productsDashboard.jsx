@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productsDashboard.scss';
+
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import classNames from 'classnames';
 import { useLocation, useHistory } from 'react-router-dom';

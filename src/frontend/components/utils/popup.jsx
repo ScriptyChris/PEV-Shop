@@ -1,6 +1,7 @@
 /**
  * @module
  */
+import '@frontend/assets/styles/views/popup.scss';
 
 import React, { useCallback, memo, useState, useEffect, useRef } from 'react';
 
