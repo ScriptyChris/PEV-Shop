@@ -74,17 +74,17 @@ describe('#middleware-index', () => {
     });
 
     it('should call res.sendFile(..) when image is found', async (): Promise<void> => {
-      let imageFoundPromise: Promise<string> | string = new Promise((resolve) => {
+      type TImagesArgs = [string, { maxAge: number }];
+      const imageFoundPromise = new Promise<TImagesArgs>((resolve) => {
         (globMock as TJestMock).mockImplementationOnce((path: any, callback: any) => {
-          const images = ['some image'];
+          const images: TImagesArgs = ['some image', { maxAge: 3600000 }];
 
           callback(null, images);
-          resolve(images[0]);
+          resolve(images);
         });
       });
 
       middleware(appMock);
-      imageFoundPromise = await imageFoundPromise;
 
       return new Promise((resolve) => {
         /*
@@ -93,8 +93,8 @@ describe('#middleware-index', () => {
           Thus, without modifying target source code to be controllable/watchable/observable (i.e. by returning Promise)
           it's difficult to check in other way when mentioned async functions call chain finished, in order to use expect(..) to test the final result.
          */
-        setImmediate(() => {
-          expect(resMock.sendFile).toHaveBeenCalledWith(imageFoundPromise);
+        setImmediate(async () => {
+          expect(resMock.sendFile).toHaveBeenCalledWith(...(await imageFoundPromise));
 
           resolve();
         });
