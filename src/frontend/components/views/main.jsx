@@ -1,21 +1,24 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
-import Home from '@frontend/components/pages/home';
-import Products from '@frontend/components/pages/products';
-import Register from '@frontend/components/pages/register';
-import NotLoggedIn from '@frontend/components/pages/notLoggedIn';
-import NotAuthorized from '@frontend/components/pages/notAuthorized';
-import LogIn from '@frontend/components/pages/logIn';
-import Account from '@frontend/components/pages/account';
-import ConfirmRegistration from '@frontend/components/pages/confirmRegistration';
+
+const Home = lazy(() => import('@frontend/components/pages/home'));
+const Products = lazy(() => import('@frontend/components/pages/products'));
+const Register = lazy(() => import('@frontend/components/pages/register'));
+const NotLoggedIn = lazy(() => import('@frontend/components/pages/notLoggedIn'));
+const NotAuthorized = lazy(() => import('@frontend/components/pages/notAuthorized'));
+const LogIn = lazy(() => import('@frontend/components/pages/logIn'));
+const Account = lazy(() => import('@frontend/components/pages/account'));
+const ConfirmRegistration = lazy(() => import('@frontend/components/pages/confirmRegistration'));
+const NotFound = lazy(() => import('@frontend/components/pages/notFound'));
+const ScrollToTop = lazy(() => import('@frontend/components/utils/scrollToTop'));
+
 import { SetNewPassword, ResetPassword } from './password';
-import NotFound from '@frontend/components/pages/notFound';
 import { GenericErrorPopup } from '@frontend/components/utils/popup';
-import { ScrollToTop } from '@frontend/components/utils/scrollToTop';
+import { PEVSuspense } from '@frontend/components/utils/pevElements';
 
 export default observer(function Main() {
   const routesGuards = useRoutesGuards(storeService);
@@ -24,55 +27,85 @@ export default observer(function Main() {
     <main className="main">
       <Switch>
         <Route path={ROUTES.ROOT} exact>
-          <Home />
+          <PEVSuspense>
+            <Home />
+          </PEVSuspense>
         </Route>
 
         <Route path={ROUTES.PAGES}>
           <Route path={ROUTES.PRODUCTS}>
-            <Products />
+            <PEVSuspense>
+              <Products />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.REGISTER}>
-            <Register />
+            <PEVSuspense>
+              <Register />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.CONFIRM_REGISTRATION}>
-            <ConfirmRegistration />
+            <PEVSuspense>
+              <ConfirmRegistration />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.LOG_IN}>
-            <LogIn />
+            <PEVSuspense>
+              <LogIn />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.NOT_LOGGED_IN}>
-            <NotLoggedIn />
+            <PEVSuspense>
+              <NotLoggedIn />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.NOT_AUTHORIZED}>
-            <NotAuthorized />
+            <PEVSuspense>
+              <NotAuthorized />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.RESET_PASSWORD}>
-            <ResetPassword />
+            <PEVSuspense>
+              <ResetPassword />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.SET_NEW_PASSWORD}>
-            <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
+            <PEVSuspense>
+              <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
+            </PEVSuspense>
           </Route>
           <Route path={ROUTES.ACCOUNT}>
             {
               /* TODO: [BUG] show loader for the time `storeService.userAccountState` is updated by MobX 
               to prevent redirecting when user indeed has session */
-              routesGuards.isUser() ? <Account /> : <Redirect to={ROUTES.NOT_LOGGED_IN} />
+              routesGuards.isUser() ? (
+                <PEVSuspense>
+                  <Account />
+                </PEVSuspense>
+              ) : (
+                <Redirect to={ROUTES.NOT_LOGGED_IN} />
+              )
             }
           </Route>
 
           {/* for explicit redirection to 404 */}
           <Route path={ROUTES.NOT_FOUND}>
-            <NotFound />
+            <PEVSuspense>
+              <NotFound />
+            </PEVSuspense>
           </Route>
         </Route>
 
         {/* for unexpected 404 */}
         <Route>
-          <NotFound />
+          <PEVSuspense>
+            <NotFound />
+          </PEVSuspense>
         </Route>
       </Switch>
 
-      <ScrollToTop />
+      <PEVSuspense emptyLoader>
+        <ScrollToTop />
+      </PEVSuspense>
       <GenericErrorPopup />
     </main>
   );

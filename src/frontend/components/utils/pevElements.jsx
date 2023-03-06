@@ -4,7 +4,7 @@
  */
 import '@frontend/assets/styles/views/pevElements.scss';
 
-import React, { forwardRef, useState, useMemo, useEffect, useRef } from 'react';
+import React, { forwardRef, useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
@@ -452,3 +452,7 @@ export const PEVPopover = forwardRef(function PEVPopover(
     </Popover>
   );
 });
+
+export function PEVSuspense({ children }) {
+  return <Suspense fallback={<div>lazy loading a component</div>}>{children}</Suspense>;
+}

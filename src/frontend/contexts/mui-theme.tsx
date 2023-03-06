@@ -1,5 +1,5 @@
 import React from 'react';
-import { ThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider, StylesProvider } from '@material-ui/core/styles';
 import { unstable_createMuiStrictModeTheme, createMuiTheme } from '@material-ui/core';
 
 // eslint-disable-next-line no-var
@@ -30,7 +30,17 @@ function MUIThemeProvider({ children }: React.PropsWithChildren<Record<string, u
   });
   console.log('muiTheme:', muiTheme);
 
-  return <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>;
+  return (
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    <StylesProvider
+      injectFirst
+      // TODO: [build code redundancy] use that to prevent MUI from generating internal CSS
+      // disableGeneration={true}
+    >
+      <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>
+    </StylesProvider>
+  );
 }
 
-export { MUIThemeProvider };
+export default MUIThemeProvider;
