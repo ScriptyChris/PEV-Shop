@@ -22,6 +22,7 @@ import { ROUTES } from '@frontend/components/pages/_routes';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { subscribeToBodyMutations, unSubscribeFromBodyMutations } from '@frontend/components/utils/bodyObserver';
 import { ProductCardLink } from '@frontend/components/views/productCard';
+import { COMMON_PERCEPTION_DELAY_TIME } from '@commons/consts';
 
 const translations = {
   addToCompare: 'Add to compare',
@@ -43,7 +44,7 @@ const bodyStyleUpdaters = Object.freeze({
     document.body.style.marginBottom = null;
   },
   setTransition() {
-    document.body.style.transition = 'margin-bottom 250ms';
+    document.body.style.transition = `margin-bottom ${COMMON_PERCEPTION_DELAY_TIME}ms`;
   },
   clearTransition() {
     document.body.style.transition = null;

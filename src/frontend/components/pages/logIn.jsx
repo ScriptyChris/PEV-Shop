@@ -2,6 +2,7 @@ import '@frontend/assets/styles/views/login.scss';
 
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import classNames from 'classnames';
 
 import {
   PEVForm,
@@ -16,6 +17,7 @@ import {
 import userSessionService from '@frontend/features/userSessionService';
 import { ROUTES } from './_routes';
 import { PasswordField } from '@frontend/components/views/password';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   logInHeader: 'Login to shop',
@@ -32,6 +34,8 @@ export default function LogIn() {
     password: '',
   };
   const history = useHistory();
+  const { isMobileLayout } = useRWDLayout();
+  const columnDirectionedFlex = isMobileLayout ? 'pev-flex--columned' : '';
 
   const onSubmitHandler = (values) => {
     userSessionService.logIn(values).then((res) => {
@@ -55,11 +59,16 @@ export default function LogIn() {
             <PEVHeading level={2}>{translations.logInHeader}</PEVHeading>
           </PEVLegend>
 
-          <div className="pev-flex">
+          <div className={classNames('pev-flex', columnDirectionedFlex)}>
             <PEVTextField identity="login" label={translations.logInField} required data-cy="input:login" />
           </div>
 
-          <PasswordField identity="password" label={translations.passwordField} dataCy="input:password" />
+          <PasswordField
+            identity="password"
+            label={translations.passwordField}
+            containerClassName={columnDirectionedFlex}
+            dataCy="input:password"
+          />
 
           <PEVButton className="login__submit-button" size="small" type="submit" data-cy="button:submit-login">
             {translations.submitLogIn}

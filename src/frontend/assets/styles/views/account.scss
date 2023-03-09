@@ -77,6 +77,10 @@
 .orders {
     margin: 1rem;
 
+    .pev-element-skeleton {
+        height: 4rem;
+    }
+
     &__all-client-users-hint {
         text-align: center;
     }

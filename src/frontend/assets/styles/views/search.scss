@@ -55,6 +55,8 @@
 }
 
 .search-initial-results {
+  min-height: 4rem;
+
   .products-list {
     max-height: 65vh;
     overflow-y: auto;

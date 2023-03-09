@@ -2,6 +2,7 @@ import '@frontend/assets/styles/views/register.scss';
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import classNames from 'classnames';
 
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
@@ -15,11 +16,13 @@ import {
   PEVFieldset,
   PEVLegend,
   PEVParagraph,
+  PEVLoadingAnimation,
 } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { PasswordField } from '@frontend/components/views/password';
 import { ROUTES } from '@frontend/components/pages/_routes';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -28,7 +31,6 @@ const translations = Object.freeze({
   repeatedPasswordField: 'Repeat password',
   submitRegistration: 'Register',
   email: 'Email',
-  loadingAccountTypes: 'Loading account types...',
   accountType: 'Account type',
   clientType: 'Client',
   sellerType: 'Seller',
@@ -60,6 +62,8 @@ export default function Register() {
   }, []);
   const [accountTypes, setAccountTypes] = useState();
   const history = useHistory();
+  const { isMobileLayout } = useRWDLayout();
+  const columnDirectionedFlex = isMobileLayout ? 'pev-flex--columned' : '';
 
   useEffect(() => {
     httpService.getUserRoles().then((res) => {
@@ -153,7 +157,7 @@ export default function Register() {
               <PEVHeading level={2}>{translations.registerHeader}</PEVHeading>
             </PEVLegend>
 
-            <div className="pev-flex">
+            <div className={classNames('pev-flex', columnDirectionedFlex)}>
               <PEVTextField
                 identity="registrationLogin"
                 name="login"
@@ -169,6 +173,7 @@ export default function Register() {
               identity="password"
               label={translations.passwordField}
               error={formikProps.errors.password}
+              containerClassName={columnDirectionedFlex}
               dataCy="input:register-password"
             />
 
@@ -176,10 +181,11 @@ export default function Register() {
               identity="repeatedPassword"
               label={translations.repeatedPasswordField}
               error={formikProps.errors.repeatedPassword}
+              containerClassName={columnDirectionedFlex}
               dataCy="input:register-repeated-password"
             />
 
-            <div className="pev-flex">
+            <div className={classNames('pev-flex', columnDirectionedFlex)}>
               <PEVTextField
                 type="email"
                 identity="registrationEmail"
@@ -190,33 +196,38 @@ export default function Register() {
               />
             </div>
 
-            <div className="pev-flex" role="group">
+            <div
+              className={classNames('register__account-types-container pev-flex', columnDirectionedFlex)}
+              role="group"
+            >
               <PEVParagraph id="account-type-label">{translations.accountType}</PEVParagraph>
-              <RadioGroup
-                className="register__account-types"
-                aria-labelledby="account-type-label"
-                name="accountType"
-                value={formikProps.values.accountType}
-                onChange={getAccountTypeChangeHandler(formikProps.setFieldValue)}
-              >
-                {accountTypes
-                  ? accountTypes.map((accountType) => (
-                      <FormControlLabel
-                        value={accountType.value}
-                        control={
-                          <Radio
-                            id={accountType.identity}
-                            inputProps={{ 'data-cy': `input:register-account-${accountType.value}-type` }}
-                            required
-                          />
-                        }
-                        label={accountType.label}
-                        htmlFor={accountType.identity}
-                        key={accountType.value}
-                      />
-                    ))
-                  : translations.loadingAccountTypes}
-              </RadioGroup>
+              {accountTypes ? (
+                <RadioGroup
+                  className="register__account-types"
+                  aria-labelledby="account-type-label"
+                  name="accountType"
+                  value={formikProps.values.accountType}
+                  onChange={getAccountTypeChangeHandler(formikProps.setFieldValue)}
+                >
+                  {accountTypes.map((accountType) => (
+                    <FormControlLabel
+                      value={accountType.value}
+                      control={
+                        <Radio
+                          id={accountType.identity}
+                          inputProps={{ 'data-cy': `input:register-account-${accountType.value}-type` }}
+                          required
+                        />
+                      }
+                      label={accountType.label}
+                      htmlFor={accountType.identity}
+                      key={accountType.value}
+                    />
+                  ))}
+                </RadioGroup>
+              ) : (
+                <PEVLoadingAnimation className="register__account-types--loader" />
+              )}
             </div>
 
             <PEVButton className="register__submit-button" type="submit" data-cy="button:submit-register">

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 import Divider from '@material-ui/core/Divider';
 
-import { PEVHeading, PEVLink } from '@frontend/components/utils/pevElements';
+import { PEVHeading, PEVLink, PEVLoadingAnimation } from '@frontend/components/utils/pevElements';
 import Scroller from '@frontend/components/utils/scroller';
 import { ProductSpecificDetail } from '@frontend/components/views/productDetails';
 import httpService from '@frontend/features/httpService';
@@ -39,11 +39,12 @@ export default function Home() {
   );
 
   useEffect(() => {
+    let _isComponentMounted = true;
     const pagination = { pageNumber: 1, productsPerPage: 5 };
 
     PRODUCTS_SECTIONS_PER_SORTING_ORDER.forEach(({ sortBy }) => {
       httpService.getProducts({ pagination, sortBy }, true).then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
+        if (res.__EXCEPTION_ALREADY_HANDLED || !_isComponentMounted) {
           return;
         }
 
@@ -53,6 +54,8 @@ export default function Home() {
         }));
       });
     });
+
+    return () => (_isComponentMounted = false);
   }, []);
 
   return (
@@ -64,7 +67,7 @@ export default function Home() {
           </PEVHeading>
 
           <div className="home-section__product-list">
-            {productListForSortedSection[sortBy].length && (
+            {productListForSortedSection[sortBy].length ? (
               <Scroller
                 scrollerBaseValueMeta={{
                   selector: '.home-section__product-list',
@@ -82,6 +85,8 @@ export default function Home() {
                   </ScrollerHookingParent>
                 )}
               />
+            ) : (
+              <PEVLoadingAnimation />
             )}
           </div>
 

@@ -20,6 +20,7 @@ import {
   PEVTextField,
   PEVTabs,
   PEVParagraph,
+  PEVLoadingAnimation,
 } from '@frontend/components/utils/pevElements';
 
 // TODO: update imported module name after products dashboard will be refactored
@@ -287,7 +288,7 @@ function SearchProductsByName({
   });
   const { isMobileLayout } = useRWDLayout();
   const [isSearchMenuOpened, setIsSearchMenuOpened] = useState(false);
-  const [foundProducts, setFoundProducts] = useState([]);
+  const [foundProducts, setFoundProducts] = useState(null);
   const { mobileSearchMenuOpenerBtnRef, getMobileSearchMenuOpenerBtnRef } = useMobileSearchMenuOpenerBtn();
   const [tabIndex, setTabIndex] = useState(TABS_BASE_INFO.recentSearches.index);
   const [initialSearch, setInitialSearch] = useState('');
@@ -300,7 +301,7 @@ function SearchProductsByName({
 
     if (!searchValue) {
       setTabIndex(TABS_BASE_INFO.recentSearches.index);
-      return setFoundProducts([]);
+      return setFoundProducts(null);
     }
 
     {
@@ -313,12 +314,13 @@ function SearchProductsByName({
       updateRecentSearchesList(searchValue);
     }
 
+    setFoundProducts([]);
     httpService.getProductsByName(searchValue, pagination).then((res) => {
       if (res.__EXCEPTION_ALREADY_HANDLED) {
         return;
       }
 
-      setFoundProducts(res.productsList);
+      setFoundProducts(res.productsList?.length ? res.productsList : null);
     });
   };
 
@@ -384,22 +386,28 @@ function SearchProductsByName({
   ) : (
     <PEVParagraph className="pev-centered-padded-text">{translations.noRecentSearchesFound}</PEVParagraph>
   );
-  const searchResults = foundProducts.length ? (
+  const searchResults = foundProducts ? (
     <div
       className="search-initial-results pev-flex pev-flex--columned"
       onKeyDown={onKeyDown}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
     >
-      <PEVLink
-        to={linkToAllSearchResults}
-        className="search-initial-results__see-all-link pev-centered-padded-text"
-        color="primary"
-      >
-        {translations.seeAllSearchResults}
-      </PEVLink>
-      <Divider variant="middle" />
-      <BaseProductsList productsList={foundProducts} isCompactProductCardSize />
+      {foundProducts.length ? (
+        <>
+          <PEVLink
+            to={linkToAllSearchResults}
+            className="search-initial-results__see-all-link pev-centered-padded-text"
+            color="primary"
+          >
+            {translations.seeAllSearchResults}
+          </PEVLink>
+          <Divider variant="middle" />
+          <BaseProductsList productsList={foundProducts} isCompactProductCardSize />
+        </>
+      ) : (
+        <PEVLoadingAnimation />
+      )}
     </div>
   ) : (
     <PEVParagraph className="pev-centered-padded-text" data-cy="message:empty-search-results">

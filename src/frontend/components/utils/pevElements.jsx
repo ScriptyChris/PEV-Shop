@@ -23,10 +23,11 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 import Popover from '@material-ui/core/Popover';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 import Scroller from '@frontend/components/utils/scroller';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
-import { IMAGES_ROOT_PATH } from '@commons/consts';
+import { IMAGES_ROOT_PATH, COMMON_PERCEPTION_DELAY_TIME } from '@commons/consts';
 import { MINOR_INFO_AUTO_CLOSE_TIME } from '@commons/consts';
 
 const useFieldsetStyles = makeStyles({
@@ -369,8 +370,21 @@ export const PEVTabs = forwardRef(function PEVTabs(
   );
 });
 
-export const PEVImage = forwardRef(function PEVImage({ image, src, alt, className = '', ...restProps }, ref) {
+export const PEVImage = forwardRef(function PEVImage(
+  { image, src, alt, className = '', onLoad, onError, defaultHeightSameAsWidth, avoidLoader = false, ...restProps },
+  ref
+) {
   const { isMobileLayout } = useRWDLayout();
+  const [isImgLoaded, setIsImgLoaded] = useState(false);
+
+  const _onLoad = (event) => {
+    setIsImgLoaded(true);
+    onLoad?.(event);
+  };
+  const _onError = (event) => {
+    setIsImgLoaded(true);
+    onError?.(event);
+  };
 
   if (image) {
     src = `/${IMAGES_ROOT_PATH}/${image.src}`;
@@ -379,17 +393,33 @@ export const PEVImage = forwardRef(function PEVImage({ image, src, alt, classNam
     throw Error('When `image` prop is not provided, both `src` and `alt` must be provided!');
   }
 
-  return (
+  const imgDefaultWidth = isMobileLayout ? 300 : 500;
+  const imgDefaultHeight = defaultHeightSameAsWidth ? imgDefaultWidth : null;
+  const imgClassName = classNames('pev-element-image', className);
+  const imgElem = (
     <img
       {...{
+        width: imgDefaultWidth,
+        height: imgDefaultHeight,
+        ...restProps,
         src,
         alt,
-        width: isMobileLayout ? 300 : 500,
-        ...restProps,
+        className: imgClassName,
+        ref,
       }}
-      className={classNames('pev-element-image', className)}
-      ref={ref}
     />
+  );
+  const dummyImgElem = React.cloneElement(imgElem, {
+    onLoad: _onLoad,
+    onError: _onError,
+  });
+
+  return isImgLoaded || avoidLoader ? (
+    imgElem
+  ) : (
+    <Skeleton variant="circle" className={imgClassName}>
+      {dummyImgElem}
+    </Skeleton>
   );
 });
 
@@ -453,6 +483,35 @@ export const PEVPopover = forwardRef(function PEVPopover(
   );
 });
 
-export function PEVSuspense({ children }) {
-  return <Suspense fallback={<div>lazy loading a component</div>}>{children}</Suspense>;
+export function PEVLoadingAnimation({ emptyLoader, onUnmountedLoader, className, children }) {
+  if (typeof onUnmountedLoader !== 'function' && onUnmountedLoader !== undefined) {
+    throw TypeError(`'onUnmountedLoader' prop has to be a function or undefined! Received "${onUnmountedLoader}".`);
+  } else if (children) {
+    throw Error('"children" prop should not be passed!');
+  }
+
+  const [finishedLoadingDelay, setFinishedLoadingDelay] = useState(false);
+
+  useEffect(() => {
+    if (emptyLoader) {
+      return () => onUnmountedLoader?.();
+    }
+
+    const loadingDelayTimeoutId = window.setTimeout(() => setFinishedLoadingDelay(true), COMMON_PERCEPTION_DELAY_TIME);
+
+    return () => {
+      window.clearTimeout(loadingDelayTimeoutId);
+      onUnmountedLoader?.();
+    };
+  }, []);
+
+  if (emptyLoader || !finishedLoadingDelay) {
+    return null;
+  }
+
+  return <Skeleton variant="rect" className={classNames('pev-element-skeleton', className)} />;
+}
+
+export function PEVSuspense({ emptyLoader, onUnmountedLoader, children }) {
+  return <Suspense fallback={<PEVLoadingAnimation {...{ emptyLoader, onUnmountedLoader }} />}>{children}</Suspense>;
 }

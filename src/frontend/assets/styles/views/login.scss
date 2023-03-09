@@ -1,3 +1,5 @@
+@use '../_var' as *;
+
 .login {
     display: flex;
     flex-direction: column;
@@ -11,6 +13,12 @@
 
     &__submit-button {
         align-self: center;
+        background: $greenColor;
+        color: $whiteColor;
+
+        &:hover {
+            background: $darkGreenColor;
+        }
     }
 
     &__reset-password-hint {

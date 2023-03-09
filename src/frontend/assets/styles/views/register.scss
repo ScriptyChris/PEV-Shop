@@ -1,14 +1,40 @@
+@use '../_var' as *;
+
 .register {
     &__root-fieldset {
         align-items: normal;
     }
 
+    &__account-types-container.pev-flex--columned {
+        flex-direction: column;
+        
+        .register__account-types {
+            margin-inline: 0;
+
+            label {
+                margin-right: 0;
+            }
+        }
+    }
+
     &__account-types {
         margin-inline: auto 10%;
+
+        &--loader {
+            width: 25%;
+            height: 5.25rem;
+            align-self: center;
+        }
     }
 
     &__submit-button {
         width: max-content;
         align-self: center;
+        background: $greenColor;
+        color: $whiteColor;
+
+        &:hover {
+            background: $darkGreenColor;
+        }
     }
 }

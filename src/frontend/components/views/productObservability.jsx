@@ -145,8 +145,10 @@ export default observer(function ObservedProducts() {
   };
 
   useEffect(() => {
+    let _isComponentMounted = true;
+
     httpService.getObservedProducts().then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
+      if (res.__EXCEPTION_ALREADY_HANDLED || !_isComponentMounted) {
         return;
       }
 
@@ -154,6 +156,8 @@ export default observer(function ObservedProducts() {
       setCanUnobserveAllProducts(!!res.length);
       setObservedProducts(res);
     });
+
+    return () => (_isComponentMounted = false);
   }, []);
 
   const getUnobserveProductHandler = (toggleProductObserve) => {
