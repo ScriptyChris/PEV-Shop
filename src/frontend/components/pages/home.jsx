@@ -1,10 +1,15 @@
 import '@frontend/assets/styles/views/home.scss';
 
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, lazy } from 'react';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVHeading, PEVLink, PEVLoadingAnimation } from '@frontend/components/utils/pevElements';
+const ProductComparisonCandidatesList = lazy(() =>
+  import('@frontend/components/views/productComparisonCandidates').then((ProductComparisonCandidatesModule) => ({
+    default: ProductComparisonCandidatesModule.ProductComparisonCandidatesList,
+  }))
+);
+
+import { PEVHeading, PEVLink, PEVSuspense, PEVLoadingAnimation } from '@frontend/components/utils/pevElements';
 import Scroller from '@frontend/components/utils/scroller';
 import { ProductSpecificDetail } from '@frontend/components/views/productDetails';
 import httpService from '@frontend/features/httpService';
@@ -99,6 +104,10 @@ export default function Home() {
           >
             {translations.seeAll}
           </PEVLink>
+
+          <PEVSuspense>
+            <ProductComparisonCandidatesList />
+          </PEVSuspense>
         </section>
       ))}
     </article>

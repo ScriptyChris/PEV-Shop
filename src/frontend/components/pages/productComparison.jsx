@@ -1,7 +1,7 @@
 import '@frontend/assets/styles/views/productComparison.scss';
 
-import { toJS } from 'mobx';
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
@@ -10,24 +10,72 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 
-import { PEVHeading, PEVImage } from '@frontend/components/utils/pevElements';
+import { PEVHeading, PEVImage, PEVLoadingAnimation } from '@frontend/components/utils/pevElements';
 import storeService from '@frontend/features/storeService';
 import { ProductSpecificDetail, getProductDetailsHeaders } from '@frontend/components/views/productDetails';
 import Scroller from '@frontend/components/utils/scroller';
 import { ProductCardLink } from '@frontend/components/views/productCard';
+import httpService from '@frontend/features/httpService';
+import { routeHelpers } from './_routes';
 
 const translations = {
   productsAmountLabelPrefix: 'Comparing',
   productsAmountLabelSuffix: 'products',
-  lackOfData: 'No data!',
+  noProductsToCompare: 'No products selected to compare!',
 };
+
+function usePrepareComparisonData() {
+  const [comparableProductsData, setComparableProductsData] = useState(() => {
+    const productsData = storeService.productComparisonState.map(({ _id, relatedProducts, ...product }) => product);
+    return productsData.length ? productsData : null;
+  });
+  const { search } = useLocation();
+  const { productsNames } = useMemo(() => routeHelpers.parseSearchParams(search), [search]);
+
+  useEffect(() => {
+    if (comparableProductsData?.length || !productsNames?.length) {
+      return;
+    }
+
+    let _isComponentMounted = true;
+
+    setComparableProductsData([]);
+    httpService.getProductsByNames(productsNames).then((res) => {
+      if (res.__EXCEPTION_ALREADY_HANDLED || !_isComponentMounted) {
+        return;
+      }
+
+      setComparableProductsData(res.length ? res : null);
+    });
+
+    return () => (_isComponentMounted = false);
+  }, []);
+
+  const { nameHeaderIndex, productDetailsHeaders, productDetailsHeadersKeys } = useMemo(() => {
+    const productDetailsHeaders = getProductDetailsHeaders(['relatedProducts']);
+    const productDetailsHeadersKeys = Object.keys(productDetailsHeaders);
+
+    let nameHeaderIndex = productDetailsHeadersKeys.findIndex((headerName) => headerName.toLowerCase() === 'name');
+    const [nameHeader] = productDetailsHeadersKeys.splice(nameHeaderIndex, 1);
+    productDetailsHeadersKeys.unshift(nameHeader);
+    nameHeaderIndex = 0;
+
+    return { nameHeaderIndex, productDetailsHeaders, productDetailsHeadersKeys };
+  }, []);
+
+  return { nameHeaderIndex, productDetailsHeaders, productDetailsHeadersKeys, comparableProductsData };
+}
 
 export default function Compare() {
   const tableRef = useRef();
   const scrollerBtnsParentRef = useRef();
-  const comparisonData = prepareComparisonData();
+  const comparisonData = usePrepareComparisonData();
 
-  useEffect(() => setTableStylingCSSVariables(), []);
+  useEffect(() => {
+    if (comparisonData?.comparableProductsData?.length) {
+      setTableStylingCSSVariables();
+    }
+  }, [comparisonData?.comparableProductsData]);
 
   const setTableStylingCSSVariables = () => {
     tableRef.current.style.setProperty('--compare-rows-number', comparisonData.productDetailsHeadersKeys.length);
@@ -92,9 +140,7 @@ export default function Compare() {
               // TODO: [UX] hovering over certain spec could highlight regarding specs in other compared products
               <TableCell className="product-comparison__cell" component="div" role="cell" key={`cell-${dataIndex}`}>
                 {isNameHeader ? (
-                  <ProductCardLink
-                    productData={toJS(storeService.productComparisonState[dataIndex], { recurseEverything: true })}
-                  >
+                  <ProductCardLink productData={comparisonData.comparableProductsData[dataIndex]}>
                     {preparedProductDetail}
                   </ProductCardLink>
                 ) : (
@@ -107,7 +153,11 @@ export default function Compare() {
       );
     };
 
-  return comparisonData ? (
+  if (!comparisonData?.comparableProductsData) {
+    return translations.noProductsToCompare;
+  }
+
+  return comparisonData.comparableProductsData.length ? (
     <article className="product-comparison-container" elevation={0}>
       <header ref={scrollerBtnsParentRef} className="product-comparison__header">
         <PEVHeading level={3}>
@@ -153,22 +203,6 @@ export default function Compare() {
       </TableContainer>
     </article>
   ) : (
-    translations.lackOfData
+    <PEVLoadingAnimation />
   );
-
-  function prepareComparisonData() {
-    const productDetailsHeaders = getProductDetailsHeaders(['relatedProducts']);
-    const productDetailsHeadersKeys = Object.keys(productDetailsHeaders);
-
-    let nameHeaderIndex = productDetailsHeadersKeys.findIndex((headerName) => headerName.toLowerCase() === 'name');
-    const [nameHeader] = productDetailsHeadersKeys.splice(nameHeaderIndex, 1);
-    productDetailsHeadersKeys.unshift(nameHeader);
-    nameHeaderIndex = 0;
-
-    const comparableProductsData = storeService.productComparisonState.map(
-      ({ _id, relatedProducts, ...product }) => product
-    );
-
-    return { nameHeaderIndex, productDetailsHeaders, productDetailsHeadersKeys, comparableProductsData };
-  }
 }

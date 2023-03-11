@@ -55,7 +55,7 @@ fake-pev-shopping
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:18](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L18)
+[src/frontend/features/storageService.ts:18](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L18)
 
 ## Properties
 
@@ -65,7 +65,7 @@ fake-pev-shopping
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L16)
+[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L16)
 
 ## Methods
 
@@ -81,7 +81,7 @@ Already parsed (from JSON) stored value.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L42)
+[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L42)
 
 ___
 
@@ -97,7 +97,7 @@ Removes a values.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L54)
+[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L54)
 
 ___
 
@@ -121,7 +121,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:26](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L26)
+[src/frontend/features/storageService.ts:26](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L26)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / [<internal\>](#modulestypes_internal_md) / StoreService
 
@@ -165,7 +165,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:27](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L27)
+[src/frontend/features/storeService.ts:27](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L27)
 
 ## Accessors
 
@@ -179,7 +179,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:151](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L151)
+[src/frontend/features/storeService.ts:151](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L151)
 
 ___
 
@@ -193,7 +193,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:147](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L147)
+[src/frontend/features/storeService.ts:147](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L147)
 
 ___
 
@@ -207,7 +207,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:135](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L135)
+[src/frontend/features/storeService.ts:135](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L135)
 
 ___
 
@@ -221,7 +221,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:143](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L143)
+[src/frontend/features/storeService.ts:143](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L143)
 
 ___
 
@@ -235,7 +235,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:131](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L131)
+[src/frontend/features/storeService.ts:131](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L131)
 
 ___
 
@@ -249,7 +249,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:139](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L139)
+[src/frontend/features/storeService.ts:139](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L139)
 
 ## Methods
 
@@ -274,7 +274,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:48](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L48)
+[src/frontend/features/storeService.ts:48](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L48)
 
 ___
 
@@ -288,7 +288,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:119](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L119)
+[src/frontend/features/storeService.ts:119](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L119)
 
 ___
 
@@ -302,7 +302,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:127](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L127)
+[src/frontend/features/storeService.ts:127](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L127)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:43](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L43)
+[src/frontend/features/storeService.ts:43](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L43)
 
 ___
 
@@ -330,7 +330,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:89](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L89)
+[src/frontend/features/storeService.ts:89](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L89)
 
 ___
 
@@ -355,7 +355,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:69](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L69)
+[src/frontend/features/storeService.ts:69](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L69)
 
 ___
 
@@ -375,7 +375,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:96](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L96)
+[src/frontend/features/storeService.ts:96](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L96)
 
 ___
 
@@ -402,7 +402,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:102](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L102)
+[src/frontend/features/storeService.ts:102](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L102)
 
 ___
 
@@ -422,7 +422,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:123](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L123)
+[src/frontend/features/storeService.ts:123](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L123)
 
 ___
 
@@ -442,7 +442,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L39)
+[src/frontend/features/storeService.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L39)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / [<internal\>](#modulestypes_internal_md) / UserAccount
 
@@ -490,7 +490,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:70](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L70)
+[src/frontend/features/storageService.ts:70](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L70)
 
 ## Properties
 
@@ -504,7 +504,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L16)
+[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L16)
 
 ## Methods
 
@@ -524,7 +524,7 @@ Already parsed (from JSON) stored value.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L42)
+[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L42)
 
 ___
 
@@ -544,7 +544,7 @@ Removes a values.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L54)
+[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L54)
 
 ___
 
@@ -571,7 +571,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:74](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L74)
+[src/frontend/features/storageService.ts:74](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L74)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / [<internal\>](#modulestypes_internal_md) / UserAuthToken
 
@@ -619,7 +619,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:80](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L80)
+[src/frontend/features/storageService.ts:80](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L80)
 
 ## Properties
 
@@ -633,7 +633,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L16)
+[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L16)
 
 ## Methods
 
@@ -653,7 +653,7 @@ Already parsed (from JSON) stored value.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L42)
+[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L42)
 
 ___
 
@@ -673,7 +673,7 @@ Removes a values.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L54)
+[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L54)
 
 ___
 
@@ -700,7 +700,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:84](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L84)
+[src/frontend/features/storageService.ts:84](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L84)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / [<internal\>](#modulestypes_internal_md) / UserCart
 
@@ -748,7 +748,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:60](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L60)
+[src/frontend/features/storageService.ts:60](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L60)
 
 ## Properties
 
@@ -762,7 +762,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L16)
+[src/frontend/features/storageService.ts:16](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L16)
 
 ## Methods
 
@@ -782,7 +782,7 @@ Already parsed (from JSON) stored value.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L42)
+[src/frontend/features/storageService.ts:42](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L42)
 
 ___
 
@@ -802,7 +802,7 @@ Removes a values.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L54)
+[src/frontend/features/storageService.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L54)
 
 ___
 
@@ -829,7 +829,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:64](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L64)
+[src/frontend/features/storageService.ts:64](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L64)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / HTTP\_STATUS\_CODE
 
@@ -862,7 +862,7 @@ depending on result of calling `checkIfShouldRemove`.
 
 #### Defined in
 
-[commons/types.ts:50](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L50)
+[commons/types.ts:50](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L50)
 
 ___
 
@@ -872,7 +872,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L54)
+[commons/types.ts:54](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L54)
 
 ___
 
@@ -882,7 +882,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:46](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L46)
+[commons/types.ts:46](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L46)
 
 ___
 
@@ -892,7 +892,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:52](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L52)
+[commons/types.ts:52](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L52)
 
 ___
 
@@ -902,7 +902,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:55](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L55)
+[commons/types.ts:55](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L55)
 
 ___
 
@@ -912,7 +912,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:57](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L57)
+[commons/types.ts:57](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L57)
 
 ___
 
@@ -922,7 +922,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:53](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L53)
+[commons/types.ts:53](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L53)
 
 ___
 
@@ -932,7 +932,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:49](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L49)
+[commons/types.ts:49](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L49)
 
 ___
 
@@ -942,7 +942,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:47](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L47)
+[commons/types.ts:47](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L47)
 
 ___
 
@@ -952,7 +952,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:45](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L45)
+[commons/types.ts:45](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L45)
 
 ___
 
@@ -962,7 +962,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:56](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L56)
+[commons/types.ts:56](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L56)
 
 ___
 
@@ -972,7 +972,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:51](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L51)
+[commons/types.ts:51](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L51)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / IOrderPayload
 
@@ -1003,7 +1003,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:78](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L78)
+[commons/types.ts:78](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L78)
 
 ___
 
@@ -1013,7 +1013,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:85](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L85)
+[commons/types.ts:85](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L85)
 
 ___
 
@@ -1031,7 +1031,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:73](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L73)
+[commons/types.ts:73](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L73)
 
 ___
 
@@ -1048,7 +1048,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:81](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L81)
+[commons/types.ts:81](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L81)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / IPayByLinkMethod
 
@@ -1075,7 +1075,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L39)
+[commons/types.ts:39](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L39)
 
 ___
 
@@ -1085,7 +1085,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L38)
+[commons/types.ts:38](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L38)
 
 ___
 
@@ -1095,7 +1095,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:36](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L36)
+[commons/types.ts:36](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L36)
 
 ___
 
@@ -1105,7 +1105,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:37](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L37)
+[commons/types.ts:37](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L37)
 
 ___
 
@@ -1115,7 +1115,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:34](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L34)
+[commons/types.ts:34](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L34)
 
 ___
 
@@ -1125,7 +1125,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:35](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L35)
+[commons/types.ts:35](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L35)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / IProductInOrder
 
@@ -1149,7 +1149,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:28](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L28)
+[commons/types.ts:28](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L28)
 
 ___
 
@@ -1159,7 +1159,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:30](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L30)
+[commons/types.ts:30](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L30)
 
 ___
 
@@ -1169,7 +1169,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:29](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L29)
+[commons/types.ts:29](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L29)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / IUserCart
 
@@ -1193,7 +1193,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:61](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L61)
+[commons/types.ts:61](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L61)
 
 ___
 
@@ -1203,7 +1203,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:68](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L68)
+[commons/types.ts:68](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L68)
 
 ___
 
@@ -1213,7 +1213,7 @@ ___
 
 #### Defined in
 
-[commons/types.ts:69](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L69)
+[commons/types.ts:69](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L69)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / [<internal\>](#modulestypes_internal_md) / ICustomResExt
 
@@ -1237,7 +1237,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/httpService.ts:604](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/httpService.ts#L604)
+[src/frontend/features/httpService.ts:604](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/httpService.ts#L604)
 
 ___
 
@@ -1247,7 +1247,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/httpService.ts:605](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/httpService.ts#L605)
+[src/frontend/features/httpService.ts:605](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/httpService.ts#L605)
 
 ___
 
@@ -1257,7 +1257,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/httpService.ts:603](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/httpService.ts#L603)
+[src/frontend/features/httpService.ts:603](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/httpService.ts#L603)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / [<internal\>](#modulestypes_internal_md) / IEmbracedResponse
 
@@ -1289,7 +1289,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:11](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/middleware/helpers/middleware-response-wrapper.ts#L11)
+[src/middleware/helpers/middleware-response-wrapper.ts:11](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/middleware/helpers/middleware-response-wrapper.ts#L11)
 
 ___
 
@@ -1299,7 +1299,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/middleware/helpers/middleware-response-wrapper.ts#L14)
+[src/middleware/helpers/middleware-response-wrapper.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/middleware/helpers/middleware-response-wrapper.ts#L14)
 
 ___
 
@@ -1309,7 +1309,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:15](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/middleware/helpers/middleware-response-wrapper.ts#L15)
+[src/middleware/helpers/middleware-response-wrapper.ts:15](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/middleware/helpers/middleware-response-wrapper.ts#L15)
 
 ___
 
@@ -1319,7 +1319,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:13](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/middleware/helpers/middleware-response-wrapper.ts#L13)
+[src/middleware/helpers/middleware-response-wrapper.ts:13](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/middleware/helpers/middleware-response-wrapper.ts#L13)
 
 ___
 
@@ -1329,7 +1329,7 @@ ___
 
 #### Defined in
 
-[src/middleware/helpers/middleware-response-wrapper.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/middleware/helpers/middleware-response-wrapper.ts#L12)
+[src/middleware/helpers/middleware-response-wrapper.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/middleware/helpers/middleware-response-wrapper.ts#L12)
 
 [fake-pev-shopping](#readmemd) / [logger](#modulesloggermd) / <internal\>
 
@@ -1365,7 +1365,7 @@ Custom wrapper for a commonly used global `console` methods.
 
 #### Defined in
 
-[commons/logger.ts:72](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/logger.ts#L72)
+[commons/logger.ts:72](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/logger.ts#L72)
 
 ## Functions
 
@@ -1390,7 +1390,7 @@ Creates a module bound logger, which name will be visually emphased in output lo
 
 #### Defined in
 
-[commons/logger.ts:62](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/logger.ts#L62)
+[commons/logger.ts:62](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/logger.ts#L62)
 
 [fake-pev-shopping](#readmemd) / [types](#modulestypesmd) / <internal\>
 
@@ -1432,7 +1432,7 @@ Creates a module bound logger, which name will be visually emphased in output lo
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:9](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L9)
+[src/frontend/features/storageService.ts:9](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L9)
 
 ___
 
@@ -1442,7 +1442,7 @@ ___
 
 #### Defined in
 
-[src/database/models/_user.ts:306](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/database/models/_user.ts#L306)
+[src/database/models/_user.ts:306](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/database/models/_user.ts#L306)
 
 ## Variables
 
@@ -1462,7 +1462,7 @@ Manipulating storage data API for various contexts, such as `UserCart` or `UserA
 
 #### Defined in
 
-[src/frontend/features/storageService.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storageService.ts#L14)
+[src/frontend/features/storageService.ts:14](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storageService.ts#L14)
 
 ___
 
@@ -1472,7 +1472,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/storeService.ts:177](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/storeService.ts#L177)
+[src/frontend/features/storeService.ts:177](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/storeService.ts#L177)
 
 ___
 
@@ -1491,7 +1491,7 @@ ___
 
 #### Defined in
 
-[src/frontend/features/userSessionService.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/src/frontend/features/userSessionService.ts#L12)
+[src/frontend/features/userSessionService.ts:12](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/src/frontend/features/userSessionService.ts#L12)
 
 [fake-pev-shopping](#readmemd) / types
 
@@ -1535,4 +1535,4 @@ Common types for whole app.
 
 #### Defined in
 
-[commons/types.ts:88](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/2e7492c/commons/types.ts#L88)
+[commons/types.ts:88](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/0723e45/commons/types.ts#L88)
