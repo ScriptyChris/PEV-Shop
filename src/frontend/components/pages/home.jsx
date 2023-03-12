@@ -104,12 +104,12 @@ export default function Home() {
           >
             {translations.seeAll}
           </PEVLink>
-
-          <PEVSuspense>
-            <ProductComparisonCandidatesList />
-          </PEVSuspense>
         </section>
       ))}
+
+      <PEVSuspense>
+        <ProductComparisonCandidatesList />
+      </PEVSuspense>
     </article>
   );
 }
