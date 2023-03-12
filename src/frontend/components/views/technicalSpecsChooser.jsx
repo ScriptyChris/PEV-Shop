@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/technicalSpecsChooser.scss';
+
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { ErrorMessage } from 'formik';
 import classNames from 'classnames';

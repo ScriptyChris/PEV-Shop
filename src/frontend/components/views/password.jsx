@@ -1,5 +1,8 @@
+import '@frontend/assets/styles/views/password.scss';
+
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import classNames from 'classnames';
 
 import {
   PEVForm,
@@ -13,6 +16,7 @@ import {
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { ROUTES } from '@frontend/components/pages/_routes';
+import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 
 const translations = Object.freeze({
   resetPasswordHeader: 'Reset password',
@@ -42,7 +46,7 @@ const translations = Object.freeze({
   popupGoToLogIn: 'Go to log in',
 });
 
-function PasswordField({ identity, label, error, dataCy }) {
+function PasswordField({ identity, label, error, containerClassName, dataCy }) {
   if (!identity || !label) {
     throw ReferenceError(
       `'identity' and 'label' props must be non-empty! Received subsequently: '${identity}' and '${label}'`
@@ -53,7 +57,7 @@ function PasswordField({ identity, label, error, dataCy }) {
   const [passwordMinLength, passwordMaxLength] = [8, 20];
 
   return (
-    <div className="pev-flex">
+    <div className={classNames('pev-flex', containerClassName)}>
       {/* TODO: [UX] add feature to temporary preview (unmask) the password field */}
       <PEVTextField
         type="password"
@@ -158,6 +162,8 @@ function SetNewPassword({ contextType }) {
   const [popupData, setPopupData] = useState(null);
   const history = useHistory();
   const { search: searchParam } = useLocation();
+  const { isMobileLayout } = useRWDLayout();
+  const columnDirectionedFlex = isMobileLayout ? 'pev-flex--columned' : '';
 
   useEffect(() => {
     if (contextType === SetNewPassword.CONTEXT_TYPES.LOGGED_OUT) {
@@ -254,6 +260,7 @@ function SetNewPassword({ contextType }) {
                 identity="currentPassword"
                 label={translations.currentPasswordField}
                 error={formikProps.errors.currentPassword}
+                containerClassName={columnDirectionedFlex}
               />
             )}
 
@@ -261,6 +268,7 @@ function SetNewPassword({ contextType }) {
               identity="newPassword"
               label={translations.newPasswordField}
               error={formikProps.errors.newPassword}
+              containerClassName={columnDirectionedFlex}
               dataCy="input:new-password"
             />
 
@@ -268,6 +276,7 @@ function SetNewPassword({ contextType }) {
               identity="repeatedNewPassword"
               label={translations.repeatedNewPasswordField}
               error={formikProps.errors.repeatedNewPassword}
+              containerClassName={columnDirectionedFlex}
               dataCy="input:repeated-new-password"
             />
 

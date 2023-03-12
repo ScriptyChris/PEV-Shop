@@ -1,6 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import '@frontend/assets/styles/views/account.scss';
+
+import React, { useState, useEffect, useMemo, lazy } from 'react';
 import { useHistory, useLocation, Route, Switch, Redirect } from 'react-router-dom';
 import classNames from 'classnames';
+
+const CartContent = lazy(() =>
+  import('@frontend/components/views/cart').then((CartModule) => ({ default: CartModule.CartContent }))
+);
+const OrderSummary = lazy(() =>
+  import('@frontend/components/pages/order').then((OrderModule) => ({ default: OrderModule.OrderSummary }))
+);
 
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -17,7 +26,14 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 
-import { PEVButton, PEVLink, PEVHeading, PEVParagraph } from '@frontend/components/utils/pevElements';
+import {
+  PEVButton,
+  PEVLink,
+  PEVHeading,
+  PEVParagraph,
+  PEVSuspense,
+  PEVLoadingAnimation,
+} from '@frontend/components/utils/pevElements';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout.tsx';
 import storeService from '@frontend/features/storeService';
 import httpService from '@frontend/features/httpService';
@@ -27,8 +43,6 @@ import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils
 import ObservedProducts from '@frontend/components/views/productObservability';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES, routeHelpers } from './_routes';
-import { CartContent } from '@frontend/components/views/cart';
-import { OrderSummary } from '@frontend/components/pages/order';
 import { PAYMENT_METHODS, SHIPMENT_METHODS } from '@commons/consts';
 
 const translations = Object.freeze({
@@ -92,9 +106,7 @@ function UserProfile() {
     }
   }, []);
 
-  const edit = () => {
-    console.log('TODO: [FEATURE] implement editing user profile');
-  };
+  // const edit = () => console.log('TODO: [FEATURE] implement editing user profile');
 
   return userData ? (
     <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:user-profile">
@@ -117,9 +129,10 @@ function UserProfile() {
         </Table>
       </TableContainer>
 
-      <PEVButton className="account__menu-tab-user-profile-edit-btn" onClick={edit}>
+      {/* TODO: [feature] implement editing user data */}
+      {/* <PEVButton className="account__menu-tab-user-profile-edit-btn" onClick={edit}>
         {translations.editUserData}
-      </PEVButton>
+      </PEVButton> */}
     </section>
   ) : (
     translations.lackOfData
@@ -206,18 +219,19 @@ function Security() {
 // TODO: [feature] implement listing orders with options such as: status, invoice, review, refund
 // TODO: [feature] implement searching orders via name and date(?)
 function Orders() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(null);
   const { search } = useLocation();
   const { chosenTimestamp } = useMemo(() => routeHelpers.parseSearchParams(search), [search]);
   const isSellerUser = storeService.userAccountState.accountType === 'seller';
 
   useEffect(() => {
     let _isComponentMounted = true;
+    setOrders([]);
 
     const userOrdersPromise = isSellerUser ? httpService.getAllOrders() : httpService.getCurrentUserOrders();
     userOrdersPromise.then((userOrders) => {
       if (_isComponentMounted) {
-        setOrders(userOrders);
+        setOrders(userOrders?.length ? userOrders : null);
       }
     });
 
@@ -228,46 +242,54 @@ function Orders() {
     <section className="account__menu-tab orders pev-flex pev-flex--columned" data-cy="section:orders">
       {isSellerUser && <small className="orders__all-client-users-hint">{translations.ordersOfAllClients}</small>}
 
-      {orders.length ? (
-        orders
-          .sort((prev, next) => next.timestamp - prev.timestamp)
-          .map(({ timestamp, receiver, payment, shipment, regardingUser, regardingProducts, cost }) => (
-            <Accordion defaultExpanded={timestamp === chosenTimestamp} key={timestamp} data-cy="container:order">
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <PEVParagraph
-                  className={classNames('orders__order-summary', { 'orders__order-summary--for-seller': isSellerUser })}
-                >
-                  <span data-cy="label:order__summary-date">
-                    <strong>{translations.orderSummaryDate}</strong> {new Date(timestamp).toLocaleString()}
-                  </span>
-                  {isSellerUser && (
-                    <span data-cy="label:order__summary-user">
-                      <strong>{translations.orderSummaryRegardingUser}</strong> {regardingUser}
+      {orders ? (
+        orders.length ? (
+          orders
+            .sort((prev, next) => next.timestamp - prev.timestamp)
+            .map(({ timestamp, receiver, payment, shipment, regardingUser, regardingProducts, cost }) => (
+              <Accordion defaultExpanded={timestamp === chosenTimestamp} key={timestamp} data-cy="container:order">
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <PEVParagraph
+                    className={classNames('orders__order-summary', {
+                      'orders__order-summary--for-seller': isSellerUser,
+                    })}
+                  >
+                    <span data-cy="label:order__summary-date">
+                      <strong>{translations.orderSummaryDate}</strong> {new Date(timestamp).toLocaleString()}
                     </span>
-                  )}
-                </PEVParagraph>
-              </AccordionSummary>
-              <AccordionDetails className="orders__order-details">
-                <Orders.Receiver receiver={receiver} />
-                <Divider />
-                <Orders.Shipment {...shipment} />
-                <Divider />
-                <Orders.Payment {...payment} />
-                <Divider />
-                <Orders.Products regardingProducts={regardingProducts} totalProductsCost={cost.products} />
-                <Divider />
-                <section className="orders__order-details--summary">
-                  <OrderSummary
-                    headingLevel={4}
-                    containerClassName="order-detail-value"
-                    shipmentPrice={cost.shipment}
-                    productsPrice={cost.products}
-                    totalCost={cost.total}
-                  />
-                </section>
-              </AccordionDetails>
-            </Accordion>
-          ))
+                    {isSellerUser && (
+                      <span data-cy="label:order__summary-user">
+                        <strong>{translations.orderSummaryRegardingUser}</strong> {regardingUser}
+                      </span>
+                    )}
+                  </PEVParagraph>
+                </AccordionSummary>
+                <AccordionDetails className="orders__order-details">
+                  <Orders.Receiver receiver={receiver} />
+                  <Divider />
+                  <Orders.Shipment {...shipment} />
+                  <Divider />
+                  <Orders.Payment {...payment} />
+                  <Divider />
+                  <Orders.Products regardingProducts={regardingProducts} totalProductsCost={cost.products} />
+                  <Divider />
+                  <section className="orders__order-details--summary">
+                    <PEVSuspense>
+                      <OrderSummary
+                        headingLevel={4}
+                        containerClassName="order-detail-value"
+                        shipmentPrice={cost.shipment}
+                        productsPrice={cost.products}
+                        totalCost={cost.total}
+                      />
+                    </PEVSuspense>
+                  </section>
+                </AccordionDetails>
+              </Accordion>
+            ))
+        ) : (
+          <PEVLoadingAnimation />
+        )
       ) : (
         <PEVParagraph>{translations.noOrdersMadeYet}</PEVParagraph>
       )}
@@ -414,16 +436,18 @@ Orders.Products = function Products({ regardingProducts, totalProductsCost }) {
   return (
     <section className="orders__order-details--products">
       <PEVHeading level={4}>{translations.orderProductsHeading}</PEVHeading>
-      <CartContent
-        productsList={regardingProducts.map(({ id, unitPrice, ...restProduct }) => ({
-          ...restProduct,
-          _id: id,
-          price: unitPrice,
-        }))}
-        containerClassName="order-detail-value"
-        totalProductsCount={regardingProducts.reduce((totalCount, { quantity }) => totalCount + quantity, 0)}
-        totalProductsCost={totalProductsCost}
-      />
+      <PEVSuspense>
+        <CartContent
+          productsList={regardingProducts.map(({ id, unitPrice, ...restProduct }) => ({
+            ...restProduct,
+            _id: id,
+            price: unitPrice,
+          }))}
+          containerClassName="order-detail-value"
+          totalProductsCount={regardingProducts.reduce((totalCount, { quantity }) => totalCount + quantity, 0)}
+          totalProductsCost={totalProductsCost}
+        />
+      </PEVSuspense>
     </section>
   );
 };

@@ -2,6 +2,7 @@
  * Flexible list component, which allows adding, editing and deleting it's items in a customizable way.
  * @module
  */
+import '@frontend/assets/styles/views/flexibleList.scss';
 
 import React, { useState, useEffect, useReducer, useMemo } from 'react';
 import classNames from 'classnames';

@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/categoriesTree.scss';
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import TreeMenu, { ItemComponent } from 'react-simple-tree-menu';
 
@@ -91,13 +93,17 @@ function useTreeMetaData({ preSelectedCategories, valueToPassToParentOnClickRef,
   );
 
   useEffect(() => {
+    let _isComponentMounted = true;
+
     httpService.getProductCategories().then((res) => {
-      if (res.__EXCEPTION_ALREADY_HANDLED) {
+      if (res.__EXCEPTION_ALREADY_HANDLED || !_isComponentMounted) {
         return;
       }
 
       setTreeData(res.map(treeRecursiveMapper));
     });
+
+    return () => (_isComponentMounted = false);
   }, []);
 
   useEffect(() => {

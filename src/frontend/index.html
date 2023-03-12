@@ -6,16 +6,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Fake PEV Shopping</title>
-
-    <!-- TODO: fix assets path -->
     <link rel="shortcut icon" type="image/png" href="/public/icons/icons8-engine-48.png" />
+    <style>
+      .app-loader {
+        position: fixed;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        background: #3f51b5;
+      }
+
+      .app-loader--visible {
+        display: flex;
+      }
+
+      .app-loader__msg {
+        font-size: 2rem;
+        font-family: sans-serif;
+        margin: 0;
+        color: white;
+      }
+
+      .app-loader__spinner {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: small;
+        border: 0.2rem solid var(--oval-color, lightgrey);
+        border-left-color: var(--stipe-fragment-color, grey);
+        border-radius: 50%;
+        box-sizing: border-box;
+        transform: translateZ(0);
+        animation: spin 1s infinite linear;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg) }
+        100% { transform: rotate(360deg) }
+      }
+    </style>
 
     <!-- TODO: [CSS optimization] split CSS by media queries, so mobile doesn't have to load redundant code -->
   </head>
   <body>
     <!-- TODO: add <noscript> tag with multi-lang information -->
 
+    <!--
+      This loader is first used "natively" until React gets loaded and then is moved (cloned) inside React Suspense controlled #app wrapper, 
+      to wait for remaining initial content to be loaded.
+    -->
+    <div id="app-loader" class="app-loader">
+      <p class="app-loader__msg">PEV Shop</p>
+      <!-- TODO: [i18n] translate it -->
+      <div class="app-loader__spinner" aria-label="Loading..."></div>
+    </div>
+
     <div id="app" class="app-root"></div>
+
+    <script>
+      window.__appLoaderAPI = (() => {
+        const appLoader = document.querySelector('#app-loader');
+        
+        window.setTimeout(() => {
+          if (appLoader) {
+            appLoader.classList.add('app-loader--visible');
+          }
+        }, 250);
+
+        return {
+          getContent: () => appLoader.outerHTML,
+          removeFromDOM: () => appLoader.remove(),
+        };
+      })();
+    </script>
 
     <!-- TODO: that script might be injected only in E2E "mode" -->
     <script>

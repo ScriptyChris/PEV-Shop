@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productDetails.scss';
+
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Field } from 'formik';
@@ -29,7 +31,10 @@ import {
   PEVImage,
 } from '@frontend/components/utils/pevElements';
 import ProductCard from './productCard';
-import { ProductComparisonCandidatesList } from '@frontend/components/views/productComparisonCandidates';
+import {
+  ProductComparisonCandidatesToggler,
+  ProductComparisonCandidatesList,
+} from '@frontend/components/views/productComparisonCandidates';
 import httpService from '@frontend/features/httpService';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import RatingWidget from '@frontend/components/utils/ratingWidget';
@@ -38,11 +43,11 @@ import { AddToCartButton } from '@frontend/components/views/cart';
 import { useRoutesGuards, routeHelpers, ROUTES } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
 import { ProductObservabilityToggler } from '@frontend/components/views/productObservability';
-import { ProductComparisonCandidatesToggler } from '@frontend/components/views/productComparisonCandidates';
 import Scroller from '@frontend/components/utils/scroller';
 import { DeleteProductFeature, NavigateToModifyProduct } from '@frontend/components/shared';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import Price from '@frontend/components/views/price';
+import { COMMON_PERCEPTION_DELAY_TIME } from '@commons/consts';
 
 const productDetailsTranslations = Object.freeze({
   category: 'Category',
@@ -451,12 +456,13 @@ function Gallery({ images }) {
     <div className="product-details__header-gallery">
       <PEVImage
         image={images[activeStep]}
+        defaultHeightSameAsWidth
         className="product-details__header-gallery-image"
         onClick={getImageZoomHandler(true)}
       />
       <Fade
         in={imageZoomed}
-        timeout={{ enter: 1000, exit: 250 }}
+        timeout={{ enter: 1000, exit: COMMON_PERCEPTION_DELAY_TIME }}
         onEntering={handleDisablePageScroll}
         onExiting={handleEnablePageScroll}
       >
@@ -473,10 +479,12 @@ function Gallery({ images }) {
             image={images[activeStep]}
             className="product-details__header-gallery-image zoom-container__image"
             onClick={getImageZoomHandler(false)}
+            avoidLoader
           />
         </div>
       </Fade>
       <MobileStepper
+        style={{ marginTop: 'auto' }}
         steps={maxSteps}
         position="static"
         variant="text"

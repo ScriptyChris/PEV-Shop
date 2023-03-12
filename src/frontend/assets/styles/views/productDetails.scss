@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .product-details {
     margin: 1rem;
     
@@ -85,9 +88,12 @@
     &__header-gallery {
         grid-area: image;
         justify-self: center;
+        display: 'grid';
+        grid-template-rows: 300px auto;
 
         &-image {
             max-width: 90vw;
+            max-height: 300px;
 
             &:hover {
                 cursor: pointer;
@@ -202,6 +208,11 @@
                 "image image base-data-container base-data-container";
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem 3rem;
+
+            &-gallery-image {
+                max-width: 40vw;
+                max-height: 500px;
+            }
         }
 
         &__nav-menu {
@@ -223,10 +234,6 @@
 
 @include useMediaQuery(tablet) {
     .product-details {
-        &__header-image .pev-element-image {
-            max-width: 40vw;
-        }
-
         &__nav-menu {
             top: 4rem;
         }

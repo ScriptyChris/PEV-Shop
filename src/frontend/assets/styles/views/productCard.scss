@@ -1,14 +1,21 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .product-card {
   display: grid;
-  gap: 1rem;
+  gap: 1rem 0.5rem;
 
   &--detailed-layout {
     grid-template-areas: "link-with-content action-btns";
     grid-template-columns: 1fr max-content;
+    padding-inline: 0;
+    max-width: calc(100vw - 0.5rem);
+    justify-self: center;
 
     .product-card__link {
       grid-template-areas: "image content";
       grid-template-columns: 1fr 2fr;
+      column-gap: 0.5rem;
     }
 
     .product-card__content {
@@ -16,6 +23,8 @@
     }
 
     .product-card__content--with-reviews {
+      column-gap: 0.5rem;
+
       .product-card__name {
         grid-row: span 2;
       }
@@ -24,6 +33,10 @@
         grid-column: 2;
         justify-self: center;
       }
+    }
+
+    .product-card__actions-bar-toggler {
+      padding: 0.5rem;
     }
   }
 
@@ -87,6 +100,13 @@
     }
   }
 
+  &__action-bar-loader {
+    grid-area: action-btns;
+    align-self: center;
+    width: 3rem;
+    height: 3rem;
+  }
+
   &__actions-bar-toggler {
     grid-area: action-btns;
     justify-self: center;
@@ -112,6 +132,20 @@
 
 @include createMediaQuery(min-width, tablet) {
   .product-card {
+    column-gap: 1rem;
+
+    &--detailed-layout {
+      padding-inline: 1rem;
+
+      .product-card__link {
+        column-gap: 1rem;
+      }
+
+      .product-card__actions-bar-toggler {
+        padding: 0.75rem;
+      }
+    }
+
     &__actions-bar {
       align-items: center;
       gap: 1rem;

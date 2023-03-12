@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .search-container {
   position: relative;
 
@@ -52,6 +55,8 @@
 }
 
 .search-initial-results {
+  min-height: 4rem;
+
   .products-list {
     max-height: 65vh;
     overflow-y: auto;

@@ -1,5 +1,8 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .app-root {
-    --main-row-calc: calc(100vh - 4rem);
+    --main-row-calc: calc(100vh - 8.5rem);
     display: grid;
     grid-template-rows: 3.5rem minmax(var(--main-row-calc), max-content) minmax(4rem, auto);
     grid-template-areas:
@@ -50,6 +53,7 @@
     
     p {
       font-size: small;
+      text-align: center;
     }
 
     hr {

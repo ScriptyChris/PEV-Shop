@@ -1,4 +1,4 @@
-@import '../_var';
+@use '../_var' as *;
 
 .pagination-container {
   display: flex;

@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/productComparisonCandidates.scss';
+
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { reaction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -20,6 +22,8 @@ import { ROUTES } from '@frontend/components/pages/_routes';
 import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils/popup';
 import { subscribeToBodyMutations, unSubscribeFromBodyMutations } from '@frontend/components/utils/bodyObserver';
 import { ProductCardLink } from '@frontend/components/views/productCard';
+import { COMMON_PERCEPTION_DELAY_TIME, ARRAY_FORMAT_SEPARATOR } from '@commons/consts';
+import { possiblyReEncodeURI } from '@commons/uriReEncoder';
 
 const translations = {
   addToCompare: 'Add to compare',
@@ -41,7 +45,7 @@ const bodyStyleUpdaters = Object.freeze({
     document.body.style.marginBottom = null;
   },
   setTransition() {
-    document.body.style.transition = 'margin-bottom 250ms';
+    document.body.style.transition = `margin-bottom ${COMMON_PERCEPTION_DELAY_TIME}ms`;
   },
   clearTransition() {
     document.body.style.transition = null;
@@ -177,6 +181,9 @@ export const ProductComparisonCandidatesList = observer(function ProductComparis
 
   const areComparableProductsReady = storeService.productComparisonState.length > 0;
   const toggleExpandBtnA11y = isContainerExpanded ? translations.hideCandidatesList : translations.showCandidatesList;
+  const productsNamesToCompareQueryParam = `?productsNames[]=${storeService.productComparisonState
+    .map(({ name }) => possiblyReEncodeURI(name))
+    .join(ARRAY_FORMAT_SEPARATOR)}`;
 
   return (
     <Collapse
@@ -252,15 +259,17 @@ export const ProductComparisonCandidatesList = observer(function ProductComparis
         />
 
         <div className="product-comparison-candidates__actions">
-          <PEVIconButton
-            component={PEVLink}
-            to={{ pathname: ROUTES.PRODUCTS__COMPARE }}
+          <PEVLink
+            to={{
+              pathname: ROUTES.PRODUCTS__COMPARE,
+              search: productsNamesToCompareQueryParam,
+            }}
             onClick={handleProceedComparison}
             a11y={translations.proceedComparison}
             data-cy="link:product-comparison-candidates__actions-proceed"
           >
             <DoneIcon />
-          </PEVIconButton>
+          </PEVLink>
 
           <Divider orientation="vertical" flexItem />
 

@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import '@frontend/assets/styles/views/home.scss';
 
+import React, { useState, useEffect, lazy } from 'react';
 import Divider from '@material-ui/core/Divider';
 
-import { PEVHeading, PEVLink } from '@frontend/components/utils/pevElements';
+const ProductComparisonCandidatesList = lazy(() =>
+  import('@frontend/components/views/productComparisonCandidates').then((ProductComparisonCandidatesModule) => ({
+    default: ProductComparisonCandidatesModule.ProductComparisonCandidatesList,
+  }))
+);
+
+import { PEVHeading, PEVLink, PEVSuspense, PEVLoadingAnimation } from '@frontend/components/utils/pevElements';
 import Scroller from '@frontend/components/utils/scroller';
 import { ProductSpecificDetail } from '@frontend/components/views/productDetails';
 import httpService from '@frontend/features/httpService';
@@ -37,11 +44,12 @@ export default function Home() {
   );
 
   useEffect(() => {
+    let _isComponentMounted = true;
     const pagination = { pageNumber: 1, productsPerPage: 5 };
 
     PRODUCTS_SECTIONS_PER_SORTING_ORDER.forEach(({ sortBy }) => {
       httpService.getProducts({ pagination, sortBy }, true).then((res) => {
-        if (res.__EXCEPTION_ALREADY_HANDLED) {
+        if (res.__EXCEPTION_ALREADY_HANDLED || !_isComponentMounted) {
           return;
         }
 
@@ -51,6 +59,8 @@ export default function Home() {
         }));
       });
     });
+
+    return () => (_isComponentMounted = false);
   }, []);
 
   return (
@@ -62,7 +72,7 @@ export default function Home() {
           </PEVHeading>
 
           <div className="home-section__product-list">
-            {productListForSortedSection[sortBy].length && (
+            {productListForSortedSection[sortBy].length ? (
               <Scroller
                 scrollerBaseValueMeta={{
                   selector: '.home-section__product-list',
@@ -80,6 +90,8 @@ export default function Home() {
                   </ScrollerHookingParent>
                 )}
               />
+            ) : (
+              <PEVLoadingAnimation />
             )}
           </div>
 
@@ -94,6 +106,10 @@ export default function Home() {
           </PEVLink>
         </section>
       ))}
+
+      <PEVSuspense>
+        <ProductComparisonCandidatesList />
+      </PEVSuspense>
     </article>
   );
 }

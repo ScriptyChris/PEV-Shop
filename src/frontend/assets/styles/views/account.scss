@@ -1,3 +1,6 @@
+@use '../_var' as *;
+@use '../_mixins' as *;
+
 .account {
     display: grid;
     grid-template-rows: 3rem auto auto;
@@ -73,6 +76,10 @@
 
 .orders {
     margin: 1rem;
+
+    .pev-element-skeleton {
+        height: 4rem;
+    }
 
     &__all-client-users-hint {
         text-align: center;

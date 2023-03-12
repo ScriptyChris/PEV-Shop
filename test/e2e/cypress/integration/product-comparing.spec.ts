@@ -11,35 +11,45 @@ describe('product-comparing', () => {
     // add a few products to compare
     cy.get(productCardSelectors)
       .should('have.length', 4)
-      .then(($productCards) => {
-        const $listOfProductLabelsAndActionBarTogglerBtns = $productCards.map((_, card) =>
-          card.querySelectorAll(
-            `${makeCyDataSelector('label:product-card__name')},${makeCyDataSelector('button:toggle-action-bar')}`
-          )
-        );
-
+      .find(`${makeCyDataSelector('label:product-card__name')},${makeCyDataSelector('button:toggle-action-bar')}`)
+      .should('have.length', 8)
+      .then(($listOfProductLabelsAndActionBarTogglerBtns) => {
         return cy.wrap(
-          $listOfProductLabelsAndActionBarTogglerBtns.map((_, elements) => {
-            const [productLabel, togglerBtn] = [elements[0], elements[1]];
+          [...$listOfProductLabelsAndActionBarTogglerBtns]
+            .reduce((acc, element, index, inputArray) => {
+              // Group a pair of previous and current elements on every odd iteration index
+              // So each group contains: [
+              // - [data-cy="label:product-card__name"]
+              // - [button:toggle-action-bar"]
+              // ]
+              if (index % 2 === 1) {
+                const prevElement = inputArray[index - 1];
+                acc.push([prevElement, element]);
+              }
 
-            cy.wrap(togglerBtn).click();
-            // add product to compare
-            cy.get(makeCyDataSelector('button:add-product-to-comparison'))
-              .click()
-              // assert button update after removal
-              .should(($btn) => expect($btn.attr('data-cy')).to.eq('button:remove-product-from-comparison'))
-              // close action bar overlay
-              .closest(makeCyDataSelector('popup:product-card__actions-bar'))
-              .children('[aria-hidden="true"]')
-              .first()
-              .click();
+              return acc;
+            }, [] as [HTMLElement, HTMLElement][])
+            .flatMap(([productLabel, togglerBtn]) => {
+              cy.wrap(togglerBtn).click();
+              // add product to compare
+              cy.get(makeCyDataSelector('button:add-product-to-comparison'))
+                .click()
+                // assert button update after removal
+                .should(($btn) => expect($btn.attr('data-cy')).to.eq('button:remove-product-from-comparison'))
+                // close action bar overlay
+                .closest(makeCyDataSelector('popup:product-card__actions-bar'))
+                .children('[aria-hidden="true"]')
+                .first()
+                .click();
 
-            return productLabel;
-          })
+              return productLabel;
+            })
         );
       })
       // assert if added products are correct
-      .then(($productLabels) => {
+      .then((productLabels) => {
+        const $productLabels = productLabels as unknown as JQuery<HTMLElement>;
+
         cy.get(makeCyDataSelector('counter:product-comparison-candidates__list-counter')).should(($counter) => {
           expect(Number($counter.text())).to.equal($productLabels.length);
         });
@@ -47,8 +57,8 @@ describe('product-comparing', () => {
           ($productComparisonCandidatesNameEls) => {
             expect($productLabels.length).to.equal($productComparisonCandidatesNameEls.length);
 
-            const productNamesLabels = [...$productLabels.map((_, label) => label.textContent)];
-            const candidateNames = [...$productComparisonCandidatesNameEls.map((_, nameEl) => nameEl.textContent)];
+            const productNamesLabels = [...$productLabels.map((_, { textContent }) => textContent)];
+            const candidateNames = [...$productComparisonCandidatesNameEls.map((_, { textContent }) => textContent)];
 
             expect(productNamesLabels).to.have.ordered.members(candidateNames);
           }

@@ -16,7 +16,7 @@ module.exports = (env) => {
 
   return {
     mode: env,
-    entry: ['react-hot-loader/patch', './src/frontend/index.js'],
+    entry: ['react-hot-loader/patch', './src/frontend/index.jsx'],
     output: {
       filename: 'index.js',
       path: resolve(__dirname, './dist/src/frontend'),

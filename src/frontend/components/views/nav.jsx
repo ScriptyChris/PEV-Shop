@@ -1,3 +1,5 @@
+import '@frontend/assets/styles/views/nav.scss';
+
 import { useHistory } from 'react-router-dom';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';

@@ -1,6 +1,16 @@
-import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import '@frontend/assets/styles/views/productsDashboard.scss';
+
+import React, { useEffect, useState, useMemo, useRef, useCallback, lazy } from 'react';
 import classNames from 'classnames';
 import { useLocation, useHistory } from 'react-router-dom';
+
+const Toolbar = lazy(() => import('@material-ui/core/Toolbar'));
+const Pagination = lazy(() => import('@frontend/components/utils/pagination'));
+const ProductComparisonCandidatesList = lazy(() =>
+  import('./productComparisonCandidates').then((ProductComparisonCandidatesModule) => ({
+    default: ProductComparisonCandidatesModule.ProductComparisonCandidatesList,
+  }))
+);
 
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -18,10 +28,11 @@ import ViewModuleIcon from '@material-ui/icons/ViewModule';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListIcon from '@material-ui/icons/List';
-import Toolbar from '@material-ui/core/Toolbar';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import { FormControl, Select, MenuItem } from '@material-ui/core';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import {
   PEVButton,
@@ -30,21 +41,22 @@ import {
   PEVForm,
   PEVTextField,
   PEVFormFieldError,
+  PEVSuspense,
+  PEVLoadingAnimation,
 } from '@frontend/components/utils/pevElements';
 import httpService from '@frontend/features/httpService';
 import ProductCard, { PRODUCT_CARD_LAYOUT_TYPES } from './productCard';
-import Pagination from '@frontend/components/utils/pagination';
 import CategoriesTree from './categoriesTree';
-import { ProductComparisonCandidatesList } from './productComparisonCandidates';
 import TechnicalSpecsChooser from './technicalSpecsChooser';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import { routeHelpers } from '@frontend/components/pages/_routes';
 import { FILTER_RANGE_SEPARATOR } from '@commons/consts';
 import { productPriceRangeValidator } from '@commons/validators';
 import { subscribeToBodyMutations, unSubscribeFromBodyMutations } from '@frontend/components/utils/bodyObserver';
+import { PEVParagraph } from '../utils/pevElements';
 
 const translations = {
-  lackOfProducts: 'Lack of products...',
+  noProductsToList: 'Could not find products',
   typeProductName: 'Type product name:',
   showFilters: 'filters',
   viewMode: 'view',
@@ -182,30 +194,39 @@ export function BaseProductsList({
   listViewModeType,
   currentListViewModeClassName,
 }) {
+  const { isMobileLayout } = useRWDLayout();
+
+  if (!productsList) {
+    return <PEVParagraph className="pev-centered-padded-text">{translations.noProductsToList}</PEVParagraph>;
+  }
+
   return (
     <List
       className={classNames('products-dashboard__list products-list', currentListViewModeClassName)}
       data-cy="list:products-dashboard__list"
     >
-      {productsList.length > 0
-        ? productsList.map((product, index) => (
-            <ProductCard
-              key={product.name}
-              entryNo={index}
-              product={product}
-              layoutType={listViewModeToProductCardLayoutMap[listViewModeType]}
-              RenderedComponent={ListItem}
-              isCompact={isCompactProductCardSize}
-              lazyLoadImages
-            />
-          ))
-        : translations.lackOfProducts}
+      {productsList.length > 0 ? (
+        productsList.map((product, index) => (
+          <ProductCard
+            key={product.name}
+            entryNo={index}
+            product={product}
+            layoutType={listViewModeToProductCardLayoutMap[listViewModeType]}
+            RenderedComponent={ListItem}
+            isCompact={isCompactProductCardSize}
+            hideReviewsAmount={isMobileLayout}
+            lazyLoadImages
+          />
+        ))
+      ) : (
+        <PEVLoadingAnimation />
+      )}
     </List>
   );
 }
 
 function ProductsList({ currentListViewModeClassName, listViewModeType, searchParams, settersProp }) {
-  const [productsList, setProductsList] = useState([]);
+  const [productsList, setProductsList] = useState(null);
 
   useEffect(() => {
     updateProductsList(searchParams);
@@ -229,8 +250,9 @@ function ProductsList({ currentListViewModeClassName, listViewModeType, searchPa
     sortBy,
   } = {}) => {
     if (!productsPerPage || !pageNumber) {
-      return;
+      return setProductsList(null);
     }
+    setProductsList([]);
 
     const normalizedForAPI = {
       productPrice: productPrice.length ? productPrice : undefined,
@@ -239,20 +261,20 @@ function ProductsList({ currentListViewModeClassName, listViewModeType, searchPa
       sortBy: sortBy || undefined,
     };
 
-    let productsList = [];
+    let fetchedProductsList = null;
     let totalPages = 1;
     const isHighestProductsPerPage = productsPerPage === productsPerPageLimits[productsPerPageLimits.length - 1];
 
     if (isHighestProductsPerPage) {
-      productsList = await httpService.getProducts({ name, ...normalizedForAPI }, true).then(onGetProducts);
+      fetchedProductsList = await httpService.getProducts({ name, ...normalizedForAPI }, true).then(onGetProducts);
     } else {
       const pagination = { pageNumber, productsPerPage };
-      ({ productsList, totalPages } = await httpService
+      ({ productsList: fetchedProductsList, totalPages } = await httpService
         .getProducts({ name, pagination, ...normalizedForAPI }, true)
         .then(onGetProducts));
     }
 
-    setProductsList(productsList);
+    setProductsList(fetchedProductsList?.length ? fetchedProductsList : null);
     settersProp.setTotalPages(totalPages);
     settersProp.setCurrentProductPage(pageNumber);
     settersProp.setProductPrice(productPrice);
@@ -859,20 +881,24 @@ export default function ProductsDashboard() {
         }}
       />
 
-      {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
-      <Toolbar className="products-dashboard__pagination">
-        <Pagination
-          itemsName="product"
-          translations={paginationTranslations}
-          totalPages={totalPages}
-          currentItemPageIndex={currentProductPage - 1}
-          itemLimitsPerPage={productsPerPageLimits}
-          onItemsPerPageLimitChange={onProductsPerPageLimitChange}
-          onItemPageChange={onProductPageChange}
-        />
-      </Toolbar>
+      <PEVSuspense>
+        {/* TODO: [UX] disable pagination list options, which are unnecessary, because of too little products */}
+        <Toolbar className="products-dashboard__pagination">
+          <Pagination
+            itemsName="product"
+            translations={paginationTranslations}
+            totalPages={totalPages}
+            currentItemPageIndex={currentProductPage - 1}
+            itemLimitsPerPage={productsPerPageLimits}
+            onItemsPerPageLimitChange={onProductsPerPageLimitChange}
+            onItemPageChange={onProductPageChange}
+          />
+        </Toolbar>
+      </PEVSuspense>
 
-      <ProductComparisonCandidatesList />
+      <PEVSuspense>
+        <ProductComparisonCandidatesList />
+      </PEVSuspense>
     </article>
   );
 }

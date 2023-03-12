@@ -26,9 +26,11 @@ import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getPopulationState } from '@database/connector';
 import { dotEnv } from '@commons/dotEnvLoader';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
-import { IMAGES_ROOT_PATH } from '@root/commons/consts';
+import { IMAGES_ROOT_PATH, ICONS_ROOT_PATH } from '@root/commons/consts';
 
 const logger = getLogger(module.filename);
+// TODO: [performance] calculate cache based on database TTL
+const ONE_HOUR = 3600000;
 
 // TODO: [SECURITY] https://expressjs.com/en/advanced/best-practice-security.html
 const middleware = (app: Application): void => {
@@ -53,7 +55,7 @@ function wrappedMiddleware(): void {
   const frontendPath = getFrontendPath();
 
   const app: Application = Express();
-  app.use(getDatabaseReadinessHandler(), Express.static(frontendPath));
+  app.use(getDatabaseReadinessHandler(), Express.static(frontendPath, { maxAge: ONE_HOUR }), getIconsHandler());
 
   middleware(app);
 
@@ -103,9 +105,23 @@ function getFrontendPath(): string {
   return resolve(__dirname, `../../${relativeDist}src/frontend`);
 }
 
+function getIconsHandler() {
+  const relativeRoot = __dirname.includes(`${sep}dist${sep}`) ? '../' : '';
+  const iconsAbsolutePath = resolve(__dirname, `../../${relativeRoot}${ICONS_ROOT_PATH}`);
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.url.startsWith(`/${ICONS_ROOT_PATH}`)) {
+      return next();
+    }
+
+    const iconName = req.url.replace(ICONS_ROOT_PATH, '');
+    res.sendFile(join(iconsAbsolutePath, iconName), { maxAge: ONE_HOUR });
+  };
+}
+
 function imageHandler() {
-  // TODO: change string type to probably ArrayBuffer
   const getImage = (() => {
+    // TODO: change string type to probably ArrayBuffer
     const imageCache: { [prop: string]: string } = {};
     const projectRoot = resolve(__dirname, rootRelativePath);
     const imagesFolder = join(projectRoot, IMAGES_ROOT_PATH);
@@ -136,7 +152,7 @@ function imageHandler() {
       const imagePath = globalThis.decodeURIComponent(possiblyReEncodeURI(imagePossibleUrl));
 
       getImage(imagePath)
-        .then((image) => res.sendFile(image))
+        .then((image) => res.sendFile(image, { maxAge: ONE_HOUR }))
         .catch((error) => {
           logger.log('Image searching error: ', error, ' /imagePath: ', imagePath);
 

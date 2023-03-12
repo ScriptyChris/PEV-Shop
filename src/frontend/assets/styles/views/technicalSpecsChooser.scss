@@ -1,3 +1,5 @@
+@use '../_mixins' as *;
+
 .products-spec-chooser {
     &__header {
         position: relative;

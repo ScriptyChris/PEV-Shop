@@ -1,17 +1,21 @@
-import React, { memo } from 'react';
+import React, { memo, lazy } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
+const ProductComparison = lazy(() => import('./productComparison'));
+const ProductDetails = lazy(() => import('@frontend/components/views/productDetails'));
+const NewProduct = lazy(() => import('./productForm').then((ProductModule) => ({ default: ProductModule.NewProduct })));
+const ModifyProduct = lazy(() =>
+  import('./productForm').then((ProductModule) => ({ default: ProductModule.ModifyProduct }))
+);
+const Order = lazy(() => import('./order'));
+
 import { ROUTES, useRoutesGuards } from './_routes';
 import storeService from '@frontend/features/storeService';
+import { PEVSuspense } from '@frontend/components/utils/pevElements';
 
 // TODO: update module file name after search refactor is done
 import ProductsDashboard from '@frontend/components/views/productsDashboard';
-
-import ProductDetails from '@frontend/components/views/productDetails';
-import { NewProduct, ModifyProduct } from './productForm';
-import ProductComparison from './productComparison';
-import Order from './order';
 
 function Products() {
   const routesGuards = useRoutesGuards(storeService);
@@ -22,19 +26,41 @@ function Products() {
         <ProductsDashboard />
       </Route>
       <Route path={ROUTES.PRODUCTS__COMPARE}>
-        <ProductComparison />
+        <PEVSuspense>
+          <ProductComparison />
+        </PEVSuspense>
       </Route>
       <Route path={ROUTES.PRODUCTS__ADD_NEW_PRODUCT}>
-        {routesGuards.isSeller() ? <NewProduct /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
+        {routesGuards.isSeller() ? (
+          <PEVSuspense>
+            <NewProduct />
+          </PEVSuspense>
+        ) : (
+          <Redirect to={ROUTES.NOT_AUTHORIZED} />
+        )}
       </Route>
       <Route path={ROUTES.PRODUCTS__MODIFY_PRODUCT}>
-        {routesGuards.isSeller() ? <ModifyProduct /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
+        {routesGuards.isSeller() ? (
+          <PEVSuspense>
+            <ModifyProduct />
+          </PEVSuspense>
+        ) : (
+          <Redirect to={ROUTES.NOT_AUTHORIZED} />
+        )}
       </Route>
       <Route path={ROUTES.PRODUCTS__ORDER}>
-        {routesGuards.isClient() ? <Order /> : <Redirect to={ROUTES.NOT_AUTHORIZED} />}
+        {routesGuards.isClient() ? (
+          <PEVSuspense>
+            <Order />
+          </PEVSuspense>
+        ) : (
+          <Redirect to={ROUTES.NOT_AUTHORIZED} />
+        )}
       </Route>
       <Route path={ROUTES.PRODUCTS__PRODUCT}>
-        <ProductDetails />
+        <PEVSuspense>
+          <ProductDetails />
+        </PEVSuspense>
       </Route>
     </Switch>
   );

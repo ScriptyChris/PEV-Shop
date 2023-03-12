@@ -1,3 +1,5 @@
+@use '_mixins' as *;
+
 .pev-flex {
     display: flex;
     justify-content: space-between;
