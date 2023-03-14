@@ -89,9 +89,14 @@ export const PEVIconButton = forwardRef(function PEVIconButton(props, ref) {
   );
 });
 
-export const PEVLink = forwardRef(function PEVLink({ children, ...restProps }, ref) {
+export const PEVLink = forwardRef(function PEVLink({ children, toExternalPage, ...restProps }, ref) {
+  const externalPageAttrs = {
+    target: '_blank',
+    rel: 'noreferrer',
+  };
+
   return (
-    <MUILink color="inherit" {...restProps} component={Link} ref={ref}>
+    <MUILink color="inherit" {...restProps} component={Link} {...(toExternalPage && externalPageAttrs)} ref={ref}>
       {children}
     </MUILink>
   );

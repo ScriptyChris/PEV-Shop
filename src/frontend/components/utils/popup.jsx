@@ -4,6 +4,7 @@
 import '@frontend/assets/styles/views/popup.scss';
 
 import React, { useCallback, memo, useState, useEffect, useRef } from 'react';
+import classNames from 'classnames';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -103,6 +104,7 @@ export default function Popup(props) {
     buttons,
     singleAltBtn,
     dataCy,
+    customPopupClassName,
   } = props;
 
   if (!Object.keys(POPUP_TYPES).includes(type)) {
@@ -143,7 +145,7 @@ export default function Popup(props) {
       data-cy={dataCy}
       TransitionProps={{ onEntered: handleOpen }}
       aria-labelledby="popup-description" /* TODO: [a11y] use aria-describedby, which requires React > v16 */
-      PaperProps={{ className: 'popup' }}
+      PaperProps={{ className: classNames('popup', customPopupClassName) }}
     >
       <DialogContent>
         <DialogContentText data-cy="popup:message" id="popup-description" color="textPrimary">
@@ -152,7 +154,7 @@ export default function Popup(props) {
       </DialogContent>
       {altMessage && (
         <DialogContent>
-          <DialogContentText>{altMessage}</DialogContentText>
+          <DialogContentText className="popup__alt-message">{altMessage}</DialogContentText>
         </DialogContent>
       )}
       <DialogActions>
@@ -172,6 +174,7 @@ export default function Popup(props) {
 
         {buttons?.map((btn, index) => (
           <PEVButton
+            {...btn}
             onClick={btn.onClick}
             key={btn.text}
             data-cy={btn.dataCy}

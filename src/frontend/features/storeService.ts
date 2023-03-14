@@ -4,9 +4,9 @@
 
 import { observable, decorate, action } from 'mobx';
 import type { TUserPublic } from '@database/models';
-import type { IUserCart } from '@commons/types';
+import type { IUserCart, TAppSetup } from '@commons/types';
 
-const USER_CART_STATE: IUserCart = {
+const INITIAL_USER_CART_STATE: IUserCart = {
   totalPrice: 0,
   totalCount: 0,
   products: [],
@@ -18,6 +18,8 @@ type TUserCartProduct = IUserCart['products'][number];
 
 class StoreService {
   /** @internal */
+  _appSetup: TAppSetup | Record<never, never>;
+  /** @internal */
   _userAccountState: TUserPublic | null;
   /** @internal */
   _userCartState: IUserCart;
@@ -25,15 +27,28 @@ class StoreService {
   _productComparisonState: TUserCartProduct[];
 
   constructor() {
+    this._appSetup = {};
     // TODO: [CONSISTENCY] keep userAccountState structure in sync with backend's TUserPublic
     this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
-    this._userCartState = { ...USER_CART_STATE };
+    this._userCartState = { ...INITIAL_USER_CART_STATE };
     this._productComparisonState = [];
   }
 
   /** @internal */
-  _getProductIndex(newUserCartStateName: TUserCartProduct['name']) {
+  // Re-does some of `constructor()` assignments.
+  private _reInitialize() {
+    this._userAccountState = INITIAL_USER_ACCOUNT_STATE;
+    this._userCartState = { ...INITIAL_USER_CART_STATE };
+    this._productComparisonState = [];
+  }
+
+  /** @internal */
+  private _getProductIndex(newUserCartStateName: TUserCartProduct['name']) {
     return this._userCartState.products.findIndex((productItem) => productItem.name === newUserCartStateName);
+  }
+
+  updateAppSetup(newAppSetup: TAppSetup) {
+    this._appSetup = newAppSetup;
   }
 
   updateUserAccountState(userAccountState: TUserPublic) {
@@ -128,6 +143,14 @@ class StoreService {
     this.updateUserAccountState({ ...this._userAccountState, observedProductsIDs: [] } as TUserPublic);
   }
 
+  clearAllUserData() {
+    this._reInitialize();
+  }
+
+  get appSetup() {
+    return this._appSetup;
+  }
+
   get userCartState() {
     return this._userCartState;
   }
@@ -155,6 +178,10 @@ class StoreService {
 
 decorate(StoreService, {
   /** @internal */
+  _appSetup: observable,
+  updateAppSetup: action,
+
+  /** @internal */
   _userAccountState: observable,
   updateUserAccountState: action,
   clearUserAccountState: action,
@@ -172,6 +199,8 @@ decorate(StoreService, {
 
   updateProductObservedState: action,
   clearProductObservedState: action,
+
+  clearAllUserData: action,
 });
 
 const storeService = new StoreService();

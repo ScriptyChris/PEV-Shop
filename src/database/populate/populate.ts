@@ -86,9 +86,9 @@ import {
   IUserRole,
   TUserRoleToPopulate,
 } from '@database/models';
+import cyclicDatabaseCleanup from '@commons/cyclicAppReset';
 
 const logger = getLogger(module.filename);
-logger.log('process.argv:', process.argv);
 
 // Explanation for using root relative path is at the top of `src/middleware/middleware-index.ts` module.
 const rootRelativePath = relative(__dirname, process.env.INIT_CWD as string);
@@ -206,6 +206,15 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
 
   return Object.values(populationResults).every(Boolean);
 };
+
+if (
+  process.env.BACKEND_ONLY === 'true' &&
+  process.env.CYPRESS_RUN !== 'true' &&
+  !getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)
+) {
+  const startSchedule = cyclicDatabaseCleanup(executeDBPopulation);
+  startSchedule();
+}
 
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   executeDBPopulation().then(() => {

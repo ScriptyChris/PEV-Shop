@@ -17,8 +17,7 @@ const translations = {
 export default function Footer() {
   const { isMobileLayout } = useRWDLayout();
   const linkSharedProps = {
-    target: '_blank',
-    rel: 'noreferrer',
+    toExternalPage: true,
     color: 'inherit',
     underline: 'always',
   };

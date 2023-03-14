@@ -62,6 +62,10 @@
     }
 }
 
+.app-reload-prompt-counter .popup__alt-message {
+  text-align: center;
+}
+
 @include createMediaQuery(min-width, tablet) {
   .app-root {
     grid-template-rows: 4.5rem minmax(var(--main-row-calc), max-content) 4rem;
