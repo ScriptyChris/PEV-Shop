@@ -3,7 +3,9 @@ const { addAliases } = require('module-alias');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { resolve } = require('path');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const modulePathsAliases = require('../tsconfig.json').compilerOptions.paths;
+const _modulePathsAliases = require('../tsconfig.json').compilerOptions.paths;
+const serializedModulePathAliases = JSON.stringify(_modulePathsAliases);
+const modulePathsAliases = JSON.parse(serializedModulePathAliases);
 
 const helpers = Object.freeze({
   isInCorrectAliasesForm: Object.values(modulePathsAliases).some((aliasPaths) => aliasPaths.length > 1),
@@ -45,7 +47,7 @@ const resolvers = Object.freeze({
     if (helpers.isInCorrectAliasesForm) {
       throw TypeError(
         `Unable to handle more than one module alias path - update webpack to v5.
-            \nModule aliases: ${JSON.stringify(modulePathsAliases)}`
+            \nModule aliases: ${serializedModulePathAliases}`
       );
     }
 
@@ -58,7 +60,7 @@ const resolvers = Object.freeze({
     if (helpers.isInCorrectAliasesForm) {
       throw TypeError(
         `Only a single module alias path is supported.
-        \nModule aliases: ${JSON.stringify(modulePathsAliases)}`
+        \nModule aliases: ${serializedModulePathAliases}`
       );
     }
 
@@ -75,7 +77,7 @@ const resolvers = Object.freeze({
     if (helpers.isInCorrectAliasesForm) {
       throw TypeError(
         `Only a single module alias path is supported.
-        \nModule aliases: ${JSON.stringify(modulePathsAliases)}`
+        \nModule aliases: ${serializedModulePathAliases}`
       );
     }
 

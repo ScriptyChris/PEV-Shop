@@ -106,8 +106,8 @@ function ViewModeBtn({ viewModeType, onClick }) {
 }
 
 const paginationTranslations = {
-  itemsPerPageSuffix: 'produktów',
-  allItems: 'Wszystkie produkty',
+  itemsPerPageSuffix: 'products',
+  allItems: 'All products',
 };
 
 // TODO: setup this on backend and pass via some initial config to frontend

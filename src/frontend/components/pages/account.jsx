@@ -3,6 +3,7 @@ import '@frontend/assets/styles/views/account.scss';
 import React, { useState, useEffect, useMemo, lazy } from 'react';
 import { useHistory, useLocation, Route, Switch, Redirect } from 'react-router-dom';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 
 const CartContent = lazy(() =>
   import('@frontend/components/views/cart').then((CartModule) => ({ default: CartModule.CartContent }))
@@ -25,6 +26,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import EmailIcon from '@material-ui/icons/Email';
 
 import {
   PEVButton,
@@ -44,6 +46,7 @@ import ObservedProducts from '@frontend/components/views/productObservability';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES, routeHelpers } from './_routes';
 import { PAYMENT_METHODS, SHIPMENT_METHODS } from '@commons/consts';
+import { createEmailServiceUrl } from '@frontend/components/shared';
 
 const translations = Object.freeze({
   accountHeader: 'Account',
@@ -53,6 +56,10 @@ const translations = Object.freeze({
   goToSecurity: 'Security',
   goToObservedProducts: 'Observed products',
   goToOrders: 'Orders',
+  profileLogin: 'Login',
+  profileEmail: 'Email',
+  profileCheckEmails: 'view emails',
+  profileAccountType: 'Account type',
   editUserData: 'Edit',
   logOutFromAllSessions: 'Log out from all sessions',
   logOutFromOtherSessions: 'Log out from other sessions',
@@ -86,9 +93,10 @@ const translations = Object.freeze({
   noOrdersMadeYet: 'No orders made yet!',
 });
 
-function UserProfile() {
+const UserProfile = observer(function UserProfile() {
   const [userData, setUserData] = useState(storeService.userAccountState);
-  const isUserAttributeIgnored = (attributeName) => ['_id'].includes(attributeName);
+  const { isMobileLayout } = useRWDLayout();
+  const emailServiceUrl = createEmailServiceUrl(storeService.appSetup.emailServicePort);
 
   useEffect(() => {
     // this should not happen, because user account state is ready either on app start or after logging in
@@ -107,24 +115,40 @@ function UserProfile() {
   }, []);
 
   // const edit = () => console.log('TODO: [FEATURE] implement editing user profile');
+  const viewEmailLabel = isMobileLayout ? translations.profileCheckEmails : null;
 
   return userData ? (
     <section className="account__menu-tab pev-flex pev-flex--columned" data-cy="section:user-profile">
       <TableContainer className="account__menu-tab-profile-table-container">
         <Table>
           <TableBody>
-            {Object.entries(userData).map(([key, value]) => {
-              if (isUserAttributeIgnored(key)) {
-                return null;
-              }
-
-              return (
-                <TableRow key={key}>
-                  <TableCell component="th">{key}</TableCell>
-                  <TableCell>{value}</TableCell>
-                </TableRow>
-              );
-            })}
+            <TableRow>
+              <TableCell component="th" data-cy="cell-header:user-login">
+                {translations.profileLogin}
+              </TableCell>
+              <TableCell data-cy="cell-value:user-login">{userData.login}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" className="account__profile-email">
+                <span data-cy="cell-header:user-email">{translations.profileEmail}</span>
+                <PEVLink
+                  to={{ pathname: emailServiceUrl }}
+                  toExternalPage
+                  aria-label={viewEmailLabel}
+                  title={viewEmailLabel}
+                >
+                  <EmailIcon color="primary" fontSize="small" />
+                  {!isMobileLayout && translations.profileCheckEmails}
+                </PEVLink>
+              </TableCell>
+              <TableCell data-cy="cell-value:user-email">{userData.email}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" data-cy="cell-header:user-account-type">
+                {translations.profileAccountType}
+              </TableCell>
+              <TableCell data-cy="cell-value:user-account-type">{userData.accountType}</TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
@@ -137,7 +161,7 @@ function UserProfile() {
   ) : (
     translations.lackOfData
   );
-}
+});
 
 function Security() {
   const [popupData, setPopupData] = useState(null);
@@ -453,59 +477,30 @@ Orders.Products = function Products({ regardingProducts, totalProductsCost }) {
 };
 
 export default function Account() {
-  const { isMobileLayout } = useRWDLayout();
+  const { isDesktopLayout } = useRWDLayout();
   const { pathname } = useLocation();
 
   const TabsLayoutWrapper = ({ children }) =>
-    isMobileLayout ? children : <Paper className="account__menu-tabs">{children}</Paper>;
+    isDesktopLayout ? <Paper className="account__menu-tabs">{children}</Paper> : children;
   const subMenuNavCrumb = Object.values(Account.MENU_ITEMS).find(
     ({ url }) => window.location.pathname === url
   )?.translation;
 
   return (
     <article className="account">
-      {isMobileLayout ? (
-        <PEVHeading level={2} className="account__header">
-          {translations.accountHeader}
-        </PEVHeading>
-      ) : (
+      {isDesktopLayout ? (
         <Breadcrumbs component={Paper} className="account__header" aria-label={translations.accountNavCrumbs}>
           <PEVHeading level={2}>{translations.accountHeader}</PEVHeading>
           {subMenuNavCrumb && <PEVHeading level={3}>{subMenuNavCrumb}</PEVHeading>}
         </Breadcrumbs>
+      ) : (
+        <PEVHeading level={2} className="account__header">
+          {translations.accountHeader}
+        </PEVHeading>
       )}
 
       <nav className="account__menu-nav">
-        {isMobileLayout ? (
-          <Scroller
-            scrollerBaseValueMeta={{
-              useDefault: true,
-            }}
-            render={({ ScrollerHookingParent }) => (
-              <ScrollerHookingParent>
-                <MenuList
-                  component="ol"
-                  className="account__menu-nav-list"
-                  disablePadding
-                  // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
-                  aria-label={translations.accountNavMenuLabel}
-                >
-                  {Account.MENU_ITEMS.map((item) => (
-                    <MenuItem {...routeHelpers.getPossibleNavItemSelectedState(item.url)} key={item.url}>
-                      <PEVLink
-                        to={item.url}
-                        {...routeHelpers.getPossibleAriaCurrentPage(item.url)}
-                        data-cy="link:account-feature"
-                      >
-                        {item.translation}
-                      </PEVLink>
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ScrollerHookingParent>
-            )}
-          />
-        ) : (
+        {isDesktopLayout ? (
           <Paper>
             <MenuList component="ol" className="account__menu-nav-list" aria-label={translations.accountNavMenuLabel}>
               {Account.MENU_ITEMS.map((item) => (
@@ -521,6 +516,35 @@ export default function Account() {
               ))}
             </MenuList>
           </Paper>
+        ) : (
+          <Scroller
+            scrollerBaseValueMeta={{
+              useDefault: true,
+            }}
+            render={({ ScrollerHookingParent }) => (
+              <ScrollerHookingParent>
+                <MenuList
+                  component="ol"
+                  className="account__menu-nav-list"
+                  disablePadding
+                  // TODO: [a11y] `aria-describedby` would rather be better, but React has to be upgraded
+                  aria-label={translations.accountNavMenuLabel}
+                >
+                  {Account.MENU_ITEMS.map((item) => (
+                    <MenuItem {...routeHelpers.getPossibleNavItemSelectedState(item.url)} disableGutters key={item.url}>
+                      <PEVLink
+                        to={item.url}
+                        {...routeHelpers.getPossibleAriaCurrentPage(item.url)}
+                        data-cy="link:account-feature"
+                      >
+                        {item.translation}
+                      </PEVLink>
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </ScrollerHookingParent>
+            )}
+          />
         )}
       </nav>
 

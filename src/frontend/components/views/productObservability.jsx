@@ -7,7 +7,7 @@ import ListItem from '@material-ui/core/ListItem';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
 import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
 
-import { PEVButton, PEVIconButton, PEVParagraph } from '@frontend/components/utils/pevElements';
+import { PEVButton, PEVParagraph } from '@frontend/components/utils/pevElements';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout.tsx';
 import { ROUTES, useRoutesGuards } from '@frontend/components/pages/_routes';
 import storeService from '@frontend/features/storeService';
@@ -160,13 +160,6 @@ export default observer(function ObservedProducts() {
     return () => (_isComponentMounted = false);
   }, []);
 
-  const getUnobserveProductHandler = (toggleProductObserve) => {
-    return (event) => {
-      event.stopPropagation();
-      toggleProductObserve(event, false);
-    };
-  };
-
   return (
     <section
       className="account__menu-tab observed-products pev-flex pev-flex--columned"
@@ -186,19 +179,12 @@ export default observer(function ObservedProducts() {
         >
           {observedProducts.map((product, index) => (
             <ListItem key={product.name} disableGutters={isMobileLayout}>
-              <ProductObservabilityToggler
-                productId={product._id}
-                getCustomButton={(toggleProductObserve) => (
-                  <PEVIconButton
-                    onClick={getUnobserveProductHandler(toggleProductObserve)}
-                    onFocus={(event) => event.stopPropagation()}
-                    a11y={translations.unobserveProduct}
-                  >
-                    <RemoveFromQueueIcon />
-                  </PEVIconButton>
-                )}
+              <ProductCard
+                product={product}
+                entryNo={index}
+                layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED}
+                hideReviewsAmount
               />
-              <ProductCard product={product} entryNo={index} layoutType={PRODUCT_CARD_LAYOUT_TYPES.DETAILED} />
             </ListItem>
           ))}
         </List>
