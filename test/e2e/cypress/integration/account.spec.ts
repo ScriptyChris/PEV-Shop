@@ -47,20 +47,12 @@ describe('#account', () => {
 
     cy.get(`${makeCyDataSelector('link:account-feature')}[href="${ROUTES.ACCOUNT__USER_PROFILE}"]`).click();
     cy.getFromStorage<TUserPublic>('userAccount').then((user) => {
-      const profileDetails = [
-        { header: 'login', data: user.login },
-        { header: 'email', data: user.email },
-        // TODO: [UI] add this check when UI will render it as a list instead array
-        // { header: 'observedProductsIDs', data: user.observedProductsIDs },
-      ];
-      cy.get(`${makeCyDataSelector('section:user-profile')} tr`).each(($tr, index) => {
-        const detail = profileDetails[index];
-
-        if (detail) {
-          cy.wrap($tr).as('tr').get('th').contains(detail.header);
-          cy.get('@tr').get('td').contains(detail.data);
-        }
-      });
+      cy.contains(makeCyDataSelector('cell-header:user-login'), 'Login');
+      cy.contains(makeCyDataSelector('cell-value:user-login'), user.login);
+      cy.contains(makeCyDataSelector('cell-header:user-email'), 'Email');
+      cy.contains(makeCyDataSelector('cell-value:user-email'), user.email);
+      cy.contains(makeCyDataSelector('cell-header:user-account-type'), 'Account type');
+      cy.contains(makeCyDataSelector('cell-value:user-account-type'), user.accountType);
     });
   });
 

@@ -1,4 +1,7 @@
 services:
+  node:
+    environment:
+      - CYPRESS_RUN=true
   cypress:
     image: "cypress/included:9.1.1"
     container_name: pev-cypress

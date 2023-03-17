@@ -13,6 +13,13 @@ const [apiConfigMock, apiProductsMock, apiProductsCategoriesMock, apiUsersMock, 
   'api-orders',
 ].map((apiFileName) => mockAndRequireModule(`src/middleware/routes/${apiFileName}`).default);
 
+jest.doMock(getRootRelativePath('commons/cyclicAppReset'), () => ({
+  getRemainingTimestampToNextAppReset: () => {
+    const oneHour = 3600000;
+    return oneHour;
+  },
+}));
+
 import middleware from '@middleware/middleware-index';
 
 describe('#middleware-index', () => {
@@ -77,7 +84,8 @@ describe('#middleware-index', () => {
       type TImagesArgs = [string, { maxAge: number }];
       const imageFoundPromise = new Promise<TImagesArgs>((resolve) => {
         (globMock as TJestMock).mockImplementationOnce((path: any, callback: any) => {
-          const images: TImagesArgs = ['some image', { maxAge: 3600000 }];
+          const oneHourMinus15SecsBuffer = 3585000;
+          const images: TImagesArgs = ['some image', { maxAge: oneHourMinus15SecsBuffer }];
 
           callback(null, images);
           resolve(images);
