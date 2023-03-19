@@ -166,81 +166,85 @@ export default observer(function Main() {
         </Route>
 
         <Route path={ROUTES.PAGES}>
-          <Route path={ROUTES.WELCOME}>
-            <PEVSuspense>
-              <Welcome
-                useAppReloadCountdown={useAppReloadCountdown}
-                remainingTimestampToNextAppReset={storeService.appSetup.remainingTimestampToNextAppReset}
-              />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.PRODUCTS}>
-            <PEVSuspense>
-              <Products />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.REGISTER}>
-            <PEVSuspense>
-              <Register />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.CONFIRM_REGISTRATION}>
-            <PEVSuspense>
-              <ConfirmRegistration />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.LOG_IN}>
-            <PEVSuspense>
-              <LogIn />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.NOT_LOGGED_IN}>
-            <PEVSuspense>
-              <NotLoggedIn />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.NOT_AUTHORIZED}>
-            <PEVSuspense>
-              <NotAuthorized />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.RESET_PASSWORD}>
-            <PEVSuspense>
-              <ResetPassword />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.SET_NEW_PASSWORD}>
-            <PEVSuspense>
-              <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
-            </PEVSuspense>
-          </Route>
-          <Route path={ROUTES.ACCOUNT}>
-            {
-              /* TODO: [BUG] show loader for the time `storeService.userAccountState` is updated by MobX 
+          <Switch>
+            <Route path={ROUTES.WELCOME}>
+              <PEVSuspense>
+                <Welcome
+                  useAppReloadCountdown={useAppReloadCountdown}
+                  remainingTimestampToNextAppReset={storeService.appSetup.remainingTimestampToNextAppReset}
+                />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.PRODUCTS}>
+              <PEVSuspense>
+                <Products />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.REGISTER}>
+              <PEVSuspense>
+                <Register />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.CONFIRM_REGISTRATION}>
+              <PEVSuspense>
+                <ConfirmRegistration />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.LOG_IN}>
+              <PEVSuspense>
+                <LogIn />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.NOT_LOGGED_IN}>
+              <PEVSuspense>
+                <NotLoggedIn />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.NOT_AUTHORIZED}>
+              <PEVSuspense>
+                <NotAuthorized />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.RESET_PASSWORD}>
+              <PEVSuspense>
+                <ResetPassword />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.SET_NEW_PASSWORD}>
+              <PEVSuspense>
+                <SetNewPassword contextType={SetNewPassword.CONTEXT_TYPES.LOGGED_OUT} />
+              </PEVSuspense>
+            </Route>
+            <Route path={ROUTES.ACCOUNT}>
+              {
+                /* TODO: [BUG] show loader for the time `storeService.userAccountState` is updated by MobX 
               to prevent redirecting when user indeed has session */
-              routesGuards.isUser() ? (
-                <PEVSuspense>
-                  <Account />
-                </PEVSuspense>
-              ) : (
-                <Redirect to={ROUTES.NOT_LOGGED_IN} />
-              )
-            }
-          </Route>
+                routesGuards.isUser() ? (
+                  <PEVSuspense>
+                    <Account />
+                  </PEVSuspense>
+                ) : (
+                  <Redirect to={ROUTES.NOT_LOGGED_IN} />
+                )
+              }
+            </Route>
 
-          {/* for explicit redirection to 404 */}
-          <Route path={ROUTES.NOT_FOUND}>
-            <PEVSuspense>
-              <NotFound />
-            </PEVSuspense>
-          </Route>
+            {/* for explicit redirection to 404 */}
+            <Route path={ROUTES.NOT_FOUND}>
+              <PEVSuspense>
+                <NotFound />
+              </PEVSuspense>
+            </Route>
+            {/* for unexpected 404 within `ROUTES.PAGES` group */}
+            <Route>
+              <Redirect to={ROUTES.NOT_FOUND} />
+            </Route>
+          </Switch>
         </Route>
 
         {/* for unexpected 404 */}
         <Route>
-          <PEVSuspense>
-            <NotFound />
-          </PEVSuspense>
+          <Redirect to={ROUTES.NOT_FOUND} />
         </Route>
       </Switch>
 
