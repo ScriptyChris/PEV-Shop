@@ -11,7 +11,7 @@ import sendMail, { EMAIL_TYPES } from '@middleware/helpers/mailer';
 import { HTTP_STATUS_CODE } from '@commons/types';
 import getMiddlewareErrorHandler from '@middleware/helpers/middleware-error-handler';
 import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
-import { dotEnv } from '@commons/dotEnvLoader';
+import { dotEnv, APP_HOST_NAME } from '@commons/dotEnvLoader';
 
 const logger = getLogger(module.filename);
 const router: Router &
@@ -96,7 +96,7 @@ const sendRegistrationEmail = async ({
     email,
     EMAIL_TYPES.ACTIVATION,
     /* TODO: [DX] take "pages" from _routeGroups.js module */
-    `http://${dotEnv.APP_LOCAL_HOST}:${dotEnv.APP_PORT}/pages/confirm-registration/?token=${token}`
+    `${dotEnv.APP_SERVING_PROTOCOL}://${APP_HOST_NAME}:${dotEnv.APP_PORT}/pages/confirm-registration/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {
@@ -129,7 +129,7 @@ const sendResetPasswordEmail = async ({ email, token, res }: { email: string; to
     email,
     EMAIL_TYPES.RESET_PASSWORD,
     /* TODO: [DX] take "pages" from _routeGroups.js module */
-    `http://${dotEnv.APP_LOCAL_HOST}:${dotEnv.APP_PORT}/pages/set-new-password/?token=${token}`
+    `${dotEnv.APP_SERVING_PROTOCOL}://${APP_HOST_NAME}:${dotEnv.APP_PORT}/pages/set-new-password/?token=${token}`
   )
     .then(async (emailSentInfo) => {
       if (emailSentInfo.rejected.length) {

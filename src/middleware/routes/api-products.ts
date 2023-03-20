@@ -81,8 +81,6 @@ async function getProductsSpecs(req: Request, res: Response, next: NextFunction)
 async function getProducts(req: Request, res: Response, next: NextFunction) {
   // TODO: move building query with options to queryBuilder module; pass query type/target name, to use Strategy like pattern
   try {
-    logger.log('(getProducts) req.query', req.query);
-
     if (!req.query) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Request query is empty or not attached!' });
     }
@@ -143,8 +141,6 @@ async function getProducts(req: Request, res: Response, next: NextFunction) {
 
 async function getProductById(req: Request, res: Response, next: NextFunction) {
   try {
-    logger.log('(getProductById) req.param', req.params);
-
     if (!req.params || !req.params._id) {
       return wrapRes(res, HTTP_STATUS_CODE.BAD_REQUEST, { error: 'Id params is empty or not attached!' });
     }

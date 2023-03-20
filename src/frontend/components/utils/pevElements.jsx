@@ -206,12 +206,16 @@ export const PEVForm = forwardRef(function PEVForm(
   ref
 ) {
   // TODO: consider if providing `onSubmit` and `initialViews` is required or just optional
-  const callStack = new Error().stack;
-  const onSubmit = props.onSubmit || (() => console.log("Empty form's `onSubmit()`.\nCall stack:", { callStack }));
+  // const callStack = new Error().stack;
+  const onSubmit =
+    props.onSubmit ||
+    (() => {
+      // console.log("Empty form's `onSubmit()`.\nCall stack:", { callStack });
+    });
 
-  if (!props.initialValues) {
-    console.log("Empty form's `initialValues`.\nCall stack:", { callStack });
-  }
+  // if (!props.initialValues) {
+  //   console.log("Empty form's `initialValues`.\nCall stack:", { callStack });
+  // }
 
   return (
     <Formik onSubmit={onSubmit} initialValues={initialValues} {...props} ref={ref}>

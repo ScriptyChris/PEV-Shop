@@ -18,7 +18,7 @@ services:
     container_name: pev-mail
     ports:
       - ${EMAIL_SMTP_PORT}:${EMAIL_SMTP_PORT}
-      - ${EMAIL_HTTP_PORT}:${EMAIL_HTTP_PORT}
+      - ${EMAIL_INTERNAL_HTTP_PORT}:${EMAIL_INTERNAL_HTTP_PORT}
     logging:
       driver: "none"
 

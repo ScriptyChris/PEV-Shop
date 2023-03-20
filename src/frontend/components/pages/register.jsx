@@ -24,7 +24,6 @@ import { PasswordField } from '@frontend/components/views/password';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
 import storeService from '@frontend/features/storeService';
-import { createEmailServiceUrl } from '@frontend/components/shared';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -130,7 +129,7 @@ export default function Register() {
               },
               {
                 // TODO: [a11y] refactor Popup component to also support links (apart from buttons)
-                onClick: () => window.open(createEmailServiceUrl(storeService.appSetup.emailServicePort), '_blank'),
+                onClick: () => window.open(storeService.appSetup.emailServiceUrl, '_blank'),
                 text: translations.popupReadEmail,
               },
               {

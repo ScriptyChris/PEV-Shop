@@ -46,7 +46,6 @@ import ObservedProducts from '@frontend/components/views/productObservability';
 import Scroller from '@frontend/components/utils/scroller';
 import { ROUTES, routeHelpers } from './_routes';
 import { PAYMENT_METHODS, SHIPMENT_METHODS } from '@commons/consts';
-import { createEmailServiceUrl } from '@frontend/components/shared';
 
 const translations = Object.freeze({
   accountHeader: 'Account',
@@ -96,7 +95,6 @@ const translations = Object.freeze({
 const UserProfile = observer(function UserProfile() {
   const [userData, setUserData] = useState(storeService.userAccountState);
   const { isMobileLayout } = useRWDLayout();
-  const emailServiceUrl = createEmailServiceUrl(storeService.appSetup.emailServicePort);
 
   useEffect(() => {
     // this should not happen, because user account state is ready either on app start or after logging in
@@ -132,7 +130,7 @@ const UserProfile = observer(function UserProfile() {
               <TableCell component="th" className="account__profile-email">
                 <span data-cy="cell-header:user-email">{translations.profileEmail}</span>
                 <PEVLink
-                  to={{ pathname: emailServiceUrl }}
+                  to={{ pathname: storeService.appSetup.emailServiceUrl }}
                   toExternalPage
                   aria-label={viewEmailLabel}
                   title={viewEmailLabel}

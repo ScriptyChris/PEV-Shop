@@ -62,8 +62,6 @@ export default router;
 
 async function getProductCategoriesHierarchy(req: Request, res: Response, next: NextFunction) {
   try {
-    logger.log('(getProductCategoriesHierarchy) req.params:', req.params);
-
     const productCategories = await getFromDB({ modelName: COLLECTION_NAMES.Product, isDistinct: true }, 'category');
 
     if (!productCategories) {

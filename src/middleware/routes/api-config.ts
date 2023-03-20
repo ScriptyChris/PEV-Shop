@@ -42,7 +42,7 @@ async function populateDB(req: Request, res: Response, next: NextFunction) {
 function getSetupData(req: Request, res: Response, next: NextFunction) {
   try {
     const payload: TAppSetup = {
-      emailServicePort: Number(dotEnv.EMAIL_HTTP_PORT),
+      emailServiceUrl: `${dotEnv.APP_SERVING_PROTOCOL}://${dotEnv.EMAIL_WEB_HOST}:${dotEnv.EMAIL_WEB_HTTP_PORT}`,
       previousAppResetTimestamp: getPreviousAppResetTimestamp(),
       remainingTimestampToNextAppReset: getRemainingTimestampToNextAppReset(),
     };

@@ -97,7 +97,3 @@ export function NavigateToModifyProduct({ productData }) {
     </PEVLink>
   );
 }
-
-// TODO: [code structure] put it inside a function (not component) related shared component
-export const createEmailServiceUrl = (emailServicePort) =>
-  `${window.location.protocol}//${window.location.hostname}:${emailServicePort}`;

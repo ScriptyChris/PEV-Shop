@@ -8,6 +8,7 @@ const DOT_ENV_KEYS = [
   'APP_PORT',
   'APP_LOCAL_HOST',
   'APP_PRODUCTION_HOST',
+  'APP_SERVING_PROTOCOL',
 
   'PAYU_CLIENT_ID',
   'PAYU_CLIENT_SECRET',
@@ -15,9 +16,11 @@ const DOT_ENV_KEYS = [
   'PAYU_ORDERS_URL',
   'PAYU_PAYMENT_METHODS_URL',
 
-  'EMAIL_HOST',
+  'EMAIL_INTERNAL_HOST',
+  'EMAIL_WEB_HOST',
   'EMAIL_SMTP_PORT',
-  'EMAIL_HTTP_PORT',
+  'EMAIL_INTERNAL_HTTP_PORT',
+  'EMAIL_WEB_HTTP_PORT',
   'EMAIL_FROM',
 ] as const;
 type TDotEnv = {
@@ -53,3 +56,6 @@ if (divergedKeys.length) {
 }
 
 export const dotEnv = _env as TDotEnv;
+
+export const APP_HOST_NAME =
+  String(dotEnv.APP_SERVING_PROTOCOL) === 'https' ? dotEnv.APP_PRODUCTION_HOST : dotEnv.APP_LOCAL_HOST;

@@ -111,7 +111,7 @@ export type TE2EUser = {
 };
 
 export type TAppSetup = {
-  emailServicePort: number;
+  emailServiceUrl: string;
   previousAppResetTimestamp: number;
   remainingTimestampToNextAppReset: number;
 };

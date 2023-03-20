@@ -14,9 +14,9 @@ COPY \
     .eslintrc.js \
     .prettierrc \
     tsconfig* \
-    scripts/generate-grouped-api-docs.js \
     webpack.config.js \
     ./
+COPY ./scripts/generate-grouped-api-docs.js ./scripts/generate-grouped-api-docs.js
 
 RUN npm run build
 
