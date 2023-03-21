@@ -317,6 +317,7 @@ async function resendConfirmRegistration(req: Request, res: Response, next: Next
         res,
       });
     } else {
+      // TODO: [UX] show different error when user is already confirmed
       return wrapRes(res, HTTP_STATUS_CODE.NOT_FOUND, { error: 'Could not resend user confirmation!' });
     }
   } catch (exception) {

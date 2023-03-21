@@ -20,7 +20,8 @@ const DISCLAIMER_FALLBACK_URL =
   'https://github.com/ScriptyChris/Fake-PEV-Shopping/tree/develop/src/frontend/assets/embedded/DISCLAIMER.html';
 const USERS_CREDENTIALS_FALLBACK_URL =
   'https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/database/populate/initialData/users.json';
-const APP_FEATURES_LIST = 'https://github.com/ScriptyChris/Fake-PEV-Shopping#1-features';
+const APP_FEATURES_LIST = 'https://github.com/ScriptyChris/Fake-PEV-Shopping#2-features';
+const APP_PREVIEW = 'https://github.com/ScriptyChris/Fake-PEV-Shopping#1-preview';
 const APP_EMAIL_SERVICE_URL = 'https://github.com/ScriptyChris/Fake-PEV-Shopping#manual-email-service-setup';
 
 const translations = {
@@ -179,7 +180,7 @@ export default function Welcome({ useAppReloadCountdown, remainingTimestampToNex
               {translations.features1LinkLabel}
             </PEVLink>
             {translations.preview1}
-            <PEVLink to={{ pathname: '' }} underline="always" toExternalPage>
+            <PEVLink to={{ pathname: APP_PREVIEW }} underline="always" toExternalPage>
               {translations.preview1LinkLabel}
             </PEVLink>
             {translations.preview2}

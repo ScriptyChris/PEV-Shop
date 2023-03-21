@@ -20,6 +20,7 @@ export default function cyclicDatabaseCleanup(executeDBPopulation: () => Promise
   const SCHEDULE_AT_EVERY_HOUR = '0 * * * *';
   const cronJob = new CronJob(SCHEDULE_AT_EVERY_HOUR, () => {
     logger.log('Triggering database population by cron...');
+    // TODO: also remove emails
     executeDBPopulation().then(() => {
       const currentDate = new Date();
       logger.log(`Database populated by cron at: ${currentDate}.`);

@@ -14,24 +14,46 @@ take any responsibility for users possible data loss <em>NOR</em> actions made b
 <!-- END_OF disclaimer -->
 
 ## Table of Contents
-1. [Features](#1-features)
-2. [Tech stack](#2-tech-stack)
-3. [Setup](#3-setup)
+1. [Preview](#1-preview)
+2. [Features](#2-features)
+3. [Tech stack](#3-tech-stack)
+4. [Setup](#4-setup)
     - [automatic (Docker based)](#automatic-setup)
     - [manual](#manual-setup)
         - [database](#manual-database-setup)
         - [email service](#manual-email-service-setup)
         - [app](#manual-app-setup)
-4. [Tests](#4-tests)
-5. [API documentation](#5-api-documentation)
+5. [Tests](#5-tests)
+6. [API documentation](#6-api-documentation)
     - [middleware](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/middleware.md)
     - [database](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/database.md)
     - [frontend](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/frontend.md)
     - [commons](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/commons.md)
-6. [Development](#6-development)
-7. [Credits](#7-credits)
+7. [Development](#7-development)
+8. [Credits](#8-credits)
 
-## 1. Features
+## 1. Preview
+Below you can watch a [brief preview of the app](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/pev-shop-preview.mp4), which presents:
+1) welcome page, 
+2) home page, 
+3) products dashboard, 
+4) chosen products pages, 
+5) registration, 
+6) mail service, 
+7) login, 
+8) searching products, 
+9) products comparison, 
+10) cart and ordering process.
+
+
+<div align="center">
+  <video width="975" height="1040" controls>
+    <source src="./pev-shop-preview.mp4" type="video/mp4">
+  </video>
+</div>
+
+
+## 2. Features
 App offers the following features (with [ideas to add more](https://github.com/ScriptyChris/Fake-PEV-Shopping/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)):
 - client and seller **user accounts**:
     - **registering**,
@@ -47,7 +69,7 @@ App offers the following features (with [ideas to add more](https://github.com/S
 - support for **mobile**, **tablet** and **PC** devices
 - **making orders** for products added to the cart with **various payment and shipment methods**
 - **reviewing** bought products
-## 2. Tech stack
+## 3. Tech stack
 <p align="center">
   <a href="https://skillicons.dev">
     <img src="https://skillicons.dev/icons?i=react,scss,mui,webpack,typescript,nodejs,express,mongo,docker,githubactions,jest" alt="React, SCSS, MUI, Webpack, TypeScript, NodeJS, Express, Mongo, Docker, GitHub Actions and Jest logos" title="React, SCSS, MUI, Webpack, TypeScript, NodeJS, Express, Mongo, Docker, GitHub Actions and Jest" />
@@ -65,12 +87,12 @@ App offers the following features (with [ideas to add more](https://github.com/S
 
 App's [frontend](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/frontend) is built with [**React**](https://reactjs.org/) (and partial [**TypeScript**](https://typescriptlang.org/) usage). Global state is handled by [**MobX**](https://mobx.js.org/). Layouts are made with a mix of custom [**SCSS**](http://sass-lang.com/) and [**Material-UI**](https://v4.mui.com/). Forms are created with [**Formik**](https://formik.org/). Products shipment via parcels is possible due to [**InPost's Geowidget**](https://dokumentacja-inpost.atlassian.net/wiki/spaces/PL/pages/7438409/Geowidget+v4+User+s+Guide+Old). Frontend is bundled with [**webpack**](http://webpackjs.org/).
 
-Backend is written on [**Node.js**](https://nodejs.org/) in **TypeScript**, with [middleware](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/middleware) based on [**Express.js**](https://expressjs.com/) (supporting Rest API) and [database](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/database) created with [**MongoDB**](https://www.mongodb.com/) (using [**Mongoose**](https://mongoosejs.com/) as ODM). Authorization is implemented via [**JWT**](https://www.npmjs.com/package/jsonwebtoken) and custom user roles system. Emails to users are send via [**Nodemailer**](https://www.npmjs.com/package/nodemailer). Payments for ordered products are handled by integrated [**PayU API**](https://developers.payu.com/en/).
+Backend is written on [**Node.js**](https://nodejs.org/) in **TypeScript**, with [middleware](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/middleware) based on [**Express.js**](https://expressjs.com/) (supporting Rest API) and [database](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/database) created with [**MongoDB**](https://www.mongodb.com/) (using [**Mongoose**](https://mongoosejs.com/) as ODM). Authorization is implemented via [**JWT**](https://www.npmjs.com/package/jsonwebtoken) and custom user roles system. Emails to users are send via [**Nodemailer**](https://www.npmjs.com/package/nodemailer) and hosted with [**MailHog**](https://github.com/mailhog/MailHog). Payments for ordered products are handled by integrated [**PayU API**](https://developers.payu.com/en/).
 
 The app's database and middleware are covered with [*unit* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/unit) created with [**Jest**](https://jestjs.io/). Whole-feature focused scenarios are covered by [*end-to-end* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/e2e) created with [**Cypress**](https://www.cypress.io/).
 
 Whole app is containerized via [**Docker**](https://docker.com/), which helps with easier setup and executing end-to-end tests. Repository is hooked with [**GitHub Actions CI/CD**](https://docs.github.com/en/actions) for integration purposes.
-## 3. Setup
+## 4. Setup
 Regardles of setup method, the app is locally served on [`http://localhost:3000`](http://localhost:3000) by default.
 ### Automatic setup
 Whole app can be bootstrapped with [Docker](https://www.docker.com/).
@@ -106,7 +128,7 @@ In case of any issues, please refer to the official MongoDB installation guide f
 
 #### Manual email service setup
 The app is integrated with **MailHog** email service, which you can [install from it's repository](https://github.com/mailhog/MailHog#installation). 
-By default, this service's website is available on [port 8025](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/.env.example#L20).
+By default, this service's website is available on [EMAIL_WEB_HTTP_PORT](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/.env.example) `8025`. You may need to change [EMAIL_INTERNAL_HOST](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/.env.example) env variable to `localhost`, if you want to use your system's MailHog instead of the instance from Docker.
 
 #### Manual app setup
 The app building process is based on Node.js v14 LTS and npm, so after [installing it](https://nodejs.org/download/release/latest-fermium/) (optionally via [NVM](https://github.com/nvm-sh/nvm)) do the following:
@@ -125,8 +147,8 @@ npm build
 npm serve
 ```
 
-## 4. Tests
-The app contains [**unit** and **end-to-end** tests](#2-tech-stack). You can run them as following:
+## 5. Tests
+The app contains [**unit** and **end-to-end** tests](#3-tech-stack). You can run them as following:
 - unit tests:
 ```sh
 npm run test:unit
@@ -138,10 +160,10 @@ npm run test:unit
 npm run test:e2e:dev
 ```
 
-## 5. API documentation
+## 6. API documentation
 API docs are generated by [**TypeDoc**](https://npmjs.com/package/typedoc), which output is [grouped](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/scripts/generate-grouped-api-docs.js) into [a few folders](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs).
 
-## 6. Development
+## 7. Development
 If you would like to play with the application's code, [*package.json* file](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/package.json) contains helpful NPM commands, for example:
 - populate database with default initial data and included cleanup (in case you would like to reset database state)
 ```sh
@@ -164,7 +186,7 @@ npm run debug
 npm run generate-api-docs
 ```
 
-## 7. Credits
+## 8. Credits
 - initial products data is based on the [**eWheels** shop](https://www.ewheels.com/)
 - tech stack icons are provided by [https://github.com/tandpfun/skill-icons](https://github.com/tandpfun/skill-icons)
 - the app's (favicon) icon is provided by [**Icons8**](https://icons8.com)
