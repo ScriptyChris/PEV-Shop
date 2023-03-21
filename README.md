@@ -49,7 +49,7 @@ Below you can watch a brief preview, which presents:
 10) cart and ordering process.
 
 
-https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4?raw=true
+![Preview video: https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4?raw=true](https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4?raw=true)
 
 
 ## 2. Features
