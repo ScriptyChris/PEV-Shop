@@ -49,12 +49,7 @@ Below you can watch a brief preview, which presents:
 10) cart and ordering process.
 
 
-<div align="center">
-  <video width="975" height="1040" controls>
-    <source src="https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4" type="video/mp4">
-    Sorry, but could not load the preview video.
-  </video>
-</div>
+https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4?raw=true
 
 
 ## 2. Features
