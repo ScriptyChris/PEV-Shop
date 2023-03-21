@@ -21,7 +21,7 @@ const DISCLAIMER_FALLBACK_URL =
 const USERS_CREDENTIALS_FALLBACK_URL =
   'https://github.com/ScriptyChris/PEV-Shop/blob/develop/src/database/populate/initialData/users.json';
 const APP_FEATURES_LIST = 'https://github.com/ScriptyChris/PEV-Shop#2-features';
-const APP_PREVIEW = 'https://github.com/ScriptyChris/PEV-Shop#1-preview';
+const APP_PREVIEW = 'https://github.com/ScriptyChris/PEV-Shop#1-live-version-and-preview';
 const APP_EMAIL_SERVICE_URL = 'https://github.com/ScriptyChris/PEV-Shop#manual-email-service-setup';
 
 const translations = {

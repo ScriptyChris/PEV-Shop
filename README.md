@@ -15,7 +15,7 @@ take any responsibility for users possible data loss <em>NOR</em> actions made b
 <!-- END_OF disclaimer -->
 
 ## Table of Contents
-1. [Preview](#1-preview)
+1. [Live version and preview](#1-live-version-and-preview)
 2. [Features](#2-features)
 3. [Tech stack](#3-tech-stack)
 4. [Setup](#4-setup)
@@ -33,8 +33,10 @@ take any responsibility for users possible data loss <em>NOR</em> actions made b
 7. [Development](#7-development)
 8. [Credits](#8-credits)
 
-## 1. Preview
-Below you can watch a [brief preview of the app](https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4), which presents:
+## 1. Live version and preview
+The app is available live online: https://pev-shop.scriptychris.dev/.
+
+Below you can watch a brief preview, which presents:
 1) welcome page, 
 2) home page, 
 3) products dashboard, 
@@ -49,7 +51,8 @@ Below you can watch a [brief preview of the app](https://github.com/ScriptyChris
 
 <div align="center">
   <video width="975" height="1040" controls>
-    <source src="./pev-shop-preview.mp4" type="video/mp4">
+    <source src="https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4" type="video/mp4">
+    Sorry, but could not load the preview video.
   </video>
 </div>
 

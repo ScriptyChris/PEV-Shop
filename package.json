@@ -45,6 +45,7 @@
     "postbuild:backend": "cp -r src/database/populate/initialData/product-images dist/src/database/populate/initialData/product-images",
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend && npm run prepare-commons",
+    "postbuild": "npm run generate-api-docs",
     "debug": "cross-env BACKEND_ONLY=true node --inspect-brk dist/src/middleware/middleware-index.js",
     "update-readme-disclaimer": "node scripts/update-readme-disclaimer.js",
     "generate-api-docs": "node scripts/generate-grouped-api-docs.js",
