@@ -59,3 +59,5 @@ export const dotEnv = _env as TDotEnv;
 
 export const APP_HOST_NAME =
   String(dotEnv.APP_SERVING_PROTOCOL) === 'https' ? dotEnv.APP_PRODUCTION_HOST : dotEnv.APP_LOCAL_HOST;
+
+export const APP_EXTERNAL_PORT = String(dotEnv.APP_SERVING_PROTOCOL) === 'https' ? 443 : dotEnv.APP_PORT;
