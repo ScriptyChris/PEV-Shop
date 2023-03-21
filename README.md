@@ -1,5 +1,6 @@
-# Fake-PEV-Shopping
-Fake [**P**ersonal **E**lectric **V**ehicle](https://en.wikipedia.org/wiki/Personal_transporter#Types) Shopping application.
+# PEV-Shop
+
+[**P**ersonal **E**lectric **V**ehicle](https://en.wikipedia.org/wiki/Personal_transporter#Types) Shop application.
 
 <!-- Placeholder for injecting DISCLAIMER.html file -->
 <!-- START_OF disclaimer -->
@@ -25,15 +26,15 @@ take any responsibility for users possible data loss <em>NOR</em> actions made b
         - [app](#manual-app-setup)
 5. [Tests](#5-tests)
 6. [API documentation](#6-api-documentation)
-    - [middleware](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/middleware.md)
-    - [database](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/database.md)
-    - [frontend](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/frontend.md)
-    - [commons](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs/commons.md)
+    - [middleware](https://github.com/ScriptyChris/PEV-Shop/blob/develop/api-docs/middleware.md)
+    - [database](https://github.com/ScriptyChris/PEV-Shop/blob/develop/api-docs/database.md)
+    - [frontend](https://github.com/ScriptyChris/PEV-Shop/blob/develop/api-docs/frontend.md)
+    - [commons](https://github.com/ScriptyChris/PEV-Shop/blob/develop/api-docs/commons.md)
 7. [Development](#7-development)
 8. [Credits](#8-credits)
 
 ## 1. Preview
-Below you can watch a [brief preview of the app](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/pev-shop-preview.mp4), which presents:
+Below you can watch a [brief preview of the app](https://github.com/ScriptyChris/PEV-Shop/blob/develop/pev-shop-preview.mp4), which presents:
 1) welcome page, 
 2) home page, 
 3) products dashboard, 
@@ -54,7 +55,7 @@ Below you can watch a [brief preview of the app](https://github.com/ScriptyChris
 
 
 ## 2. Features
-App offers the following features (with [ideas to add more](https://github.com/ScriptyChris/Fake-PEV-Shopping/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)):
+App offers the following features (with [ideas to add more](https://github.com/ScriptyChris/PEV-Shop/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)):
 - client and seller **user accounts**:
     - **registering**,
     - **logging in**,
@@ -85,19 +86,19 @@ App offers the following features (with [ideas to add more](https://github.com/S
   </a>
 </p>
 
-App's [frontend](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/frontend) is built with [**React**](https://reactjs.org/) (and partial [**TypeScript**](https://typescriptlang.org/) usage). Global state is handled by [**MobX**](https://mobx.js.org/). Layouts are made with a mix of custom [**SCSS**](http://sass-lang.com/) and [**Material-UI**](https://v4.mui.com/). Forms are created with [**Formik**](https://formik.org/). Products shipment via parcels is possible due to [**InPost's Geowidget**](https://dokumentacja-inpost.atlassian.net/wiki/spaces/PL/pages/7438409/Geowidget+v4+User+s+Guide+Old). Frontend is bundled with [**webpack**](http://webpackjs.org/).
+App's [frontend](https://github.com/ScriptyChris/PEV-Shop/blob/develop/src/frontend) is built with [**React**](https://reactjs.org/) (and partial [**TypeScript**](https://typescriptlang.org/) usage). Global state is handled by [**MobX**](https://mobx.js.org/). Layouts are made with a mix of custom [**SCSS**](http://sass-lang.com/) and [**Material-UI**](https://v4.mui.com/). Forms are created with [**Formik**](https://formik.org/). Products shipment via parcels is possible due to [**InPost's Geowidget**](https://dokumentacja-inpost.atlassian.net/wiki/spaces/PL/pages/7438409/Geowidget+v4+User+s+Guide+Old). Frontend is bundled with [**webpack**](http://webpackjs.org/).
 
-Backend is written on [**Node.js**](https://nodejs.org/) in **TypeScript**, with [middleware](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/middleware) based on [**Express.js**](https://expressjs.com/) (supporting Rest API) and [database](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/database) created with [**MongoDB**](https://www.mongodb.com/) (using [**Mongoose**](https://mongoosejs.com/) as ODM). Authorization is implemented via [**JWT**](https://www.npmjs.com/package/jsonwebtoken) and custom user roles system. Emails to users are send via [**Nodemailer**](https://www.npmjs.com/package/nodemailer) and hosted with [**MailHog**](https://github.com/mailhog/MailHog). Payments for ordered products are handled by integrated [**PayU API**](https://developers.payu.com/en/).
+Backend is written on [**Node.js**](https://nodejs.org/) in **TypeScript**, with [middleware](https://github.com/ScriptyChris/PEV-Shop/blob/develop/src/middleware) based on [**Express.js**](https://expressjs.com/) (supporting Rest API) and [database](https://github.com/ScriptyChris/PEV-Shop/blob/develop/src/database) created with [**MongoDB**](https://www.mongodb.com/) (using [**Mongoose**](https://mongoosejs.com/) as ODM). Authorization is implemented via [**JWT**](https://www.npmjs.com/package/jsonwebtoken) and custom user roles system. Emails to users are send via [**Nodemailer**](https://www.npmjs.com/package/nodemailer) and hosted with [**MailHog**](https://github.com/mailhog/MailHog). Payments for ordered products are handled by integrated [**PayU API**](https://developers.payu.com/en/).
 
-The app's database and middleware are covered with [*unit* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/unit) created with [**Jest**](https://jestjs.io/). Whole-feature focused scenarios are covered by [*end-to-end* tests](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/test/e2e) created with [**Cypress**](https://www.cypress.io/).
+The app's database and middleware are covered with [*unit* tests](https://github.com/ScriptyChris/PEV-Shop/blob/develop/test/unit) created with [**Jest**](https://jestjs.io/). Whole-feature focused scenarios are covered by [*end-to-end* tests](https://github.com/ScriptyChris/PEV-Shop/blob/develop/test/e2e) created with [**Cypress**](https://www.cypress.io/).
 
 Whole app is containerized via [**Docker**](https://docker.com/), which helps with easier setup and executing end-to-end tests. Repository is hooked with [**GitHub Actions CI/CD**](https://docs.github.com/en/actions) for integration purposes.
 ## 4. Setup
 Regardles of setup method, the app is locally served on [`http://localhost:3000`](http://localhost:3000) by default.
 ### Automatic setup
 Whole app can be bootstrapped with [Docker](https://www.docker.com/).
-1. Create `.env` file based on [`.env.example`](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/.env.example).
-2. Navigate to [`./docker`](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/docker) folder with command:
+1. Create `.env` file based on [`.env.example`](https://github.com/ScriptyChris/PEV-Shop/blob/develop/.env.example).
+2. Navigate to [`./docker`](https://github.com/ScriptyChris/PEV-Shop/blob/develop/docker) folder with command:
 ```sh
 cd docker
 ```
@@ -128,7 +129,7 @@ In case of any issues, please refer to the official MongoDB installation guide f
 
 #### Manual email service setup
 The app is integrated with **MailHog** email service, which you can [install from it's repository](https://github.com/mailhog/MailHog#installation). 
-By default, this service's website is available on [EMAIL_WEB_HTTP_PORT](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/.env.example) `8025`. You may need to change [EMAIL_INTERNAL_HOST](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/.env.example) env variable to `localhost`, if you want to use your system's MailHog instead of the instance from Docker.
+By default, this service's website is available on [EMAIL_WEB_HTTP_PORT](https://github.com/ScriptyChris/PEV-Shop/blob/develop/.env.example) `8025`. You may need to change [EMAIL_INTERNAL_HOST](https://github.com/ScriptyChris/PEV-Shop/blob/develop/.env.example) env variable to `localhost`, if you want to use your system's MailHog instead of the instance from Docker.
 
 #### Manual app setup
 The app building process is based on Node.js v14 LTS and npm, so after [installing it](https://nodejs.org/download/release/latest-fermium/) (optionally via [NVM](https://github.com/nvm-sh/nvm)) do the following:
@@ -140,7 +141,7 @@ npm ci
 ```sh
 npm build
 ```
-3. Create `.env` file based on [`.env.example`](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/.env.example). Change `DATABASE_HOST` variable in `.env` file to `localhost` value.
+3. Create `.env` file based on [`.env.example`](https://github.com/ScriptyChris/PEV-Shop/blob/develop/.env.example). Change `DATABASE_HOST` variable in `.env` file to `localhost` value.
 
 4. Serve the app:
 ```sh
@@ -161,10 +162,10 @@ npm run test:e2e:dev
 ```
 
 ## 6. API documentation
-API docs are generated by [**TypeDoc**](https://npmjs.com/package/typedoc), which output is [grouped](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/scripts/generate-grouped-api-docs.js) into [a few folders](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/api-docs).
+API docs are generated by [**TypeDoc**](https://npmjs.com/package/typedoc), which output is [grouped](https://github.com/ScriptyChris/PEV-Shop/blob/develop/scripts/generate-grouped-api-docs.js) into [a few folders](https://github.com/ScriptyChris/PEV-Shop/blob/develop/api-docs).
 
 ## 7. Development
-If you would like to play with the application's code, [*package.json* file](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/package.json) contains helpful NPM commands, for example:
+If you would like to play with the application's code, [*package.json* file](https://github.com/ScriptyChris/PEV-Shop/blob/develop/package.json) contains helpful NPM commands, for example:
 - populate database with default initial data and included cleanup (in case you would like to reset database state)
 ```sh
 npm run populate-db
@@ -181,7 +182,7 @@ npm run dev:backend
 ```sh
 npm run debug
 ```
-- generate API documentation based on current source code (with restriction to files listed in [grouping script](https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/scripts/generate-grouped-api-docs.js))
+- generate API documentation based on current source code (with restriction to files listed in [grouping script](https://github.com/ScriptyChris/PEV-Shop/blob/develop/scripts/generate-grouped-api-docs.js))
 ```sh
 npm run generate-api-docs
 ```

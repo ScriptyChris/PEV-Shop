@@ -1,21 +1,23 @@
 {
-  "name": "fake-pev-shopping",
+  "name": "pev-shop",
   "version": "1.0.0",
-  "description": "Fake Personal Electric Vehicle Shopping application built with React. Browse, compare, buy, review vehicles and their accessories.",
+  "description": "Personal Electric Vehicle Shop application built with React. Browse, compare, buy, review vehicles and their accessories.",
   "author": "ScriptyChris",
   "license": "ISC",
-  "homepage": "https://github.com/ScriptyChris/Fake-PEV-Shopping#readme",
+  "homepage": "https://github.com/ScriptyChris/PEV-Shop#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ScriptyChris/Fake-PEV-Shopping.git"
+    "url": "git+https://github.com/ScriptyChris/PEV-Shop.git"
   },
   "keywords": [
-    "shopping",
+    "shop",
     "pev",
-    "react"
+    "react",
+    "typescript",
+    "demo"
   ],
   "bugs": {
-    "url": "https://github.com/ScriptyChris/Fake-PEV-Shopping/issues"
+    "url": "https://github.com/ScriptyChris/PEV-Shop/issues"
   },
   "scripts": {
     "prettier:commons": "prettier --write commons/",
@@ -43,7 +45,6 @@
     "postbuild:backend": "cp -r src/database/populate/initialData/product-images dist/src/database/populate/initialData/product-images",
     "build:frontend": "rimraf dist/src/frontend/ && webpack --env production",
     "build": "npm run build:backend && npm run build:frontend && npm run prepare-commons",
-    "postbuild": "npm run generate-api-docs",
     "debug": "cross-env BACKEND_ONLY=true node --inspect-brk dist/src/middleware/middleware-index.js",
     "update-readme-disclaimer": "node scripts/update-readme-disclaimer.js",
     "generate-api-docs": "node scripts/generate-grouped-api-docs.js",

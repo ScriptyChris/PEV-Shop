@@ -17,12 +17,12 @@ import storageService from '@frontend/features/storageService';
 import storeService from '@frontend/features/storeService';
 
 const DISCLAIMER_FALLBACK_URL =
-  'https://github.com/ScriptyChris/Fake-PEV-Shopping/tree/develop/src/frontend/assets/embedded/DISCLAIMER.html';
+  'https://github.com/ScriptyChris/PEV-Shop/tree/develop/src/frontend/assets/embedded/DISCLAIMER.html';
 const USERS_CREDENTIALS_FALLBACK_URL =
-  'https://github.com/ScriptyChris/Fake-PEV-Shopping/blob/develop/src/database/populate/initialData/users.json';
-const APP_FEATURES_LIST = 'https://github.com/ScriptyChris/Fake-PEV-Shopping#2-features';
-const APP_PREVIEW = 'https://github.com/ScriptyChris/Fake-PEV-Shopping#1-preview';
-const APP_EMAIL_SERVICE_URL = 'https://github.com/ScriptyChris/Fake-PEV-Shopping#manual-email-service-setup';
+  'https://github.com/ScriptyChris/PEV-Shop/blob/develop/src/database/populate/initialData/users.json';
+const APP_FEATURES_LIST = 'https://github.com/ScriptyChris/PEV-Shop#2-features';
+const APP_PREVIEW = 'https://github.com/ScriptyChris/PEV-Shop#1-preview';
+const APP_EMAIL_SERVICE_URL = 'https://github.com/ScriptyChris/PEV-Shop#manual-email-service-setup';
 
 const translations = {
   welcomeMessage: 'Welcome to PEV Shop!',
