@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lowercase author and repository name
-        #run: echo "REPO_LOWERCASE=ghcr.io/scriptychris/fake-pev-shopping" >> $GITHUB_ENV
+        #run: echo "REPO_LOWERCASE=ghcr.io/scriptychris/pev-shop" >> $GITHUB_ENV
         run: echo "REPO_LOWERCASE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Build and push
@@ -31,7 +31,7 @@ jobs:
         with:
       #    push: true
           outputs: type=local,dest=./built-docker-image
-          tags: ghcr.io/scriptychris/fake-pev-shopping:latest #${{ env.REPO_LOWERCASE }}
+          tags: ghcr.io/scriptychris/pev-shop:latest #${{ env.REPO_LOWERCASE }}
 
       # for debugging purposes
       - name: Setup tmate session
@@ -39,5 +39,5 @@ jobs:
       
       - name: Manually push docker image to registry
         run: >
-          docker tag fake-pev-shopping ghcr.io/scriptychris/fake-pev-shopping:latest && 
-          docker push ghcr.io/scriptychris/fake-pev-shopping:latest
+          docker tag pev-shop ghcr.io/scriptychris/pev-shop:latest && 
+          docker push ghcr.io/scriptychris/pev-shop:latest

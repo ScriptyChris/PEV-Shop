@@ -17,8 +17,7 @@ const translations = {
 export default function Footer() {
   const { isMobileLayout } = useRWDLayout();
   const linkSharedProps = {
-    target: '_blank',
-    rel: 'noreferrer',
+    toExternalPage: true,
     color: 'inherit',
     underline: 'always',
   };
@@ -32,7 +31,7 @@ export default function Footer() {
     >
       <PEVParagraph>
         {translations.sourceCodePrefix}{' '}
-        <PEVLink to={{ pathname: 'https://github.com/ScriptyChris/Fake-PEV-Shopping' }} {...linkSharedProps}>
+        <PEVLink to={{ pathname: 'https://github.com/ScriptyChris/PEV-Shop' }} {...linkSharedProps}>
           {translations.sourceCode}
         </PEVLink>
       </PEVParagraph>

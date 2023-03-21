@@ -375,12 +375,12 @@ function TechnicalSpecs({ data: { productCurrentSpecs, initialData = [] }, metho
             const minValue = spec.fieldType === 'number' ? 0 : null;
             const BASE_NAME = `${FIELD_NAME_PREFIXES.TECHNICAL_SPECS}${spec.fieldName}`;
             const isSpecDescriptionsArray = Array.isArray(spec.descriptions);
-            const specDefaultUnitContent = spec.defaultUnit && `(${spec.defaultUnit})`;
-            const legendOrLabelContent = `
-            ${spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase())}
-            ${SPEC_NAMES_SEPARATORS.SPACE}
-            ${specDefaultUnitContent}
-          `;
+            const specDefaultUnitContent = spec.defaultUnit ? `(${spec.defaultUnit})` : '';
+            const legendOrLabelContent = [
+              spec.name.replace(/\w/, (firstChar) => firstChar.toUpperCase()),
+              SPEC_NAMES_SEPARATORS.SPACE,
+              specDefaultUnitContent,
+            ].join('');
 
             if (isSpecDescriptionsArray) {
               return (

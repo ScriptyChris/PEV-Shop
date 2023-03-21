@@ -66,7 +66,7 @@ if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   require('../../../commons/moduleAliasesResolvers.js').backend();
 }
 
-import { copyFileSync, readdirSync, mkdirSync, rmdirSync } from 'fs';
+import { copyFileSync, readdirSync, mkdirSync, rmdirSync, readFileSync } from 'fs';
 import { join, relative } from 'path';
 import { IMAGES__PRODUCTS_ROOT_PATH, IMAGES__PRODUCTS_TMP_FOLDER } from '@commons/consts';
 import getLogger from '@commons/logger';
@@ -86,9 +86,9 @@ import {
   IUserRole,
   TUserRoleToPopulate,
 } from '@database/models';
+import cyclicDatabaseCleanup from '@commons/cyclicAppReset';
 
 const logger = getLogger(module.filename);
-logger.log('process.argv:', process.argv);
 
 // Explanation for using root relative path is at the top of `src/middleware/middleware-index.ts` module.
 const rootRelativePath = relative(__dirname, process.env.INIT_CWD as string);
@@ -207,6 +207,15 @@ const executeDBPopulation = async (shouldCleanupAll = false) => {
   return Object.values(populationResults).every(Boolean);
 };
 
+if (
+  process.env.BACKEND_ONLY === 'true' &&
+  process.env.CYPRESS_RUN !== 'true' &&
+  !getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)
+) {
+  const startSchedule = cyclicDatabaseCleanup(executeDBPopulation);
+  startSchedule();
+}
+
 if (getScriptParamStringValue(PARAMS.EXECUTED_FROM_CLI)) {
   executeDBPopulation().then(() => {
     logger.log('Exiting from populate.ts initiated via CLI...');
@@ -236,8 +245,9 @@ async function cleanDatabase() {
 }
 function getSourceData<T extends TDataToPopulate>(sourceDataPath: string): T[] {
   logger.log('getSourceData() /sourceDataPath:', sourceDataPath);
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const sourceDataFiles = require(sourceDataPath);
+
+  const absoluteSourceDataPath = join(__dirname, rootRelativePath, 'src/database/populate', sourceDataPath);
+  const sourceDataFiles = readFileSync(absoluteSourceDataPath, { encoding: 'utf8' });
 
   if (Array.isArray(sourceDataFiles)) {
     return sourceDataFiles;
@@ -273,8 +283,10 @@ function populateProducts(productsSourceDataList: TProductToPopulate[]): Promise
 function populateUsers(usersSourceDataList: TUserToPopulate[]): Promise<IUser[]> {
   return Promise.all(
     usersSourceDataList.map(async (userDataToPopulate) => {
-      userDataToPopulate.password = await hashPassword(userDataToPopulate.password);
-      const user = new UserModel(userDataToPopulate);
+      const user = new UserModel({
+        ...userDataToPopulate,
+        password: await hashPassword(userDataToPopulate.password),
+      });
 
       // assign User to UserRole indicated by `__accountType`
       await UserRoleModel.updateOne(

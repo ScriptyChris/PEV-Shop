@@ -161,7 +161,7 @@ class Ajax {
     }
 
     return this._fetchBaseHandler(
-      fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
+      window.fetch(`${this._BASE_API_URL}/${apiEndpoint}`, {
         method: methodName,
         headers,
         body: shouldSendAsFormData ? (data as FormData) : JSON.stringify(data || {}),
@@ -196,7 +196,7 @@ class Ajax {
       };
     }
 
-    return this._fetchBaseHandler(fetch(url.toString(), options));
+    return this._fetchBaseHandler(window.fetch(url.toString(), options));
   }
 
   /** @internal */
@@ -224,7 +224,7 @@ class Ajax {
       };
     }
 
-    return this._fetchBaseHandler(fetch(url.toString(), options));
+    return this._fetchBaseHandler(window.fetch(url.toString(), options));
   }
 }
 
@@ -233,6 +233,7 @@ class Ajax {
  */
 class HttpService extends Ajax {
   private URLS = {
+    CONFIG: 'config',
     PRODUCTS: 'products',
     PRODUCT_CATEGORIES: 'productCategories',
     PRODUCTS_SPECS: 'products/specs',
@@ -264,6 +265,20 @@ class HttpService extends Ajax {
     }
 
     return userId;
+  }
+
+  /**
+   * Fetches app's setup data.
+   */
+  getSetupData() {
+    return this.getRequest(`${this.URLS.CONFIG}/setup-data`);
+  }
+
+  /**
+   * Fetches data regarding Welcome page (such as disclaimer content and test users credentials).
+   */
+  getWelcomePageData() {
+    return this.getRequest(`${this.URLS.CONFIG}/welcome-data`);
   }
 
   /**

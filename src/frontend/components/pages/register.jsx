@@ -23,6 +23,7 @@ import Popup, { POPUP_TYPES, getClosePopupBtn } from '@frontend/components/utils
 import { PasswordField } from '@frontend/components/views/password';
 import { ROUTES } from '@frontend/components/pages/_routes';
 import { useRWDLayout } from '@frontend/contexts/rwd-layout';
+import storeService from '@frontend/features/storeService';
 
 const translations = Object.freeze({
   registerHeader: 'Account registration',
@@ -44,6 +45,7 @@ const translations = Object.freeze({
   registrationSuccessAltMsg: "Email hasn't arrived yet? Click the button and we will re-send the email again.",
   popupReSendEmail: 'Re-send email',
   popupGoToLogin: 'Go to login',
+  popupReadEmail: 'Read email',
 });
 
 export default function Register() {
@@ -124,6 +126,11 @@ export default function Register() {
               {
                 onClick: redirectToLogInPage,
                 text: translations.popupGoToLogin,
+              },
+              {
+                // TODO: [a11y] refactor Popup component to also support links (apart from buttons)
+                onClick: () => window.open(storeService.appSetup.emailServiceUrl, '_blank'),
+                text: translations.popupReadEmail,
               },
               {
                 onClick: () => resendConfirmRegistration(values.email),

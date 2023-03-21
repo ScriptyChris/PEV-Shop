@@ -117,6 +117,7 @@ describe('order', () => {
   beforeEach(() => {
     cy.cleanupTestUsersAndEmails();
     cy.cleanupCartState();
+    // TODO: [bug] extend `_order.ts` to update regarding products `availability` prop after orders are removed
     cy.removeOrders();
   });
 

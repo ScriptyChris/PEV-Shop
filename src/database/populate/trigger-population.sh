@@ -3,7 +3,7 @@
 echo "[<>] Preparing to trigger population via API through port: $APP_PORT"
 
 call_api() {
-  return $(curl -sw '%{http_code}' -o /dev/null http://pev-app:$APP_PORT/api/populate-db)
+  return $(curl -sw '%{http_code}' -o /dev/null http://pev-app:$APP_PORT/api/config/populate-db)
 }
 
 readonly max_attempts=30

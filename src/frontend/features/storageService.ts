@@ -6,7 +6,12 @@
 import type { IUserCart } from '@commons/types';
 import type { IUser, TUserPublic } from '@database/models';
 
-type TStorageValue = IUserCart | TUserPublic | NonNullable<IUser['tokens']['auth']>[number] | null;
+type TStorageValue =
+  | IUserCart
+  | TUserPublic
+  | NonNullable<IUser['tokens']['auth']>[number]
+  | null
+  | ReturnType<typeof Date.now>;
 
 /**
  * Manipulating storage data API for various contexts, such as `UserCart` or `UserAccount`.
@@ -86,10 +91,26 @@ const storageService = (() => {
     }
   }
 
+  class RecentWelcomeVisitTimestamp extends StorageService {
+    constructor(key: string) {
+      super(key);
+    }
+
+    update(timestamp: number) {
+      super.update(timestamp, () => !timestamp);
+    }
+  }
+
   return {
     userCart: new UserCart('userCart'),
     userAccount: new UserAccount('userAccount'),
     userAuthToken: new UserAuthToken('userAuthToken'),
+    recentWelcomeVisitTimestamp: new RecentWelcomeVisitTimestamp('recentWelcomeVisitTimestamp'),
+    clearAllUserData() {
+      Object.keys(this)
+        .filter((key) => key.startsWith('user'))
+        .forEach((userKey) => window.localStorage.removeItem(userKey));
+    },
   };
 })();
 

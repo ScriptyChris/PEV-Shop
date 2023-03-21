@@ -130,8 +130,6 @@ export default router;
 
 async function getUserRoles(req: Request, res: Response, next: NextFunction) {
   try {
-    logger.log('(getUserRoles)');
-
     const userRoles = (await getFromDB(
       { modelName: COLLECTION_NAMES.User_Role, findMultiple: true },
       {},

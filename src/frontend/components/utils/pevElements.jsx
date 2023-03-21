@@ -89,9 +89,14 @@ export const PEVIconButton = forwardRef(function PEVIconButton(props, ref) {
   );
 });
 
-export const PEVLink = forwardRef(function PEVLink({ children, ...restProps }, ref) {
+export const PEVLink = forwardRef(function PEVLink({ children, toExternalPage, ...restProps }, ref) {
+  const externalPageAttrs = {
+    target: '_blank',
+    rel: 'noreferrer',
+  };
+
   return (
-    <MUILink color="inherit" {...restProps} component={Link} ref={ref}>
+    <MUILink color="inherit" {...restProps} component={Link} {...(toExternalPage && externalPageAttrs)} ref={ref}>
       {children}
     </MUILink>
   );
@@ -201,12 +206,16 @@ export const PEVForm = forwardRef(function PEVForm(
   ref
 ) {
   // TODO: consider if providing `onSubmit` and `initialViews` is required or just optional
-  const callStack = new Error().stack;
-  const onSubmit = props.onSubmit || (() => console.log("Empty form's `onSubmit()`.\nCall stack:", { callStack }));
+  // const callStack = new Error().stack;
+  const onSubmit =
+    props.onSubmit ||
+    (() => {
+      // console.log("Empty form's `onSubmit()`.\nCall stack:", { callStack });
+    });
 
-  if (!props.initialValues) {
-    console.log("Empty form's `initialValues`.\nCall stack:", { callStack });
-  }
+  // if (!props.initialValues) {
+  //   console.log("Empty form's `initialValues`.\nCall stack:", { callStack });
+  // }
 
   return (
     <Formik onSubmit={onSubmit} initialValues={initialValues} {...props} ref={ref}>

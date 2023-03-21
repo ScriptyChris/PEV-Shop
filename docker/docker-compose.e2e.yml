@@ -1,4 +1,7 @@
 services:
+  node:
+    environment:
+      - CYPRESS_RUN=true
   cypress:
     image: "cypress/included:9.1.1"
     container_name: pev-cypress
@@ -10,7 +13,7 @@ services:
       - DISPLAY ## `xhost +local:` command must first be run on the host computer
       - CYPRESS_APP_LOCAL_HOST=${APP_LOCAL_HOST}
       - CYPRESS_BASE_URL=http://${APP_LOCAL_HOST}:${APP_PORT}
-      - CYPRESS_MAIL_PORT=${EMAIL_HTTP_PORT}
+      - CYPRESS_MAIL_PORT=${EMAIL_INTERNAL_HTTP_PORT}
       - CYPRESS_WAIT_3_SEC=3000
       - CYPRESS_WAIT_1_SEC=1000
       - CYPRESS_TEST_MODE=development

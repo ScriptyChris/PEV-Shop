@@ -28,7 +28,7 @@ const translations = Object.freeze({
   `.trim(),
 });
 const mailerConfig: SMTPTransport.Options = Object.freeze({
-  host: dotEnv.EMAIL_HOST, //'0.0.0.0',
+  host: dotEnv.EMAIL_INTERNAL_HOST, //'0.0.0.0',
   port: Number(dotEnv.EMAIL_SMTP_PORT), //1025// 587 // TODO: [ENV] use 465 for HTTPS
 });
 

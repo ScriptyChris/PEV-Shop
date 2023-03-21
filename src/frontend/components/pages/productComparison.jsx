@@ -2,6 +2,7 @@ import '@frontend/assets/styles/views/productComparison.scss';
 
 import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { toJS } from 'mobx';
 
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
@@ -26,7 +27,7 @@ const translations = {
 
 function usePrepareComparisonData() {
   const [comparableProductsData, setComparableProductsData] = useState(() => {
-    const productsData = storeService.productComparisonState.map(({ _id, relatedProducts, ...product }) => product);
+    const productsData = storeService.productComparisonState.map(({ relatedProducts, ...product }) => product);
     return productsData.length ? productsData : null;
   });
   const { search } = useLocation();
@@ -140,7 +141,11 @@ export default function Compare() {
               // TODO: [UX] hovering over certain spec could highlight regarding specs in other compared products
               <TableCell className="product-comparison__cell" component="div" role="cell" key={`cell-${dataIndex}`}>
                 {isNameHeader ? (
-                  <ProductCardLink productData={comparisonData.comparableProductsData[dataIndex]}>
+                  <ProductCardLink
+                    productData={toJS(comparisonData.comparableProductsData[dataIndex], {
+                      recurseEverything: true,
+                    })}
+                  >
                     {preparedProductDetail}
                   </ProductCardLink>
                 ) : (

@@ -1,0 +1,62 @@
+@use '../_var' as *;
+
+.welcome-container {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    overflow: auto;
+    background: $blueColor;
+    color: $whiteColor;
+}
+
+.welcome {
+    margin-block: 1rem;
+    counter-reset: section-heading;
+
+    h3 {
+        align-self: start;
+        
+        &::before {
+            counter-increment: section-heading;
+            content: counter(section-heading) ". ";
+        }
+    }
+
+    &__disclaimer {
+        border: 2px solid $redColor;
+        padding: 1rem;
+        min-height: 2rem;
+    }
+
+    &__default-users-credentials {
+        &--fallback {
+            margin-inline: 2rem;
+        }
+
+        span {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+    }
+
+    &__reload-app {
+        margin-top: 2rem;
+        background: $whiteColor;
+        color: $blueColor;
+
+        &:hover {
+            background: $greyColor;
+        }
+    }
+
+    &__continue-to-app {
+        margin-top: 2rem;
+        background: $greenColor;
+        color: $whiteColor;
+
+        &:hover {
+            background: $darkGreenColor;
+        }
+    }
+}

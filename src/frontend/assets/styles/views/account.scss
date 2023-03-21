@@ -19,9 +19,19 @@
 
     &__menu-nav-list {
         display: flex;
+
+        li {
+            padding: 0;
+        }
+
+        a {
+            padding: 0.5rem 1rem;
+        }
     }
 
     &__menu-tab-profile-table-container {
+        padding: 1rem;
+
         tbody {
             display: flex;
             flex-direction: column;
@@ -57,6 +67,21 @@
             align-self: center;
         }
     }
+
+    &__profile-email {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        a {
+            margin-left: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-weight: normal;
+            font-size: small;
+        }
+    }
 }
 
 .observed-products {
@@ -64,8 +89,11 @@
         list-style: none;
 
         li {
-            margin-inline: 2rem;
-            gap: 2rem;
+            justify-content: center;
+        }
+
+        .product-card {
+            margin-inline: 1rem;
         }
     }
 
@@ -148,7 +176,7 @@
     }
 }
 
-@include createMediaQuery(min-width, tablet) {
+@include createMediaQuery(min-width, desktop) {
     .account {
         grid-template-areas:
             "nav header"
@@ -172,13 +200,8 @@
         &__menu-nav-list {
             flex-direction: column;
 
-            li {
-                padding: 0;
-            }
-
             a {
                 width: 100%;
-                padding: 0.5rem 1rem;
             }
         }
 
@@ -199,11 +222,7 @@
         &__order-details dl {
             grid-template-columns: 1fr 3fr;
         }
-    }
-}
-
-@include createMediaQuery(min-width, desktop) {
-    .orders {
+        
         &__order-summary--for-seller {
             grid-template-rows: auto;
             grid-template-columns: 15rem 1fr;

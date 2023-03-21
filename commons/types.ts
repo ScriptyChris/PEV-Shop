@@ -109,3 +109,9 @@ export type TE2EUser = {
   accountType?: string;
   isConfirmed?: boolean;
 };
+
+export type TAppSetup = {
+  emailServiceUrl: string;
+  previousAppResetTimestamp: number;
+  remainingTimestampToNextAppReset: number;
+};

@@ -26,11 +26,18 @@ import { wrapRes } from '@middleware/helpers/middleware-response-wrapper';
 import { getPopulationState } from '@database/connector';
 import { dotEnv } from '@commons/dotEnvLoader';
 import { possiblyReEncodeURI } from '@commons/uriReEncoder';
-import { IMAGES_ROOT_PATH, ICONS_ROOT_PATH } from '@root/commons/consts';
+import { IMAGES_ROOT_PATH, ICONS_ROOT_PATH } from '@commons/consts';
+import { getRemainingTimestampToNextAppReset } from '@commons/cyclicAppReset';
 
 const logger = getLogger(module.filename);
-// TODO: [performance] calculate cache based on database TTL
-const ONE_HOUR = 3600000;
+const getTimeToNextAppReset = () => {
+  const smallTimeBuffer = 15 * 1000;
+  const timestamp = getRemainingTimestampToNextAppReset() - smallTimeBuffer;
+  const cacheTimestamp = timestamp <= smallTimeBuffer ? 0 : timestamp;
+
+  return cacheTimestamp;
+};
+const PROJECT_ROOT_ABSOLUTE_PATH = resolve(__dirname, rootRelativePath);
 
 // TODO: [SECURITY] https://expressjs.com/en/advanced/best-practice-security.html
 const middleware = (app: Application): void => {
@@ -38,7 +45,7 @@ const middleware = (app: Application): void => {
 
   app.use(json());
   app.use(API_MIDDLEWARES);
-  app.get(...imageHandler());
+  app.get(...getImageHandler());
 };
 
 if (process.env.BACKEND_ONLY === 'true') {
@@ -55,7 +62,7 @@ function wrappedMiddleware(): void {
   const frontendPath = getFrontendPath();
 
   const app: Application = Express();
-  app.use(getDatabaseReadinessHandler(), Express.static(frontendPath, { maxAge: ONE_HOUR }), getIconsHandler());
+  app.use(getDatabaseReadinessHandler(), getStaticFilesHandler(frontendPath), getIconsHandler());
 
   middleware(app);
 
@@ -85,7 +92,7 @@ function getDatabaseReadinessHandler() {
         return next();
       }
 
-      if (req.url !== '/api/populate-db') {
+      if (req.url !== '/api/config/populate-db') {
         return res.status(HTTP_STATUS_CODE.SERVICE_UNAVAILABLE).send(
           `
             <p><strong>Database is not ready yet!</strong></p>
@@ -105,6 +112,14 @@ function getFrontendPath(): string {
   return resolve(__dirname, `../../${relativeDist}src/frontend`);
 }
 
+function getStaticFilesHandler(frontendPath: ReturnType<typeof getFrontendPath>) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // wrap 3rd party method to ensure it always gets calculated `maxAge` for the time each request is received
+    const middleware = Express.static(frontendPath, { maxAge: getTimeToNextAppReset() });
+    middleware(req, res, next);
+  };
+}
+
 function getIconsHandler() {
   const relativeRoot = __dirname.includes(`${sep}dist${sep}`) ? '../' : '';
   const iconsAbsolutePath = resolve(__dirname, `../../${relativeRoot}${ICONS_ROOT_PATH}`);
@@ -115,16 +130,15 @@ function getIconsHandler() {
     }
 
     const iconName = req.url.replace(ICONS_ROOT_PATH, '');
-    res.sendFile(join(iconsAbsolutePath, iconName), { maxAge: ONE_HOUR });
+    res.sendFile(join(iconsAbsolutePath, iconName), { maxAge: getTimeToNextAppReset() });
   };
 }
 
-function imageHandler() {
+function getImageHandler() {
   const getImage = (() => {
     // TODO: change string type to probably ArrayBuffer
     const imageCache: { [prop: string]: string } = {};
-    const projectRoot = resolve(__dirname, rootRelativePath);
-    const imagesFolder = join(projectRoot, IMAGES_ROOT_PATH);
+    const imagesFolder = join(PROJECT_ROOT_ABSOLUTE_PATH, IMAGES_ROOT_PATH);
 
     return async (fileName: string) => {
       const cachedImage = imageCache[fileName];
@@ -152,7 +166,7 @@ function imageHandler() {
       const imagePath = globalThis.decodeURIComponent(possiblyReEncodeURI(imagePossibleUrl));
 
       getImage(imagePath)
-        .then((image) => res.sendFile(image, { maxAge: ONE_HOUR }))
+        .then((image) => res.sendFile(image, { maxAge: getTimeToNextAppReset() }))
         .catch((error) => {
           logger.log('Image searching error: ', error, ' /imagePath: ', imagePath);
 
